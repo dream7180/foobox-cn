@@ -1,0 +1,302 @@
+MILKDROP_PRESET_VERSION=201
+PSVERSION=2
+PSVERSION_WARP=2
+PSVERSION_COMP=2
+[preset00]
+fRating=3.000
+fGammaAdj=2.000
+fDecay=0.880
+fVideoEchoZoom=1.007
+fVideoEchoAlpha=0.500
+nVideoEchoOrientation=3
+nWaveMode=0
+bAdditiveWaves=0
+bWaveDots=1
+bWaveThick=1
+bModWaveAlphaByVolume=0
+bMaximizeWaveColor=1
+bTexWrap=0
+bDarkenCenter=0
+bRedBlueStereo=0
+bBrighten=0
+bDarken=1
+bSolarize=0
+bInvert=0
+fWaveAlpha=100.000
+fWaveScale=0.590
+fWaveSmoothing=0.000
+fWaveParam=0.700
+fModWaveAlphaStart=0.750
+fModWaveAlphaEnd=0.950
+fWarpAnimSpeed=1.000
+fWarpScale=1.000
+fZoomExponent=0.42000
+fShader=1.000
+zoom=1.00000
+rot=0.00000
+cx=0.500
+cy=0.500
+dx=0.00000
+dy=0.00000
+warp=0.01000
+sx=1.00000
+sy=1.00000
+wave_r=1.000
+wave_g=1.000
+wave_b=1.000
+wave_x=0.500
+wave_y=0.500
+ob_size=0.010
+ob_r=0.000
+ob_g=0.000
+ob_b=0.000
+ob_a=1.000
+ib_size=0.010
+ib_r=0.250
+ib_g=0.250
+ib_b=0.250
+ib_a=0.000
+nMotionVectorsX=64.000
+nMotionVectorsY=48.000
+mv_dx=0.000
+mv_dy=0.000
+mv_l=5.000
+mv_r=0.000
+mv_g=0.000
+mv_b=0.000
+mv_a=0.000
+b1n=0.000
+b2n=0.000
+b3n=0.000
+b1x=1.000
+b2x=1.000
+b3x=1.000
+b1ed=0.250
+wavecode_0_enabled=0
+wavecode_0_samples=512
+wavecode_0_sep=0
+wavecode_0_bSpectrum=1
+wavecode_0_bUseDots=0
+wavecode_0_bDrawThick=0
+wavecode_0_bAdditive=0
+wavecode_0_scaling=1.00000
+wavecode_0_smoothing=0.50000
+wavecode_0_r=1.000
+wavecode_0_g=1.000
+wavecode_0_b=1.000
+wavecode_0_a=1.000
+wave_0_per_point1=//Spiral custom wave code by stahlregen ;)
+wave_0_per_point2=amplitude = .1+.05*bass_att;
+wave_0_per_point3=turns = 7.5;
+wave_0_per_point4=centerx = .25;
+wave_0_per_point5=centery = .35;
+wave_0_per_point6=size = .5;
+wave_0_per_point7=speed = -1;
+wave_0_per_point8=x = centerx+(size-size*sample)*sin(speed*3.14*time+sample*6.28*turns)*(1+amplitude*(value1+value2));
+wave_0_per_point9=y = centery+(size-size*sample)*cos(speed*3.14*time+sample*6.28*turns)*(1+amplitude*(value1+value2));
+wavecode_1_enabled=1
+wavecode_1_samples=462
+wavecode_1_sep=0
+wavecode_1_bSpectrum=0
+wavecode_1_bUseDots=1
+wavecode_1_bDrawThick=1
+wavecode_1_bAdditive=1
+wavecode_1_scaling=1.00000
+wavecode_1_smoothing=0.00000
+wavecode_1_r=1.000
+wavecode_1_g=1.000
+wavecode_1_b=1.000
+wavecode_1_a=0.800
+wave_1_per_frame1=r = .5 + .4*sin(0.5*(time*1.13+bass));
+wave_1_per_frame2=g = .5 + .4*cos(0.5*(time*1.23+treb));
+wave_1_per_frame3=b = .5 + .4*sin(0.5*(time*1.33+mid));
+wave_1_per_point1=//Spiral custom wave code by stahlregen ;)
+wave_1_per_point2=amplitude = .075+.025*bass_att;
+wave_1_per_point3=turns = 7;
+wave_1_per_point4=centerx = .5+.015*sin(time)+.015*cos(3.28+time*0.01);
+wave_1_per_point5=centery = .5+.015*cos(time)+.015*sin(3.14+time*0.01);
+wave_1_per_point6=size = .28;
+wave_1_per_point7=speed = 1.25;
+wave_1_per_point8=x = centerx+(size-size*sample)*sin(speed*3.14*time+sample*6.28*turns)*(1+amplitude*(value1+value2));
+wave_1_per_point9=y = centery+(size-size*sample)*cos(speed*3.14*time+sample*6.28*turns)*(1+amplitude*(value1+value2));
+wavecode_2_enabled=0
+wavecode_2_samples=512
+wavecode_2_sep=0
+wavecode_2_bSpectrum=0
+wavecode_2_bUseDots=0
+wavecode_2_bDrawThick=0
+wavecode_2_bAdditive=0
+wavecode_2_scaling=1.00000
+wavecode_2_smoothing=0.50000
+wavecode_2_r=1.000
+wavecode_2_g=1.000
+wavecode_2_b=1.000
+wavecode_2_a=1.000
+wavecode_3_enabled=0
+wavecode_3_samples=512
+wavecode_3_sep=0
+wavecode_3_bSpectrum=0
+wavecode_3_bUseDots=0
+wavecode_3_bDrawThick=0
+wavecode_3_bAdditive=0
+wavecode_3_scaling=1.00000
+wavecode_3_smoothing=0.50000
+wavecode_3_r=1.000
+wavecode_3_g=1.000
+wavecode_3_b=1.000
+wavecode_3_a=1.000
+shapecode_0_enabled=1
+shapecode_0_sides=100
+shapecode_0_additive=0
+shapecode_0_thickOutline=0
+shapecode_0_textured=0
+shapecode_0_num_inst=1
+shapecode_0_x=0.500
+shapecode_0_y=0.500
+shapecode_0_rad=71.13834
+shapecode_0_ang=0.00000
+shapecode_0_tex_ang=0.00000
+shapecode_0_tex_zoom=1.00000
+shapecode_0_r=0.500
+shapecode_0_g=0.500
+shapecode_0_b=0.500
+shapecode_0_a=0.020
+shapecode_0_r2=0.500
+shapecode_0_g2=0.500
+shapecode_0_b2=0.500
+shapecode_0_a2=0.020
+shapecode_0_border_r=1.000
+shapecode_0_border_g=1.000
+shapecode_0_border_b=1.000
+shapecode_0_border_a=0.000
+shapecode_1_enabled=0
+shapecode_1_sides=4
+shapecode_1_additive=0
+shapecode_1_thickOutline=0
+shapecode_1_textured=0
+shapecode_1_num_inst=1
+shapecode_1_x=0.500
+shapecode_1_y=0.500
+shapecode_1_rad=0.10000
+shapecode_1_ang=0.00000
+shapecode_1_tex_ang=0.00000
+shapecode_1_tex_zoom=1.00000
+shapecode_1_r=1.000
+shapecode_1_g=0.000
+shapecode_1_b=0.000
+shapecode_1_a=1.000
+shapecode_1_r2=0.000
+shapecode_1_g2=1.000
+shapecode_1_b2=0.000
+shapecode_1_a2=0.000
+shapecode_1_border_r=1.000
+shapecode_1_border_g=1.000
+shapecode_1_border_b=1.000
+shapecode_1_border_a=0.100
+shapecode_2_enabled=1
+shapecode_2_sides=100
+shapecode_2_additive=0
+shapecode_2_thickOutline=0
+shapecode_2_textured=0
+shapecode_2_num_inst=1
+shapecode_2_x=0.500
+shapecode_2_y=0.500
+shapecode_2_rad=0.03030
+shapecode_2_ang=0.00000
+shapecode_2_tex_ang=0.00000
+shapecode_2_tex_zoom=1.00000
+shapecode_2_r=0.800
+shapecode_2_g=0.800
+shapecode_2_b=0.800
+shapecode_2_a=0.600
+shapecode_2_r2=0.700
+shapecode_2_g2=0.700
+shapecode_2_b2=0.700
+shapecode_2_a2=0.000
+shapecode_2_border_r=1.000
+shapecode_2_border_g=1.000
+shapecode_2_border_b=1.000
+shapecode_2_border_a=0.000
+shapecode_3_enabled=0
+shapecode_3_sides=4
+shapecode_3_additive=0
+shapecode_3_thickOutline=0
+shapecode_3_textured=0
+shapecode_3_num_inst=1
+shapecode_3_x=0.500
+shapecode_3_y=0.500
+shapecode_3_rad=0.10000
+shapecode_3_ang=0.00000
+shapecode_3_tex_ang=0.00000
+shapecode_3_tex_zoom=1.00000
+shapecode_3_r=1.000
+shapecode_3_g=0.000
+shapecode_3_b=0.000
+shapecode_3_a=1.000
+shapecode_3_r2=0.000
+shapecode_3_g2=1.000
+shapecode_3_b2=0.000
+shapecode_3_a2=0.000
+shapecode_3_border_r=1.000
+shapecode_3_border_g=1.000
+shapecode_3_border_b=1.000
+shapecode_3_border_a=0.100
+per_frame_1=zoom = 1.0+0.025*max(bass_att,treb_att);
+warp_1=`#define MyGet GetPixel //GetBlur1
+warp_2=`shader_body
+warp_3=`{
+warp_4=`    // GROW EFFECT - bright pixels spread radially outward.
+warp_5=`    // BE CAREFUL - this can really thrash the texture cache! (SLOW)
+warp_6=`    float grad_rad = 8;  //TWEAK
+warp_7=`    float str = 4;      //TWEAK
+warp_8=`    float3 d = float3(texsize.zw, 0) * grad_rad;
+warp_9=`    float4 lums = 0;
+warp_10=`    lums.x = lum( MyGet(uv + texsize.zw*d.xz) );
+warp_11=`    lums.y = lum( MyGet(uv - texsize.zw*d.xz) );
+warp_12=`    lums.z = lum( MyGet(uv + texsize.zw*d.zy) );
+warp_13=`    lums.w = lum( MyGet(uv - texsize.zw*d.zy) );
+warp_14=`    float2 grad = float2(lums.x-lums.y, lums.z-lums.w)*str*1000/grad_rad;
+warp_15=`    grad = (saturate(grad*0.5+0.5)*2-1)*1.4;
+warp_16=`
+warp_17=`    // sample previous frame
+warp_18=`    ret = tex2D( sampler_fc_main, uv + grad*texsize.zw ).xyz;
+warp_19=`
+warp_20=`float2 uv_echo = (uv - 0.5)*float2(-1,-1) + 0.5;
+warp_21=`
+warp_22=`    float4 lums2 = 0;
+warp_23=`    lums2.x = lum( MyGet(uv_echo + texsize.zw*d.xz) );
+warp_24=`    lums2.y = lum( MyGet(uv_echo - texsize.zw*d.xz) );
+warp_25=`    lums2.z = lum( MyGet(uv_echo + texsize.zw*d.zy) );
+warp_26=`    lums2.w = lum( MyGet(uv_echo - texsize.zw*d.zy) );
+warp_27=`    float2 grad2 = float2(lums2.x-lums2.y, lums2.z-lums2.w)*str*1000/grad_rad;
+warp_28=`    grad2 = (saturate(grad2*0.5+0.5)*2-1)*1.4;
+warp_29=`
+warp_30=`float3 ret2 = tex2D(sampler_fc_main, uv_echo + grad2*texsize.zw).xyz;
+warp_31=`
+warp_32=`ret = lerp(ret,ret2,0.50);
+warp_33=`
+warp_34=`    // darken (decay) over time
+warp_35=`    ret *= 0.93; //or try: ret -= 0.004;
+warp_36=`}
+comp_1=`shader_body
+comp_2=`{
+comp_3=`
+comp_4=`float2 uv1 = uv-.5;
+comp_5=`
+comp_6=`float3 ret1 = tex2D(sampler_main, uv) +tex2D(sampler_main, 1-uv)*0;
+comp_7=`
+comp_8=`
+comp_9=`float2 hor = float2 (texsize.z,0);
+comp_10=`float2 ver = float2 (0,texsize.w);
+comp_11=`float dx = GetPixel (uv-hor) - GetPixel (uv+hor);
+comp_12=`float dy = GetPixel (uv-ver) - GetPixel (uv+ver);
+comp_13=`float2 dz = float2 (dx,dy);
+comp_14=`
+comp_15=`uv1 = .3*cos(uv1*2+1.7) -2*dz;;
+comp_16=`float3 dots = saturate(.03/length(uv1));
+comp_17=`
+comp_18=`
+comp_19=`ret1 = (-ret1/4) + 6*dots*(-0.08+ret1);
+comp_20=`
+comp_21=`ret = ret1;
+comp_22=`}

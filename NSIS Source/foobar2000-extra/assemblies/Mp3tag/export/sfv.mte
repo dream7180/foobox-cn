@@ -1,0 +1,4 @@
+$filename(sfv,ansi); Generated with %_app%
+; http://www.mp3tag.de
+$loop(%_path%)%_filename_rel% %_crc%
+$loopend()

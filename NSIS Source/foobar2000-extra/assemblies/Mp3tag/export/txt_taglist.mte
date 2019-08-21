@@ -1,0 +1,2 @@
+$filename(txt,utf-8)$loop(%_path%)%artist%  -  %album%  -  %title%  -  %track%  -  %year%  -  %genre%  -  %comment%
+$loopend()

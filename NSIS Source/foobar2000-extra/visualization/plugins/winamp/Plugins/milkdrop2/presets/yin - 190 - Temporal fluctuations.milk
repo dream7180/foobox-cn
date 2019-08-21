@@ -1,0 +1,109 @@
+[preset00]
+fRating=2.000000
+fGammaAdj=4.990001
+fDecay=1.000000
+fVideoEchoZoom=0.999988
+fVideoEchoAlpha=0.000000
+nVideoEchoOrientation=0
+nWaveMode=7
+bAdditiveWaves=1
+bWaveDots=1
+bWaveThick=0
+bModWaveAlphaByVolume=0
+bMaximizeWaveColor=0
+bTexWrap=0
+bDarkenCenter=0
+bRedBlueStereo=0
+bBrighten=0
+bDarken=0
+bSolarize=0
+bInvert=0
+fWaveAlpha=0.997938
+fWaveScale=1.990516
+fWaveSmoothing=0.000000
+fWaveParam=1.000000
+fModWaveAlphaStart=0.500000
+fModWaveAlphaEnd=1.000000
+fWarpAnimSpeed=1.000000
+fWarpScale=0.999998
+fZoomExponent=0.999987
+fShader=1.000000
+zoom=0.999900
+rot=0.000000
+cx=0.500000
+cy=0.500000
+dx=0.000000
+dy=0.000010
+warp=0.010000
+sx=1.000000
+sy=1.000000
+wave_r=0.400001
+wave_g=0.400000
+wave_b=1.000000
+wave_x=0.500000
+wave_y=1.000000
+ob_size=0.000000
+ob_r=0.300001
+ob_g=1.000000
+ob_b=0.300000
+ob_a=0.100001
+ib_size=0.005000
+ib_r=0.000000
+ib_g=0.000000
+ib_b=0.000000
+ib_a=0.500000
+nMotionVectorsX=8.960042
+nMotionVectorsY=12.960033
+mv_dx=-0.260000
+mv_dy=0.440000
+mv_l=5.000000
+mv_r=1.000000
+mv_g=1.000000
+mv_b=1.000000
+mv_a=0.000000
+per_frame_1=warp=0;decay=1;wave_mystery=0;
+per_frame_2=vol = ((bass_att+mid_att+treb_att)/3+prevVol)/2;
+per_frame_3=
+per_frame_4=// -------------------------------- Beat Detective 007 ----------------------------------
+per_frame_5=sure=if(equal(sure,0),.6,sure);
+per_frame_6=interval=if(equal(interval,0),40,interval);
+per_frame_7=lastbeat=if(equal(lastbeat,0),frame-FPS,lastbeat);
+per_frame_8=dbass=(bass-pbass)/FPS;
+per_frame_9=beat=above(dbass,.6*maxdbass)*above(frame-lastbeat,FPS/3);
+per_frame_10=sure=if(beat*below(abs(frame-(interval+lastbeat)),FPS/5),
+per_frame_11=min(.095+sure,1),beat*(sure-.095)+(1-beat)*sure*.9996);
+per_frame_12=sure=max(.5,sure);
+per_frame_13=cheat=if(above(frame,lastbeat+interval+ int(FPS/10))*above(sure,.91),1,cheat);
+per_frame_14=beat=if(cheat,1,beat);
+per_frame_15=sure=if(cheat,.95*sure,sure);
+per_frame_16=maxdbass=max(maxdbass*.999,dbass);
+per_frame_17=maxdbass=max(.012,maxdbass);
+per_frame_18=maxdbass=min(.02,maxdbass);
+per_frame_19=interval=if(beat, frame-lastbeat,interval);
+per_frame_20=lastbeat=if(beat,frame-cheat*int(FPS/10),lastbeat);
+per_frame_21=cheat=0;
+per_frame_22=pbass=bass;
+per_frame_23=// ----------------------------------------------------------------------------------------------
+per_frame_24=ob_size = below(frame-lastBeat,FPS/8)*.08*(frame-lastBeat)/FPS;
+per_frame_25=f=abs(cos(time/8+.54+sin(time/3+1.075)));
+per_frame_26=ob_r=1*f + 1*(1-f);
+per_frame_27=ob_g=.3*f + 1*(1-f);
+per_frame_28=ob_b=.3*f + .3*(1-f);
+per_frame_29=
+per_frame_30=q1= 3.1416*(wave_mystery+1)/2;
+per_frame_31=q2=.25*cos(time+abs(2*sin(time*2+2.311)*( vol-amt))*sin(time*7.45+.876));
+per_frame_32=amt=amt+ .05*(vol-amt);
+per_frame_33=prevVol=vol;
+per_pixel_1=x=x-.5;
+per_pixel_2=y=-(y-.5);
+per_pixel_3=ttan1 = tan(q1+1.5708)*x-y+q2;
+per_pixel_4=ttan2 = tan(q1+1.5708);
+per_pixel_5=IsLeftYtonosY = above(ttan1*(sign(3.1416-q1)),0);
+per_pixel_6=
+per_pixel_7=dist = abs(ttan1)/sqrt(ttan2*ttan2 + 1);
+per_pixel_8=totX=.5*cos(q1)*sign(IsLeftYtonosY-.5)*sqr(dist)/(.5-q2);
+per_pixel_9=totY=-.5*sin(q1)*sign(IsLeftYtonosY-.5)*sqr(dist)/(.5-q2);
+per_pixel_10=
+per_pixel_11=dx=dx+totX;
+per_pixel_12=dy=dy+totY;
+per_pixel_13=prevRot=q1;

@@ -1,0 +1,617 @@
+﻿LANGAUTHOR HiSen(更新语言), Li Fanxi, WanderMax
+LANGCONTACT lifanxi@freemindworld.com
+LANGVERSION 2.97
+LANGNAME Simpl. Chinese
+LANGNAMELOC 简体中文 
+SLangCancel 取消
+SLangOk 确定(&O)
+SLangErrCatch 程序运行错误\n\n文件名:\t{1}\n行:\t{2}\n\n应用程序遇到了一个未知的错误，正运行在一种不可靠的状态下。请关闭应用程序并把文件：\n\n{3}\n\n连同详细的错误描述发送给我们。\n\n电子邮件: support@mp3tag.de
+SLangErrCheck 程序运行错误\n\n文件名:\t{1}\行:\t{2}\n类型:\t{3}\n代码:\t0x{4}\n\n应用程序遇到了一个未知的错误，正运行在一种不可靠的状态下。请关闭应用程序并把文件：\n\n{5}\n\n连同详细的错误描述发送给我们。\n\n电子邮件: support@mp3tag.de
+SLangErrDriveCannotBeAccessed 无法访问{1}驱动器。\n\n» 请检查驱动器是否工作正常。
+SLangErrFileCannotBeAccessed 无法访问{1}文件。\n\n» 请检查驱动器是否工作正常。
+SLangErrFileCannotBeDeleted 无法删除{1}文件。\n\n» 请检查驱动器是否工作正常并确保其它进程不在访问该文件。
+SLangErrFolderCannotBeAccessed 无法访问{1}文件夹。\n\n» 请检查驱动器是否工作正常。
+SLangErrFolderCannotBeDeleted 无法删除{1}文件夹。\n\n» 请检查驱动器是否工作正常并确保其它进程不在访问该文件夹。
+SLangErrHelpBrowserIsNotAvailable 您需要安装一个网页浏览器（如Opera, Mozilla Firefox或Internet Explorer）来查看帮助。\n\n» 请安装一个合适的网页浏览器。
+SLangErrHelpSystemIsNotAvailable 帮助文件不存在。\n\n» 请重新安装{1}。
+SLangErrHelpTopicIsNotAvailable 帮助主题不存在。\n\n» 请联系技术支持。\n\n电子邮件: support@mp3tag.de
+SLangErrNotEnoughFreeDiskSpace 磁盘{1}空间不够。\n\n» 请确认磁盘剩余空间大于{2}。
+SLangErrRegistryCannotBeAccessed 无法读取数据\n\n» 无法访问Windows注册表。
+SLangMsgItemExistsAlready 现有项的名称与之重复了。\n\n» 请重新指定一个名称。
+SLangMsgFirstSteps 请花一些时间来学习熟悉“入门教程”中的内容。
+SLangMsgShutdownInfo {1} 正在关闭，请稍候。
+SLangWrnAppIsAlreadyRunning 本程序已经运行。
+SLangWrnAppHasToBeRestarted Mp3tag需要重新启动以便使用新的设置。\n\n现在就重新启动Mp3tag吗？
+SLangWrnNameContainsInvalidCharacters 该名称中包含非法字符。\n\n» 请重新指定一个名称。
+SLangWrnStartLogging 您在启动{1}时使用了FLOG1命令行参数。这个命令行参数仅用于调试目的。\n\n您要开启日志记录的功能吗?
+_C_ABORT 中断
+_C_ABORTING 退出...
+_C_APP_ST_ALBUM 唱片集
+_C_APP_ST_ARTIST 艺术家
+_C_APP_ST_COMMENT 注释
+_C_APP_ST_FOLDER 目录
+_C_APP_ST_GENRE 流派
+_C_APP_ST_TITLE 标题
+_C_APP_ST_TRACK 音轨号
+_C_APP_ST_YEAR 年份
+_C_CANCEL 取消(&C)
+_C_CANCELING 取消...
+_C_CLOSE 关闭(&O)
+_C_DLG_CDDBCONFIRM_CAPTION 搜索结果列表...
+_C_DLG_CDDBCONFIRM_CHK_DISCID 把Disc ID作为注释字段的值
+_C_DLG_CDDBCONFIRM_CHK_DISCID2 把Disc ID作为DISCID的值
+_C_DLG_CDDBCONFIRM_CHK_SAMPLER 编辑...
+_C_DLG_CDDBCONFIRM_CHK_SORT 建议排序
+_C_DLG_CDDBCONFIRM_ST_INFO 找到多个结果。\n请从中选择一个:
+_C_DLG_CDDBCONFIRM_ST_INFO2 搜索到{2}个结果(搜索数据源:{1})。\n请选择一个结果:
+_C_DLG_CDDBCONFIRM_STC_TOP 调整标签信息
+_C_DLG_CDDBINPUT_CAPTION 输入freedb ID
+_C_DLG_CDDBINPUT_ST_CATEGORY 类别:
+_C_DLG_CDDBINPUT_ST_ID freedb ID:
+_C_DLG_CDDBSTYLE_CAPTION freedb
+_C_DLG_CDDBSTYLE_RD_CDROM 根据插入的音频CD查找信息(&A)
+_C_DLG_CDDBSTYLE_RD_ENTER 手工输入freedb-ID
+_C_DLG_CDDBSTYLE_RD_MP3 根据选定的文件查找信息
+_C_DLG_CDDBSTYLE_RD_SEARCH 通过Web搜索查找信息
+_C_DLG_CDDBSTYLE_RD_SEARCHLOCAL 通过文本搜索查找信息
+_C_DLG_CDDBSTYLE_STC_TOP freedb ID...
+_C_DLG_COLUMNS_CAPTION 分栏
+_C_DLG_COLUMNS_TOP 设置栏可视化
+_C_DLG_TAGS 编辑标签信息
+_C_DLG_TTF_TOP 选择格式字符串
+_C_HELP 帮助(&H)
+_C_MNU_ACTIONS 动作(&A)\tALT+6
+_C_MNU_CON 转换(&C)
+_C_MNU_CON_FTF 文件名 - 文件名(&I)\tALT+3
+_C_MNU_CON_FTT 文件名 - 标签(&F)\tALT+2
+_C_MNU_CON_TFF 标签列表文件 - 标签(&X)\tALT+4
+_C_MNU_CON_TTF 标签 - 文件名(&T)\tALT+1
+_C_MNU_CON_TTT 标签 - 标签(&A)\tALT+5
+_C_MNU_EDIT 编辑(&E)
+_C_MNU_EDIT_COPY 复制(&O)\tCtrl+C
+_C_MNU_EDIT_CUT 剪切(&T)\tCtrl+X
+_C_MNU_EDIT_INVERTSELECTION 反向选择(&I)\tCtrl+Shift+A
+_C_MNU_EDIT_NEXT 选定下一个文件(&N)\tCtrl+N
+_C_MNU_EDIT_PASTE 粘贴(&P)\tCtrl+V
+_C_MNU_EDIT_SELECT 选定全部文件(&F)\tCtrl+A
+_C_MNU_EDIT_UNDO 撤消(&U)\tCtrl+Z
+_C_MNU_EDIT_UNSELECTALL 取消选定(&U)\tCtrl+U
+_C_MNU_EXTRA 工具(&O)
+_C_MNU_EXTRA_OPTIONS 选项(&O)...\tCtrl+O
+_C_MNU_EXTRA_RESET_EDITS 还原所有输入字段(&I)\tCtrl+B
+_C_MNU_EXTRA_SET_EDITS 把输入字段设为默认值\tCtrl+W
+_C_MNU_EXTRA_TRACKWIZARD 自动编号向导...\tCtrl+K
+_C_MNU_FILE 文件(&F)
+_C_MNU_FILE_ADD 添加目录...
+_C_MNU_FILE_CDDB freedb...\tCtrl+I
+_C_MNU_FILE_CDDBLOCAL freedb(本地)...\tCtrl+L
+_C_MNU_FILE_COPY 复制到...
+_C_MNU_FILE_DELETE 删除...
+_C_MNU_FILE_DIR 改变工作目录(&D)...\tCtrl+D
+_C_MNU_FILE_EXIT 退出(&X)\tAlt+F4
+_C_MNU_FILE_EXPORT 导出(&E)\tCtrl+E
+_C_MNU_FILE_FAVDIR 常用目录(&F)\tCtrl+F
+_C_MNU_FILE_MOVE 移动到...
+_C_MNU_FILE_PLALL 创建播放列表(所有文件)\tCtrl+P
+_C_MNU_FILE_PLAY 播放
+_C_MNU_FILE_PLAYLIST 打开播放列表或Cuesheet...
+_C_MNU_FILE_PLSEL 创建播放列表(选定文件)
+_C_MNU_FILE_PROPERTIES 属性...
+_C_MNU_FILE_READ 读取标签(&T)\tCtrl+T
+_C_MNU_FILE_REMOVE 清除标签(&R)\tCtrl+R
+_C_MNU_FILE_REMOVEFILE 移除文件(&M)\tDel
+_C_MNU_FILE_RENAME 重命名\tF2
+_C_MNU_FILE_SAVE 保存标签(&S)\tCtrl+S
+_C_MNU_FILE_SAVECONFIG 保存配置(&C)...
+_C_MNU_FREEDB freedb(&R)
+_C_MNU_FREEDB_INDEX 创建本地索引
+_C_MNU_FS_EXT 扩展字段
+_C_MNU_FS_FNCT 函数
+_C_MNU_FS_INFO 文件信息字段
+_C_MNU_FS_REM 从历史记录中删除
+_C_MNU_FS_REMALL 清除全部历史纪录...
+_C_MNU_FS_REMALL_MSG 是否确认移除全部项目？
+_C_MNU_HELP 帮助(&H)
+_C_MNU_HELP_ABOUT 关于Mp3tag...
+_C_MNU_HELP_DONATE 捐助
+_C_MNU_HELP_FINDER 帮助主题(&C)...\tF1
+_C_MNU_HELP_FIRSTSTEPS 入门教程(&F)
+_C_MNU_HELP_KEYBOARD 快捷键表(&K)
+_C_MNU_HELP_SUPPORT 在线技术支持...
+_C_MNU_HELP_UPGRADE 检查新版本...
+_C_MNU_HELP_WWW Mp3tag网站(&W)...
+_C_MNU_TAGSOURCES 标签数据源(&S)
+_C_MNU_TOOLS 工具(&T)
+_C_MNU_VIEW 视图(&V)
+_C_MNU_VIEW_COLUMNS 自定义显示列(&C)...
+_C_MNU_VIEW_FILTER 过滤(&F)\tF3
+_C_MNU_VIEW_FILTER_AUTOAPPLY 自动应用过滤器
+_C_MNU_VIEW_ID3 标签面板\tCtrl+Q
+_C_MNU_VIEW_REFRESH 刷新(&E)\tF5
+_C_MNU_VIEW_SORTBY 排序(&S)
+_C_MNU_VIEW_TAGS 标签(&X)...\tALT+T
+_C_MNU_VIEW_TOOLBAR 工具栏(&L)
+_C_MNU_SB_ACTIONS 将用户定义的动作(如大小写转换,替换...)应用到选定的文件上。
+_C_MNU_SB_CON_FTF 按照指定的格式根据原始文件名重命名文件。
+_C_MNU_SB_CON_FTT 按照指定的格式根据文件名填充标签。
+_C_MNU_SB_CON_TFF 按照指定的格式根据标签列表文件填充标签。
+_C_MNU_SB_CON_TTF 按照指定的格式根据标签重命名文件。
+_C_MNU_SB_CON_TTT 以原标签格式化标签。
+_C_MNU_SB_EDIT_COPY 把选定的文本或选定文件的标签复制到剪贴板上。
+_C_MNU_SB_EDIT_CUT 剪切选定的文本或选定文件的标签并放到剪贴板上。
+_C_MNU_SB_EDIT_INVERTSELECTION 选定当前未选定的文件并取消对当前已选定文件的选定。
+_C_MNU_SB_EDIT_NEXT 选定文件列表中的下一个文件。
+_C_MNU_SB_EDIT_PASTE 把剪贴板上的内容粘贴到插入点之后或粘贴到选定的文件中。
+_C_MNU_SB_EDIT_SELECT 选定文件列表中的所有文件。
+_C_MNU_SB_EDIT_UNDO 撤消上一次操作。
+_C_MNU_SB_EDIT_UNSELECTALL 取消对所有文件的选定。
+_C_MNU_SB_EXTRA_OPTIONS 显示选项对话框。
+_C_MNU_SB_EXTRA_RESET_EDITS 把标签面板中所有输入字段中的文本清除。
+_C_MNU_SB_EXTRA_SET_EDITS 把所有输入字段的值置为设定好的默认值。
+_C_MNU_SB_EXTRA_TRACKWIZARD 运行自动音轨编号向导。
+_C_MNU_SB_FILE_ADD 添加另一个目录中的文件到当前文件列表。
+_C_MNU_SB_FILE_CDDB 通过Internet获取所插入的音频CD或所选定的文件的信息。
+_C_MNU_SB_FILE_CDDBLOCAL 通过本地的freedb数据库获取所插入的音频CD或所选定的文件的信息。
+_C_MNU_SB_FILE_COPY 把选定的文件复制到另一个目录中。
+_C_MNU_SB_FILE_DELETE 删除选定的文件。
+_C_MNU_SB_FILE_DIR 改变当前工作目录。
+_C_MNU_SB_FILE_EXIT 退出应用程序。
+_C_MNU_SB_FILE_EXPORT 导出选定文件的标签信息和文件信息。
+_C_MNU_SB_FILE_FAVDIR 把当前工作目录切换到常用目录。
+_C_MNU_SB_FILE_FREEDBINDEX 创建本地freedb以便在本地查找freedb信息。
+_C_MNU_SB_FILE_MOVE 把选定的文件移动到另一个目录中。
+_C_MNU_SB_FILE_PLALL 把所有的文件创建为播放列表。
+_C_MNU_SB_FILE_PLAY 播放选定的文件。
+_C_MNU_SB_FILE_PLAYLIST 载入播放列表文件中的内容。
+_C_MNU_SB_FILE_PLSEL 把选定的文件创建为播放列表。
+_C_MNU_SB_FILE_PROPERTIES 显示选定文件的属性。
+_C_MNU_SB_FILE_READ 从选定的文件中读取标签并填入标签面板上的输入字段。
+_C_MNU_SB_FILE_REMOVE 把选定文件中的标签清除。
+_C_MNU_SB_FILE_REMOVEFILE 从列表中移除所选择的文件。
+_C_MNU_SB_FILE_RENAME 重命名选定的文件。
+_C_MNU_SB_FILE_SAVE 把标签写入选定的文件。
+_C_MNU_SB_FILE_SAVECONFIG 把当前的设置保存到配置文件。
+_C_MNU_SB_HELP_ABOUT 有关Mp3tag软件的信息.
+_C_MNU_SB_HELP_CONTEXT 显示当前所点击的字段、菜单或窗口的上下文帮助。
+_C_MNU_SB_HELP_DONATE 请考虑捐赠支持 Mp3tag 的发展。
+_C_MNU_SB_HELP_FINDER 显示帮助文档。
+_C_MNU_SB_HELP_FIRSTSTEPS 显示对Mp3tag的一些简单介绍。
+_C_MNU_SB_HELP_KEYBOARD 显示键盘快捷键列表。
+_C_MNU_SB_HELP_SUPPORT 打开Mp3tag软件的论坛。
+_C_MNU_SB_HELP_UPGRADE 检查 Mp3tag 的更新
+_C_MNU_SB_HELP_WWW 打开Mp3tag网站。
+_C_MNU_SB_UPDIR 返回上层目录。
+_C_MNU_SB_VIEW_COLUMNS 显示用于设定文件列表中所查看的列信息的对话框。
+_C_MNU_SB_VIEW_FILTER 按指定条件过滤文件列表中列出的文件。
+_C_MNU_SB_VIEW_ID3 显示或隐藏标签输入面板。
+_C_MNU_SB_VIEW_REFRESH 刷新文件列表。
+_C_MNU_SB_VIEW_TAGS 显示扩展标签编辑对话框。
+_C_MNU_SB_VIEW_TOOLBAR 显示或隐藏工具栏。
+_C_MNU_SB_WND_IDLE 就绪
+_C_MNU_SB_WND_MAXIMIZE 把窗口放大到全屏大小
+_C_MNU_SB_WND_MINIMIZE 把窗口最小化到任务栏中
+_C_MNU_SB_WND_MOVE 移动窗口的位置
+_C_MNU_SB_WND_RESTORE 把窗口从最大化或最小化状态中还原到正常的大小
+_C_MNU_SB_WND_SIZE 改变窗口大小
+_C_MULTILINE 多行
+_C_OK 确定(&O)
+_C_OPT_ACTIONGROUPS 动作组
+_C_OPT_ACTIONS 动作
+_C_OPT_ACTIONS_TYPE 选择一个动作
+_C_OPT_ADVANCED 高级
+_C_OPT_ADVANCED_ID3V2LANG ID3v2 注释语言代码 (ISO-639-2)
+_C_OPT_ADVANCED_LISTCHAPTERS 将章节作为单独的文件列出
+_C_OPT_CAPTION 选项
+_C_OPT_CDDB_CAPTION freedb
+_C_OPT_CDDB_CHK_USEPROXY 使用代理服务器(&O)
+_C_OPT_CDDB_FRM_CDDB freedb服务器
+_C_OPT_CDDB_FRM_LOCALPATH 本地freedb路径(&L):
+_C_OPT_CDDB_FRM_PROXY 代理服务器
+_C_OPT_CDDB_RD_FMT_UNIX UNIX格式
+_C_OPT_CDDB_RD_FMT_WIN Windows格式
+_C_OPT_CDDB_ST_ADDRESS 地址(&A):
+_C_OPT_CDDB_ST_EMAIL 电子邮件地址(&E):
+_C_OPT_CDDB_ST_NAME 名称(&N):
+_C_OPT_CDDB_ST_PATH 路径:
+_C_OPT_CDDB_ST_PORT 端口:
+_C_OPT_CDDB_ST_PROXYNAME 代理服务器(&P):
+_C_OPT_CDDB_ST_PROXYPORT 端口(&R):
+_C_OPT_CDDB_ST_PWD 密码(&W):
+_C_OPT_CDDB_ST_TIMEOUT 超时(&I):
+_C_OPT_CDDB_ST_USERNAME 用户名(&U):
+_C_OPT_CDDB3_CAPTION 本地 freedb
+_C_OPT_CON_FRM_FTT 文件名 - 标签(&F)
+_C_OPT_CON_FRM_TFF 标签列表文件 - 标签(&X)
+_C_OPT_CON_FRM_TTF 标签 - 文件名(&T)
+_C_OPT_CON_ST_FNAME 文件名:
+_C_OPT_CON_ST_FS 格式串:
+_C_OPT_DIR 目录
+_C_OPT_DIR_COVER 专辑封面目录
+_C_OPT_EMPTY_HINT 请从下级选项中选择一个主题
+_C_OPT_EXP_CAPTION 导出
+_C_OPT_EXP_CHK_APPEND 追加数据
+_C_OPT_EXP_CHK_WRITEBOM 写入BOM
+_C_OPT_EXP_FRM_EXPORT 导出配置
+_C_OPT_EXP_RD_TRACK 音轨号
+_C_OPT_EXP_ST_FNAME 导出文件名:
+_C_OPT_EXP_ST_NAME 新导出配置径名称
+_C_OPT_FMT_CASE 大小写转换
+_C_OPT_FMT_FRM_FTF 文件名 - 文件名
+_C_OPT_FMT_ST_BEGIN 以指定字符开头:
+_C_OPT_FMT_ST_FNAME_NEW 新文件名格式:
+_C_OPT_FMT_ST_FNAME_OLD 原始文件名格式:
+_C_OPT_FMT2 替换
+_C_OPT_FMT2_CASE 区分大小写
+_C_OPT_FMT2_COL_ORIGINAL 原始
+_C_OPT_FMT2_COL_REPLACE 替换为
+_C_OPT_FMT2_ONLYWORDS 全字匹配
+_C_OPT_GEN_CAPTION 常规
+_C_OPT_GEN_CHK_AUTOSAVE 使用光标移动键或鼠标单击时保存标签(&U)
+_C_OPT_GEN_CHK_FOLDERSTART 程序启动时切换到该文件夹
+_C_OPT_GEN_CHK_GRID 文件列表中显示表格线
+_C_OPT_GEN_CHK_JUMPONEDIT 在文件列表中进行编辑时自动选定下一个文件
+_C_OPT_GEN_CHK_KEEPFILETIME 保存标签时不改变文件修改时间
+_C_OPT_GEN_CHK_KEEPMOVEDFILES 将移走的文件保持在文件列表中
+_C_OPT_GEN_CHK_MSG_ACTIONWARNINGS 实施动作
+_C_OPT_GEN_CHK_MSG_CHANGE 修改之后
+_C_OPT_GEN_CHK_MSG_CUT 剪切标签
+_C_OPT_GEN_CHK_MSG_DEL 删除之后
+_C_OPT_GEN_CHK_MSG_DELETEFILE 删除文件
+_C_OPT_GEN_CHK_MSG_EXPORT 导出标签
+_C_OPT_GEN_CHK_MSG_PASTE 粘贴标签
+_C_OPT_GEN_CHK_MSG_REMOVETAGS 清除标签
+_C_OPT_GEN_CHK_MSG_SAVE 保存之后
+_C_OPT_GEN_CHK_PL 自动创建播放列表(&P)
+_C_OPT_GEN_CHK_RELPL 根据当前工作路径为文件指定相对路径
+_C_OPT_GEN_CHK_AUTOCOMPLETE 下拉列表框中启用自动完成功能
+_C_OPT_GEN_CHK_SELECTFILES 自动选择文件
+_C_OPT_GEN_CHK_SORTNATURAL 使用自然排序
+_C_OPT_GEN_CHK_TITLESHOWFOLDERPATH 在窗口标题栏中显示当前路径(&S)
+_C_OPT_GEN_FRM_GEN 常规
+_C_OPT_GEN_FRM_MSG 下列情况弹出提示信息对话框
+_C_OPT_GEN_FRM_PL 播放列表文件名(&F)
+_C_OPT_GEN_RD_PLALL 从所有文件
+_C_OPT_GEN_RD_PLSEL 从选定的文件
+_C_OPT_GEN_ST_FAVDIR 常用目录:
+_C_OPT_GEN2_CAPTION 消息
+_C_OPT_GENRES 用户自定义流派
+_C_OPT_GENRES_HIDESTANDARD 只显示用户自定义的流派
+_C_OPT_ID3_CHK_ISO88591 总是以ISO-8859-1写入标签而不使用UTF-16
+_C_OPT_ID3_CHK_LEADINGZEROS 在音轨号前置0(如01, 02, ...)
+_C_OPT_ID3_CHK_LENGTHDEPENDEND 仅当ID3v1标签不够容纳内容时才处理ID3v2标签
+_C_OPT_ID3_CHK_V1 ID3v1
+_C_OPT_ID3_CHK_V2 ID3v2
+_C_OPT_ID3_FRM_READ 读取
+_C_OPT_ID3_FRM_REMOVE 清除
+_C_OPT_ID3_FRM_WRITE 写入
+_C_OPT_LIB 库
+_C_OPT_LIB_CHK_ENABLE 启用库
+_C_OPT_LIB_CHK_RESTRICT 只包含这些路径
+_C_OPT_LIB_CLEANUP 清理库
+_C_OPT_MAPPING 映射
+_C_OPT_MAPPING_FRM 用户自定义域映射 
+_C_OPT_MAPPING_SOURCE 原始信息
+_C_OPT_MAPPING_TARGET 目标信息
+_C_OPT_PLAYLIST_CAPTION 播放列表
+_C_OPT_PLAYLIST_EXTENDED 写入扩展信息
+_C_OPT_PLAYLIST_NOFOLDERS 不要创建目录
+_C_OPT_PLAYLIST_SHOWDLG 显示确认文件名对话框
+_C_OPT_TAG 标签
+_C_OPT_TAGS_COVER 默认唱片封面图片文件名：
+_C_OPT_TAGS_EXT 在标签处理对话框中点击<<或>>时的保存方式:
+_C_OPT_TAGS_FILEFILTER 只处理以下扩展名的文件:
+_C_OPT_TAGS_NOIMG 不要以文件夹中第一个图像文件作为唱片封面显示(&D)
+_C_OPT_TOOLS 工具
+_C_OPT_TOOLS_CHK_DEFAULT 双击鼠标时指定的工具处理文件:
+_C_OPT_TOOLS_CHK_MULTIPLEINSTANCES 对所有选定的文件
+_C_OPT_TOOLS_COL_PARAM 参数
+_C_OPT_TOOLS_COL_PATH 路径
+_C_OPT_TOOLS_EDIT 自定义一种工具。名称和路径是必须输入的。
+_C_OPT_TOOLS_FRM_DEFAULT 默认工具
+_C_OPT_TOOLS_FRM_TOOLS 工具
+_C_OVERWRITE 覆盖(&W)
+_C_RENAME 重命名(&R)
+_C_TT_CDDB freedb...
+_C_TT_CDDBLOCAL freedb(本地)...
+_C_TT_CLOSE 关闭
+_C_TT_DIR 改变工作目录...
+_C_TT_EDIT_UNDO 撤消
+_C_TT_EXPORT 导出
+_C_TT_FAVDIR 常用目录
+_C_TT_FILE_ADD 添加目录...
+_C_TT_FILE_COPY 复制到...
+_C_TT_FILE_DELETE 删除...
+_C_TT_FILE_MOVE 移动到...
+_C_TT_FILE_PLAY 播放
+_C_TT_FILE_PROPERTIES 属性...
+_C_TT_FILE_RENAME 重命名
+_C_TT_FTF 文件名 - 文件名
+_C_TT_FTT 文件名 - 标签
+_C_TT_HELP 帮助主题...
+_C_TT_OPT 选项对话框...
+_C_TT_PLALL 从所有文件创建播放列表
+_C_TT_PLSEL 从选定的文件创建播放列表
+_C_TT_REFRESH 刷新文件列表
+_C_TT_REMOVE 清除标签
+_C_TT_SAVE 保存
+_C_TT_TFF 标签列表文件 - 标签
+_C_TT_TTF 标签 - 文件名
+_C_TT_TTT 标签 - 标签
+_C_TT_UPDIR 向上
+_C_WIZARD_TRACKS 自动编号向导
+_C_WIZARD_TRACKS_BEGIN 起始音轨号:
+_C_WIZARD_TRACKS_DESC 分配音轨号和CD号
+_C_WIZARD_TRACKS_DISC_BEGIN 以CD号开始
+_C_WIZARD_TRACKS_DISC_LEADINGZEROS 以0给CD号打头 (01, 02, ...)
+_C_WIZARD_TRACKS_DISC_SAVETOTAL 保存唱片总计数
+_C_WIZARD_TRACKS_DISCNUMBER CD号
+_C_WIZARD_TRACKS_RESETFOLDERS 对每个目录重新开始计数
+_C_WIZARD_TRACKS_SAVETOTAL 保存总的音轨数
+_C_WIZARD_TRACKS_TRACKNUMBER 音轨号
+_M_ERR_CANCEL 处理中断。
+_M_ERR_CDDB_CD 读取音频CD出错
+_M_ERR_CDDB_CONNECT 无法连接到服务器: {1}
+_M_ERR_CDDB_NOENTRY 没有找到freedb-ID为{1}的相关信息。
+_M_ERR_CDDB_NOENTRYINLOCALBD 无法按freedb-ID为{1}的条件在本地freedb数据库'{2}'中找到相关的信息。
+_M_ERR_CDDB_PARSER 查询没有返回合适的结果。
+_M_ERR_CDDB_READ 从freedb服务器 {1} 上读取数据时发生错误。
+_M_ERR_CONFIGURATION 无法导入配置。
+_M_ERR_COPY 无法复制选定的文件!
+_M_ERR_DELETE 无法删除选定的文件!
+_M_ERR_FILECREATE 无法创建\"{1}\"文件。
+_M_ERR_FILEDELETE File 无法删除\"{1}\"文件。
+_M_ERR_FILENAMEALREADYEXISTS 名为\"{1}\"的文件已经存在。
+_M_ERR_FILENAMEALREADYEXISTS2 跳过文件\"{1}\"。
+_M_ERR_FILEOPABORTED 当前目录中的内容已经发生变化。\n\n要刷新当前目录文件列表的信息吗?
+_M_ERR_FILEOPEN 无法打开\"{1}\"文件。
+_M_ERR_FILEREADONLY \"{1}\"是一个只读文件。\n\n是否允许Mp3tag去除本文件和其它只读文件的只读属性？
+_M_ERR_FOLDERCANNOTBEACCESSED 访问错误\n\n目录\"{1}\"无法访问。
+_M_ERR_INVALID_FILENAME 请指定一个有效的文件名。
+_M_ERR_INVALID_FTF_FS 字符串\"{1}\"不是一个有效的文件名格式串。
+_M_ERR_INVALID_TOKEN {1}:\n文件名中不允许出现以下字符:\n\\ / : * ? \" < > |\n\n您希望系统自动更改它们吗?
+_M_ERR_MOVE 无法移动选定的文件!
+_M_ERR_ONLINE_NOTFOUND 对不起，没有找到符合您所指定的搜索条件的项。
+_M_ERR_OPT_CDDB_NOADDRESS 请输入一个freedb服务器的地址。
+_M_ERR_OPT_CDDB_NOEMAIL 请在'选项, freedb, 服务器'中输入您的电子邮件地址。它将被用于记录对freedb服务器的访问。
+_M_ERR_OPT_CDDB_NONAME 请输入一个合法的配置名称。
+_M_ERR_OPT_CDDB_NOPORT 请输入freedb服务器的端口号。
+_M_ERR_PARSELINE 无法解析行 {1}.
+_M_ERR_PLAY 无法播放\"{1}\"文件!
+_M_ERR_READ_FILE 无法读取\"{1}\"文件。
+_M_ERR_RENAME_FILE \"{1}\"文件无法重命名为\"{2}\"。
+_M_ERR_TL_NOTAGS 没有匹配文件\"{1}\"的条目。
+_M_ERR_WRITE_FILE 无法写入\"{1}\"文件。
+_M_ERR_YN \n\n要继续吗?
+_M_LOG_FMT_FNAME 已重命名{1}(共{2}个)文件。\n
+_M_LOG_FMT_TAG 已格式化{1}(共{2}个)文件。\n
+_M_LOG_FTF 已重命名{1}(共{2}个)文件。
+_M_LOG_FTT 已推导出{1}(共{2}个)文件中的标签值。
+_M_LOG_PL_ALL 已根据全部文件创建播放列表\"{1}\"(共{2}个文件)。
+_M_LOG_PL_SEL 已根据选定的文件创建播放列表\"{1}\"(共选定了{2}个文件)。
+_M_LOG_REMOVE \"{1}\"文件中的标签已经清除。
+_M_LOG_REMOVED 己经清除{1}个文件(共{2}个)中的标签。
+_M_LOG_REMOVE_NOTAG \"{1}\"文件中没有标签信息。
+_M_LOG_SAVE 已把标签存入\"{1}\"文件中。
+_M_LOG_SAVED 已经把标签存入{1}个文件(共{2}个)。
+_M_LOG_TFF 已从标签文件\"{1}\"中提取出标签并存入{2}个文件(共{3}个)。
+_M_LOG_TFF_S 从\"{1}\"中导入标签信息到文件。
+_M_LOG_TTF 已对{1}个文件(共{2}个)进行重命名。
+_M_STAT_PLAY 正在播放\"{1}\"...
+_M_STR_ACTION_CODEPAGE 转换代码页
+_M_STR_ACTION_CODEPAGE_DESC 代码页
+_M_STR_ACTION_EXPORTCOVER 导出专辑封面至文件
+_M_STR_ACTION_EXPORTCOVER_DUPES 导出重复的专辑封面
+_M_STR_ACTION_EXPORTCOVER_TYPES 只导出封面类型
+_M_STR_ACTION_FORMAT 格式化值
+_M_STR_ACTION_GUESS 猜测值
+_M_STR_ACTION_GUESSPATTERN 猜测模式
+_M_STR_ACTION_GUESSSOURCE 源格式
+_M_STR_ACTION_IMPORTCOVER 从文件导入专辑封面
+_M_STR_ACTION_IMPORTCOVER_FS 图像文件名格式字符式:
+_M_STR_ACTION_IMPORTCOVER_DELETE 清除现有的专辑封面(&D)
+_M_STR_ACTION_IMPORTCOVER_TYPE 导入封面为:
+_M_STR_ACTION_IMPORTTEXT 导入文本文件
+_M_STR_ACTION_MERGEDUPLICATEFIELDS 合并重复的字段
+_M_STR_ACTION_REGEXP 根据正则表达式替换
+_M_STR_ACTION_REGEXP_EXP 正则表达式
+_M_STR_ACTION_REGEXP_MATCH 将匹配值替换为
+_M_STR_ACTION_REMOVEDUPES 册除重复的字段
+_M_STR_ACTION_REM 清除字段
+_M_STR_ACTION_REM_DESC 要清除的字段(多个字段用分号隔开):
+_M_STR_ACTION_REM_EX 清除多余字段
+_M_STR_ACTION_REM_EX_DESC 要保留的字段(多个字段用分号隔开):
+_M_STR_ACTION_SPLITFIELDS 使用分隔符拆分字段
+_M_STR_ACTIONGROUP_NAME 动作组名称
+_M_STR_ALBUM 专辑集
+_M_STR_ALBUMARTIST 专辑集艺术家
+_M_STR_ALL_FILEDLGFILTER 所有文件(*.*)|*.*||
+_M_STR_ARTIST 艺术家
+_M_STR_AUTHOR 作者
+_M_STR_BACK < 上一步(&B)
+_M_STR_BROWSE_COPY 复制到:
+_M_STR_BROWSE_MOVE 移动到:
+_M_STR_BROWSE_TEXT 请选一个包含有音频文件的文件夹。
+_M_STR_BYTES 字节
+_M_STR_CDDB_CD 读取音乐CD
+_M_STR_CDDB_CONNECT 连接到 {1}...
+_M_STR_CDDB_CONNECTED  已连接!
+_M_STR_CDDB_IDXDB_ENTRIES 已创建数据库项
+_M_STR_CDDB_RETRIEVE 获取标题信息
+_M_STR_COLUMNFILENAME 文件名
+_M_STR_COLUMNPATH 路径
+_M_STR_COLUMNUSEDCOLS 显示
+_M_STR_COMBO_HOLD < 保留 >
+_M_STR_COMBO_REMOVE < 空白 >
+_M_STR_COMBO_USER < 输入 >
+_M_STR_COMMENT 注释
+_M_STR_COMPOSER 作曲家
+_M_STR_COPYOF 复件 {1}
+_M_STR_COVER 封面
+_M_STR_COVER_ADD 要保留已有的专辑封面吗？
+_M_STR_COVER_CORRECTAR 校正长宽比
+_M_STR_COVER_SETDESC 设置封面描述...
+_M_STR_COVER_SETTYPE 设置封面类型
+_M_STR_COVERVARIES 多种封面
+_M_STR_CUSTOMIZE 自定义...
+_M_STR_DAY 天
+_M_STR_DAYS 天
+_M_STR_DEFAULTVALUE 默认值
+_M_STR_DISCID CDDB ID
+_M_STR_DISCOGS_OAUTH_PIN 输入Discogs授权码
+_M_STR_DISCNUMBER CD号
+_M_STR_ERR_CDDB_NOENTRYSELECTED 请选择一项
+_M_STR_EXPORT_DELETE 要删除导出的配置文件\"{1}\"吗?
+_M_STR_EXPORT_FILEDLGTITLE 选择要导出的文件
+_M_STR_EXPORT_MULTIPLE 在每个目录中创建单独的文件
+_M_STR_EXPORT_SHOWEXPORTFILE \n\n要显示导出的文件吗?
+_M_STR_EXP_MSG 已成功导出{2}个文件的信息至'{1}'文件。
+_M_STR_FIELD 字段(&I):
+_M_STR_FIELDSIZE 字段大小
+_M_STR_FIELDROWS 列
+_M_STR_FILE 文件
+_M_STR_FILEDELETE 您确信要删除所有选定的文件吗?
+_M_STR_FILEMODIFIED 修改日期
+_M_STR_FILESIZE 大小
+_M_STR_FILTER 过滤(&F):
+_M_STR_FMT_CAPITAL 混合大小写
+_M_STR_FMT_HIGH 大写字母
+_M_STR_FMT_LOW 小写字母
+_M_STR_FMT_SENTENCE 句子
+_M_STR_FREEDBCREATEINDEX 要创建本地freedb索引数据库吗?\n\n这个操作可能需要几分钟时间。
+_M_STR_FREEDB_SEARCH 通过Web搜索freedb
+_M_STR_GENRE 流派
+_M_STR_GENRES 流派
+_M_STR_HIDE 隐藏(&H)
+_M_STR_ITEMALREADYEXISTS 一个同名的项已经存在，覆盖它吗?
+_M_STR_LANGUAGE 语言
+_M_STR_M3U_FILEDLGFILTER 支持的文件格式(*.m3u; *.m3u8; *.cue)|*.m3u; *.m3u8; *.cue||
+_M_STR_METADATA 元数据(&M)
+_M_STR_MOVEDOWN 下移(&V)
+_M_STR_MOVEUP 上移(&P)
+_M_STR_MPEGBITRATE 比特率
+_M_STR_MPEGFREQUENCY 采样率
+_M_STR_MPEGLENGTH 长度
+_M_STR_MPEGMODE 模式
+_M_STR_MPEGVERSION 编码器
+_M_STR_MSGCUT 您确信要把文件中的标签清除并把它们复制到剪贴板上吗?
+_M_STR_MSGPASTE 您确信要把剪贴板上的内容作为新的标签写入所选定的文件吗?
+_M_STR_MSGREMOVE 您确信要清除所选文件中的标签吗?
+_M_STR_NAME 名称(&A)
+_M_STR_NETWORKING 网络
+_M_STR_NEXT 下一步(&N) >
+_M_STR_NOACTION 没有动作
+_M_STR_NOACTIONENABLED 要使用本功能对文件执行操作必须至少选中一项动作。
+_M_STR_NUMERIC 数值型(&M)
+_M_STR_OPT_CDDB_BROWSE_LOCALPATH 请选择一个目录作为本地freedb数据库的工作目录。
+_M_STR_OPT_CDDB_PROCEED 这个操作将删除所有的服务器!\n\n要继续吗?\n
+_M_STR_OPTIMIZEMP4 优化 MP4
+_M_STR_OPTS_ALWAYS 总是
+_M_STR_OPTS_ASK 提示
+_M_STR_OPTS_NEVER 从不
+_M_STR_PLNAME 播放列表 - 文件名
+_M_STR_PL_CONFIRM 为播放列表文件命名
+_M_STR_PL_SAVEFILTER 播放列表文件(*.m3u)|*.m3u|Unicode 播放列表文件(*.m3u8)|*.m3u8||
+_M_STR_PREVIEW 预览
+_M_STR_PROPERTIES {1} 属性
+_M_STR_QUICK 快速
+_M_STR_RECURSE 包含子目录
+_M_STR_REST 其它
+_M_STR_SAVE_NOT < 没有关联 >
+_M_STR_SAVECONFIG 你当前的配置信息已被保存到'{1}'文件。\n\n如果以后需要把软件设置重新恢复到当前的状态，只需把这个文件解压缩到\n\"{2}\"。
+_M_STR_SAVECONFIG_FILEDLGFILTER 配置文件(*.zip)|*.zip||
+_M_STR_SAVECONFIG_FILEDLGTITLE 保存配置文件...
+_M_STR_SAVEIMAGE 将图像存入标签
+_M_STR_SAVEIMAGEDIRECTORY 保存图片
+_M_STR_SAVESELECTION 保存选区...
+_M_STR_SB_ABORTED 取消操作
+_M_STR_SB_ACTION 正在对文件应用动作... 第{1}个(共{2}个)
+_M_STR_SB_CLEANUPDATABASE 处理文件 ... {2} 中的 {1} ({3} 已清理)
+_M_STR_SB_CLEANUPDATABASE_BINARIES 清理孤立的二进制值
+_M_STR_SB_CLEANUPDATABASE_COVERS 清理孤立的封面
+_M_STR_SB_CLEANUPDATABASE_NONLIBFILES 清理非库中的文件
+_M_STR_SB_EXPORTTAGS 正在导出标签信息... 第{1}个(共{2}个)
+_M_STR_SB_LOADTAGS 正在读取标签信息... 第{1}个(共{2}个)
+_M_STR_SB_READDIRECTORY 正在读取目录信息
+_M_STR_SB_REMOVETAGS 正在清除标签信息... 第{1}个(共{2}个)
+_M_STR_SB_RENAMEFILES 正在重命名文件... 第{1}个(共{2}个)
+_M_STR_SB_WRITETAGS 正在保存标签... 第{1}个(共{2}个)
+_M_STR_SHOWCHOOSEDLG 开始操作前显示选项对话框
+_M_STR_SEARCHBY 查找条件:
+_M_STR_SEARCHTEXT 搜索文本:
+_M_STR_SEPARATOR 分隔符
+_M_STR_SHOW 显示(&W)
+_M_STR_SIZE_LARGE 大
+_M_STR_SIZE_MEDIUM 中等
+_M_STR_SIZE_NORMAL 正常
+_M_STR_SIZE_SMALLER 较小
+_M_STR_SIZE_SMALL 小
+_M_STR_SNA 通知区域
+_M_STR_SNA_SHOW 总在通知区域显示图标
+_M_STR_SNA_SHOWMIN 最小化到通知区域
+_M_STR_STRIPCHAPTERSMP4 剥离 MP4 章节
+_M_STR_TAG_COPIED 已经将{1}个文件中的标签内容复制到剪贴板上。
+_M_STR_TAG2 标签
+_M_STR_TAGFIELDS_REMOVE 移除字段
+_M_STR_TAGFIELDS_REMOVEALL 移除全部字段...
+_M_STR_TAGFIELDS_REMOVEALLMSG 是否确认移除列表中全部字段？
+_M_STR_TAGFIELDS_RESET 重置字段...
+_M_STR_TAGFIELDS_RESETMSG 是否确认重置列表中字段到默认值？
+_M_STR_TAGPANEL 标签面板
+_M_STR_TAGPANEL_COVER 显示专辑封面
+_M_STR_TAGPANEL_DIRECTORY 显示目录选择框
+_M_STR_TAGLIST_FILEDLGFILTER 标签列表文件(*.txt;*.csv)|*.txt; *.csv||
+_M_STR_TAGLIST_FILEDLGTITLE 选择标签列表文件
+_M_STR_TAGSOURCES 标签数据源
+_M_STR_THISALBUMON 查看{1}上本专辑集的信息
+_M_STR_TITLE 标题
+_M_STR_TRYAGAIN 要重试一次吗?
+_M_STR_TTF 标签 - 文件名
+_M_STR_UPDATE_FRM 更新
+_M_STR_UPDATE_OPT_CHECK 启动时检查新版本
+_M_STR_UPDATE_OPT_CHECK_BETA 包括尚在开发中的版本(Beta版)
+_M_STR_UPDATE_OPT_CHECK_RELEASENOTES 显示新版本的发行说明
+_M_STR_UPDATEAVAILABLE 发现新版本Mp3tag {1}！\n\n您希望从{2}下载更新吗?
+_M_STR_UPDATENOTAVAILABLE 您正在使用的是最新版的{1}.\n\n没有更新的版本。
+_M_STR_URL https://www.mp3tag.de/en/download.html
+_M_STR_UTILS 工具(&U)
+_M_STR_VALUE 值(&L)
+_M_STR_VERSION 版本
+_M_STR_YEAR 年份
+_M_TP_CDDB_LOCALPATH 指定本地freedb目录
+_M_TP_CDDB_SITES 当前Internet上可用的freedb服务器列表
+_M_TP_CVR_CLIPBOARD 粘贴专辑封面
+_M_TP_CVR_CLIPBOARD_COPY 复制专辑封面
+_M_TP_CVR_CLIPBOARD_CUT 剪切专辑封面
+_M_TP_CVR_DEL 清除封面
+_M_TP_CVR_NEW 添加封面...
+_M_TP_CVR_SAVE 提取封面...
+_M_TP_DUPLICATE 复制
+_M_TP_EXP_DEL 删除(&D)
+_M_TP_EXP_EDIT 编辑
+_M_TP_EXP_FILE 选择一个导出文件
+_M_TP_EXP_HLP 显示快速帮助
+_M_TP_EXP_LOAD 加载项
+_M_TP_EXP_NEW 新建(&N)
+_M_TP_EXP_SAVE 保存项
+_M_TP_GEN_DIR 选择目录
+_M_TP_TAG_DEL 清除字段
+_M_TP_TAG_EDIT 编辑字段...
+_M_TP_TAG_NEW 添加字段...
+_M_TS_ADDINFO 附加信息(&D)
+_M_TS_MULTIPLEVALUES 多种值
+_M_TS_RELEASE 发布信息(&R)
+_M_TS_TRACKS 音轨(&T)
+_M_UNDO_CANNOTUNDO 无法撤销 {1}
+_M_UNDO_CDDB freedb
+_M_UNDO_DIRECTORYCREATE 创建目录
+_M_UNDO_DIRECTORYMOVE 移动目录
+_M_UNDO_FORMAT 格式
+_M_UNDO_FTF 文件名 - 文件名
+_M_UNDO_FTT 文件名 - 标签
+_M_UNDO_REMOVEFILE 删除
+_M_UNDO_RENAME 重命名
+_M_UNDO_TAGCHANGE 编辑标签
+_M_UNDO_TAGREMOVE 清除标签
+_M_UNDO_TAGSAVE 保存标签
+_M_UNDO_TFF 标签列表文件 - 标签
+_M_UNDO_TTF 标签 - 文件名

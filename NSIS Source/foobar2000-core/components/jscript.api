@@ -1,0 +1,169 @@
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Object
+Object()
+Object(mixed value) value: The initial value of the Boolean object. 
+Object.toSource() Returns an object literal representing the specified object; you can use this value to create a new object.
+Object.toString() Returns a string representing the specified object.
+Object.valueOf() Returns the primitive value of the specified object.
+Object.prototype
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array
+Array()
+Array(arrayLength)
+Array(element0, element1, ..., elementN)
+Array.prototype
+Array.index
+Array.input
+Array.length
+Array.pop() Removes the last element from an array and returns that element.
+Array.push(element1, ..., elementN) Adds one or more elements to the end of an array and returns the new length of the array.
+Array.shift() Removes the first element from an array and returns that element.
+Array.reverse() Reverses the order of the elements of an array -- the first becomes the last, and the last becomes the first.
+Array.sort(compareFunction) Sorts the elements of an array.
+Array.splice(index, howMany, [element1][, ..., elementN]) Adds and/or removes elements from an array.
+Array.unshift(element1, ..., elementN) Adds one or more elements to the front of an array and returns the new length of the array.
+Array.concat(value1, value2, ..., valueN) Returns a new array comprised of this array joined with other array(s) and/or value(s).
+Array.join(separator) Joins all elements of an array into a string.
+Array.splice(begin[,end]) Extracts a section of an array and returns a new array.
+Array.prototype
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Boolean
+Boolean(mixed value) value: The initial value of the Boolean object. 
+Boolean.prototype
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Date
+Date()
+Date(milliseconds)
+Date(dateString)
+Date(yr_num, mo_num, day_num[, hr_num, min_num, sec_num, ms_num])
+Date.prototype
+Date.now() Returns the numeric value corresponding to the current time.
+Date.parse(dateString) Parses a string representation of a date, and returns the number of milliseconds since January 1, 1970, 00:00:00, local time.
+Date.getDate() Returns the day of the month for the specified date according to local time.
+Date.getDay() Returns the day of the week for the specified date according to local time.
+Date.getFullYear() Returns the year of the specified date according to local time.
+Date.getHours() Returns the hour in the specified date according to local time.
+Date.getMilliseconds() Returns the milliseconds in the specified date according to local time.
+Date.getMinutes() Returns the minutes in the specified date according to local time.
+Date.getMonth() Returns the month in the specified date according to local time.
+Date.getSeconds() Returns the seconds in the specified date according to local time.
+Date.getTime() Returns the numeric value corresponding to the time for the specified date according to universal time.
+Date.getTimezoneOffset() Returns the time-zone offset in minutes for the current locale.
+Date.getUTCDate() Returns the day (date) of the month in the specified date according to universal time.
+Date.getUTCDay() Returns the day of the week in the specified date according to universal time.
+Date.getUTCFullYear() Returns the year in the specified date according to universal time.
+Date.getUTCHours() Returns the hours in the specified date according to universal time.
+Date.getUTCMilliseconds() Returns the milliseconds in the specified date according to universal time.
+Date.getUTCMinutes() Returns the minutes in the specified date according to universal time.
+Date.getUTCMonth() Returns the month in the specified date according to universal time.
+Date.getUTCSeconds() Returns the seconds in the specified date according to universal time.
+Date.getYear() Deprecated. Returns the year in the specified date according to local time. Use getFullYear instead.
+Date.setDate(dayValue) Sets the day of the month for a specified date according to local time.
+Date.setFullYear(yearValue[, monthValue[, dayValue]]) Sets the full year for a specified date according to local time.
+Date.setHours(hoursValue[, minutesValue[, secondsValue[, msValue]]]) Sets the hours for a specified date according to local time.
+Date.setMilliseconds(millisecondsValue) Sets the milliseconds for a specified date according to local time.
+Date.setMinutes(minutesValue[, secondsValue[, msValue]]) Sets the minutes for a specified date according to local time.
+Date.setMonth(monthValue[, dayValue]) Sets the month for a specified date according to local time.
+Date.setSeconds(secondsValue[, msValue]) Sets the seconds for a specified date according to local time.
+Date.setTime(timeValue) Sets the value of the Date object according to local time.
+Date.setUTCDate(dayValue) Sets the day of the month for a specified date according to universal time.
+Date.setUTCFullYear(yearValue[, monthValue[, dayValue]]) Sets the full year for a specified date according to universal time.
+Date.setUTCHours(hoursValue[, minutesValue[, secondsValue[, msValue]]]) Sets the hour for a specified date according to universal time.
+Date.setUTCMilliseconds(millisecondsValue) Sets the milliseconds for a specified date according to universal time.
+Date.setUTCMinutes(minutesValue[, secondsValue[, msValue]]) Sets the minutes for a specified date according to universal time.
+Date.setUTCMonth(monthValue[, dayValue]) Sets the month for a specified date according to universal time.
+Date.setUTCSeconds(secondsValue[, msValue]) Sets the seconds for a specified date according to universal time.
+Date.setYear(yearValue) Deprecated. Sets the year for a specified date according to local time. Use setFullYear instead.
+Date.toGMTString() Deprecated. Converts a date to a string, using the Internet GMT conventions. Use toUTCString instead.
+Date.toLocaleString() Converts a date to a string, using the current locale's conventions. Overrides the Object.toLocaleString method.
+Date.toLocaleDateString() Returns the "date" portion of the Date as a string, using the current locale's conventions.
+Date.toLocaleTimeString() Returns the "time" portion of the Date as a string, using the current locale's conventions.
+Date.toString() Returns a string representing the specified Date object. Overrides the Object.toString method.
+Date.toUTCString() Converts a date to a string, using the universal time convention.
+Date.valueOf() Returns the primitive value of a Date object. Overrides the Object.valueOf method. 
+Date.prototype
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Error
+Error
+Error(message)
+
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Function
+function()
+Function()
+Function([arg1[, arg2[, ... argN]],] functionBody)
+Function.toSource() Returns an object literal representing the specified Function object; you can use this value to create a new object. Overrides the Object.toSource method.
+Function.toString() Returns a string representing the specified Function object. Overrides the Object.toString method.
+Function.valueOf() Returns the primitive value of a Function object. Overrides the Object.valueOf method. 
+Function.apply(thisArg[, argArray]) Allows you to apply a method of another object in the context of a different object (the calling object).
+Function.call(thisArg[, arg1[, arg2[, ...]]]) Allows you to call (execute) a method of another object in the context of a different object (the calling object).
+Function.prototype
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Math
+Math
+Math.prototype
+Math.E
+Math.LN2
+Math.LN10
+Math.LOG2E
+Math.LOG10E
+Math.PI
+Math.SQRT1_2
+Math.SQRT2
+Math.abs(x) Returns the absolute value of a number.
+Math.acos(x) Returns the arccosine (in radians) of a number.
+Math.asin(x) Returns the arcsine (in radians) of a number.
+Math.atan(x) Returns the arctangent (in radians) of a number.
+Math.atan2(x, y) Returns the arctangent of the quotient of its arguments.
+Math.ceil(x) Returns the smallest integer greater than or equal to a number.
+Math.cos(x) Returns the cosine of a number.
+Math.exp(x) Returns Enumber, where number is the argument, and E is Euler's constant, the base of the natural logarithms.
+Math.floor(x) Returns the largest integer less than or equal to a number.
+Math.log(x) Returns the natural logarithm (base E) of a number.
+Math.max([value1[,value2[, ...]]]) Returns the largest of zero or more numbers.
+Math.min([value1[,value2[, ...]]]) Returns the smallest of zero or more numbers.
+Math.pow(base,exponent) Returns base to the exponent power, that is, base exponent.
+Math.random() Returns a pseudo-random number between 0 and 1.
+Math.round(x) Returns the value of a number rounded to the nearest integer.
+Math.sin(x) Returns the sine of a number.
+Math.sqrt(x) Returns the square root of a number.
+Math.tan(x) Returns the tangent of a number. 
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Number
+Number
+Number(value)
+Number.MAX_VALUE
+Number.MIN_VALUE
+Number.NEGATIVE_INFINITY
+Number.POSITIVE_INFINITY
+Number.prototype
+Number.NaN
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:RegExp
+RegExp
+RegExp("pattern"[, "flags"]) 
+RegExp.prototype
+RegExp.exec(str) Executes a search for a match in a specified string. Returns a result array, or null.
+RegExp.test(str) Executes the search for a match between a regular expression and a specified string. Returns true or false.
+RegExp.toString() Returns a string representing the specified object.
+
+
+#http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:String
+String
+String(string) Creates a new String Object
+String.charAt(index) Returns the character at the specified index.
+String.charCodeAt(index) Returns a number indicating the Unicode value of the character at the given index.
+String.concat(string2, string3[, ..., stringN]) Combines the text of two strings and returns a new string.
+String.fromCharCode() Converts Unicode values to characters.
+String.indexOf(searchValue[, fromIndex]) Returns the index within the calling String object of the first occurrence of the specified value, or -1 if not found.
+String.lastIndexOf(searchValue[, fromIndex]) Returns the index within the calling String object of the last occurrence of the specified value, or -1 if not found.
+String.match(regexp) Used to match a regular expression against a string.
+String.replace(regexp/substr, newSubStr/function[, flags]) Used to find a match between a regular expression and a string, and to replace the matched substring with a new substring.
+String.search(regexp) Executes the search for a match between a regular expression and a specified string.
+String.slice(beginslice[, endSlice]) Extracts a section of a string and returns a new string.
+String.split([separator[, limit]]) Splits a String object into an array of strings by separating the string into substrings.
+String.substr(start[, length]) Returns the characters in a string beginning at the specified location through the specified number of characters.
+String.substring(indexA [,indexB]) Returns the characters in a string between two indexes into the string.
+String.toLowerCase() Returns the calling string value converted to lowercase.
+String.toString() Returns a string representing the specified object. Overrides the Object.toString method.
+String.toUpperCase() Returns the calling string value converted to uppercase.
+String.valueOf() Returns the primitive value of the specified object. Overrides the Object.valueOf method. 

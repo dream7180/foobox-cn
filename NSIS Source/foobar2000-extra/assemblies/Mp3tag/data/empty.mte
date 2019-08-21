@@ -1,0 +1,20 @@
+$filename(New export file.txt,utf-8)
+(Use the $filename command if you want to set the exported file default name and/or its encoding)
+
+This is the header line of the export file
+
+Use the loop(...) command do loop over specific fields of your files e.g.
+
+$loop(%artist%)
+	This part is shown for all different artists: %artist%
+	You can even nest loops:
+$loop(%album%)
+	This will show the artists albums: %album%
+	With its tracks:
+$loop(%track%) %title%
+$loopend()
+$loopend()
+$loopend()
+Be sure to close the loops
+
+This is the footer line - Have fun :)

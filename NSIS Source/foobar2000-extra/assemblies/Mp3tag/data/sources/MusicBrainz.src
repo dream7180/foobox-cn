@@ -1,0 +1,328 @@
+﻿# ###################################################################
+# Mp3tag Tag Source for MusicBrainz API v2 (Official)
+#
+# Search by ALBUM
+#
+# This file needs to be stored in Mp3tag's tag sources directory. 
+# %APPDATA%\Mp3tag\data\sources
+#
+# [2018-10-02] v1.04
+#         FIX: included joinphrases that were omitted for featuring artists.
+# [2018-07-02] v1.03
+#         CHG: included artist in search query.
+#         FIX: extended namespace alias changed on server.
+# [2018-06-05] v1.02
+#         NEW: added MusicBrainz field MUSICBRAINZ_ALBUMID.
+#         CHG: adjusted to write MUSICBRAINZ_ARTISTID.
+# [2018-03-25] v1.01
+#         NEW: added MusicBrainz fields MusicBrainz Artist Id and MUSICBRAINZ_TRACKID.
+#         FIX: multi-disc releases were not parsed correctly.
+# [2018-01-27] v1.00 based on Tag Source for MusicBrainz API v1 by dano
+#
+# ###################################################################
+
+[Name]=MusicBrainz
+[BasedOn]=musicbrainz.org
+[IndexUrl]=http://musicbrainz.org/ws/2/release/?limit=50&query=release:%s
+[AlbumUrl]=http://musicbrainz.org/ws/2/release/
+[WordSeparator]=+
+[IndexFormat]=%_preview%|%_url%|%Score%|%Type%|%Artist%|%Album%|%Tracks%|%Year%|%Country%|%Format%|%Publisher%|%CatNo%
+[SearchBy]=$regexp(%album%,'[-+!(){}\[\]^"~*?:\\]',)$if(%artist%, AND artist:($regexp(%artist%,'[-+!(){}\[\]^"~*?:\\]',)),)
+[UserAgent]=1
+[Encoding]=url-utf-8
+
+[ParserScriptIndex]=...
+# ###################################################################
+#					I  N  D  E  X
+# ###################################################################
+
+findline "<release-list"
+joinuntil "</release-list>"
+replace "|" "$verticalBar()"
+
+do
+	# Preview
+	say "http://musicbrainz.org/release/"
+	sayregexp "(?<= id=\")[-0-9a-y]{34,40}(?=\" )" ", " "<title>"
+	say "|"
+
+	# URL
+	sayregexp "(?<= id=\")[-0-9a-y]{34,40}(?=\" )" ", " "<title>"
+	say "?inc=artists+artist-credits+labels+recordings+release-groups"
+	say "|"
+
+	# Score
+	findinline ":score=\""
+	sayuntil "\""
+	say "|"
+
+	# Type
+	sayregexp "(?<=<primary-type>)[^<]+(?=</primary-type>)" ", " "</release-group>"
+	say "|"
+
+	# Artist
+	sayregexp "(?<=<name>)[^<]+(?=</name>)" ", " "</artist-credit>"
+	say "|"
+
+	# Album
+	findinline "<title>"
+	sayuntil "</title>"
+	say "|"
+
+	# Tracks
+	sayregexp "(?<=<track-list count=\")\d+(?=\")" ", " "</release>"
+	say "|"
+
+	# Year
+	sayregexp "(?<=release-group><date>)[-0-9]{4,10}(?=</date>)" ", " "</release>"
+	say "|"
+
+	# Country
+	sayregexp "(?<=country>)[^<]+(?=<)" ", " "</release>"
+	say "|"
+
+	# Format
+	sayregexp "(?<=format>)[^<]+(?=<)" ", " "</release>"
+	say "|"
+
+	# Label
+	sayregexp "(?<=<name>)[^<]+(?=</name></label>)" ", " "</release>"
+	say "|"
+
+	# Catalog-number
+	sayregexp "(?<=catalog-number>)[^<]+(?=<)" ", " "</release>"
+	saynewline
+
+	findinline "</release>"
+while "<release "
+
+
+[ParserScriptAlbum]=...
+# ###################################################################
+#					A  L  B  U  M
+# ###################################################################
+
+# MusicBrainz Album ID
+outputto "MUSICBRAINZ_ALBUMID"
+sayregexp "(?<= id=\")[-0-9a-y]{34,40}(?=\")" ", " "<title>"
+
+# Album
+outputto "Album"
+findinline "<title>"
+sayuntil "</title>"
+
+# ASIN
+findinline "<ASIN>" 1 1
+movechar -6
+if "<asin>"
+	outputto "ASIN"
+	movechar 6
+	sayuntil "</asin>"
+endif
+
+findline "<?xml"
+
+# Cover via CoverArtArchive
+findinline "<artwork>" 1 1
+if "true"
+	findline "<?xml"
+	findinline "<release id=\""
+	outputto "coverurl"
+	say "http://coverartarchive.org/release/"
+	sayuntil "\""
+	say "/front"
+else
+#Cover via ASIN
+	findline "<?xml"
+	findinline "<asin>" 1 1
+	movechar -6
+	if "<asin>"
+		outputto "coverurl"
+		movechar 6
+		say "http://images.amazon.com/images/P/"
+		sayuntil "</asin>"
+		say ".01.LZZZZZZZ.jpg"
+	endif
+endif
+
+findline "<?xml"
+
+# Year
+findinline "<release-event>" 1 1
+findinline "<date>" 1 1
+movechar -6
+if "<date>"
+	outputto "Year"
+	findinline "<date>"
+	saynextnumber
+else
+	gotoline 1
+endif
+
+
+# Publisher
+findinline "<label id=\"" 1 1
+movechar -11
+if "<label id=\""
+	outputto "Publisher"
+	findinline "<name>"
+	sayuntil "</name>"
+else
+	gotoline 1
+endif
+
+gotoline 1
+
+replace "</track-list></medium></medium-list>" ""
+replace "</track-list></medium>" "<track>"
+
+regexpreplace "(<name-credit[^>]*?>)(<name>.+?</name>)(<artist id=\".+?\">)(<name>.+?</name>)" "$1$3$2"
+regexpreplace "<name-credit joinphrase=\"(.+?)\">(<artist id=\".+?\">)(<name>)(.+?)(</name>)" "<name-credit$2$3$4$1$5"
+regexpreplace "<name-credit joinphrase=\"(.+?)\">(<name>)(.+?)(</name>)(<artist id=\".+?\">)(<name>)(.+?)(</name>)" "<name-credit$2$3$1$4$5<name2>$7</name2>"
+regexpreplace "<name-credit>(<name>)(.+?)(</name>)(<artist id=\".+?\">)(<name>)(.+?)(</name>)" "<name-credit>$1$2$3$4<name2>$6</name2>"
+
+findinline "<medium-list count=\""
+
+# Totaldiscs
+outputto "TEMP_TotalDiscs"
+saynextnumber
+
+findinline ">"
+
+do
+	if "<track"
+		movechar 7
+	endif
+
+	if "<medium>"
+		## Collect the medium title (if exists)
+		set "TEMP_DiscTitle"
+		outputto "TEMP_DiscTitle"
+		sayregexp "(?<=<title>)[^<]+(?=</title>)" "" "<position>"
+
+		outputto "Disc Title"
+		sayregexp "(?<=<title>)[^<]+(?=</title>)" "" "<position>"
+		say "|"
+
+		findinline "<position>"
+
+		## Collect the medium number (if exists)
+		set "TEMP_DiscNumber"
+		outputto "TEMP_DiscNumber"
+		sayregexp "\d+" "" "</"
+
+		outputto "Discnumber"
+		sayregexp "\d+" "" "</"
+		say "/"
+		sayoutput "TEMP_TotalDiscs"
+		say "|"
+
+		set "TEMP_TotalTracks"
+		outputto "TEMP_TotalTracks"
+		findinline "track-list "
+		sayregexp "(?<=count=\")\d+(?=\")" ", " "<track"
+
+		findinline "<track"
+	else
+		outputto "Disc Title"
+		sayoutput "TEMP_DiscTitle"
+		say "|"
+
+		outputto "Discnumber"
+		sayoutput "TEMP_DiscNumber"
+		say "/"
+		sayoutput "TEMP_TotalDiscs"
+		say "|" 
+	endif
+
+	# Track Temp
+	outputto "TEMP_Track"
+	sayregexp "(?<=<position>)\d+(?=</position)" ", " "</track>"
+	say "/"
+	sayoutput "TEMP_TotalTracks"
+	say "|"
+
+	# _LENGTH
+	outputto "_LENGTH"
+	sayregexp "(?<=<length>)[^<]+(?=</length>)" ", " "</track>"
+	say "|"
+
+	# MusicBrainz Track ID
+	outputto "MUSICBRAINZ_TRACKID"
+	sayregexp "(?<=<recording id=\")[-0-9a-y]{36,40}(?=\")" ", " "</track>"
+	say "|"
+
+	# Tracks
+	outputto "TEMP_Title"
+	findinline "<title>"
+	sayuntil "</title>"
+	say "|"
+
+	# Tracks
+	outputto "tracks"
+	say "|"
+
+	findinline "</title>"
+	if "<length>"
+		findinline "</length>"
+	endif
+	
+	if "<artist-credit>"
+		# MusicBrainz Artist ID
+		outputto "MUSICBRAINZ_ARTISTID"
+		sayregexp "(?<=<artist id=\")[-0-9a-y]{36,40}(?=\")" ", " "</artist-credit>"
+		say "|"
+			
+		# Artist
+		outputto "Artist"
+		sayregexp "(?<=<name>)[^<]+(?=</name>)" "" "</artist-credit>"
+		say "|"
+			
+		# Artistsort
+		outputto "Artistsort"
+		sayregexp "(?<=<sort-name>)[^<]+(?=</sort-name>)" "; " "</artist-credit>"
+		say "|"
+	else	
+		# MusicBrainz Artist ID
+		outputto "MUSICBRAINZ_ARTISTID"
+		sayregexp "(?<=<artist id=\")[-0-9a-y]{36,40}(?=\")" ", " "</track>"
+		say "|"
+			
+		# Artist
+		outputto "Artist"
+		sayregexp "(?<=<name>)[^<]+(?=</name>)" "" "</track>"
+		say "|"
+			
+		# Artistsort
+		outputto "Artistsort"
+		sayregexp "(?<=<sort-name>)[^<]+(?=</sort-name>)" "; " "</track>"
+		say "|"
+	endif
+	
+	findinline "</track>"
+	
+while "<track" 999
+
+# Avoid discnumber 1/1 
+gotoline 1
+
+replace "</track-list></medium></medium-list>" ""
+replace "</track-list></medium>" "<track>"
+
+findinline "<medium-list count=\""
+if "1\""
+	set "Discnumber"
+endif
+
+outputto "Title"
+sayoutput "TEMP_Title"
+
+outputto "Track"
+sayoutput "TEMP_Track"
+
+set "TEMP_DiscNumber"
+set "TEMP_DiscTitle"
+set "TEMP_Title"
+set "TEMP_TotalDiscs"
+set "TEMP_TotalTracks"
+set "TEMP_Track"

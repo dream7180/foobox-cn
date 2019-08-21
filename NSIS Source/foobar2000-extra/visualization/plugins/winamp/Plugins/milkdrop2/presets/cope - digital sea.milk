@@ -1,0 +1,294 @@
+MILKDROP_PRESET_VERSION=201
+PSVERSION=2
+PSVERSION_WARP=2
+PSVERSION_COMP=2
+[preset00]
+fRating=3.000
+fGammaAdj=1.000
+fDecay=0.985
+fVideoEchoZoom=0.997
+fVideoEchoAlpha=0.000
+nVideoEchoOrientation=0
+nWaveMode=5
+bAdditiveWaves=0
+bWaveDots=0
+bWaveThick=1
+bModWaveAlphaByVolume=1
+bMaximizeWaveColor=1
+bTexWrap=1
+bDarkenCenter=0
+bRedBlueStereo=0
+bBrighten=1
+bDarken=0
+bSolarize=0
+bInvert=0
+fWaveAlpha=0.080
+fWaveScale=0.588
+fWaveSmoothing=0.000
+fWaveParam=-0.400
+fModWaveAlphaStart=0.710
+fModWaveAlphaEnd=1.300
+fWarpAnimSpeed=1.645
+fWarpScale=1.500
+fZoomExponent=0.99990
+fShader=0.000
+zoom=1.00020
+rot=0.00600
+cx=0.500
+cy=0.500
+dx=0.00000
+dy=0.00000
+warp=0.08927
+sx=1.00000
+sy=1.00000
+wave_r=0.450
+wave_g=0.450
+wave_b=0.450
+wave_x=0.500
+wave_y=0.500
+ob_size=0.000
+ob_r=0.300
+ob_g=0.300
+ob_b=0.500
+ob_a=1.000
+ib_size=0.260
+ib_r=0.000
+ib_g=0.000
+ib_b=0.000
+ib_a=0.000
+nMotionVectorsX=12.800
+nMotionVectorsY=11.400
+mv_dx=0.000
+mv_dy=0.000
+mv_l=5.000
+mv_r=1.000
+mv_g=1.000
+mv_b=1.000
+mv_a=0.000
+b1n=0.400
+b2n=0.000
+b3n=0.000
+b1x=1.000
+b2x=1.000
+b3x=1.000
+b1ed=0.250
+wavecode_0_enabled=0
+wavecode_0_samples=512
+wavecode_0_sep=0
+wavecode_0_bSpectrum=0
+wavecode_0_bUseDots=1
+wavecode_0_bDrawThick=0
+wavecode_0_bAdditive=1
+wavecode_0_scaling=1.00000
+wavecode_0_smoothing=0.50000
+wavecode_0_r=0.500
+wavecode_0_g=0.500
+wavecode_0_b=1.000
+wavecode_0_a=1.000
+wavecode_1_enabled=1
+wavecode_1_samples=512
+wavecode_1_sep=0
+wavecode_1_bSpectrum=0
+wavecode_1_bUseDots=1
+wavecode_1_bDrawThick=1
+wavecode_1_bAdditive=1
+wavecode_1_scaling=1.22019
+wavecode_1_smoothing=0.50000
+wavecode_1_r=1.000
+wavecode_1_g=1.000
+wavecode_1_b=1.000
+wavecode_1_a=0.100
+wavecode_2_enabled=0
+wavecode_2_samples=512
+wavecode_2_sep=0
+wavecode_2_bSpectrum=0
+wavecode_2_bUseDots=0
+wavecode_2_bDrawThick=0
+wavecode_2_bAdditive=0
+wavecode_2_scaling=1.00000
+wavecode_2_smoothing=0.50000
+wavecode_2_r=1.000
+wavecode_2_g=1.000
+wavecode_2_b=1.000
+wavecode_2_a=1.000
+wavecode_3_enabled=0
+wavecode_3_samples=512
+wavecode_3_sep=0
+wavecode_3_bSpectrum=0
+wavecode_3_bUseDots=0
+wavecode_3_bDrawThick=0
+wavecode_3_bAdditive=0
+wavecode_3_scaling=1.00000
+wavecode_3_smoothing=0.50000
+wavecode_3_r=1.000
+wavecode_3_g=1.000
+wavecode_3_b=1.000
+wavecode_3_a=1.000
+shapecode_0_enabled=0
+shapecode_0_sides=34
+shapecode_0_additive=0
+shapecode_0_thickOutline=1
+shapecode_0_textured=0
+shapecode_0_num_inst=1
+shapecode_0_x=0.500
+shapecode_0_y=0.500
+shapecode_0_rad=0.80781
+shapecode_0_ang=2.51327
+shapecode_0_tex_ang=3.76980
+shapecode_0_tex_zoom=2.78490
+shapecode_0_r=1.000
+shapecode_0_g=1.000
+shapecode_0_b=1.000
+shapecode_0_a=0.500
+shapecode_0_r2=1.000
+shapecode_0_g2=1.000
+shapecode_0_b2=1.000
+shapecode_0_a2=0.000
+shapecode_0_border_r=1.000
+shapecode_0_border_g=1.000
+shapecode_0_border_b=1.000
+shapecode_0_border_a=0.000
+shape_0_per_frame1=//r = r + 0.400*(0.60*sin(2.22*time) + 0.4*sin(1.888*time));
+shape_0_per_frame2=//g = g + 0.300*(0.60*sin(1.90*time) + 0.4*sin(2.100*time));
+shape_0_per_frame3=//b = b + 0.400*(0.60*sin(2.12*time) + 0.4*sin(1.98*time));
+shapecode_1_enabled=0
+shapecode_1_sides=34
+shapecode_1_additive=0
+shapecode_1_thickOutline=0
+shapecode_1_textured=0
+shapecode_1_num_inst=1
+shapecode_1_x=0.500
+shapecode_1_y=0.500
+shapecode_1_rad=0.40254
+shapecode_1_ang=0.00000
+shapecode_1_tex_ang=2.51312
+shapecode_1_tex_zoom=2.06615
+shapecode_1_r=0.000
+shapecode_1_g=0.000
+shapecode_1_b=0.000
+shapecode_1_a=0.100
+shapecode_1_r2=0.000
+shapecode_1_g2=0.000
+shapecode_1_b2=0.000
+shapecode_1_a2=1.000
+shapecode_1_border_r=1.000
+shapecode_1_border_g=1.000
+shapecode_1_border_b=1.000
+shapecode_1_border_a=0.000
+shape_1_per_frame1=//r2 = r2 + 0.500*(0.60*sin(1.52*time) + 0.4*sin(1.988*time));
+shape_1_per_frame2=//g2 = g2 + 0.500*(0.60*sin(0.70*time) + 0.4*sin(1.300*time));
+shape_1_per_frame3=//b2 = b2 + 0.500*(0.60*sin(1.32*time) + 0.4*sin(0.91*time));
+shapecode_2_enabled=1
+shapecode_2_sides=44
+shapecode_2_additive=1
+shapecode_2_thickOutline=1
+shapecode_2_textured=1
+shapecode_2_num_inst=1
+shapecode_2_x=0.500
+shapecode_2_y=0.500
+shapecode_2_rad=1.79044
+shapecode_2_ang=0.00000
+shapecode_2_tex_ang=3.76991
+shapecode_2_tex_zoom=0.89576
+shapecode_2_r=0.500
+shapecode_2_g=0.500
+shapecode_2_b=0.500
+shapecode_2_a=0.100
+shapecode_2_r2=0.500
+shapecode_2_g2=0.500
+shapecode_2_b2=0.500
+shapecode_2_a2=0.500
+shapecode_2_border_r=1.000
+shapecode_2_border_g=1.000
+shapecode_2_border_b=1.000
+shapecode_2_border_a=0.000
+shape_2_per_frame1=r = r + 0.500*(0.60*sin(2.22*time) + 0.4*sin(1.888*time));
+shape_2_per_frame2=g = g + 0.500*(0.60*sin(1.90*time) + 0.4*sin(2.100*time));
+shape_2_per_frame3=b = b + 0.500*(0.60*sin(2.12*time) + 0.4*sin(1.98*time));
+shape_2_per_frame4=r2=r;
+shape_2_per_frame5=b2=b;
+shape_2_per_frame6=g2=g;
+shape_2_per_frame7=
+shapecode_3_enabled=0
+shapecode_3_sides=4
+shapecode_3_additive=0
+shapecode_3_thickOutline=1
+shapecode_3_textured=1
+shapecode_3_num_inst=1
+shapecode_3_x=0.200
+shapecode_3_y=0.501
+shapecode_3_rad=0.54270
+shapecode_3_ang=3.14150
+shapecode_3_tex_ang=1.50790
+shapecode_3_tex_zoom=1.76257
+shapecode_3_r=1.000
+shapecode_3_g=1.000
+shapecode_3_b=1.000
+shapecode_3_a=1.000
+shapecode_3_r2=0.800
+shapecode_3_g2=0.800
+shapecode_3_b2=1.000
+shapecode_3_a2=1.000
+shapecode_3_border_r=0.000
+shapecode_3_border_g=0.000
+shapecode_3_border_b=0.000
+shapecode_3_border_a=0.500
+shape_3_per_frame1=ta2 = equal(q2,2)*abs(6*(sin(time))) + (1-equal(q2,2))*ta2;
+shape_3_per_frame2=ta3 = equal(q2,2)*ta2 + (1-equal(q2,2))*ta3;
+shape_3_per_frame3=ta = ta + above(ta3,0)*0.05;
+shape_3_per_frame4=ta3 = ta3-0.5;
+shape_3_per_frame5=tex_ang = tex_ang + ta;
+shape_3_per_frame6=tex_zoom=tex_zoom+0.05*q1;
+per_frame_1=//Yndi Halda - We Flood Empty Lakes
+per_frame_2=
+per_frame_3=vol=(bass+mid+treb)*0.25;
+per_frame_4=vol=vol*vol;
+per_frame_5=
+per_frame_6=
+per_frame_7=mtime=mtime+vol*0.01;
+per_frame_8=q3=mtime*0.25;
+per_frame_9=
+per_frame_10=vola = 0.1*(vola*9 + (bass_att+mid_att+treb_att)*0.333333);
+per_frame_11=q1 = vola;
+per_frame_12=
+per_frame_13=q6 = 0.5 + 0.3*sin(-time*2);
+per_frame_14=q7 = 0.5 + 0.3*cos(-time);
+per_frame_15=
+per_frame_16=monitor = bass_thresh;
+per_frame_17=
+per_frame_18=zoom = zoom + 0.05*vol;
+per_frame_19=wave_x = wave_x + 0.5*sin(mtime*2);
+per_frame_20=wave_y = wave_y + 0.5*sin(-mtime*1.34);
+warp_1=`shader_body
+warp_2=`{
+warp_3=`
+warp_4=`    ret = tex2D(sampler_fw_main, (uv)).xyz;
+warp_5=`    
+warp_6=`    float3 noise2 = tex2D(sampler_noise_lq, uv_orig*texsize.xy*texsize_noise_lq.zw+rand_frame.xy);
+warp_7=`    
+warp_8=`    float1 sand = dot(noise2, abs(GetBlur1(uv)-GetBlur2(uv)-GetBlur3(uv)));
+warp_9=`    sand += GetBlur1(uv);
+warp_10=`    ret += 0.1+frac(pow(ret, sand+sand))*2;
+warp_11=`    ret *= 0.41; 
+warp_12=`    
+warp_13=`
+warp_14=`}
+comp_1=`shader_body 
+comp_2=`{ 
+comp_3=`    //flexi's bump map effect
+comp_4=`
+comp_5=`    float2 d = texsize.zw*4; 
+comp_6=`    float3 dx = ( GetBlur1(uv + float2(1,0)*d) - GetBlur1(uv-float2(1,0)*d) ); 
+comp_7=`    float3 dy = ( GetBlur1(uv + float2(0,1)*d) - GetBlur1(uv-float2(0,1)*d) ); 
+comp_8=`    float2 light_pos = float2(0.5,0); 
+comp_9=`    float3 col = float3(4,4,4); 
+comp_10=`    float c = 4; 
+comp_11=`    float dd = 16; 
+comp_12=`    float3 plastic; 
+comp_13=`    plastic.x = col.x/(1+dd*pow(length( uv - float2(dx.x,dy.x)*c - light_pos),0.5)); 
+comp_14=`    plastic.y = col.y/(1+dd*pow(length( uv - float2(dx.y,dy.y)*c - light_pos),0.5)); 
+comp_15=`    plastic.z = col.z/(1+dd*pow(length( uv - float2(dx.z,dy.z)*c - light_pos),0.5)); 
+comp_16=`
+comp_17=`    ret = plastic*GetPixel(uv); 
+comp_18=`    ret *= 3;
+comp_19=`}

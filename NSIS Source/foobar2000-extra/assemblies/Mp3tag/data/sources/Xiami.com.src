@@ -1,0 +1,177 @@
+[Name]=xiami.com
+[BasedOn]=http://www.xiami.com/search
+[IndexUrl]=http://www.xiami.com/search/album?key=%s
+[AlbumUrl]=
+[WordSeperator]=+
+[IndexFormat]=%_url%|%_preview%|%Album%|%Artist%|%Released%
+[SearchBy]=%album%
+[Encoding]=url-utf-8
+
+[ParserScriptIndex]=...
+# ###################################################################
+#					查询页
+# ###################################################################
+# Uncomment the following line if you want to write some debug output
+#debug "on" "c:\debug_xiami_A.html" "10"
+
+
+
+findline "<div class=\"album_item100_block\">"
+
+do
+  # Url 
+  findline "<p class=\"cover\""
+  findinline "href=\""
+  sayuntil "\""
+  say "|"
+  
+  # Preview
+  findline "<p class=\"name\""
+  moveline 1
+  findinline "href=\""
+  sayuntil "\""
+  say "|"
+  
+  # Album
+  findinline "title=\""
+  sayuntil "\""
+  say "|"
+  
+  # Artist
+  findline "<a class=\"singer\""
+  findinline ">"
+  sayuntil "<"
+  say "|"
+  
+  # Released
+  findline "<p class=\"year\">"
+  findinline "<p class=\"year\">"
+  sayuntil "<"
+  
+  # New
+  findline "</li>"
+  moveline 2
+  saynewline
+  unspace
+  
+while "<div class=\"album_item100_block\">"
+
+[ParserScriptAlbum]=...
+# ###################################################################
+#					专辑页
+# ###################################################################
+# Uncomment the following line if you want to write some debug output
+debug "on" "c:\\debug_xiami_B.html"
+
+
+#Album
+findline "<h1 property=\"v:itemreviewed\">"
+replace "<span>" "("
+replace "</span>" ")"
+findinline "<h1 property=\"v:itemreviewed\">"
+outputto "Album"
+sayuntil "</h1>"
+
+#ALBUMARTIST
+findline "<a href=\"/artist/"
+unspace
+findinline ">"
+outputto "ALBUMARTIST"
+sayuntil "<"
+GotoChar 1
+findinline ">"
+outputto "ALBUMARTISTSORT"
+sayuntil "<"
+
+#Publisher
+findline "唱片公司"
+MoveLine 1
+findinline "target=\"_blank\">"
+outputto "Publisher"
+sayuntil "</a>"
+
+#Year
+findline "发行时间"
+MoveLine 1
+replace "年" "-"
+replace "月" "-"
+replace "日" ""
+findinline "<td valign=\"top\">"
+outputto "Year"
+sayuntil "</td>"
+
+#MEDIATYPE
+findline "专辑类别"
+MoveLine 1
+findinline "<td valign=\"top\">"
+outputto "MEDIATYPE"
+sayuntil "</td>"
+
+#STYLE
+MoveLine 5
+unspace
+If "<td class=\"item\" valign=\"top\">专辑风格"
+    Do
+        findinline "a href="
+        findinline ">"
+        outputto "STYLE"
+        sayuntil "</a>"
+        say " "
+        MoveChar 4
+    While ","
+endif
+
+#coverurl
+findline "<a id=\"cover_lightbox\""
+findinline "href=\""
+outputto "coverurl"
+sayuntil "\""
+
+#tracks
+
+findline "<td class=\"song_name\">"
+Do  
+    MoveLine 1
+        #普通
+    outputto "tracks"
+    findinline "title=\"\">"
+    sayuntil "</a>"
+    say "|"
+    #判断是否有MV
+    MoveLine 1
+    unspace
+    RegexpReplace "\s\s\s*" ""
+    If "<a"
+    #有MV
+        findinline "</a>"
+        #判断是否有备注或者其他作者
+        If "<"
+            #没有其他作者
+            outputto "Artist"
+            sayoutput "ALBUMARTIST"
+            say "|"
+        else
+            #有其他作者
+            outputto "Artist"
+            sayuntil "<"
+            say "|"
+        endif
+    else
+    #无MV
+        If "<"
+        #没有其他作者
+            outputto "Artist"
+            sayoutput "ALBUMARTIST"
+            say "|"
+        else 
+        #有其他作者
+            outputto "Artist"
+            sayuntil "<"
+            say "|"
+        endif
+    endif
+outputto "bigfuji"
+    MoveLine 16
+    findline "<td class=\"song_name\">"
+    unspace
+While "<td class=\"song_name\">"                                                                                                              

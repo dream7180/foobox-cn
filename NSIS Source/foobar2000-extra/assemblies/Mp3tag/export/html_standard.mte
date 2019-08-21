@@ -1,0 +1,47 @@
+﻿$filename(html,utf-8)<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
+<head>
+	<meta name="GENERATOR" content="Mp3tag - http://www.mp3tag.de" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Mp3tag - File Overview</title>
+	<style type="text/css"><!--
+		h1 { font-family: Verdana, Tahoma, Arial, sans-serif; font-size: 14pt; color: #000 }
+		body { font-family: Verdana, Tahoma, Arial, sans-serif; font-size: 8pt; background: #fff }
+		table, tr, td { font-family: Verdana, Tahoma, Arial, sans-serif; font-size: 9pt; color: #000; }
+		a:link, a:visited, a:active { text-decoration: none; color: #03f; }
+		a:hover { text-decoration: none; color: #f03; }
+		.title { font-weight: bold; padding: 7px; margin: 0px; color: #000; }
+		.odd { background-color: #ccc; }
+	--></style>
+</head>
+<body>
+	<h1>Mp3tag - File Overview</h1>
+	<p>%_date%</p>
+	<table>
+		<tr>
+			<th class="title">Title</th>
+			<th class="title">Artist</th>
+			<th class="title">Album</th>
+			<th class="title">Track</th>
+			<th class="title">Year</th>
+			<th class="title">Genre</th>
+			<th class="title">Filename</th>
+		</tr>
+
+$loop(%_filename_ext%)
+		<tr>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%title%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%artist%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%album%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%track%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%year%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%genre%,&,&amp;)</td>
+			<td$if($odd(%_counter%), class="odd",)>$replace(%_filename_ext%,&,&amp;)</td>
+		</tr>
+$loopend()
+
+	</table>
+	<p>built on %_date% with %_app% - the universal Tag Editor <a href="http://www.mp3tag.de/en/" title="Mp3tag Website">www.mp3tag.de</a></p>
+</body>
+</html>

@@ -1,0 +1,89 @@
+[preset00]
+fRating=2.000000
+fGammaAdj=1.000000
+fDecay=1.000000
+fVideoEchoZoom=1.000400
+fVideoEchoAlpha=0.000000
+nVideoEchoOrientation=0
+nWaveMode=1
+bAdditiveWaves=1
+bWaveDots=1
+bWaveThick=1
+bModWaveAlphaByVolume=1
+bMaximizeWaveColor=1
+bTexWrap=1
+bDarkenCenter=1
+bRedBlueStereo=0
+bBrighten=0
+bDarken=1
+bSolarize=0
+bInvert=0
+fWaveAlpha=1.005730
+fWaveScale=0.282090
+fWaveSmoothing=0.000000
+fWaveParam=0.000000
+fModWaveAlphaStart=1.489999
+fModWaveAlphaEnd=0.750000
+fWarpAnimSpeed=1.000000
+fWarpScale=1.331000
+fZoomExponent=0.690737
+fShader=1.000000
+zoom=2.380962
+rot=0.000000
+cx=0.499900
+cy=0.499900
+dx=0.200000
+dy=0.200000
+warp=0.010000
+sx=0.463935
+sy=0.535239
+wave_r=0.000000
+wave_g=1.000000
+wave_b=0.000000
+wave_x=0.500000
+wave_y=0.500000
+ob_size=0.030000
+ob_r=0.000000
+ob_g=0.000000
+ob_b=0.000000
+ob_a=1.000000
+ib_size=0.005000
+ib_r=0.000000
+ib_g=0.000000
+ib_b=0.000000
+ib_a=1.000000
+nMotionVectorsX=64.000000
+nMotionVectorsY=1.248000
+mv_dx=0.000000
+mv_dy=0.000000
+mv_l=0.900000
+mv_r=1.000000
+mv_g=1.000000
+mv_b=1.000000
+mv_a=1.000000
+per_frame_1=// che's sensor - alpha
+per_frame_2=le=1.4*bass_att+.1*bass+.5*treb;
+per_frame_3=pulse=band(above(le,th),above(le-th,block));
+per_frame_4=block=le-th;
+per_frame_5=th=if(above(le,th),le+114/(le+10)-7.407,
+per_frame_6=th+th*.07/(th-12)+below(th,2.7)*.1*(2.7-th));
+per_frame_7=
+per_frame_8=cycle=if(pulse,cycle+1,cycle);
+per_frame_9=q1=cycle;
+per_frame_10=
+per_frame_11=wave_r = 0.5 + 0.350*( 0.60*sin(0.825*time) + 0.40*sin(0.915*time) );
+per_frame_12=wave_g = 0.5+ 0.350*( 0.60*sin(0.900*time) + 0.40*sin(1.025*time) );
+per_frame_13=wave_b = 0.5 + 0.350*( 0.60*sin(0.810*time) + 0.40*sin(0.950*time) );
+per_frame_14=mv_r= 0.5 + 0.350*( 0.60*sin(0.900*time) + 0.40*sin(0.750*time) );
+per_frame_15=mv_g= 0.5+ 0.350*( 0.60*sin(0.825*time) + 0.40*sin(0.950*time) );
+per_frame_16=mv_b= 0.5 + 0.350*( 0.60*sin(0.775*time) + 0.40*sin(1.025*time) );
+per_frame_17=ib_r=mv_b;
+per_frame_18=ib_b=1-mv_g;
+per_frame_19=ib_g=wave_r;
+per_frame_20=ob_b=mv_r;
+per_frame_21=ob_r=0.5*(wave_b + wave_g);
+per_frame_22=ob_g=0.5*(wave_r+mv_b);
+per_frame_23=zoom = zoom-(0.10-(.5*th+.2*le+pulse))*0.1;
+per_frame_24=warp = 0;
+per_pixel_1=rot = -ang+sin(q1);
+per_pixel_2=zoom = zoom - rot*.08;

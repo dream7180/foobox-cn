@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTM L 1.0 Strict//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh"
+ lang="zh" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>标题格式化语法参考</title>
+  <link rel="stylesheet" type="text/css" href="titleformat_help.css" />
+</head>
+<body>
+<div class="dokuwiki export">
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header">目录</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="clear">
+
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#title_formatting_syntax_reference" class="toc">标题格式化语法参考</a></span></div>
+<ul class="toc">
+<li class="level3"><div class="li"><span class="li"><a href="#generic_fields" class="toc">一般字段</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#context-specific_fields" class="toc">上下文字段</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#functions" class="toc">函数</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#variable_operations" class="toc">变量操作</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#other" class="toc">其它</a></span></div></li></ul>
+</li></ul>
+</li></ul>
+</div>
+</div>
+
+
+
+<h2><a name="title_formatting_syntax_reference" id="title_formatting_syntax_reference">标题格式化语法参考</a></h2>
+<div class="level2">
+
+</div>
+<!-- SECTION "Title Formatting Syntax Reference" [1-46] -->
+<h3><a name="generic_fields" id="generic_fields">一般字段</a></h3>
+<div class="level3">
+<table class="inline">
+	<tr>
+		<th> 语法 </th>
+		<th> 解释 </th>
+	</tr>
+	<tr>
+		<td> %title% </td>
+		<td> 音轨标题。若元数据 “title” 不存在则使用文件名代替。</td>
+	</tr>
+	<tr>
+		<td> %artist% </td>
+		<td> 艺术家名。依次检查下列元数据字段: “artist”, “album artist”, “composer”, “performer”。</td>
+	</tr>
+	<tr>
+		<td> %album artist% </td>
+		<td> 专辑艺术家名。依次检查下列元数据字段: “album artist”, “artist”, “composer”, “performer”。与 %artist% 不同的是 %album artist% 用于在整张专辑有不同艺术家的情况。</td>
+	</tr>
+	<tr>
+		<td> %track artist% </td>
+		<td> 音轨艺术家名。仅在 %album artist% 与 %artist% 不同的时候有效。用于与 %album artist% 共同使用以指定专辑中的不同艺术家，例如: ”%album artist% - %title%[ &#039;//&#039; %track artist%]” ；在这种情况下，最后一部分内容仅会在有根据音轨指定的艺术家存在时才会显示。</td>
+	</tr>
+	<tr>
+		<td> %album% </td>
+		<td> 专辑名。依次检查下列元数据字段:  “album”, “venue”. </td>
+	</tr>
+	<tr>
+		<td> %date% </td>
+		<td> 年代。使用元数据  “date” 字段。 </td>
+	</tr>
+	<tr>
+		<td> %genre% </td>
+		<td> 流派，使用元数据 “genre” 字段。 </td>
+	</tr>
+	<tr>
+		<td> %tracknumber% </td>
+		<td> 音轨号。仅在存在元数据 “tracknumber” 字段时有效。 </td>
+	</tr>
+	<tr>
+		<td> %totaltracks% </td>
+		<td> 合计音轨。仅在存在元数据 “totaltracks” 字段时有效。 </td>
+	</tr>
+	<tr>
+		<td> %discnumber% </td>
+		<td> 光盘编号。仅在存在元数据 “discnumber” 或 “disc” 字段时有效。 </td>
+	</tr>
+	<tr>
+		<td> %totaldiscs% </td>
+		<td> 合计光盘。仅在存在元数据 “totaldiscs” 字段时有效。 </td>
+	</tr>
+	<tr>
+		<td> %codec% </td>
+		<td> 编码格式名。若无法有效取得准确的编码格式，使用文件后缀。</td>
+	</tr>
+	<tr>
+		<td> %codec_profile% </td>
+		<td> 关于编码设置的附加信息，并不总是有效。</td>
+	</tr>
+	<tr>
+		<td> %filename% </td>
+		<td>文件名，不包括后缀名和目录</td>
+	</tr>
+	<tr>
+		<td> %filename_ext% </td>
+		<td> 文件名，包括后缀名但不包括目录。</td>
+	</tr>
+	<tr>
+		<td> %directoryname% </td>
+		<td> 文件所处目录名。</td>
+	</tr>
+	<tr>
+		<td> %path% </td>
+		<td> 文件路径，注意排序时应使用 %path_sort% 而非 %path%。</td>
+	</tr>
+	<tr>
+		<td> %subsong% </td>
+		<td> 文件内的音轨编号，用于单文件支持多音轨的文件格式(例如章节和CUE)。</td>
+	</tr>
+	<tr>
+		<td> %path_sort% </td>
+		<td colspan="2"> 结合了音轨号的文件路径，用于排序；返回值不确定，因此不应依赖其返回值。</td>
+	</tr>
+	<tr>
+		<td> %length% </td>
+		<td> 长度，格式为 [HH:]MM:SS。</td>
+	</tr>
+	<tr>
+		<td> %length_seconds% </td>
+		<td> 长度，单位为秒，格式是整数。</td>
+	</tr>
+	<tr>
+		<td> %bitrate% </td>
+		<td> 比特率，单位为千比特每秒(kbps)；支持动态 VBR 比特率。</td>
+	</tr>
+	<tr>
+		<td> %channels% </td>
+		<td> 声道数(mono/stereo/etc)。</td>
+	</tr>
+	<tr>
+		<td> %samplerate% </td>
+		<td> 采样率，单位为 Hz。</td>
+	</tr>
+	<tr>
+		<td> %replaygain_track_gain%, %replaygain_album_gain%, %replaygain_track_peak%, %replaygain_album_peak% </td>
+		<td> 播放增益相关信息。 </td>
+	</tr>
+	<tr>
+		<td> %filesize%</td>
+		<td> 文件大小，单位为字节。 </td>
+	</tr>
+	<tr>
+		<td> %filesize_natural%</td>
+		<td> 文件大小，将根据实际情况返回如MB或KB的形式。 </td>
+	</tr>
+	<tr>
+		<td> %last_modified%</td>
+		<td> 返回文件最后更改时间，格式为  YYYY-MM-DD HH:MM:SS。 </td>
+	</tr>
+</table>
+
+<p>
+以上列表内容没有完成，还有一些不太重要的字段如 %field%、元数据和 %__field%、技术信息映射，它们用于保持向后兼容性。</p>
+
+</div>
+<!-- SECTION "Generic fields" [47-3492] -->
+<h3><a name="context-specific_fields" id="context-specific_fields">上下文字段</a></h3>
+<div class="level3">
+<table class="inline">
+	<tr>
+		<th> 语法 </th>
+		<th>解释</th>
+	</tr>
+	<tr>
+		<td> %list_index% </td>
+		<td> 指定项目所在的列表编号。应用于：播放列表，由 masstagger/massrenamer 处理过的项目的列表，等等。在结果前补足0以适应列表中最大数的位数。 </td>
+	</tr>
+	<tr>
+		<td> %list_total% </td>
+		<td> 指定项目所在列表的总项目数。应用于：播放列表，由 masstagger/massrenamer 处理过的列表，等等。 </td>
+	</tr>
+	<tr>
+		<td> %isplaying% </td>
+		<td> 若当前项目正在播放则有效，例如: 一个播放列表项正在播放。用于 $if() 中的条件。 </td>
+	</tr>
+	<tr>
+		<td> %ispaused% </td>
+		<td> 若当前项目正在播放并处于暂停状态则有效，例如: 一个播放列表项已暂停。用于 $if() 中的条件。 </td>
+	</tr>
+	<tr>
+		<td> %playback_time% </td>
+		<td> 当前播放时间，格式为 [HH:]MM:SS。仅在某些使用播放上下文信息的地方有效，例如状态栏。 </td>
+	</tr>
+	<tr>
+		<td> %playback_time_seconds% </td>
+		<td> 当前播放时间，单位为秒。格式为整数。仅在某些使用播放上下文信息的地方有效，例如状态栏。 </td>
+	</tr>
+	<tr>
+		<td> %playback_time_remaining% </td>
+		<td> 剩余播放时间，格式为 [HH:]MM:SS。仅在某些会使用播放上下文信息的地方有效，例如状态栏。若当前播放音轨无持续时间信息则无效。 </td>
+	</tr>
+	<tr>
+		<td> %playback_time_remaining_seconds% </td>
+		<td> 剩余播放时间，单位为秒。格式为整数。仅在某些使用播放上下文信息的地方有效，例如状态栏。若当前播放音轨无持续时间信息则无效。 </td>
+	</tr>
+	<tr>
+		<td> %queue_index% </td>
+		<td> 指定项目所处队列的编号，仅对播放列表有效。 </td>
+	</tr>
+	<tr>
+		<td> %queue_indexes% </td>
+		<td> 指定项目所处队列的编号列表，仅对播放列表有效。当指定项目仅在队列中出现一次则与 %queue_index% 等价。 </td>
+	</tr>
+	<tr>
+		<td> %queue_total% </td>
+		<td> 队列的项目总数。由于技术上的原因该字段仅对属于队列中音轨有效。 </td>
+	</tr>
+</table>
+
+</div>
+<!-- SECTION "Context-specific fields" [3493-5028] -->
+<h3><a name="functions" id="functions">函数</a></h3>
+<div class="level3">
+<table class="inline">
+	<tr>
+		<th> 语法 </th>
+		<th> 解释 </th>
+		<th> 示例 </th>
+	</tr>
+	<tr>
+		<td> $abbr(X) </td>
+		<td> 返回 X 的缩写。</td>
+		<td> $abbr(%album%) </td>
+	</tr>
+	<tr>
+		<td> $abbr(X,Y) </td>
+		<td>若 X 的长度不大于 Y，则返回 X 的缩写，否则返回 X。</td>
+		<td> $abbr(%album%,5) </td>
+	</tr>
+		<tr>
+		<td> $ansi(X) </td>
+		<td> 返回字符串 X 中属于当前代码页的部分，否则替换为相应最适合的字符。一般用于清理文件名与外部一些对Unicode支持不好的软件交互。 </td>
+		<td> $ansi(%title%), $ansi(%filename%) </td>
+	</tr>
+		<tr>
+		<td> $ascii(X) </td>
+		<td> 返回字符串 X 中属于ASCII表部分，否则替换为相应最适合的字符。一般用于与外部一些对Unicode支持不好的软件交互。 </td>
+		<td> $ascii(%title%), $ascii(%filename%) </td>
+	</tr>
+	<tr>
+		<td> $lower(X), $upper(X) </td>
+		<td> 将 X 转换到小写/大写。</td>
+		<td> $upper(%title%) </td>
+	</tr>
+	<tr>
+		<td> $num(X,Y) </td>
+		<td> 显示数字 X 并在前补足0使其长度不小于 Y (用于音轨号等)。</td>
+		<td> $num(%tracknumber%,3) </td>
+	</tr>
+	<tr>
+		<td> $caps(X) </td>
+		<td> 将所有单词的第一个字母转换为大写，所有其他字母转换为小写，例如:  “blah BLAH” &rArr; “Blah Blah”. </td>
+		<td> $caps(%title%) </td>
+	</tr>
+	<tr>
+		<td> $caps2(X) </td>
+		<td> 类似于 $caps，但是不改变已为大写的字母，例如:  “blah BLAH” &rArr; “Blah BLAH”. </td>
+		<td> $caps2(%title%) </td>
+	</tr>
+	<tr>
+		<td> $if(X,Y,Z) </td>
+		<td> 若 X 包含了至少一个有效字段，则执行/显示 Y， 否则执行/显示 Z。</td>
+		<td> $if(%artist%,%artist%,unknown artist) </td>
+	</tr>
+	<tr>
+		<td> $if2(X,Y) </td>
+		<td> 与 $if(X,X,Y) 相同。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $if3(X,Y,Z,..) </td>
+		<td> 返回首先包含至少一个有效字段的参数。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $ifgreater(A,B,C,D) </td>
+		<td> 若数字 A 大于 B, 则执行/返回 C，否则执行/返回 D。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $iflonger(A,B,C,D) </td>
+		<td> 若字符串 A 长度大于 B，则执行/返回 C，否则执行/返回 D。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $ifequal(A,B,C,D) </td>
+		<td> 若数字 A 等于 B，则执行/返回 C，否则执行/返回 D。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $longest(A,B,C,&hellip;.) </td>
+		<td> 比较字符串 A,B,C,&hellip;并返回最大长度的字符串。</td>
+		<td> $longest(%title%,%filename%) </td>
+	</tr>
+	<tr>
+		<td> $len(X) </td>
+		<td> 返回字符串 X 的长度。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $pad(X,Y), $pad_right(X,Y) </td>
+		<td> 对字符串 X 前/后补足空格使其长度不小于 Y。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $pad(X,Y,Z), $pad_right(X,Y,Z) </td>
+		<td> 对字符串 X 前/后补足字符 Z 使其长度不小于 Y。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $cut(X,Y) </td>
+		<td> 截取 X 使其长度为 Y。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $padcut(X,Y), $padcut_right(X,Y) </td>
+		<td> 对字符串 X 前/后补足空格，并截取结果使其长度不大于 Y。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $insert(A,B,N) </td>
+		<td> 向字符串 A 中 N 个字符后插入字符串 B。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $add(X,Y), $sub(X,Y), $mul(X,Y), $div(X,Y), $mod(X,Y), $min(X,Y), $max(X,Y) </td>
+		<td> 数学运算，依次为：加、减、乘、除、取模、最小值、最大值。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $left(X,Y) </td>
+		<td> 返回字符串 X 的头 Y 个字符。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $right(X,Y) </td>
+		<td> 返回字符串 X 的后 Y 个字符。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $and(X,Y), $or(X,Y), $xor(X,Y), $not(X) </td>
+		<td> 逻辑运算符，依次为：与、或、异或、非。用于与 $if() 协作。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $fix_eol(x), $fix_eol(x,y) </td>
+		<td> 截取多行字符串，在字符串尾添加 ” (&hellip;)” (第一个版本) 或 y (第二个版本)。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $meta(X) </td>
+		<td> 返回元数据字段 X 的值。 </td>
+		<td> $meta(artist) </td>
+	</tr>
+	<tr>
+		<td> $meta_sep(X,Y), $meta_sep(X,Y,Z) </td>
+		<td> 返回元数据字段 X 中的值，对于多值情况，加上自定义分隔符。</td>
+		<td> $meta(artist,&#039;, &#039;,&#039; and &#039;) &rArr; “artist1, artist2 and artist3” </td>
+	</tr>
+	<tr>
+		<td> $meta_num(X) </td>
+		<td> 返回元数据字段 X 中值的数目。 </td>
+	</tr>
+	<tr>
+		<td> $info(X) </td>
+		<td> 返回名为 X 的技术信息。</td>
+		<td> $info(bitrate) </td>
+	</tr>
+	<tr>
+		<td> $char(X) </td>
+		<td> 插入编号为 X 的 Unicode 字符。</td>
+		<td> $char(9674) </td>
+	</tr>
+	<tr>
+		<td> $strcmp(X,Y) </td>
+		<td> 当字符串 X 和 Y 相同时返回 “1”，否则返回空字符串，用于与 $if() 协同使用。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $stricmp(X,Y) </td>
+		<td> $strcmp(X,Y) 的不区分大小写版本。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $directory(X), $directory(X,N) </td>
+		<td> 从文件路径 X 中提取目录名，附加选项指定提取上 N 级目录名。 </td>
+		<td> $directory(%path%,2) </td>
+	</tr>
+	<tr>
+		<td> $directory_path(X) </td>
+		<td> 从文件路径 X 中获取相应目录路径。 </td>
+		<td> $directory_path(%path%) </td>
+	</tr>
+	<tr>
+		<td> $greater(X,Y) </td>
+		<td> 比较两个整数，检测是否 X &gt; Y，用于与 $if() 和 逻辑运算符共同使用。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $longer(X,Y) </td>
+		<td> 比较两个字符串，检测是否 X 长度大于 Y，用于与 $if() 和 逻辑运算符共同使用。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $strchr(X,Y) </td>
+		<td> 查找字符串 X 中字符 Y 首先出现位置。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $strrchr(X,Y) </td>
+		<td> 查找字符串 X 中字符 Y 最后出现位置。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $strstr(X,Y) </td>
+		<td> 查找字符串 X 中字符串 Y 中首先出现位置。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $progress2(A,B,C,D,E) </td>
+		<td> 创建进度条。(版本2)</td>
+		<td> $progress2(%playback_time_seconds%,%length%,20,’#’,’=’) &rArr; ”#####===============” </td>
+	</tr>
+	<tr>
+		<td> $select(N,A,B,C,&hellip;.) </td>
+		<td> 返回从 A,B,C... 的第 N 个参数。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $repeat(X,N) </td>
+		<td> 重复X N 次。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $replace(A,B,C) </td>
+		<td> 将字符串 A 中所有出现的字符串 B 替换为字符串 C。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $ext(X) </td>
+		<td>从文件名/路径 X 中提取后缀名。 </td>
+		<td> $ext(%path%) </td>
+	</tr>
+	<tr>
+		<td> $substr(A,B,C) </td>
+		<td> 返回 A 的子串，从第 B 个字符到 第C 个字符。</td>
+		<td> $substr(blah,1,2) &rArr; “bl” </td>
+	</tr>
+	<tr>
+		<td> $trim(A) </td>
+		<td> 移除字符串 A 中首/尾空白字符。 </td>
+		<td> $trim(%title%) </td>
+	</tr>
+	<tr>
+		<td> $tab() </td>
+		<td> 生成一个制表符，等同于 $char(9)。参见下面 “Tab(制表符)” 以获取详尽信息。 </td>
+		<td> $tab() </td>
+	</tr>
+	<tr>
+		<td> $stripprefix(X) </td>
+		<td> 将前缀 “A” 和 “The” 从X中移除。 </td>
+		<td> $strippefix(%artist%) &rArr; “The Prodigy” 变为 “Prodigy” </td>
+	</tr>
+	<tr>
+		<td> $stripprefix(X,prefix1,prefix2,&hellip;) </td>
+		<td> 将指定前缀从 X 中移除。 </td>
+		<td> $stripprefix(%artist%,a,the) &rArr; “The Prodigy” 变为 “Prodigy” </td>
+	</tr>
+	<tr>
+		<td> $swapprefix(X) </td>
+		<td> 将前缀 “A” 和 “The” 移动到 X 尾。 </td>
+		<td> $swapprefix(%artist%) &rArr; “The Prodigy” 变为 “Prodigy, The” </td>
+	</tr>
+	<tr>
+		<td> $swapprefix(X,prefix1,prefix2,&hellip;) </td>
+		<td> 将指定前缀移动到 X 尾。 </td>
+		<td> $swapprefix(%artist%,a,the) &rArr; “The Prodigy” 变为 “Prodigy, The” </td>
+	</tr>
+	<tr>
+		<td> $year(time) </td>
+		<td> 从时间/日期字符串中得到“年”(格式为4位数字)。 </td>
+		<td> $year(%last_modified%) </td>
+	</tr>
+	<tr>
+		<td> $month(time) </td>
+		<td>从时间/日期字符串中得到“月”(格式为2位数字)。</td>
+		<td> $month(%last_modified%) </td>
+	</tr>
+	<tr>
+		<td> $day_of_month(time) </td>
+		<td>从时间/日期字符串中得到月中的第几天(格式为2位数字)。</td>
+		<td> $day_of_month(%last_modified%) </td>
+	</tr>
+	<tr>
+		<td> $date(time) </td>
+		<td> 从时间/日期字符串中得到日期信息(格式为 YYYY-MM-DD)。 </td>
+		<td> $date(%last_modified%) </td>
+	</tr>
+	<tr>
+		<td> $time(time) </td><td> 从时间/日期字符串中得到时间信息(格式为 HH:MM:SS 或 HH:MM)。 </td>
+		<td> $time(%last_modified%) </td>
+	</tr>
+</table>
+
+</div>
+<!-- SECTION "Functions" [5029-11458] -->
+<h3><a name="variable_operations" id="variable_operations">变量操作</a></h3>
+<div class="level3">
+<ul>
+<li class="level1">
+  <div class="li"> 变量允许你立即保存文本处理的结果减少冗余格式化文本。</div>
+</li>
+<li class="level1">
+  <div class="li"> 变量不能在多个运行实例中进行交换，并且无法修改实际文件信息。</div>
+</li>
+<li class="level1">
+  <div class="li"> 变量的作用仅仅是缩短过于复杂脚本的尺寸，而不是有其它作用。</div>
+</li>
+</ul>
+<table class="inline">
+	<tr>
+		<th> 语法 </th>
+		<th> 解释 </th>
+		<th> 示例 </th>
+	</tr>
+	<tr>
+		<td> $put(name,text) </td>
+		<td> 设置名为 <em>name</em> 的变量的值为 <em>text</em> 并且返回 <em>text</em>。</td>
+		<td> “$put(x,blah)” 设置变量 x 为 “blah” 并且返回 “blah”. </td>
+	</tr>
+	<tr>
+		<td> $puts(name,text) </td>
+		<td>  $put() 的静默版本。与 $put(name,text) 作用相同，但返回空字符串。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> $get(name) </td>
+		<td> 返回名为 <em>name</em> 的值，若变量不存在，返回空字符串。</td>
+		<td> “$puts(x,blah)$get(x)$get(x)” 返回 “blahblah” </td>
+	</tr>
+</table>
+
+</div>
+<!-- SECTION "Variable operations" [11459-12359] -->
+<h3><a name="other" id="other">其它</a></h3>
+<div class="level3">
+<table class="inline">
+	<tr>
+		<th> 语法 </th>
+		<th> 解释 </th>
+		<th> 示例 </th>
+	</tr>
+	<tr>
+		<td> [ &hellip;. ] </td>
+		<td> 若字段不存在引用则丢弃方括号中的所有内容。主要用于创建部分仅在相关字段有效时的格式化脚本。</td>
+		<td> %artist% - [%album% / ]%title% </td>
+	</tr>
+	<tr>
+		<td> &#039; (单引号) </td>
+		<td> 插入指定文本忽略语法处理；允许有特殊字符比如&quot;%&quot;、&quot;$&quot;、&quot;[&quot;和&quot;]&quot;。若需要在文本中插入单引号，可以使用 '' (两个单引号)。 </td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td> // </td>
+		<td> 注释，仅能用于行首；注释后的文本从行首到行尾不会被解析。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td>EOL字符</td>
+		<td> 忽略; 你可以使你的脚本拆分为多行以增加可读性，而不会影响结果。</td>
+		<td> </td>
+	</tr>
+	<tr>
+		<td>Tab(制表符)</td>
+		<td> 用于对特定上下文文本进行对齐，例如状态栏。参见: $tab() </td>
+		<td> %title%$tab()%length% </td>
+	</tr>
+	<tr>
+		<td> 颜色控制: &lt; &gt; </td><td> 用于控制文本颜色的深浅,现在可用于播放列表和状态栏.深浅都有3个级别,可通过重复颜色控制字符控制级别. </td><td> &lt;浅&gt; &gt;深&lt; &gt;&gt;更深&lt;&lt; </td>
+	</tr>
+</table>
+
+</div>
+<!-- SECTION "Other" [12360-] --></div>
+</body>
+</html>

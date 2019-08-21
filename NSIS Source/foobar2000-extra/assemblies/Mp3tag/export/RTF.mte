@@ -1,0 +1,17 @@
+$filename(rtf,ansi){\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Tahoma;}}
+\viewkind4\uc1\pard\b\f0\fs32 Mp3tag File Overview\par
+\b0\fs20 %_date%\par
+\par
+
+$loop(%_filename_ext%)Title: \b %title%\b0\par
+Artist: \b %artist%\b0\par
+Album: \b %album%\b0\par
+Year: \b %year%\b0\par
+Track: \b %track%\b0\par
+Genre: \b %genre%\b0\par
+Comment: \b %comment%\b0\par
+\par
+$loopend()
+\par
+build on %_date%, with \b %_app% - the universal Tag Editor\b0  - http://www.mp3tag.de/en/\par
+}

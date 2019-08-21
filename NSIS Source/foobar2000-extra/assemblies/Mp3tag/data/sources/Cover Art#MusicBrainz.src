@@ -1,0 +1,118 @@
+﻿# ###################################################################
+# Mp3tag Tag Source for Cover Art from MusicBrainz API v2 (Official)
+#
+# Search by ALBUM
+#
+# This file needs to be stored in Mp3tag's tag sources directory. 
+# %APPDATA%\Mp3tag\data\sources
+#
+# [2018-07-02] v1.01
+#         CHG: included artist in search query.
+#         FIX: extended namespace alias changed on server.
+# [2018-01-27] v1.00 based on Tag Source for MusicBrainz API v1 by dano
+#
+# ###################################################################
+
+[Name]=MusicBrainz
+[BasedOn]=musicbrainz.org
+[IndexUrl]=http://musicbrainz.org/ws/2/release/?limit=50&query=release:%s
+[AlbumUrl]=http://musicbrainz.org/ws/2/release/
+[WordSeparator]=+
+[IndexFormat]=%_preview%|%_url%|%Score%|%Type%|%Artist%|%Album%|%Tracks%|%Year%|%Country%|%Format%|%Publisher%|%CatNo%
+[SearchBy]=$regexp(%album%,'[-+!(){}\[\]^"~*?:\\]',)$if(%artist%, AND artist:($regexp(%artist%,'[-+!(){}\[\]^"~*?:\\]',)),)
+[UserAgent]=1
+[Encoding]=url-utf-8
+
+[ParserScriptIndex]=...
+# ###################################################################
+#					I  N  D  E  X
+# ###################################################################
+
+findline "<release-list"
+joinuntil "</release-list>"
+replace "|" "$verticalBar()"
+
+do
+	# Preview
+	say "http://musicbrainz.org/release/"
+	sayregexp "(?<= id=\")[-0-9a-y]{34,40}(?=\" )" ", " "<title>"
+	say "|"
+
+	# URL
+	sayregexp "(?<= id=\")[-0-9a-y]{34,40}(?=\" )" ", " "<title>"
+	say "?inc=artists+artist-credits+labels+recordings+release-groups"
+	say "|"
+
+	# Score
+	findinline ":score=\""
+	sayuntil "\""
+	say "|"
+
+	# Type
+	sayregexp "(?<=<primary-type>)[^<]+(?=</primary-type>)" ", " "</release-group>"
+	say "|"
+
+	# Artist
+	sayregexp "(?<=<name>)[^<]+(?=</name>)" ", " "</artist-credit>"
+	say "|"
+
+	# Album
+	findinline "<title>"
+	sayuntil "</title>"
+	say "|"
+
+	# Tracks
+	sayregexp "(?<=<track-list count=\")\d+(?=\")" ", " "</release>"
+	say "|"
+
+	# Year
+	sayregexp "(?<=release-group><date>)[-0-9]{4,10}(?=</date>)" ", " "</release>"
+	say "|"
+
+	# Country
+	sayregexp "(?<=country>)[^<]+(?=<)" ", " "</release>"
+	say "|"
+
+	# Format
+	sayregexp "(?<=format>)[^<]+(?=<)" ", " "</release>"
+	say "|"
+
+	# Label
+	sayregexp "(?<=<name>)[^<]+(?=</name></label>)" ", " "</release>"
+	say "|"
+
+	# Catalog-number
+	sayregexp "(?<=catalog-number>)[^<]+(?=<)" ", " "</release>"
+	saynewline
+
+	findinline "</release>"
+while "<release "
+
+
+[ParserScriptAlbum]=...
+# ###################################################################
+#					A  L  B  U  M
+# ###################################################################
+
+# Cover via CoverArtArchive
+findinline "<artwork>" 1 1
+if "true"
+	findline "<?xml"
+	findinline "<release id=\""
+	outputto "coverurl"
+	say "http://coverartarchive.org/release/"
+	sayuntil "\""
+	say "/front"
+else
+#Cover via ASIN
+	findline "<?xml"
+	findinline "<asin>" 1 1
+	movechar -6
+	if "<asin>"
+		outputto "coverurl"
+		movechar 6
+		say "http://images.amazon.com/images/P/"
+		sayuntil "</asin>"
+		say ".01.LZZZZZZZ.jpg"
+	endif
+endif

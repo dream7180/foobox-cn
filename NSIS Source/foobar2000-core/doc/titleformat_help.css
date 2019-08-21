@@ -1,0 +1,1291 @@
+a.interwiki {
+padding-left : 16px; 
+} 
+a.iw_wp { 
+} 
+a.iw_wpde { 
+} 
+a.iw_wpmeta { 
+} 
+a.iw_doku { 
+} 
+a.iw_sb { 
+} 
+a.iw_amazon { 
+} 
+a.iw_amazon_de { 
+} 
+a.iw_amazon_uk { 
+} 
+a.iw_phpfn { 
+} 
+a.iw_dokubug { 
+} 
+a.iw_coral { 
+} 
+a.iw_google { 
+} 
+a.iw_meatball { 
+} 
+a.iw_wiki { 
+} 
+a.mediafile { 
+padding-left : 18px; 
+padding-bottom : 1px; 
+} 
+a.mf_jpg { 
+} 
+a.mf_jpeg { 
+} 
+a.mf_gif { 
+} 
+a.mf_png { 
+} 
+a.mf_tgz { 
+} 
+a.mf_tar { 
+} 
+a.mf_gz { 
+} 
+a.mf_zip { 
+} 
+a.mf_rar { 
+} 
+a.mf_pdf { 
+} 
+a.mf_ps { 
+} 
+a.mf_doc { 
+} 
+a.mf_xls { 
+} 
+a.mf_ppt { 
+} 
+a.mf_rtf { 
+} 
+a.mf_swf { 
+} 
+a.mf_rpm { 
+} 
+a.mf_deb { 
+} 
+a.mf_sxw { 
+} 
+a.mf_sxc { 
+} 
+a.mf_sxi { 
+} 
+a.mf_sxd { 
+} 
+a.mf_odc { 
+} 
+a.mf_odf { 
+} 
+a.mf_odg { 
+} 
+a.mf_odi { 
+} 
+a.mf_odp { 
+} 
+a.mf_ods { 
+} 
+a.mf_odt { 
+} 
+div.clearer { 
+clear : both; 
+line-height : 0; 
+height : 0; 
+overflow : hidden; 
+} 
+div.no { 
+display : inline; 
+margin : 0; 
+padding : 0; 
+} 
+.hidden { 
+display : none; 
+} 
+div.error { 
+background : #fcc;
+color : #000; 
+border-bottom : 1px solid #faa; 
+font-size : 90%; 
+margin : 0; 
+padding-left : 3em; 
+overflow : hidden; 
+} 
+div.info { 
+background : #ccf;
+color : #000; 
+border-bottom : 1px solid #aaf; 
+font-size : 90%; 
+margin : 0; 
+padding-left : 3em; 
+overflow : hidden; 
+} 
+div.success { 
+background : #cfc;
+color : #000; 
+border-bottom : 1px solid #afa; 
+font-size : 90%; 
+margin : 0; 
+padding-left : 3em; 
+overflow : hidden; 
+} 
+div.notify { 
+background : #ffc;
+color : #000; 
+border-bottom : 1px solid #ffa; 
+font-size : 90%; 
+margin : 0; 
+padding-left : 3em; 
+overflow : hidden; 
+} 
+.medialeft { 
+float : left; 
+} 
+.mediaright { 
+float : right; 
+} 
+.mediacenter { 
+display : block; 
+margin-left : auto; 
+margin-right : auto; 
+} 
+.leftalign { 
+text-align : left; 
+} 
+.centeralign { 
+text-align : center; 
+} 
+.rightalign { 
+text-align : right; 
+} 
+em.u { 
+font-style : normal; 
+text-decoration : underline; 
+} 
+em em.u { 
+font-style : italic; 
+} 
+.code .br0 { 
+color : #6c6; 
+} 
+.code .co1 { 
+color : #808080; 
+font-style : italic; 
+} 
+.code .co2 { 
+color : #808080; 
+font-style : italic; 
+} 
+.code .co3 { 
+color : #808080; 
+} 
+.code .coMULTI { 
+color : #808080; 
+font-style : italic; 
+} 
+.code .es0 { 
+color : #009; 
+font-weight : bold; 
+} 
+.code .kw1 { 
+color : #b1b100; 
+} 
+.code .kw2 { 
+color : #000; 
+font-weight : bold; 
+} 
+.code .kw3 { 
+color : #006; 
+} 
+.code .kw4 { 
+color : #933; 
+} 
+.code .kw5 { 
+color : #00f; 
+} 
+.code .me1 { 
+color : #060; 
+} 
+.code .me2 { 
+color : #060; 
+} 
+.code .nu0 { 
+color : #c6c; 
+} 
+.code .re0 { 
+color : #00f; 
+} 
+.code .re1 { 
+color : #00f; 
+} 
+.code .re2 { 
+color : #00f; 
+} 
+.code .re3 { 
+color : #f33; 
+font-weight : bold; 
+} 
+.code .re4 { 
+color : #099; 
+} 
+.code .st0 { 
+color : #f00; 
+} 
+.code .sy0 { 
+color : #6c6; 
+} 
+#acl__manager label { 
+text-align : left; 
+font-weight : normal; 
+display : inline; 
+} 
+#acl__manager table { 
+margin-left : 10%; 
+width : 80%; 
+} 
+#config__manager div.success, #config__manager div.error, #config__manager div.info { 
+background-position : 0.5em 0%; 
+padding : 0.5em; 
+text-align : center; 
+} 
+#config__manager fieldset { 
+margin : 1em; 
+width : auto; 
+margin-bottom : 2em; 
+background-color : #dee7ec; 
+color : #000; 
+padding : 0 1em; 
+} 
+#config__manager legend { 
+font-size : 1.25em; 
+} 
+#config__manager table { 
+margin : 1em 0; 
+width : 100%; 
+} 
+#config__manager fieldset td { 
+text-align : left; 
+} 
+#config__manager fieldset td.value { 
+width : 30em; 
+} 
+#config__manager td input.edit { 
+width : 30em; 
+} 
+#config__manager td textarea.edit { 
+width : 27.5em; 
+height : 4em; 
+} 
+#config__manager tr .input, #config__manager tr input, #config__manager tr textarea, #config__manager tr select { 
+background-color : #fff; 
+color : #000; 
+} 
+#config__manager tr.default .input, #config__manager tr.default input, #config__manager tr.default textarea, #config__manager tr.default select, #config__manager .selectiondefault { 
+background-color : #cdf; 
+color : #000; 
+} 
+#config__manager tr.protected .input, #config__manager tr.protected input, #config__manager tr.protected textarea, #config__manager tr.protected select, #config__manager tr.protected .selection { 
+background-color : #fcc !important ; 
+color : #000 !important ; 
+} 
+#config__manager td.error { 
+background-color : red; 
+color : #000; 
+} 
+#config__manager .selection { 
+width : 14.8em; 
+float : left; 
+margin : 0 0.3em 2px 0; 
+} 
+#config__manager .selection label { 
+float : right; 
+width : 14em; 
+font-size : 90%; 
+} 
+* html #config__manager .selection label { 
+padding-top : 2px; 
+} 
+#config__manager .selection input.checkbox { 
+padding-left : 0.7em; 
+} 
+#config__manager .other { 
+clear : both; 
+padding-top : 0.5em; 
+} 
+#config__manager .other label { 
+padding-left : 2px; 
+font-size : 90%; 
+} 
+#plugin__manager h2 { 
+margin-left : 0; 
+} 
+#plugin__manager form { 
+display : block; 
+margin : 0; 
+padding : 0; 
+} 
+#plugin__manager legend { 
+display : none; 
+} 
+#plugin__manager fieldset { 
+width : auto; 
+} 
+#plugin__manager .button { 
+margin : 0; 
+} 
+#plugin__manager p, #plugin__manager label { 
+text-align : left; 
+} 
+#plugin__manager .hidden { 
+display : none; 
+} 
+#plugin__manager .new { 
+background : #dee7ec; 
+} 
+#plugin__manager input[disabled] { 
+color : #ccc; 
+border-color : #ccc; 
+} 
+#plugin__manager .pm_menu, #plugin__manager .pm_info { 
+margin-left : 0; 
+text-align : left; 
+} 
+#plugin__manager .pm_menu { 
+float : left; 
+width : 48%; 
+} 
+#plugin__manager .pm_info { 
+float : right; 
+width : 50%; 
+} 
+#plugin__manager .common fieldset { 
+margin : 0; 
+padding : 0 0 1em 0; 
+text-align : left; 
+border : none; 
+} 
+#plugin__manager .common label { 
+padding : 0 0 0.5em 0; 
+} 
+#plugin__manager .common input.edit { 
+width : 24em; 
+margin : 0.5em; 
+} 
+#plugin__manager .plugins fieldset { 
+color : #000; 
+background : #fff; 
+text-align : right; 
+border-top : none; 
+border-right : none; 
+border-left : none; 
+} 
+#plugin__manager .plugins fieldset.protected { 
+background : #fdd; 
+color : #000; 
+} 
+#plugin__manager .plugins fieldset.disabled { 
+background : #e0e0e0; 
+color : #a8a8a8; 
+} 
+#plugin__manager .plugins .legend { 
+color : #000; 
+background : inherit; 
+display : block; 
+margin : 0; 
+padding : 0; 
+font-size : 1em; 
+line-height : 1.4em; 
+font-weight : normal; 
+text-align : left; 
+float : left; 
+padding : 0; 
+clear : none; 
+} 
+#plugin__manager .plugins .button { 
+font-size : 95%; 
+} 
+#plugin__manager .plugins fieldset.buttons { 
+border : none; 
+} 
+#plugin__manager .plugins fieldset.buttons .button { 
+float : left; 
+} 
+#plugin__manager .pm_info h3 { 
+margin-left : 0; 
+} 
+#plugin__manager .pm_info dl { 
+margin : 1em 0; 
+padding : 0; 
+} 
+#plugin__manager .pm_info dt { 
+width : 6em; 
+float : left; 
+clear : left; 
+margin : 0; 
+padding : 0; 
+} 
+#plugin__manager .pm_info dd { 
+margin : 0 0 0 7em; 
+padding : 0; 
+background : none; 
+} 
+#plugin__manager .plugins .enable { 
+float : left; 
+width : auto; 
+margin-right : 0.5em; 
+} 
+#user__manager tr.disabled { 
+color : #6f6f6f; 
+background : #e4e4e4; 
+} 
+#user__manager tr.user_info { 
+vertical-align : top; 
+} 
+#user__manager div.edit_user { 
+width : 46%; 
+float : left; 
+} 
+#user__manager table { 
+margin-bottom : 1em; 
+} 
+#user__manager input.button[disabled] { 
+color : #ccc !important ; 
+border-color : #ccc !important ; 
+} 
+div.dokuwiki .header { 
+padding : 3px 0 0 2px; 
+} 
+div.dokuwiki .pagename { 
+float : left; 
+font-size : 200%; 
+font-weight : bolder; 
+color : #dee7ec; 
+text-align : left; 
+vertical-align : middle; 
+} 
+div.dokuwiki .pagename a { 
+color : #436976 !important ; 
+text-decoration : none !important ; 
+} 
+div.dokuwiki .logo { 
+float : right; 
+font-size : 220%; 
+font-weight : bolder; 
+text-align : right; 
+vertical-align : middle; 
+} 
+div.dokuwiki .logo a { 
+color : #dee7ec !important ; 
+text-decoration : none !important ; 
+font-variant : small-caps; 
+letter-spacing : 2pt; 
+} 
+div.dokuwiki .bar { 
+border-top : 1px solid #8cacbb; 
+border-bottom : 1px solid #8cacbb; 
+background : #dee7ec; 
+padding : 0.1em 0.15em; 
+clear : both; 
+} 
+div.dokuwiki .bar-left { 
+float : left; 
+} 
+div.dokuwiki .bar-right { 
+float : right; 
+text-align : right; 
+} 
+div.dokuwiki #bar__bottom { 
+margin-bottom : 3px; 
+} 
+div.dokuwiki div.meta { 
+clear : both; 
+margin-top : 1em; 
+color : #638c9c; 
+font-size : 70%; 
+} 
+div.dokuwiki div.meta div.user { 
+float : left; 
+} 
+div.dokuwiki div.meta div.doc { 
+text-align : right; 
+} 
+* { 
+padding : 0; 
+margin : 0; 
+} 
+body { 
+font : 80% "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif; 
+background-color : #fff; 
+color : #000; 
+} 
+div.dokuwiki div.page { 
+margin : 4px 2em 0 1em; 
+text-align : justify; 
+} 
+div.dokuwiki table { 
+font-size : 100%; 
+} 
+div.dokuwiki img { 
+border : 0; 
+} 
+div.dokuwiki p, div.dokuwiki blockquote, div.dokuwiki table, div.dokuwiki pre { 
+margin : 0 0 1em 0; 
+} 
+div.dokuwiki hr { 
+border : 0; 
+border-top : 1px solid #8cacbb; 
+text-align : center; 
+height : 0; 
+} 
+div.dokuwiki div.nothing { 
+text-align : center; 
+margin : 2em; 
+} 
+div.dokuwiki form { 
+border : none; 
+display : inline; 
+} 
+div.dokuwiki label.block { 
+display : block; 
+text-align : right; 
+font-weight : bold; 
+} 
+div.dokuwiki label.simple { 
+display : block; 
+text-align : left; 
+font-weight : normal; 
+} 
+div.dokuwiki label.block input.edit { 
+width : 50%; 
+} 
+div.dokuwiki fieldset { 
+width : 300px; 
+text-align : center; 
+border : 1px solid #8cacbb; 
+padding : 0.5em; 
+margin : auto; 
+} 
+div.dokuwiki textarea.edit { 
+font-family : monospace; 
+font-size : 14px; 
+color : #000; 
+background-color : #fff; 
+border : 1px solid #8cacbb; 
+padding : 0.3em 0 0 0.3em; 
+width : 100%; 
+} 
+html > body div.dokuwiki textarea.edit { 
+background : #fff;
+} 
+div.dokuwiki input.edit, div.dokuwiki select.edit { 
+font-size : 100%; 
+border : 1px solid #8cacbb; 
+color : #000; 
+background-color : #fff; 
+vertical-align : middle; 
+margin : 1px; 
+padding : 0.2em 0.3em; 
+display : inline; 
+} 
+html > body div.dokuwiki input.edit, html > body div.dokuwiki select.edit { 
+background : #fff;
+} 
+div.dokuwiki select.edit { 
+padding : 0.1em 0; 
+} 
+div.dokuwiki input.missing { 
+font-size : 100%; 
+border : 1px solid #8cacbb; 
+color : #000; 
+background-color : #fcc; 
+vertical-align : middle; 
+margin : 1px; 
+padding : 0.2em 0.3em; 
+display : inline; 
+} 
+div.dokuwiki textarea.edit[disabled], div.dokuwiki textarea.edit[readonly], div.dokuwiki input.edit[disabled], div.dokuwiki input.edit[readonly], div.dokuwiki select.edit[disabled] { 
+background-color : #f5f5f5 !important ; 
+color : #666 !important ; 
+} 
+div.dokuwiki div.toolbar, div.dokuwiki div#wiki__editbar { 
+margin : 2px 0; 
+text-align : left; 
+} 
+div.dokuwiki div#size__ctl { 
+float : right; 
+width : 60px; 
+height : 2.7em; 
+} 
+div.dokuwiki #size__ctl img { 
+cursor : pointer; 
+} 
+div.dokuwiki div#wiki__editbar div.editButtons { 
+float : left; 
+padding : 0 1em 0.7em 0; 
+} 
+div.dokuwiki div#wiki__editbar div.summary { 
+float : left; 
+} 
+div.dokuwiki .nowrap { 
+white-space : nowrap; 
+} 
+div.dokuwiki div#draft__status { 
+float : right; 
+color : #638c9c; 
+} 
+div.dokuwiki input.button, div.dokuwiki button.button { 
+border : 1px solid #8cacbb; 
+color : #000; 
+background-color : #fff; 
+vertical-align : middle; 
+text-decoration : none; 
+font-size : 100%; 
+cursor : pointer; 
+margin : 1px; 
+padding : 0.125em 0.4em; 
+} 
+html > body div.dokuwiki input.button, html > body div.dokuwiki button.button { 
+background : #fff;
+} 
+* html div.dokuwiki input.button, * html div.dokuwiki button.button { 
+height : 1.8em; 
+} 
+div.dokuwiki div.secedit input.button { 
+border : 1px solid #8cacbb; 
+color : #000; 
+background-color : #fff; 
+vertical-align : middle; 
+text-decoration : none; 
+margin : 0; 
+padding : 0; 
+font-size : 10px; 
+cursor : pointer; 
+float : right; 
+display : inline; 
+} 
+div.dokuwiki div.pagenav { 
+margin : 1em 0 0 0; 
+} 
+div.dokuwiki div.pagenav-prev { 
+text-align : right; 
+float : left; 
+width : 49%; 
+} 
+div.dokuwiki div.pagenav-next { 
+text-align : left; 
+float : right; 
+width : 49%; 
+} 
+div.dokuwiki a:link, div.dokuwiki a:visited { 
+color : #436976; 
+text-decoration : none; 
+} 
+div.dokuwiki a:hover, div.dokuwiki a:active { 
+color : #000; 
+text-decoration : underline; 
+} 
+div.dokuwiki h1 a, div.dokuwiki h2 a, div.dokuwiki h3 a, div.dokuwiki h4 a, div.dokuwiki h5 a, div.dokuwiki a.nolink { 
+color : #000 !important ; 
+text-decoration : none !important ; 
+} 
+div.dokuwiki a.urlextern { 
+background : transparent;
+padding : 1px 0 1px 16px; 
+} 
+div.dokuwiki a.windows { 
+background : transparent;
+padding : 1px 0 1px 16px; 
+} 
+div.dokuwiki a.urlextern:link, div.dokuwiki a.windows:link, div.dokuwiki a.interwiki:link { 
+color : #436976; 
+} 
+div.dokuwiki a.urlextern:visited, div.dokuwiki a.windows:visited, div.dokuwiki a.interwiki:visited { 
+color : purple; 
+} 
+div.dokuwiki a.urlextern:hover, div.dokuwiki a.urlextern:active, div.dokuwiki a.windows:hover, div.dokuwiki a.windows:active, div.dokuwiki a.interwiki:hover, div.dokuwiki a.interwiki:active { 
+color : #000; 
+} 
+div.dokuwiki a.mail { 
+background : transparent;
+padding : 1px 0 1px 16px; 
+} 
+div.dokuwiki a.wikilink1 { 
+color : #090 !important ; 
+} 
+div.dokuwiki a.wikilink2 { 
+color : #f30 !important ; 
+text-decoration : none !important ; 
+border-bottom : 1px dashed #f30 !important ; 
+} 
+div.dokuwiki div.preview { 
+background-color : #f5f5f5; 
+margin : 0 0 0 2em; 
+padding : 4px; 
+border : 1px dashed #000; 
+} 
+div.dokuwiki div.breadcrumbs { 
+background-color : #f5f5f5; 
+color : #666; 
+font-size : 80%; 
+padding : 0 0 0 4px; 
+} 
+div.dokuwiki span.user { 
+color : #ccc; 
+font-size : 90%; 
+} 
+div.dokuwiki li.minor { 
+color : #666; 
+font-style : italic; 
+} 
+div.dokuwiki img.media { 
+margin : 3px; 
+} 
+div.dokuwiki img.medialeft { 
+border : 0; 
+float : left; 
+margin : 0 1.5em 0 0; 
+} 
+div.dokuwiki img.mediaright { 
+border : 0; 
+float : right; 
+margin : 0 0 0 1.5em; 
+} 
+div.dokuwiki img.mediacenter { 
+border : 0; 
+display : block; 
+margin : 0 auto; 
+} 
+div.dokuwiki img.middle { 
+vertical-align : middle; 
+} 
+div.dokuwiki acronym { 
+cursor : help; 
+border-bottom : 1px dotted #000; 
+} 
+div.dokuwiki h1, div.dokuwiki h2, div.dokuwiki h3, div.dokuwiki h4, div.dokuwiki h5 { 
+color : #000; 
+background-color : inherit; 
+font-size : 100%; 
+font-weight : normal; 
+margin : 0 0 1em 0; 
+padding : 0.5em 0 0 0; 
+border-bottom : 1px solid #8cacbb; 
+clear : left; 
+} 
+div.dokuwiki h1 { 
+font-size : 160%; 
+margin-left : 0; 
+font-weight : bold; 
+} 
+div.dokuwiki h2 { 
+font-size : 150%; 
+margin-left : 20px; 
+} 
+div.dokuwiki h3 { 
+font-size : 140%; 
+margin-left : 40px; 
+border-bottom : none; 
+font-weight : bold; 
+} 
+div.dokuwiki h4 { 
+font-size : 120%; 
+margin-left : 60px; 
+border-bottom : none; 
+font-weight : bold; 
+} 
+div.dokuwiki h5 { 
+font-size : 100%; 
+margin-left : 80px; 
+border-bottom : none; 
+font-weight : bold; 
+} 
+div.dokuwiki div.level1 { 
+margin-left : 3px; 
+} 
+div.dokuwiki div.level2 { 
+margin-left : 23px; 
+} 
+div.dokuwiki div.level3 { 
+margin-left : 43px; 
+} 
+div.dokuwiki div.level4 { 
+margin-left : 63px; 
+} 
+div.dokuwiki div.level5 { 
+margin-left : 83px; 
+} 
+div.dokuwiki ul { 
+line-height : 1.5em; 
+list-style-type : square; 
+list-style-image : none; 
+margin : 0 0 0.5em 1.5em; 
+color : #638c9c; 
+} 
+div.dokuwiki ol { 
+line-height : 1.5em; 
+list-style-image : none; 
+margin : 0 0 0.5em 1.5em; 
+color : #638c9c; 
+font-weight : bold; 
+} 
+div.dokuwiki .li { 
+color : #000; 
+font-weight : normal; 
+} 
+div.dokuwiki ol { 
+list-style-type : decimal; 
+} 
+div.dokuwiki ol ol { 
+list-style-type : upper-roman; 
+} 
+div.dokuwiki ol ol ol { 
+list-style-type : lower-alpha; 
+} 
+div.dokuwiki ol ol ol ol { 
+list-style-type : lower-greek; 
+} 
+div.dokuwiki li.open { 
+} 
+div.dokuwiki li.closed { 
+} 
+div.dokuwiki blockquote { 
+border-left : 2px solid #8cacbb; 
+padding-left : 3px; 
+} 
+div.dokuwiki pre { 
+font-size : 120%; 
+padding : 0.5em; 
+border : 1px dashed #8cacbb; 
+color : #000; 
+overflow : auto; 
+} 
+div.dokuwiki pre.pre { 
+background-color : #f7f9fa; 
+} 
+div.dokuwiki pre.code { 
+background-color : #f7f9fa; 
+} 
+div.dokuwiki code { 
+font-size : 120%; 
+} 
+div.dokuwiki pre.file { 
+background-color : #dee7ec; 
+} 
+div.dokuwiki table.inline { 
+background-color : #fff; 
+border-spacing : 0; 
+border-collapse : collapse; 
+} 
+div.dokuwiki table.inline th { 
+padding : 3px; 
+border : 1px solid #8cacbb; 
+background-color : #dee7ec; 
+} 
+div.dokuwiki table.inline td { 
+padding : 3px; 
+border : 1px solid #8cacbb; 
+} 
+div.dokuwiki div.toc { 
+margin : 1.2em 0 0 2em; 
+float : right; 
+width : 200px; 
+font-size : 80%; 
+clear : both; 
+} 
+div.dokuwiki div.tocheader { 
+border : 1px solid #8cacbb; 
+background-color : #dee7ec; 
+text-align : left; 
+font-weight : bold; 
+padding : 3px; 
+margin-bottom : 2px; 
+} 
+div.dokuwiki span.toc_open, div.dokuwiki span.toc_close { 
+border : 0.4em solid #dee7ec; 
+float : right; 
+display : block; 
+margin : 0.4em 3px 0 0; 
+} 
+div.dokuwiki span.toc_open span, div.dokuwiki span.toc_close span { 
+display : none; 
+} 
+div.dokuwiki span.toc_open { 
+margin-top : 0.4em; 
+border-top : 0.4em solid #000; 
+} 
+div.dokuwiki span.toc_close { 
+margin-top : 0; 
+border-bottom : 0.4em solid #000; 
+} 
+div.dokuwiki #toc__inside { 
+border : 1px solid #8cacbb; 
+background-color : #fff; 
+text-align : left; 
+padding : 0.5em 0 0.7em 0; 
+} 
+div.dokuwiki ul.toc { 
+list-style-type : none; 
+list-style-image : none; 
+line-height : 1.2em; 
+padding-left : 1em; 
+margin : 0; 
+} 
+div.dokuwiki ul.toc li { 
+background : transparent;
+padding-left : 0.4em; 
+} 
+div.dokuwiki ul.toc li.clear { 
+background-image : none; 
+padding-left : 0.4em; 
+} 
+div.dokuwiki a.toc:link, div.dokuwiki a.toc:visited { 
+color : #436976; 
+} 
+div.dokuwiki a.toc:hover, div.dokuwiki a.toc:active { 
+color : #000; 
+} 
+div.dokuwiki table.diff { 
+background-color : #fff; 
+width : 100%; 
+} 
+div.dokuwiki td.diff-blockheader { 
+font-weight : bold; 
+} 
+div.dokuwiki table.diff th { 
+border-bottom : 1px solid #8cacbb; 
+font-size : 120%; 
+width : 50%; 
+font-weight : normal; 
+text-align : left; 
+} 
+div.dokuwiki table.diff td { 
+font-family : monospace; 
+font-size : 100%; 
+} 
+div.dokuwiki td.diff-addedline { 
+background-color : #dfd; 
+} 
+div.dokuwiki td.diff-deletedline { 
+background-color : #ffb; 
+} 
+div.dokuwiki td.diff-context { 
+background-color : #f5f5f5; 
+} 
+div.dokuwiki table.diff td.diff-addedline strong, div.dokuwiki table.diff td.diff-deletedline strong { 
+color : red; 
+} 
+div.dokuwiki div.footnotes { 
+clear : both; 
+border-top : 1px solid #8cacbb; 
+padding-left : 1em; 
+margin-top : 1em; 
+} 
+div.dokuwiki div.fn { 
+font-size : 90%; 
+} 
+div.dokuwiki a.fn_top { 
+vertical-align : super; 
+font-size : 80%; 
+} 
+div.dokuwiki a.fn_bot { 
+vertical-align : super; 
+font-size : 80%; 
+font-weight : bold; 
+} 
+div.insitu-footnote { 
+font-size : 80%; 
+line-height : 1.2em; 
+border : 1px solid #8cacbb; 
+background-color : #f7f9fa; 
+text-align : left; 
+padding : 4px; 
+max-width : 40%; 
+} 
+* html .insitu-footnote pre.code, * html .insitu-footnote pre.file { 
+padding-bottom : 18px; 
+} 
+div.dokuwiki .search_result { 
+margin-bottom : 6px; 
+padding : 0 10px 0 30px; 
+} 
+div.dokuwiki .search_snippet { 
+color : #ccc; 
+font-size : 12px; 
+margin-left : 20px; 
+} 
+div.dokuwiki .search_sep { 
+color : #000; 
+} 
+div.dokuwiki .search_hit { 
+color : #000; 
+background-color : #ff9; 
+} 
+div.dokuwiki strong.search_hit { 
+font-weight : normal; 
+} 
+div.dokuwiki div.search_quickresult { 
+margin : 0 0 15px 30px; 
+padding : 0 10px 10px 0; 
+border-bottom : 1px dashed #8cacbb; 
+} 
+div.dokuwiki div.search_quickresult h3 { 
+margin : 0 0 1em 0; 
+font-size : 1em; 
+font-weight : bold; 
+} 
+div.dokuwiki ul.search_quickhits { 
+margin : 0 0 0.5em 1em; 
+} 
+div.dokuwiki ul.search_quickhits li { 
+margin : 0 1em 0 1em; 
+float : left; 
+width : 30%; 
+} 
+div.footerinc { 
+text-align : center; 
+} 
+.footerinc a img { 
+border : 0; 
+} 
+div.dokuwiki div.ajax_qsearch { 
+position : absolute; 
+right : 237px; 
+width : 200px; 
+display : none; 
+font-size : 80%; 
+line-height : 1.2em; 
+border : 1px solid #8cacbb; 
+background-color : #f7f9fa; 
+text-align : left; 
+padding : 4px; 
+} 
+button.toolbutton { 
+background-color : #fff; 
+padding : 0; 
+margin : 0 1px 0 0; 
+border : 1px solid #8cacbb; 
+cursor : pointer; 
+} 
+html > body button.toolbutton { 
+background : #fff;
+} 
+div.picker { 
+width : 250px; 
+border : 1px solid #8cacbb; 
+background-color : #dee7ec; 
+} 
+button.pickerbutton { 
+padding : 0; 
+margin : 0 1px 1px 0; 
+border : 0; 
+background-color : transparent; 
+font-size : 80%; 
+cursor : pointer; 
+} 
+div.dokuwiki a.spell_error { 
+color : #f00; 
+text-decoration : underline; 
+} 
+div.dokuwiki div#spell__suggest { 
+background-color : #fff; 
+padding : 2px; 
+border : 1px solid #000; 
+font-size : 80%; 
+display : none; 
+} 
+div.dokuwiki div#spell__result { 
+border : 1px solid #8cacbb; 
+color : #000; 
+font-size : 14px; 
+padding : 3px; 
+background-color : #f7f9fa; 
+display : none; 
+} 
+div.dokuwiki span.spell_noerr { 
+color : #093; 
+} 
+div.dokuwiki span.spell_wait { 
+color : #06c; 
+} 
+div.dokuwiki div.img_big { 
+float : left; 
+margin-right : 0.5em; 
+} 
+div.dokuwiki dl.img_tags dt { 
+font-weight : bold; 
+background-color : #dee7ec; 
+} 
+div.dokuwiki dl.img_tags dd { 
+background-color : #f5f5f5; 
+} 
+div.dokuwiki div.imagemeta { 
+color : #666; 
+font-size : 70%; 
+line-height : 95%; 
+} 
+div.dokuwiki div.imagemeta img.thumb { 
+float : left; 
+margin-right : 0.1em; 
+} 
+#media__manager { 
+height : 100%; 
+overflow : hidden; 
+} 
+#media__left { 
+width : 30%; 
+border-right : 1px solid #8cacbb; 
+height : 100%; 
+overflow : auto; 
+position : absolute; 
+left : 0; 
+} 
+#media__right { 
+width : 69.7%; 
+height : 100%; 
+overflow : auto; 
+position : absolute; 
+right : 0; 
+} 
+#media__manager h1 { 
+margin : 0; 
+padding : 0; 
+margin-bottom : 0.5em; 
+} 
+#media__tree img { 
+float : left; 
+padding : 0.5em 0.3em 0 0; 
+} 
+#media__tree ul { 
+list-style-type : none; 
+list-style-image : none; 
+} 
+#media__tree li { 
+clear : left; 
+list-style-type : none; 
+list-style-image : none; 
+} 
+* html #media__tree li { 
+border : 1px solid #fff; 
+} 
+#media__opts { 
+padding-left : 1em; 
+margin-bottom : 0.5em; 
+} 
+#media__opts input { 
+float : left; 
+position : absolute; 
+} 
+* html #media__opts input { 
+position : static; 
+} 
+#media__opts label { 
+display : block; 
+float : left; 
+margin-left : 30px; 
+} 
+* html #media__opts label { 
+margin-left : 10px; 
+} 
+#media__opts br { 
+clear : left; 
+} 
+#media__content img.load { 
+margin : 1em auto; 
+} 
+#media__content #scroll__here { 
+border : 1px dashed #8cacbb; 
+} 
+#media__content .odd { 
+background-color : #f7f9fa; 
+padding : 0.4em; 
+} 
+#media__content .even { 
+padding : 0.4em; 
+} 
+#media__content a.mediafile { 
+margin-right : 1.5em; 
+font-weight : bold; 
+} 
+#media__content div.detail { 
+padding : 0.3em 0 0.3em 2em; 
+} 
+#media__content div.detail div.thumb { 
+float : left; 
+width : 130px; 
+text-align : center; 
+margin-right : 0.4em; 
+} 
+#media__content img.btn { 
+vertical-align : text-bottom; 
+} 
+#media__content div.example { 
+color : #666; 
+margin-left : 1em; 
+} 
+#media__content div.upload { 
+font-size : 90%; 
+padding : 0 0.5em 0.5em 0.5em; 
+} 
+#media__content form.upload { 
+display : block; 
+border-bottom : 1px solid #8cacbb; 
+padding : 0 0.5em 1em 0.5em; 
+} 
+#media__content form.upload fieldset { 
+padding : 0; 
+margin : 0; 
+border : none; 
+width : auto; 
+} 
+#media__content form.upload p { 
+clear : left; 
+text-align : left; 
+padding : 0.25em 0; 
+margin : 0; 
+line-height : 1em; 
+} 
+#media__content form.upload label { 
+float : left; 
+width : 30%; 
+} 
+#media__content form.upload label.check { 
+float : none; 
+width : auto; 
+} 
+#media__content form.upload input.check { 
+margin-left : 30%; 
+} 
+#media__content form.meta { 
+display : block; 
+padding : 0 0 1em 0; 
+} 
+#media__content form.meta label { 
+display : block; 
+width : 25%; 
+float : left; 
+font-weight : bold; 
+margin-left : 1em; 
+clear : left; 
+} 
+#media__content form.meta .edit { 
+font : 100% "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif; 
+float : left; 
+width : 70%; 
+padding-right : 0; 
+padding-left : 0.2em; 
+margin : 2px; 
+} 
+#media__content form.meta textarea.edit { 
+height : 8em; 
+} 
+#media__content form.meta div.metafield { 
+clear : left; 
+} 
+#media__content form.meta div.buttons { 
+clear : left; 
+margin-left : 20%; 
+padding-left : 1em; 
+}

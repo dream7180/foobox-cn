@@ -1,0 +1,3 @@
+$filename(csv,utf-16)Title;Artist;Album;Track;Year;Length;Size;Last Modified;Path;Filename;
+$loop(%_filename_ext%)%title%;%artist%;%album%;%track%;%year%;%_length_seconds%;%_file_size%;%_file_mod_date%;%_folderpath%;%_filename_ext%;
+$loopend()build on %_date% with %_app% - the universal Tag editor - http://www.mp3tag.de/en/

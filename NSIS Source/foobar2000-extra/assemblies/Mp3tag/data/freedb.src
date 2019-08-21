@@ -1,0 +1,15 @@
+findline "\"fdbsr\""
+do
+  findinline "title=\""
+	sayuntil "\""
+	say "|"
+	findinline "Disc-ID"
+	findinline " "
+	sayuntil " / "
+	say "|"
+	findinline ">"
+	sayuntil "<"
+	saynewline
+	findinline "class=searchResult" 2 1
+	movechar -6
+while "Result" 250
