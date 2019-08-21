@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>高分屏适配指南</title>
+<script type="text/javascript">
+function altRows(id){
+	if(document.getElementsByTagName){
+		var table = document.getElementById(id);
+		var rows = table.getElementsByTagName("tr");
+		for(i = 0; i < rows.length; i++){      
+			if(i % 2 == 0){
+			rows[i].className = "evenrowcolor";
+			}else{
+				rows[i].className = "oddrowcolor";
+			}      
+		}
+	}
+}
+window.onload=function(){
+altRows('alternatecolor');
+}
+</script>
+<style type="text/css">
+body
+{
+padding-left:20px;
+padding-top:10px;
+padding-right:20px;
+padding-bottom:20px;
+}
+p{
+	font-family: Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+	font-size: 16px;
+}
+table.noborder {
+	font-family: Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+	font-size: 16px;
+	border-width: 0px;
+} 
+table.altrowstable {
+	border-collapse: collapse;  
+	font-family: Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+	font-size: 16px;
+	border-width: 1px;
+	border-color: #888888;
+	border-collapse: collapse;
+} 
+table.altrowstable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #888888;
+	background: #c3dde0;
+}  
+table.altrowstable td {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #888888;
+}
+.oddrowcolor{
+background-color:#ffffff;
+}
+.evenrowcolor{
+background-color:#eeeeee;
+}
+</style>
+</head>
+
+<body>
+<p align="center"><font size="+1", style="font-weight:bold;">高分屏适配指南</font></p>
+<hr>
+<p>
+Foobox 5.9 以上的版本都可以适应不同 dpi 的屏幕，方法为只要改变字体的大小，界面的元素大小都会相应变化，可是这个变化受限于 CUI 和 Panel Stack Splitter (PSS) 
+组合的功能影响，并不能完全自动化，由 PSS 控制的面板的大小需要手动改变预设的一个参数 (pss 的一个全局变量，该变量用于面板尺寸计算) 来实现。下面就是改变这个参数的具体图文操作方法。</p>
+<p>首先你要知道这个参数代表的是你所用到的界面字体的大小， 单位是<font style="font-weight:bold;">像素 px</font>, 而通常我们选字体会用到的是 pt (磅)，字号
+（如五号，小四等），所以我们需要知道字号，pt 和 px 的关系。</p>
+<table class="noborder">
+<tr><td width="165" align="right" valign="top"><font style="font-weight:bold;" color="#0d7d0f">pt (point，磅)：</font></td>
+<td>一个物理长度单位，指的是72分之一英寸。Windows 里的对话框字号选取单位缺省的话一般就是 pt</td>
+</tr>
+<tr><td width="165" align="right" valign="top"><font style="font-weight:bold;" color="#0d7d0f">px (pixel，像素)：</font></td>
+<td>一个虚拟长度单位，是计算机系统的数字化图像长度单位，如果 px 要换算成物理长度，需要指定精度 DPI 
+(Dots Per Inch，每英寸像素数)，在扫描打印时一般都有 DPI 可选。Windows 系统默认是96dpi，Apple 系统默认是72dpi。</td>
+</tr>
+<tr><td width="165" align="right" valign="top"><font style="font-weight:bold;" color="#0d7d0f">字号：</font></td>
+<td>是中文字库中特有的一种单位，以中文代号表示特定的磅值 pt，便于记忆、表述。</td>
+</tr>
+</table>
+<p>pt 和 px 的换算公式可以根据 pt 的定义得出:<br />
+<font color="#0d7d0f">pt = px * 72 / dpi</font></p>
+<p>如果 Windows 里定义了缩放比例大于100%的话(zoom 值，高分屏通常设定为150%, 200%等等），DPI 就不是96了，这个计算公式还要算上 zoom 值<br />
+<font color="#d70c0c">
+pt = (px * 72 / 96) / zoom = (px * 3 / 4) / zoom<br />
+px = (pt * 96 / 72) * zoom = (pt * 4 / 3) * zoom
+</font>
+</p>
+<p>其对应关系可由下表查得，我们是要从 pt 值得到相应的 px 值，如果你的放大比率为其他值，请按上面的公式算出，四舍五入取整数，注意，px只能取整数，小数无效。
+</p>
+<table class="altrowstable" id="alternatecolor">
+<tr>
+<th><font style="font-weight:bold;">&nbsp;字号&nbsp;</font></th>
+<th><font style="font-weight:bold;">&nbsp;&nbsp;&nbsp;pt&nbsp;&nbsp;&nbsp;</font></th>
+<th><font style="font-weight:bold;">px (DPI 96)</font><br />zoom=100%</th>
+<th><font style="font-weight:bold;">px</font><br />zoom=125%</th>
+<th><font style="font-weight:bold;">px</font><br />zoom=150%</th>
+<th><font style="font-weight:bold;">px</font><br />zoom=200%</th>
+</tr>
+<tr>
+<td>初号</td><td>42</td><td>56</td><td>70</td><td>84</td><td>112</td>
+</tr>
+<tr>
+<td>小初</td><td>36</td><td>48</td><td>60</td><td>72</td><td>96</td>
+</tr>
+<tr>
+<td></td><td>34</td><td>45</td><td>57</td><td>68</td><td>91</td>
+</tr>
+<tr>
+<td></td><td>32</td><td>42</td><td>53</td><td>64</td><td>85</td>
+</tr>
+<tr>
+<td></td><td>30</td><td>40</td><td>50</td><td>60</td><td>80</td>
+</tr>
+<tr>
+<td></td><td>29</td><td>38</td><td>48</td><td>58</td><td>77</td>
+</tr>
+<tr>
+<td></td><td>28</td><td>37</td><td>47</td><td>56</td><td>75</td>
+</tr>
+<tr>
+<td></td><td>27</td><td>36</td><td>45</td><td>54</td><td>72</td>
+</tr>
+<tr>
+<td>一号</td><td>26</td><td>35</td><td>43</td><td>52</td><td>69</td>
+</tr>
+<tr>
+<td></td><td>25</td><td>34</td><td>42</td><td>50</td><td>67</td>
+</tr>
+<tr>
+<td>小一</td><td>24</td><td>32</td><td>40</td><td>48</td><td>64</td>
+</tr>
+<tr>
+<td>二号</td><td>22</td><td>29</td><td>37</td><td>44</td><td>59</td>
+</tr>
+<tr>
+<td></td><td>20</td><td>26</td><td>33</td><td>40</td><td>53</td>
+</tr>
+<tr>
+<td>小二</td><td>18</td><td>24</td><td>30</td><td>36</td><td>48</td>
+</tr>
+<tr>
+<td></td><td>17</td><td>23</td><td>28</td><td>34</td><td>45</td>
+</tr>
+<tr>
+<td>三号</td><td>16</td><td>22</td><td>27</td><td>32</td><td>43</td>
+</tr>
+<tr>
+<td>小三</td><td>15</td><td>21</td><td>25</td><td>30</td><td>40</td>
+</tr>
+<tr>
+<td></td><td>14.5</td><td>20</td><td>24</td><td>29</td><td>39</td>
+</tr>
+<tr>
+<td>四号</td><td>14</td><td>19</td><td>23</td><td>28</td><td>37</td>
+</tr>
+<tr>
+<td></td><td>13.5</td><td>18</td><td>23</td><td>27</td><td>36</td>
+</tr>
+<tr>
+<td></td><td>13</td><td>17</td><td>22</td><td>26</td><td>35</td>
+</tr>
+<tr>
+<td>小四</td><td>12</td><td>16</td><td>20</td><td>24</td><td>32</td>
+</tr>
+<tr>
+<td></td><td>11</td><td>15</td><td>19</td><td>22</td><td>29</td>
+</tr>
+<tr>
+<td>五号</td><td>10.5</td><td>14</td><td>18</td><td>21</td><td>28</td>
+</tr>
+<tr>
+<td></td><td>10</td><td>13</td><td>17</td><td>20</td><td>27</td>
+</tr>
+<tr>
+<td>小五</td><td>9</td><td>12</td><td>15</td><td>18</td><td>24</td>
+</tr>
+<tr>
+<td></td><td>8</td><td>11</td><td>14</td><td>16</td><td>21</td>
+</tr>
+<tr>
+<td>六号</td><td>7.5</td><td>10</td><td>13</td><td>15</td><td>20</td>
+</tr>
+<tr>
+<td></td><td>7</td><td>9</td><td>12</td><td>14</td><td>19</td>
+</tr>
+<tr>
+<td>小六</td><td>6.5</td><td>8</td><td>11</td><td>13</td><td>17</td>
+</tr>
+<tr>
+<td>七号</td><td>5.5</td><td>7</td><td>9</td><td>11</td><td>15</td>
+</tr>
+<tr>
+<td>八号</td><td>5</td><td>6</td><td>8</td><td>10</td><td>13</td>
+</tr>
+</table>
+<p><font style="font-weight:bold;">下面我们就以把 10.5pt (五号, 14px) 的字体改为 12pt 为例 (zoom=100%)：由表查出 px 值为16。</font></p>
+<font color="#0d7d0f" style="font-weight:bold;">
+<p>1) 打开 foobar2000 的参数选项对话框，如图定位到 CUI 的字体选择页面更改字体，注意：这里显示的字体大小不能准确到小数，比如图里五号字应该是 10.5pt，而不是 11pt，注意一下以免查表出偏差。</p>
+<img src="images/dpi01.png" width="752" height="555" /><br /><br />
+<p>2) 改为 12pt 后页面元素都变大了，但是面板高度如顶栏，底栏的大小没有变，所以还要继续...</p>
+<img src="images/dpi02.png" border="1" width="777" height="332" /><br /><br />
+<p>3) 如图，进入 CUI 布局编辑对话框，选取第一个面板栈分离器，点击配置...按钮。</p>
+<img src="images/dpi03.png" width="754" height="552" /><br /><br />
+<p>3) 在分离器设置对话框脚本页面，把第一个变量的 FontSize_px 改成 12pt 对应的 px 值 16，然后点一路确定返回 foobar2000 界面。</p>
+<img src="images/dpi04.png" width="588" height="555" /><br /><br />
+<p>4) 如果成功，可以看到顶栏底栏等面板尺寸会变大了匹配界面元素，如果没有变化则变量加载没有成功，你可以返回刚才的分离器
+设置对话框的全局变量页面查看变量值是否变成了16，如果没有则再一路点击确定一次，那个全部删除按钮也可以点击，确定后变量会重新加载。</p>
+<img src="images/dpi05.png" width="610" height="614" /><br /><br />
+</font>
+<br />
+<p>---The End---</p>
+<p></p>
+</body>
+</html>
