@@ -1,4 +1,21 @@
-[2019-07-15]  FIX: file version info still showed 2.96.2.0 and v2.96b. 
+------------  -------------------------------------------------------------------------------------
+[2019-09-20]  REL: VERSION 2.98 (for Windows 10/8.1/8/7/2008/Vista/2003/XP SP3)
+------------  -------------------------------------------------------------------------------------
+[2019-09-11]  FIX: error when copying cover art with invalid unset mimetype to clipboard.
+[2019-09-09]  NEW: added Discogs tag source for search via artist and album.
+[2019-09-09]  NEW: added Discogs tag source for search via artist and title.
+[2019-09-09]  NEW: added Discogs tag source for search via artist and year.
+[2019-09-09]  NEW: added Discogs cover-only tag source for search via artist and album.
+[2019-09-09]  NEW: added Discogs cover-only tag source for search via artist and title.
+[2019-09-09]  NEW: added Discogs cover-only tag source for search via artist and year.
+[2019-09-09]  NEW: added support for including files from tag sources to reuse common parts.
+[2019-09-08]  NEW: added support for multi-field search for tag sources.
+[2019-09-08]  NEW: added support for more descriptive SearchBy parameters for tag sources.
+[2019-09-06]  FIX: undefined application state when changing filter while writing changes to files. (#46130)
+[2019-09-05]  FIX: files without extension were added to file list if loaded via Explorer shell extension. (#46100)
+[2019-08-21]  CHG: placeholders %_cover_height% and %_cover_width% were not mentioned in documentation.
+[2019-07-16]  FIX: accidentally switched positions of cover save and cover remove buttons at extended tag dialog (since v2.96b).
+[2019-07-15]  FIX: file version info still showed 2.96.2.0 and v2.96b.
 ------------  -------------------------------------------------------------------------------------
 [2019-07-12]  REL: VERSION 2.97 (for Windows 10/8.1/8/7/2008/Vista/2003/XP SP3)
 ------------  -------------------------------------------------------------------------------------

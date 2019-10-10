@@ -12,6 +12,7 @@ var show_shadow = fbx_set[28];
 var GetWnd = utils.CreateWND(window.ID);
 var fb_hWnd = GetWnd.GetAncestor(2);
 var sys_scrollbar = fbx_set[29];
+var lock_libpl = window.GetProperty("Lock to Library playlist", true);
 
 String.prototype.strip = function() {
 	return this.replace(/[\.,\!\?\:;'\u2019"\-_\u2010\s+]/g, "").toLowerCase();
@@ -1684,7 +1685,7 @@ function populate() {
 			pid = -1,
 			pln = plID(lib_playlist);
 		if (!def_pl) pln = plman.ActivePlaylist;
-		else plman.ActivePlaylist = pln;
+		else if(!lock_libpl) plman.ActivePlaylist = pln;
 		if (type) {
 			var items = fb.CreateHandleList();
 			for (i = 0; i < list.length; i++) items.Add(p.list.Item(list[i]));
@@ -2031,10 +2032,18 @@ function populate() {
 			if (sbar.scroll > ix * ui.row_h) sbar.check_scroll(ix * ui.row_h);
 		}
 		if (this.dbl_action || !this.dbl_action && mp == 1 && !item.child.length) {
-			var pln = plID(lib_playlist);
-			plman.ActivePlaylist = pln;
-			var c = (plman.PlaybackOrder == 3 || plman.PlaybackOrder == 4) ? Math.ceil(plman.PlaylistItemCount(pln) * Math.random() - 1) : 0;
-			plman.ExecutePlaylistDefaultAction(pln, c);
+			if(!lock_libpl){
+				var pln = plID(lib_playlist);
+				plman.ActivePlaylist = pln;
+				var c = (plman.PlaybackOrder == 3 || plman.PlaybackOrder == 4) ? Math.ceil(plman.PlaylistItemCount(pln) * Math.random() - 1) : 0;
+				plman.ExecutePlaylistDefaultAction(pln, c);
+			} else{
+				var pln = plID("媒体库");
+				plman.ActivePlaylist = pln;
+				this.get_selection(ix);
+				plman.SetPlaylistFocusItemByHandle(pln, p.list.Item(pop.sel_items[0]));
+				plman.ExecutePlaylistDefaultAction(pln, plman.GetPlaylistFocusItemIndex(pln));
+			}
 		}
 	}
 
@@ -2216,6 +2225,11 @@ function populate() {
 	}
 }
 var pop = new populate();
+
+function on_init() {
+	if(!fb.IsMediaLibraryEnabled()) lock_libpl = false;
+	window.NotifyOthers("lock_lib_playlist", lock_libpl);
+}
 
 function on_size() {
 	ui.w = window.Width;
@@ -3012,12 +3026,20 @@ function menu_object() {
 	this.PlaylistTypeMenu = function(Menu, StartIndex) {
 		var Index = StartIndex,
 			n = ["发送到当前列表", "插入到当前列表", "添加到当前列表", "折叠全部", "展开"];
-		for (i = 0; i < 5; i++) {
+		var _autopl = plman.IsAutoPlaylist(plman.ActivePlaylist);
+		var _mf = _autopl ? MF_GRAYED : MF_STRING;
+		for (i = 0; i < 3; i++) {
 			this.NewMenuItem(Index, "Playlist", i + 1);
-			Menu.AppendMenuItem(i != 4 || xp ? MF_STRING : MF_GRAYED, Index, n[i]);
-			if (i == 2) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);
+			Menu.AppendMenuItem(xp ? _mf : MF_GRAYED, Index, n[i]);
 			Index++;
 		}
+		Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);
+		this.NewMenuItem(Index, "Playlist", 4);
+		Menu.AppendMenuItem(MF_STRING, Index, n[3]);
+		Index++;
+		this.NewMenuItem(Index, "Playlist", 5);
+		Menu.AppendMenuItem(xp ? MF_STRING : MF_GRAYED, Index, n[4]);
+		Index++;
 		return Index;
 	}
 	this.FilterMenu = function(Menu, StartIndex) {
@@ -3160,6 +3182,9 @@ function menu_object() {
 				DClickMenu.AppendMenuItem(MF_STRING, 5809, "双击播放");
 				DClickMenu.AppendMenuItem(MF_STRING, 5810, "双击发送到播放列表");
 				DClickMenu.CheckMenuRadioItem(5808, 5810, pop.dbl_action + 5808);
+				DClickMenu.AppendMenuSeparator();
+				DClickMenu.AppendMenuItem(MF_STRING, 5811, "在媒体库列表中播放");
+				SettingMenu.CheckMenuItem(5811, lock_libpl ? 1 : 0);
 			}
 		}
 		if (show_context) {
@@ -3280,6 +3305,10 @@ function menu_object() {
 			case 5810:
 				pop.dbl_action = 2;
 				window.SetProperty(" Text Double-Click: ExplorerStyle-0 Play-1 Send-2", pop.dbl_action);
+				break;
+			case 5811:
+				lock_libpl = !lock_libpl;
+				window.SetProperty("Lock to Library playlist", lock_libpl);
 				break;
 			case 5820:
 				pop.collapseAll();

@@ -734,16 +734,8 @@ oBrowser = function(name) {
 					brw.repaint();
 				};
 				if (g_handles != null) {
-					if (this.activeRow > -1) {
-						var row_current = this.activeRow;
-						if (plman.IsAutoPlaylist(row_current)) {
-							window.SetCursor(IDC_NO);
-							var timer_forbidden = window.SetTimeout(function() {
-								window.SetCursor(IDC_ARROW);
-								timer_forbidden && window.ClearTimeout(timer_forbidden);
-								timer_forbidden = false;
-							}, 300);
-						}
+					var row_current = this.activeRow;
+					if (this.activeRow > -1 && !plman.IsAutoPlaylist(row_current)) {
 						var insert_index = fb.PlaylistItemCount(row_current);
 						plman.InsertPlaylistItems(row_current, insert_index, g_handles, false);
 					} else {

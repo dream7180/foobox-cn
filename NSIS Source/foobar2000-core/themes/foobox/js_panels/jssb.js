@@ -3855,6 +3855,7 @@ function on_notify_data(name, info) {
 		window.Repaint();
 		break;
 	case "Set_browser_cover":
+		if(ppt.tagMode == info) break;
 		ppt.tagMode = info;
 		window.SetProperty("_PROPERTY: Tag Mode", ppt.tagMode);
 		switch (ppt.tagMode) {

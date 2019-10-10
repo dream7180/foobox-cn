@@ -215,7 +215,8 @@ olist = function() {
 			if (y > margin_top) {
 				//plman.ActivePlaylist = pidx;
 				//plman.ExecutePlaylistDefaultAction(pidx, this.activeindex);
-				plman.ExecutePlaylistDefaultAction(plman.ActivePlaylist, plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist));
+				if(plman.ActivePlaylist != pidx) fb.RunContextCommandWithMetadb("播放", this.list_dr[this.activeindex].metadb, 0);
+				else plman.ExecutePlaylistDefaultAction(plman.ActivePlaylist, plman.GetPlaylistFocusItemIndex(plman.ActivePlaylist));
 			} else if (y < margin_top && x < ww - imgw - 1) {
 				if (fb.IsPlaying && plman.PlayingPlaylist == pidx) this.show_playing();
 				else this.show_focus();

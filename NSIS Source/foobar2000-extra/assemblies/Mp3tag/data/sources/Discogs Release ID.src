@@ -5,8 +5,10 @@
 # 
 # This file should be stored in your tag sources sources directory
 # %APPDATA%\Mp3tag\data\sources
-# and requires Mp3tag v2.83c or above.
+# and requires Mp3tag v2.97b or above.
 #
+# [2019-09-09] v1.08
+# [2019-09-09]  CHG: added descriptive syntax for SearchBy parameter.
 # [2019-05-23] v1.07
 # [2019-05-23]  FIX: titles with pipe symbol were identified as different titles.
 # [2019-03-15] v1.06
@@ -30,7 +32,7 @@
 [PreviewUrl]=http://www.discogs.com/release/%s
 [AlbumUrl]=https://api.discogs.com/releases/%s
 [WordSeparator]=%20
-[SearchBy]=$if2(%DISCOGS_RELEASE_ID%,$if2(%DISCOGS_RELEASE_ID%,$if2(%DISCOGSID%,%DISCOGS-ID%)))
+[SearchBy]=Discogs ID|$if2(%DISCOGS_RELEASE_ID%,$if2(%DISCOGS_RELEASE_ID%,$if2(%DISCOGSID%,%DISCOGS-ID%)))|%s
 [UserAgent]=1
 [Encoding]=url-utf-8
 

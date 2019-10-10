@@ -2,8 +2,8 @@
 
 ; 安装程序初始定义常量
 SetFont "Tahoma" 9
-!define FB2K_VER "1.4.4"
-!define FBOX_VER "6.2019.08"
+!define FB2K_VER "1.4.8"
+!define FBOX_VER "6.1.4.8"
 !define /date FBOX_YEAR %Y
 !define Name "foobar2000"
 !define PRODUCT_NAME "foobox"
