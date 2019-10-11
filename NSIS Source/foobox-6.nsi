@@ -139,13 +139,12 @@ Section "SACD ½âÂëÆ÷" SACD
 	SetOutPath "$INSTDIR\user-components\foo_input_sacd"
   SetOverwrite on
   File /r "foobar2000-extra\components\sacd\*.*"
-SectionEnd
-
-Section "DSD ½âÂëÆ÷" DSD
-  SectionIn 1 2 3
-	SetOutPath "$INSTDIR\user-components\foo_dsd_processor"
+  SetOutPath "$INSTDIR\user-components\foo_dsd_processor"
   SetOverwrite on
   File "foobar2000-extra\components\foo_dsd_processor.dll"
+  SetOutPath "$INSTDIR\user-components\foo_dsd_converter"
+  SetOverwrite on
+  File "foobar2000-extra\components\foo_dsd_converter.dll"
 SectionEnd
 
 Section "TTA ½âÂëÆ÷" TTA

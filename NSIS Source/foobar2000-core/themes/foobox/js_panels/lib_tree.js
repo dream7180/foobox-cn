@@ -13,6 +13,7 @@ var GetWnd = utils.CreateWND(window.ID);
 var fb_hWnd = GetWnd.GetAncestor(2);
 var sys_scrollbar = fbx_set[29];
 var lock_libpl = window.GetProperty("Lock to Library playlist", true);
+var pln = -1, lib_pln = -1;
 
 String.prototype.strip = function() {
 	return this.replace(/[\.,\!\?\:;'\u2019"\-_\u2010\s+]/g, "").toLowerCase();
@@ -1682,10 +1683,10 @@ function populate() {
 	this.load = function(list, type, add, send, def_pl, insert) {
 		var i = 0,
 			np_item = -1,
-			pid = -1,
-			pln = plID(lib_playlist);
+			pid = -1;
+		pln = plID(lib_playlist);
 		if (!def_pl) pln = plman.ActivePlaylist;
-		else if(!lock_libpl) plman.ActivePlaylist = pln;
+		else if(!lock_libpl || lib_pln < 0) plman.ActivePlaylist = pln;
 		if (type) {
 			var items = fb.CreateHandleList();
 			for (i = 0; i < list.length; i++) items.Add(p.list.Item(list[i]));
@@ -2032,17 +2033,15 @@ function populate() {
 			if (sbar.scroll > ix * ui.row_h) sbar.check_scroll(ix * ui.row_h);
 		}
 		if (this.dbl_action || !this.dbl_action && mp == 1 && !item.child.length) {
-			if(!lock_libpl){
-				var pln = plID(lib_playlist);
+			if(!lock_libpl || lib_pln < 0){
 				plman.ActivePlaylist = pln;
 				var c = (plman.PlaybackOrder == 3 || plman.PlaybackOrder == 4) ? Math.ceil(plman.PlaylistItemCount(pln) * Math.random() - 1) : 0;
 				plman.ExecutePlaylistDefaultAction(pln, c);
 			} else{
-				var pln = plID("媒体库");
-				plman.ActivePlaylist = pln;
+				plman.ActivePlaylist = lib_pln;
 				this.get_selection(ix);
-				plman.SetPlaylistFocusItemByHandle(pln, p.list.Item(pop.sel_items[0]));
-				plman.ExecutePlaylistDefaultAction(pln, plman.GetPlaylistFocusItemIndex(pln));
+				plman.SetPlaylistFocusItemByHandle(lib_pln, p.list.Item(pop.sel_items[0]));
+				plman.ExecutePlaylistDefaultAction(lib_pln, plman.GetPlaylistFocusItemIndex(lib_pln));
 			}
 		}
 	}
@@ -2227,8 +2226,7 @@ function populate() {
 var pop = new populate();
 
 function on_init() {
-	if(!fb.IsMediaLibraryEnabled()) lock_libpl = false;
-	window.NotifyOthers("lock_lib_playlist", lock_libpl);
+	lib_pln = check_libpl();
 }
 
 function on_size() {
@@ -3366,6 +3364,12 @@ function timers() {
 var timer = new timers();
 timer.lib();
 
+function check_libpl() {
+	for (var i = 0; i < plman.PlaylistCount; i++)
+		if (plman.GetPlaylistName(i) == "媒体库") return i;
+	return -1;
+}
+
 function on_char(code) {
 	if (!p.s_show) return;
 	sL.on_char(code);
@@ -3399,6 +3403,10 @@ function on_library_changed(origin) {
 		timer.lib_update();
 		break;
 	}
+}
+
+function on_playlists_changed() {
+	lib_pln = check_libpl();
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
