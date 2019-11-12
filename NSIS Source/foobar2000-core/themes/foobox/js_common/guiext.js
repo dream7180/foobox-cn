@@ -28,7 +28,9 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, paddingLeft, paddingRight) {
 
 	this.Paint = function(gr) {
 		if (this.Enabled) {
-			var pos = (this.Value / (this.MaxValue - this.MinValue) * this.Width) | 0;
+			var pos = this.Value / (this.MaxValue - this.MinValue);
+			if (pos > 1) pos = 1;
+			pos = (pos * this.Width) | 0;
 			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg, paddingLeft, 0, paddingRight, 0);
 			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay, paddingLeft, 0, paddingRight, 0);
 			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height, 0);

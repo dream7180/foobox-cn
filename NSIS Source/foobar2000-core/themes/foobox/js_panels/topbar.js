@@ -645,9 +645,9 @@ function init_buttons() {
 		menuman6.BuildMenu(child6, 1201, 100);
 
 		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		if(fso.FileExists(fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe")){
+		if(fso.FileExists(fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe")){
 			basemenu.AppendMenuSeparator();
-			basemenu.AppendMenuItem(MF_STRING, 1319, "Mp3tag");
+			basemenu.AppendMenuItem(MF_STRING, 1319, "MusicTag");
 		}
 		basemenu.AppendMenuSeparator();
 		basemenu.AppendMenuItem(MF_STRING, 1311, "foobox 帮助");
@@ -684,7 +684,7 @@ function init_buttons() {
 			break;
 		case (ret == 1319):
 			var WshShell = new ActiveXObject("WScript.Shell");
-			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\"", false);
+			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\"", 5);
 			break;
 		}
 		buttons[3].Reset();

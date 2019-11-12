@@ -2626,8 +2626,8 @@ oList = function(object_name, playlist) {
 		};
 		Context.BuildMenu(_menu, 3, -1);
 		
-		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (g_track_type < 2))
-			_menu.AppendMenuItem(MF_STRING, 1012, "用Mp3tag编辑");
+		if(fso.FileExists(fb.FoobarPath +"assemblies\\MusicTag\\MusicTag.exe") && (g_track_type < 2))
+			_menu.AppendMenuItem(MF_STRING, 1012, "用MusicTag编辑");
 		_child01.AppendTo(_menu, MF_STRING, "选择...");
 		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "从播放列表移除");
 		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "移除列表其他项");
@@ -2672,7 +2672,7 @@ oList = function(object_name, playlist) {
 			case (ret == 1012):
 				var WshShell = new ActiveXObject("WScript.Shell");
 				var obj_file = fb.Titleformat("%path%").EvalWithMetadb(fb.GetFocusItem());
-				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
 				break;
 			case (ret == 1013):
 				if (!fso.FolderExists(dl_prefix_folder)) {
