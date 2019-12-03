@@ -9,7 +9,7 @@ TOOLTIP_TEXT_PADDING_BOTTOM = 2;
 
 function UISlider(ImgBg, ImgOverlay, ImgKnob, paddingLeft, paddingRight) {
 	this.Enabled = true;
-	this.State = 0; //0-normal 1-mouse hover 2-mouse down
+	this.State = 0;//0-normal 1-mouse hover 2-mouse down
 	this.Value = 0;
 	this.MinValue = 0;
 	this.MaxValue = 100;
