@@ -1151,10 +1151,6 @@ function populate() {
 		tt_y = 0,
 		tt_id = -1;
 	this.autoplay = window.GetProperty(" Playlist: Play On Send From Menu", false);
-	var btn_pl = window.GetProperty(" Playlist Use: 0 or 1", "General,1,Alt+LeftBtn,1,MiddleBtn,1").replace(/\s+/g, "").split(",");
-	if (btn_pl[0] == "LeftBtn") window.SetProperty(" Playlist Use: 0 or 1", "General," + btn_pl[1] + ",Alt+LeftBtn," + btn_pl[3] + ",MiddleBtn," + btn_pl[5]);
-	var alt_lbtn_pl = btn_pl[3] == 1 ? true : false,
-		mbtn_pl = btn_pl[5] == 1 ? true : false;
 	var custom_sort = window.GetProperty(" Playlist: Custom Sort", "");
 	this.dbl_action = window.GetProperty(" Text Double-Click: ExplorerStyle-0 Play-1 Send-2", 1);
 	var lib_playlist = "媒体库视图"; //window.GetProperty(" Playlist", "媒体库视图");
@@ -1214,7 +1210,7 @@ function populate() {
 			}
 			return out.sort(num_sort);
 		}
-	this.add = function(x, y, pl) {
+	this.add = function(x, y) {
 		if (y < p.s_h) return;
 		var ix = this.get_ix(x, y, true, false);
 		p.pos = ix;
@@ -1223,7 +1219,7 @@ function populate() {
 				this.clear();
 				this.tree[ix].sel = true;
 				this.get_sel_items();
-				this.load(this.sel_items, true, true, false, pl, false);
+				this.load(this.sel_items, true, true, false, false);
 			}
 	}
 	this.auto = window.GetProperty(" Node: Auto Collapse", false);
@@ -1271,7 +1267,6 @@ function populate() {
 			for (var k = 0; k < obj.child.length; k++)
 				if (!obj.child[k].track) this.expandNodes(obj.child[k]);
 	}
-	this.gen_pl = btn_pl[1] == 1 ? true : false;
 	this.get_sel_items = function() {
 		p.tree_paint();
 		var i = 0;
@@ -1290,7 +1285,7 @@ function populate() {
 		p.tree_paint();
 	}
 	this.mbtn_up = function(x, y) {
-		this.add(x, y, mbtn_pl);
+		this.add(x, y);
 	}
 	this.row = function(y) {
 		return Math.round((y - p.s_h - ui.row_h * 0.5) / ui.row_h);
@@ -1680,13 +1675,12 @@ function populate() {
 		this.selection_holder.SetSelection(this.handle_list);
 	}
 
-	this.load = function(list, type, add, send, def_pl, insert) {
+	this.load = function(list, type, add, send, insert) {
 		var i = 0,
 			np_item = -1,
 			pid = -1;
 		pln = plID(lib_playlist);
-		if (!def_pl) pln = plman.ActivePlaylist;
-		else if(!lock_libpl || lib_pln < 0) plman.ActivePlaylist = pln;
+		if(!lock_libpl || lib_pln < 0) plman.ActivePlaylist = pln;
 		if (type) {
 			var items = fb.CreateHandleList();
 			for (i = 0; i < list.length; i++) items.Add(p.list.Item(list[i]));
@@ -1953,9 +1947,9 @@ function populate() {
 
 	this.send = function(item, x, y) {
 		if (!this.check_ix(item, x, y, false)) return;
-		if (v.k(1)) this.load(this.sel_items, true, false, false, this.gen_pl, false);
-		else if (v.k(0)) this.load(this.sel_items, true, false, false, this.gen_pl, false);
-		else this.load(item.item, true, false, false, this.gen_pl, false);
+		if (v.k(1)) this.load(this.sel_items, true, false, false, false);
+		else if (v.k(0)) this.load(this.sel_items, true, false, false, false);
+		else this.load(item.item, true, false, false, false);
 	}
 	
 	this.track = function(item, x, y) {
@@ -1994,7 +1988,7 @@ function populate() {
 			this.check_row(x, y);
 			break;
 		case 1:
-			if (v.k(2) && sgl_fill) return this.add(x, y, alt_lbtn_pl);
+			if (v.k(2) && sgl_fill) return this.add(x, y);
 			if (!v.k(1)) this.clear();
 			if (!item.sel) this.get_selection(ix, item.sel);
 			else if (v.k(1)) this.get_selection(ix, item.sel);
@@ -2135,7 +2129,7 @@ function populate() {
 				};
 			}
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			sbar.set_rows(this.tree.length);
 			if (sbar.scroll > p.pos * ui.row_h) sbar.check_scroll(p.pos * ui.row_h);
 			break;
@@ -2151,7 +2145,7 @@ function populate() {
 			this.get_selection(item.ix);
 			p.tree_paint();
 			m_i = p.pos = item.ix;
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			sbar.set_rows(this.tree.length);
 			var row = (p.pos * ui.row_h - sbar.scroll) / ui.row_h;
 			if (row + item.child.length > sbar.rows_drawn) {
@@ -2166,7 +2160,7 @@ function populate() {
 			sbar.wheel(1, true);
 			this.get_selection(this.tree[p.pos].ix);
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		case v.pgDn:
 			if (this.tree.length == 0) break;
@@ -2176,7 +2170,7 @@ function populate() {
 			sbar.wheel(-1, true);
 			this.get_selection(this.tree[p.pos].ix);
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		case v.home:
 			if (this.tree.length == 0) break;
@@ -2184,7 +2178,7 @@ function populate() {
 			sbar.check_scroll(0);
 			this.get_selection(this.tree[p.pos].ix);
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		case v.end:
 			if (this.tree.length == 0) break;
@@ -2192,11 +2186,11 @@ function populate() {
 			sbar.check_scroll((this.tree.length) * ui.row_h);
 			this.get_selection(this.tree[p.pos].ix);
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		case v.enter:
 			if (!this.sel_items.length) return;
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		case v.dn:
 		case v.up:
@@ -2218,7 +2212,7 @@ function populate() {
 			m_i = p.pos;
 			this.get_selection(p.pos);
 			p.tree_paint();
-			this.load(this.sel_items, true, false, false, this.gen_pl, false);
+			this.load(this.sel_items, true, false, false, false);
 			break;
 		}
 	}
@@ -2400,7 +2394,7 @@ function searchLibrary() {
 			try {
 				items = fb.GetQueryItems(lib.list, p.s_txt)
 			} catch (e) {}
-			pop.load(items, false, false, false, pop.gen_pl, false);
+			pop.load(items, false, false, false, false);
 			items.Dispose();
 			break;
 		case v.redo:
@@ -2675,7 +2669,7 @@ var j_Search = function() {
 
 				timer.reset(timer.clear_jsearch, timer.clear_jsearchi);
 				timer.clear_jsearch = window.SetTimeout(function() {
-					if (found) pop.load(pop.sel_items, true, false, false, pop.gen_pl, false);
+					if (found) pop.load(pop.sel_items, true, false, false, false);
 					jSearch = "";
 					window.RepaintRect(0, j_y - 1, ui.w, j_h + 3);
 					timer.clear_jsearch = false;
@@ -3214,7 +3208,7 @@ function menu_object() {
 					if (new_sel) pop.clear();
 					item.sel = true;
 					pop.get_sel_items();
-					pop.load(pop.sel_items, true, false, true, false, false);
+					pop.load(pop.sel_items, true, false, true, false);
 					p.tree_paint();
 					break;
 				case 4:
@@ -3227,7 +3221,7 @@ function menu_object() {
 					if (new_sel) pop.clear();
 					item.sel = true;
 					pop.get_sel_items();
-					pop.load(pop.sel_items, true, true, false, false, i == 2 ? true : false);
+					pop.load(pop.sel_items, true, true, false, i == 2 ? true : false);
 					break;
 				}
 				break;
