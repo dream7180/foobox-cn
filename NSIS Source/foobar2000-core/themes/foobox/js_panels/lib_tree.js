@@ -1153,7 +1153,7 @@ function populate() {
 	this.autoplay = window.GetProperty(" Playlist: Play On Send From Menu", false);
 	var custom_sort = window.GetProperty(" Playlist: Custom Sort", "");
 	this.dbl_action = window.GetProperty(" Text Double-Click: ExplorerStyle-0 Play-1 Send-2", 1);
-	var lib_playlist = "媒体库视图"; //window.GetProperty(" Playlist", "媒体库视图");
+	var lib_playlist = "媒体库视图";
 	var sgl_fill = window.GetProperty(" Text Single-Click: AutoFill Playlist", true);
 	this.line_l = 0;
 	this.sel_items = [];
@@ -2222,6 +2222,7 @@ var pop = new populate();
 function on_init() {
 	lib_pln = check_libpl();
 }
+on_init();
 
 function on_size() {
 	ui.w = window.Width;
