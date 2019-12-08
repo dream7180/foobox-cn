@@ -1910,19 +1910,21 @@ oBrowser = function(name) {
 					var source_name = "媒体库"
 				};
 				else {
-					var source_name = "当前列表：" + (ppt.locklibpl ? "媒体库" : plman.GetPlaylistName(plman.ActivePlaylist))
+					var source_name = "当前列表：" + (ppt.locklibpl ? "媒体库" : plman.GetPlaylistName(plman.ActivePlaylist));
 				};
+				var source_width = gr.CalcTextWidth(source_name, g_font_b);
 				gr.FillSolidRect(0, 0, ww, brw.y + 1, g_syscolor_window_bg);
 				gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), 1, g_color_line);
 
 				var tx = cFilterBox.x + cFilterBox.w + Math.round(22 * zdpi) + 10;
 				var dlw = (ppt.tagMode < 3) * images.down_all.width;
-				//var tw = (this.w - tx + (cScrollBar.enabled ? cScrollBar.width : 0)) / 2;
-				var tw = (this.w - tx - cSwitchBtn.w - 2 + (cScrollBar.enabled ? cScrollBar.width : 0)) / 2;
+				var tw = (this.w - tx - cSwitchBtn.w - 2 + (cScrollBar.enabled ? cScrollBar.width : 0))*2/3;
+				var source_w = Math.min(tw, source_width);
 				gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
 				try {
-					gr.gdiDrawText(source_name, g_font_b, blendColors(g_color_normal_txt, g_color_normal_bg, 0.4), tx + dlw, 0, tw, ppt.headerBarHeight, lc_txt);
-					gr.gdiDrawText(boxText, g_font_b, blendColors(g_color_normal_txt, g_color_normal_bg, 0.4), tx + tw, 0, tw, ppt.headerBarHeight, rc_txt);
+					gr.gdiDrawText(source_name, g_font_b, g_color_normal_txt, tx + dlw, 0, source_w, ppt.headerBarHeight, lc_txt);
+					gr.gdiDrawText(" | "+ playing_title + " [播放中] ", g_font, blendColors(g_color_normal_txt, g_color_highlight, 0.4), tx + dlw + source_width, 0, tw - source_width, ppt.headerBarHeight, lc_txt);
+					gr.gdiDrawText(boxText, g_font_b, blendColors(g_color_normal_txt, g_color_normal_bg, 0.4), tx + tw, 0, tw/2, ppt.headerBarHeight, rc_txt);
 				};
 				catch (e) {};
 				this.switch_btn.draw(gr, cSwitchBtn.x, cSwitchBtn.y, 255);
@@ -2575,6 +2577,7 @@ var g_start_ = 0,
 //var g_wallpaperImg = null;
 
 var g_rightClickedIndex = -1;
+var playing_title;
 
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
@@ -3575,7 +3578,10 @@ function on_playback_stop(reason) {
 
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
-	if(ppt.sourceMode == 0 || !window.IsVisible) return;
+	if(ppt.sourceMode == 0 || !window.IsVisible) {
+		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+		return;	
+	}
 	try {
 		if (!ppt.locklibpl) {//pure playlist mode
 			if (plman.PlayingPlaylist != plman.ActivePlaylist) {
@@ -3602,6 +3608,7 @@ function on_playback_new_track(metadb) {
 		};
 	};
 	catch (e) {};
+	playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
 };
 
 function on_playback_starting(cmd, is_paused) {};
