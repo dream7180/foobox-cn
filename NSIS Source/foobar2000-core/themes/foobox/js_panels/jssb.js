@@ -1923,7 +1923,7 @@ oBrowser = function(name) {
 				gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
 				try {
 					gr.gdiDrawText(source_name, g_font_b, g_color_normal_txt, tx + dlw, 0, source_w, ppt.headerBarHeight, lc_txt);
-					gr.gdiDrawText(" | "+ playing_title + " [播放中] ", g_font, blendColors(g_color_normal_txt, g_color_highlight, 0.4), tx + dlw + source_width, 0, tw - source_width, ppt.headerBarHeight, lc_txt);
+					if(fb.IsPlaying) gr.gdiDrawText(" | "+ playing_title + " [播放中] ", g_font, blendColors(g_color_normal_txt, g_color_highlight, 0.4), tx + dlw + source_width, 0, tw - source_width, ppt.headerBarHeight, lc_txt);
 					gr.gdiDrawText(boxText, g_font_b, blendColors(g_color_normal_txt, g_color_normal_bg, 0.4), tx + tw, 0, tw/2, ppt.headerBarHeight, rc_txt);
 				};
 				catch (e) {};
