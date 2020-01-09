@@ -2,8 +2,8 @@
 
 ; 安装程序初始定义常量
 SetFont "Tahoma" 9
-!define FB2K_VER "1.4.8"
-!define FBOX_VER "6.1.4.8"
+!define FB2K_VER "1.5.1"
+!define FBOX_VER "6.1.5.1"
 !define /date FBOX_YEAR %Y
 !define Name "foobar2000"
 !define PRODUCT_NAME "foobox"
@@ -361,11 +361,11 @@ SectionEnd
 ;  SetOverwrite on
 ;  File "visualization\Milkdrop Presets\*.*"
 ;SectionEnd
-Section /o "Mp3tag (含虾米，iTunes源)" MP3TAG
+Section /o "MusicTag" MusicTag
   SectionIn 2 3
-  SetOutPath "$INSTDIR\assemblies\Mp3tag"
+  SetOutPath "$INSTDIR\assemblies\MusicTag"
   SetOverwrite on
-  File /r "foobar2000-extra\assemblies\Mp3tag\*.*"
+  File /r "foobar2000-extra\assemblies\MusicTag\*.*"
 SectionEnd
 SubSectionEnd
 

@@ -2,6 +2,7 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <assemblyIdentity type="win32" name="runtime\runtime" version="1.0.0.0" processorArchitecture="X86"/>
   <file name="api-ms-win-core-console-l1-1-0.dll"/>
+  <file name="api-ms-win-core-console-l1-2-0.dll"/>
   <file name="api-ms-win-core-datetime-l1-1-0.dll"/>
   <file name="api-ms-win-core-debug-l1-1-0.dll"/>
   <file name="api-ms-win-core-errorhandling-l1-1-0.dll"/>
@@ -26,6 +27,7 @@
   <file name="api-ms-win-core-sysinfo-l1-1-0.dll"/>
   <file name="api-ms-win-core-timezone-l1-1-0.dll"/>
   <file name="api-ms-win-core-util-l1-1-0.dll"/>
+  <file name="API-MS-Win-core-xstate-l2-1-0.dll"/>
   <file name="api-ms-win-crt-conio-l1-1-0.dll"/>
   <file name="api-ms-win-crt-convert-l1-1-0.dll"/>
   <file name="api-ms-win-crt-environment-l1-1-0.dll"/>
