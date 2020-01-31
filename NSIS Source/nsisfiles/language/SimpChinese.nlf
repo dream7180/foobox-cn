@@ -1,0 +1,191 @@
+﻿# Header, don't edit
+NLF v6
+# Language ID
+2052
+# Font and size - dash (-) means default 字体名称与大小
+宋体
+9
+# Codepage - dash (-) means ASCII code page ASCII 字码页
+936
+# RTL - anything else than RTL means LTR 由右至左书写
+-
+# Revision date: 2010-09-28
+# Translator: Kii Ali <kiiali@cpatch.org>, <kiiali@ms1.url.com.tw>, <kiiali@pchome.com.tw>
+# ^Branding
+Nullsoft Install System %s
+# ^SetupCaption
+$(^Name) 安装
+# ^UninstallCaption
+$(^Name) 卸载
+# ^LicenseSubCaption
+: 许可证协议
+# ^ComponentsSubCaption
+: 安装选项
+# ^DirSubCaption
+: 安装文件夹
+# ^InstallingSubCaption
+: 正在安装
+# ^CompletedSubCaption
+: 已完成
+# ^UnComponentsSubCaption
+: 卸载选项
+# ^UnDirSubCaption
+: 卸载文件夹
+# ^ConfirmSubCaption
+: 卸载确认
+# ^UninstallingSubCaption
+: 正在卸载
+# ^UnCompletedSubCaption
+: 已完成
+# ^BackBtn
+< 上一步(&P)
+# ^NextBtn
+下一步(&N) >
+# ^AgreeBtn
+我接受(&I)
+# ^AcceptBtn
+我接受“许可证协议”中的条款(&A)
+# ^DontAcceptBtn
+我不接受“许可证协议”中的条款(&N)
+# ^InstallBtn
+安装(&I)
+# ^UninstallBtn
+卸载(&U)
+# ^CancelBtn
+取消(&C)
+# ^CloseBtn
+关闭(&L)
+# ^BrowseBtn
+浏览(&B)...
+# ^ShowDetailsBtn
+显示详情(&D)
+# ^ClickNext
+单击 [下一步(N)] 继续。
+# ^ClickInstall
+单击 [安装(I)] 开始安装进程。
+# ^ClickUninstall
+单击 [卸载(U)] 开始卸载进程。
+# ^Name
+名称
+# ^Completed
+已完成
+# ^LicenseText
+在安装 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，单击 [我接受(I)] 。
+# ^LicenseTextCB
+在安装 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，单击下方的勾选框。 $_CLICK
+# ^LicenseTextRB
+在安装 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，选择下方的第一个选项。 $_CLICK
+# ^UnLicenseText
+在卸载 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，单击 [我接受(I)] 。
+# ^UnLicenseTextCB
+在卸载 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，单击下方的勾选框。 $_CLICK
+# ^UnLicenseTextRB
+在卸载 $(^NameDA) 之前请检阅许可证协议。如果你接受协议中所有条款，选择下方的第一个选项。 $_CLICK
+# ^Custom
+自定义
+# ^ComponentsText
+勾选你想要安装的组件，并取消勾选你不希望安装的组件。 $_CLICK
+# ^ComponentsSubText1
+请选择安装类型: 
+# ^ComponentsSubText2_NoInstTypes
+选择要安装的组件: 
+# ^ComponentsSubText2
+或勾选要安装的可选组件: 
+# ^UnComponentsText
+选中你想要卸载的组件，并取消勾选你不希望卸载的组件。$_CLICK
+# ^UnComponentsSubText1
+选择卸载类型：
+# ^UnComponentsSubText2_NoInstTypes
+选择要卸载的组件: 
+# ^UnComponentsSubText2
+或勾选要卸载的可选组件: 
+# ^DirText
+安装向导将安装 $(^NameDA) 到下列文件夹。要安装到不同文件夹，单击 [浏览(B)...] 并选择其他的文件夹。$_CLICK
+# ^DirSubText
+目标文件夹
+# ^DirBrowseText
+选择要安装 $(^NameDA) 的文件夹位置: 
+# ^UnDirText
+卸载向导将从下列文件夹卸载 $(^NameDA)。要从不同文件夹卸载，单击 [浏览(B)...] 并选择其他的文件夹。$_CLICK
+# ^UnDirSubText
+""
+# ^UnDirBrowseText
+选择要卸载 $(^NameDA) 的文件夹位置：
+# ^SpaceAvailable
+"可用空间: "
+# ^SpaceRequired
+"所需空间: "
+# ^UninstallingText
+这个向导将从你的计算机卸载 $(^NameDA) 。 $_CLICK
+# ^UninstallingSubText
+卸载文件夹：
+# ^FileError
+不能打开要写入的文件：\r\n\t"$0"\r\n单击 [终止] 停止安装，\r\n [重试] 重新尝试写入文件，或\r\n [忽略] 忽略这个文件。
+# ^FileError_NoIgnore
+不能打开要写入的文件：\r\n\t"$0"\r\n单击 [重试] 重新尝试写入文件，或\r\n [取消] 停止安装。
+# ^CantWrite
+"无法写入: "
+# ^CopyFailed
+"复制失败 "
+# ^CopyTo
+"复制到: "
+# ^Registering
+"正在注册: "
+# ^Unregistering
+"正在解除注册: "
+# ^SymbolNotFound
+"无法找到符号: "
+# ^CouldNotLoad
+"无法加载: "
+# ^CreateFolder
+"创建文件夹: " 
+# ^CreateShortcut
+"创建快捷方式: "
+# ^CreatedUninstaller
+"创建解除安装程序: "
+# ^Delete
+"删除文件: "
+# ^DeleteOnReboot
+"重新启动后删除: "
+# ^ErrorCreatingShortcut
+"正在创建快捷方式时发生错误: "
+# ^ErrorCreating
+"正在创建时发生错误: "
+# ^ErrorDecompressing
+"解压缩数据时发生错误！已损坏的安装程序？"
+# ^ErrorRegistering
+"注册 DLL 时发生错误"
+# ^ExecShell
+"运行外部程序："
+# ^Exec
+"运行: "
+# ^Extract
+"释放文件："
+# ^ErrorWriting
+"释放文件：无法写入文件"
+# ^InvalidOpcode
+"安装损毁：无效的操作代码 "
+# ^NoOLE
+"没有 OLE 用于: "
+# ^OutputFolder
+"输出文件夹："
+# ^RemoveFolder
+"删除文件夹："
+# ^RenameOnReboot
+"重启后重命名："
+# ^Rename
+"重命名: "
+# ^Skipped
+"已跳过: "
+# ^CopyDetails
+"复制详情到剪贴板"
+# ^LogInstall
+"日志安装进程"
+# byte
+B
+# kilo
+ K
+# mega
+ M
+# giga
+ G

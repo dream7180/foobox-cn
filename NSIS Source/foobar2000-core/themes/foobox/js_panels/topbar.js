@@ -493,43 +493,12 @@ function on_notify_data(name, info) {
 	case "netradio_update":
 		var radio_num = null;
 		var radio_name = info[1];
-		if(info[0] == "电台"){
-			for (var i = 0; i < ppt.webradiolistarr2.length; i++) {
-				if(ppt.webradiolistarr2[i].split(":")[0] == radio_name) {
-					radio_num = i;
-					break;
-				}
+		for (var i = 0; i < MGRankList.length; i++) {
+			if(MGRankList[i][0] == radio_name) {
+				radio_num = i;break;
 			}
-			if (radio_num == null) return;
-			QQRadiolist(ppt.webradiolistarr2[radio_num].split(":")[1],ppt.webradiolistarr2[radio_num].split(":")[0]);
-		}else if(info[0] == "榜单"){
-			for (var i = 0; i < ppt.weblistarr1.length; i++) {
-				if(ppt.weblistarr1[i].split(":")[0] == radio_name)  {
-					radio_num = i;break;
-				}
-			}
-			//fb.trace("榜单号:" + radio_num);
-			if (radio_num != null){
-				QQRanklist(radio_num+101, ppt.weblistarr1[radio_num].split(":")[1], ppt.weblistarr1[radio_num].split(":")[0]);
-			} else{
-				for (var i = 0; i < ppt.weblistarr2.length; i++) {
-					if(ppt.weblistarr2[i].split(":")[0] == radio_name)  {
-						radio_num = i;break;
-					}
-				}
-				if (radio_num != null){
-					QQRanklist(radio_num+150, ppt.weblistarr2[radio_num].split(":")[1], ppt.weblistarr2[radio_num].split(":")[0]);
-				}else{
-					for (var i = 0; i < ppt.webkgranklistarr.length; i++) {
-						if(ppt.webkgranklistarr[i].split(":")[0] == radio_name)  {
-							radio_num = i;break;
-						}
-					}
-					if (radio_num != null) KGRankListid(ppt.webkgranklistarr[radio_num].split(":")[1],ppt.webkgranklistarr[radio_num].split(":")[0]);
-				}
-			}
-			
 		}
+		if (radio_num != null) MGRankListid(MGRankList[radio_num][1], radio_name);
 		break;
 	case "show_button_fullscreen":
 		btn_fullscr = info;
@@ -777,7 +746,7 @@ function init_icons() {
 		
 	try {
 		var _x5 = 5*zdpi, _x6 = 6*zdpi, _y6 = Math.floor(_x6), _x7 = 7*zdpi, _y7 = Math.floor(_x7), _x8 = 8*zdpi, _x9 = 9*zdpi, _y9 = Math.floor(_x9), _x10 = 10*zdpi, 
-			_x12 = 12 * zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, 
+			_x11 = 11 * zdpi, _x12 = 12 * zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, 
 			_x18 = 18*zdpi, _x19 = 19*zdpi, _x22 = 22*zdpi, _x23 = 23 * zdpi, _x24 = 24 * zdpi, _x28 = 28*zdpi;
 		
 		img_playlist = gdi.CreateImage(imgw, imgh_p);
@@ -930,7 +899,7 @@ function init_icons() {
 		gb.DrawLine(_x10, 21*zdpi, _x28, 21*zdpi, 2, c_normal);
 		gb.DrawLine(_x23, _x19, _x23, _x23, 3, c_normal);
 		gb.DrawLine(_x14, _x13, _x14, _x17, 3, c_normal);
-		gb.DrawLine(_x19, _x7, _x19, 11*zdpi, 3, c_normal);
+		gb.DrawLine(_x19, _x7, _x19, _x11, 3, c_normal);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(shadow_x, imgh, imgh, imgh, c_shadow_h);
 		gb.SetSmoothingMode(0);
@@ -939,7 +908,7 @@ function init_icons() {
 		gb.DrawLine(_x10, 21*zdpi + imgh, _x28, 21*zdpi + imgh, 2, c_hover);
 		gb.DrawLine(_x23, _x19 + imgh, _x23, _x23 + imgh, 3, c_hover);
 		gb.DrawLine(_x14, _x13 + imgh, _x14, _x17 + imgh, 3, c_hover);
-		gb.DrawLine(_x19, _x7 + imgh, _x19, 11*zdpi + imgh, 3, c_hover);
+		gb.DrawLine(_x19, _x7 + imgh, _x19, _x11 + imgh, 3, c_hover);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(shadow_x, imgh2, imgh, imgh, c_shadow);
 		gb.SetSmoothingMode(0);		
@@ -948,7 +917,7 @@ function init_icons() {
 		gb.DrawLine(_x10, 21*zdpi + imgh2, _x28, 21*zdpi + imgh2, 2, c_down);
 		gb.DrawLine(_x23, _x19 + imgh2, _x23, _x23 + imgh2, 3, c_down);
 		gb.DrawLine(_x14, _x13 + imgh2, _x14, _x17 + imgh2, 3, c_down);
-		gb.DrawLine(_x19, _x7 + imgh2, _x19, 11*zdpi + imgh2, 3, c_down);
+		gb.DrawLine(_x19, _x7 + imgh2, _x19, _x11 + imgh2, 3, c_down);
 		img_settings.ReleaseGraphics(gb);
 		
 		_x2 = 7 * zdpi;
@@ -1052,18 +1021,21 @@ function init_icons() {
 		img_max = gdi.CreateImage(_imgh, _imgh*3);
 		gb = img_max.GetGraphics();
 		gb.SetSmoothingMode(0);
-		gb.DrawRect(_y8, _y8, _y9, _y9, 1, c_normal);
-		gb.DrawLine(_y8+1, _y8+1, 2*_y9 - 2, _x8+1, 1, c_normal);
+		gb.DrawRect(_x8, _x10, _y7, _y7, 2, c_normal);
+		gb.DrawLine(_x10, _x8, _x17, _x8, 2, c_normal);
+		gb.DrawLine(_x17, _x8-1, _x17, 2*_x8-1, 2, c_normal);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(1, _imgh + 1, _imgh - 2, _imgh - 2, c_shadow_h);
 		gb.SetSmoothingMode(0);
-		gb.DrawRect(_y8, _y8+_imgh, _y9, _y9, 1, c_hover);
-		gb.DrawLine(_y8+1, _y8+1+_imgh, 2*_y9 - 2, _x8+1+_imgh, 1, c_hover);
+		gb.DrawRect(_x8, _x10+_imgh, _y7, _y7, 2, c_hover);
+		gb.DrawLine(_x10, _x8+_imgh, _x17, _x8+_imgh, 2, c_hover);
+		gb.DrawLine(_x17, _x8-1+_imgh, _x17, 2*_x8-1+_imgh, 2, c_hover);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(1, imgh2 + 1, _imgh - 2, _imgh - 2, c_shadow);
 		gb.SetSmoothingMode(0);
-		gb.DrawRect(_y8, _y8+imgh2, _y9, _y9, 1, c_down);
-		gb.DrawLine(_y8+1, _y8+1+imgh2, 2*_y9 - 2, _x8+1+imgh2, 1, c_down)
+		gb.DrawRect(_x8, _x10+imgh2, _y7, _y7, 2, c_down);
+		gb.DrawLine(_x10, _x8+imgh2, _x17, _x8+imgh2, 2, c_down);
+		gb.DrawLine(_x17, _x8-1+imgh2, _x17, 2*_x8-1+imgh2, 2, c_down);
 		img_max.ReleaseGraphics(gb);
 		
 		img_min = gdi.CreateImage(_imgh, _imgh*3);
@@ -1078,36 +1050,40 @@ function init_icons() {
 		gb.SetSmoothingMode(0);
 		gb.DrawLine(_x8, _x13+imgh2, _x18, _x13+imgh2, 2, c_down);
 		img_min.ReleaseGraphics(gb);
-
+		
 		img_fullscreen = gdi.CreateImage(_imgh, _imgh*3);
 		gb = img_fullscreen.GetGraphics();
-		gb.DrawLine(_y7, _y7, Math.round(_x10), _y7, 1, c_normal);
-		gb.DrawLine(_y7, _y7+1, _y7, _y18, 1, c_normal);
-		gb.DrawLine(_y7+1, _y18, _y18, _y18, 1, c_normal);
-		gb.DrawLine(_y18, _y18-1, _y18, Math.round(_x15), 1, c_normal);
-		gb.DrawLine(Math.round(_x14), _y7, _y18, _y7, 1, c_normal);
-		gb.DrawLine(_y18, _y7+1, _y18, Math.round(11*zdpi), 1, c_normal);
-		gb.DrawLine(_y18, _y7, _y7, _y18, 1, c_normal);
+		gb.SetSmoothingMode(0);
+		gb.DrawLine(_x8, _x8, _x11, _x8, 2, c_normal);
+		gb.DrawLine(_x8, _x8-1, _x8, _x11, 2, c_normal);
+		gb.DrawLine(_x8, _x17, _x11, _x17, 2, c_normal);
+		gb.DrawLine(_x8, _x17+1, _x8, _x14, 2, c_normal);
+		gb.DrawLine(_x14, _x8, _x17, _x8, 2, c_normal);
+		gb.DrawLine(_x17, _x8-1, _x17, _x11, 2, c_normal);
+		gb.DrawLine(_x14, _x17, _x17, _x17, 2, c_normal);
+		gb.DrawLine(_x17, _x17+1, _x17, _x14, 2, c_normal);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(1, 1+_imgh, _imgh - 2, _imgh - 2, c_shadow_h);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_y7, _y7+_imgh, Math.round(_x10), _y7+_imgh, 1, c_hover);
-		gb.DrawLine(_y7, _y7+1+_imgh, _y7, _y18+_imgh, 1, c_hover);
-		gb.DrawLine(_y7+1, _y18+_imgh, _y18, _y18+_imgh, 1, c_hover);
-		gb.DrawLine(_y18, _y18-1+_imgh, _y18, Math.round(_x15)+_imgh, 1, c_hover);
-		gb.DrawLine(Math.round(_x14), _y7+_imgh, _y18, _y7+_imgh, 1, c_hover);
-		gb.DrawLine(_y18, _y7+1+_imgh, _y18, Math.round(11*zdpi)+_imgh, 1, c_hover);
-		gb.DrawLine(_y18, _y7+_imgh, _y7, _y18+_imgh, 1, c_hover);
+		gb.DrawLine(_x8, _x8+_imgh, _x11, _x8+_imgh, 2, c_hover);
+		gb.DrawLine(_x8, _x8-1+_imgh, _x8, _x11+_imgh, 2, c_hover);
+		gb.DrawLine(_x8, _x17+_imgh, _x11, _x17+_imgh, 2, c_hover);
+		gb.DrawLine(_x8, _x17+1+_imgh, _x8, _x14+_imgh, 2, c_hover);
+		gb.DrawLine(_x14, _x8+_imgh, _x17, _x8+_imgh, 2, c_hover);
+		gb.DrawLine(_x17, _x8-1+_imgh, _x17, _x11+_imgh, 2, c_hover);
+		gb.DrawLine(_x14, _x17+_imgh, _x17, _x17+_imgh, 2, c_hover);
+		gb.DrawLine(_x17, _x17+1+_imgh, _x17, _x14+_imgh, 2, c_hover);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(1, 1+imgh2, _imgh - 2, _imgh - 2, c_shadow);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_y7, _y7+imgh2, Math.round(_x10), _y7+imgh2, 1, c_down);
-		gb.DrawLine(_y7, _y7+1+imgh2, _y7, _y18+imgh2, 1, c_down);
-		gb.DrawLine(_y7+1, _y18+imgh2, _y18, _y18+imgh2, 1, c_down);
-		gb.DrawLine(_y18, _y18-1+imgh2, _y18, Math.round(_x15)+imgh2, 1, c_down);
-		gb.DrawLine(Math.round(_x14), _y7+imgh2, _y18, _y7+imgh2, 1, c_down);
-		gb.DrawLine(_y18, _y7+1+imgh2, _y18, Math.round(11*zdpi)+imgh2, 1, c_down);
-		gb.DrawLine(_y18, _y7+imgh2, Math.round(7*zdpi), _y18+imgh2, 1, c_down);
+		gb.DrawLine(_x8, _x8+imgh2, _x11, _x8+imgh2, 2, c_down);
+		gb.DrawLine(_x8, _x8-1+imgh2, _x8, _x11+imgh2, 2, c_down);
+		gb.DrawLine(_x8, _x17+imgh2, _x11, _x17+imgh2, 2, c_down);
+		gb.DrawLine(_x8, _x17+1+imgh2, _x8, _x14+imgh2, 2, c_down);
+		gb.DrawLine(_x14, _x8+imgh2, _x17, _x8+imgh2, 2, c_down);
+		gb.DrawLine(_x17, _x8-1+imgh2, _x17, _x11+imgh2, 2, c_down);
+		gb.DrawLine(_x14, _x17+imgh2, _x17, _x17+imgh2, 2, c_down);
+		gb.DrawLine(_x17, _x17+1+imgh2, _x17, _x14+imgh2, 2, c_down);
 		img_fullscreen.ReleaseGraphics(gb);
 		
 		img_menu = gdi.CreateImage(_imgh, _imgh*3);

@@ -132,7 +132,8 @@ olist = function() {
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(pidx);
 		Context.InitContext(this.metadblist_selection);
 		Context.BuildMenu(_menu, 1, -1);
-		_menu.AppendMenuItem(MF_STRING, 803, "用Mp3tag编辑");
+		var fso = new ActiveXObject("Scripting.FileSystemObject");
+		if(fso.FileExists(fb.FoobarPath +"assemblies\\MusicTag\\MusicTag.exe")) _menu.AppendMenuItem(MF_STRING, 803, "用MusicTag编辑");
 		_child01.AppendTo(_menu, MF_STRING, "发送到...");
 		_child01.AppendMenuItem(MF_STRING, 801, "新播放列表");
 		_menu.AppendMenuSeparator();
@@ -165,7 +166,7 @@ olist = function() {
 			case 803:
 				var WshShell = new ActiveXObject("WScript.Shell");
 				var obj_file = fb.Titleformat("%path%").EvalWithMetadb(fb.GetFocusItem());
-				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
 				break;
 			default:
 				var insert_index = plman.PlaylistItemCount(ret - 1000);

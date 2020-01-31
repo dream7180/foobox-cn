@@ -24,7 +24,7 @@ var show_shadow = fbx_set[28];
 var sys_scrollbar = fbx_set[29];
 var col_by_cover = fbx_set[30];
 // GLOBALS
-var g_script_version = "6.1.5.1";
+var g_script_version = "6.1.5.1a";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -336,8 +336,8 @@ columns = {
 oToolbar = function(){
 	this.disabled = properties.disableToolbar;
 	this.state = 0;
-	this.width = 260*zdpi;
-	this.height = 30*zdpi;
+	this.width = 280*zdpi;
+	this.height = 32*zdpi;
 	this.x = 0;
 	this.y = 0;
 	this.is_netsearch = 0;
@@ -367,45 +367,45 @@ oToolbar = function(){
 		if(this.disabled) return;
 		if(this.state == 0 && !this.dlmode) gr.DrawImage(images.show_toolbar, (ww - images.show_toolbar.Width)/2, wh- images.show_toolbar.Height, images.show_toolbar.Width, images.show_toolbar.Height, 0, 0, images.show_toolbar.Width, images.show_toolbar.Height, 0, 70);
 		else{
-			var x2=2*zdpi, x3=3*zdpi, x23=23*zdpi, end_x = this.x + this.width, mid_x = this.x+this.width/2, col_activeitem = g_color_dl_txt &0x40ffffff;
+			var x2=2*zdpi, x3=3*zdpi, x4=4*zdpi, x23=23*zdpi, end_x = this.x + this.width, mid_x = this.x+this.width/2, col_activeitem = g_color_dl_txt &0x40ffffff;
 			var imgw = images.tool_album.Width, imgh = images.tool_album.Height;
 			gr.SetSmoothingMode(0);
 			gr.FillSolidRect(this.x, this.y, this.width, this.height, g_color_dl_bg);
 			gr.SetSmoothingMode(2);
 			if(properties.showgroupheaders)gr.FillRoundRect(this.x+x3, this.y+x3, x23, x23, 3, 3, col_activeitem);
-			this.groupby_bt.draw(gr, this.x + x2, this.y+x2, 255);
-			this.groupAlb_bt.draw(gr, end_x - 2*imgw-4*zdpi, this.y+x2, 255);
-			this.groupArt_bt.draw(gr, end_x - imgw-x3, this.y+x2, 255);
-			gr.gdiDrawText("组", g_font, g_color_dl_txt, this.x + x2, this.y+x2, imgw, imgh, ccs_txt);
+			this.groupby_bt.draw(gr, this.x + x2, this.y+x3, 255);
+			this.groupAlb_bt.draw(gr, end_x - 2*imgw-x4, this.y+x3, 255);
+			this.groupArt_bt.draw(gr, end_x - imgw-x3, this.y+x3, 255);
+			gr.gdiDrawText("组", g_font, g_color_dl_txt, this.x + x2, this.y+x3, imgw, imgh, ccs_txt);
 			if(p.list.dlitems.length){
-				this.dl_showhide.draw(gr, this.x + imgw+x3, this.y+x2, 255);
-				gr.FillEllipse(this.x + imgw+4*zdpi, this.y+x3, imgw-x2,imgw-x2,g_color_dl_txt)
-				gr.gdiDrawText(this.dl_count, g_font_2, g_color_dl_bg, this.x + imgw+4*zdpi, this.y+x3, imgw,imgh, ccs_txt);
-				this.dlcancel_bt.draw(gr, this.x + 2*(imgw+x2), this.y+x2, 255);
-				gr.DrawImage(images.dl_cancel, this.x + 2*(imgw+x2), this.y+x2, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+				this.dl_showhide.draw(gr, this.x + imgw+x3, this.y+x3, 255);
+				gr.FillEllipse(this.x + imgw+x4, this.y+x4, imgw-x2,imgw-x2,g_color_dl_txt)
+				gr.gdiDrawText(this.dl_count, g_font_2, g_color_dl_bg, this.x + imgw+x4, this.y+x4, imgw,imgh, ccs_txt);
+				this.dlcancel_bt.draw(gr, this.x + 2*(imgw+x2), this.y+x3, 255);
+				gr.DrawImage(images.dl_cancel, this.x + 2*(imgw+x2), this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
 			}else {
-				gr.DrawImage(images.dl_folder, this.x + imgw+x3, this.y+x2, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
-				this.dlfolder_bt.draw(gr, this.x + imgw+x3, this.y+x2, 255);
+				gr.DrawImage(images.dl_folder, this.x + imgw+x3, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+				this.dlfolder_bt.draw(gr, this.x + imgw+x3, this.y+x3, 255);
 			}
-			if(cGroup.pattern_idx == 0){gr.FillRoundRect(end_x - 2*imgw-x3, this.y+x3, x23, x23, 3, 3, col_activeitem);}
-			else if(cGroup.pattern_idx == 3){gr.FillRoundRect(end_x - imgw-x2, this.y+x3, x23, x23, 3, 3, col_activeitem);}
+			if(cGroup.pattern_idx == 0){gr.FillRoundRect(end_x - 2*imgw-x3, this.y+x4, x23, x23, 3, 3, col_activeitem);}
+			else if(cGroup.pattern_idx == 3){gr.FillRoundRect(end_x - imgw-x2, this.y+x4, x23, x23, 3, 3, col_activeitem);}
 			gr.SetSmoothingMode(0);
-			gr.DrawImage(images.tool_album, end_x - 2*imgw-4*zdpi, this.y+x2, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
-			gr.DrawImage(images.tool_artist, end_x - imgw-x3, this.y+x2, imgw, images.tool_artist.Height, 0, 0, imgw, images.tool_artist.Height, 0, 255);
+			gr.DrawImage(images.tool_album, end_x - 2*imgw-x4, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+			gr.DrawImage(images.tool_artist, end_x - imgw-x3, this.y+x3, imgw, images.tool_artist.Height, 0, 0, imgw, images.tool_artist.Height, 0, 255);
 			var _w = images.netbtn_n.Width;
 			if(this.is_netsearch) {
 				if(this.netsearch_num > 1) {
-					this.searchbt_prev.draw(gr, mid_x - _w, this.y+x2, 255);
-					this.searchbt_next.draw(gr, mid_x, this.y+x2, 255);
-					gr.gdiDrawText("上一页", g_font, g_color_dl_txt, mid_x - _w, this.y+x2, _w, imgh, ccs_txt);
-					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x, this.y+x2, _w, imgh, ccs_txt);
+					this.searchbt_prev.draw(gr, mid_x - _w, this.y+x3, 255);
+					this.searchbt_next.draw(gr, mid_x, this.y+x3, 255);
+					gr.gdiDrawText("上一页", g_font, g_color_dl_txt, mid_x - _w, this.y+x3, _w, imgh, ccs_txt);
+					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x, this.y+x3, _w, imgh, ccs_txt);
 				}else{
-					this.searchbt_next.draw(gr, mid_x - _w/2, this.y+x2, 255);
-					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w, imgh, ccs_txt);
+					this.searchbt_next.draw(gr, mid_x - _w/2, this.y+x3, 255);
+					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x3, _w, imgh, ccs_txt);
 				}
 			}else if(this.netradio) {
-				this.radiobt.draw(gr, mid_x - _w/2, this.y+x2, 255);
-				gr.gdiDrawText("更新", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w,imgh, ccs_txt);
+				this.radiobt.draw(gr, mid_x - _w/2, this.y+x3, 255);
+				gr.gdiDrawText("更新", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x3, _w,imgh, ccs_txt);
 			}
 		}
 	}
@@ -524,27 +524,36 @@ oToolbar = function(){
 	}
 	
 	this.init_netsearch_bt = function() {
-		this.netradio = (p.list.name.indexOf("电台") == 0 || p.list.name.indexOf("榜单") == 0) ? 1 : 0;
-		if(this.netradio) {
-			this.is_netsearch = 0;
-			this.netsearch_type = p.list.name.substring(0, 2);
-			this.netsearch_name = p.list.name.split(" | ")[1];
-			if(properties.NetDisableGroup) nethide_groupheader(true);
-			this.disabled = false;
-		} else{
-			this.is_netsearch = (p.list.name.indexOf("网搜") == 0) ? 1 : 0;
-			if(this.is_netsearch){
+		var pl_type = p.list.name.substring(0, 2);
+		switch (pl_type){
+			case "榜单":
+				this.netradio = 1;
+				this.is_netsearch = 0;
+				this.netsearch_type = pl_type;
+				this.netsearch_name = p.list.name.split(" | ")[1];
+				if(properties.NetDisableGroup) nethide_groupheader(true);
+				this.disabled = false;
+				break;
+			case "网搜":
+				this.is_netsearch = 1;
 				this.netradio = 0;
 				this.netsearch_name = p.list.name.split(" | ")[1];
 				this.netsearch_num = Number(p.list.name.split(" | ")[2]);
 				if(properties.NetDisableGroup) nethide_groupheader(true);
 				this.disabled = false;
-			} else {
+				break;
+			case "电台":
+				this.is_netsearch = 0;
+				this.netradio = 0;
+				if(properties.NetDisableGroup) nethide_groupheader(true);
+				if(p.list.dlitems.length == 0) this.disabled = properties.disableToolbar;
+				break;
+			default:
 				this.is_netsearch = 0;
 				this.netradio = 0;
 				if(properties.NetDisableGroup) nethide_groupheader(false);
-				this.disabled = properties.disableToolbar;
-			}
+				if(p.list.dlitems.length == 0) this.disabled = properties.disableToolbar;
+				break;
 		}
 	}
 	

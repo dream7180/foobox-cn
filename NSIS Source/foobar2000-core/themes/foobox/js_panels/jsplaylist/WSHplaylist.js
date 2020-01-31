@@ -2377,7 +2377,6 @@ oList = function(object_name, playlist) {
 		case "down":
 			this.mclicked = this.ishover;
 			if (this.ishover) {
-				//if(p.list.dlitems.length > 0) this.cancel_check(event, x, y);
 				this.item_clicked = false;
 				var fin = this.items.length;
 				for (var i = 0; i < fin; i++) {
@@ -2409,7 +2408,6 @@ oList = function(object_name, playlist) {
 			break;
 		case "up":
 			if (this.ishover) {
-				//if(p.list.dlitems.length > 0) this.cancel_check(event, x, y);
 				var fin = this.items.length;
 				for (var i = 0; i < fin; i++) {
 					this.items[i].check(event, x, y);
@@ -2447,7 +2445,6 @@ oList = function(object_name, playlist) {
 			};
 			break;
 		case "move":
-			//if(p.list.dlitems.length > 0) this.cancel_check(event, x, y);
 			var fin = this.items.length;
 			for (var i = 0; i < fin; i++) {
 				this.items[i].check(event, x, y);
@@ -2463,7 +2460,6 @@ oList = function(object_name, playlist) {
 			break;
 		default:
 			if (this.ishover) {
-				//if(p.list.dlitems.length > 0) this.cancel_check(event, x, y);
 				for (var i = 0; i < this.items.length; i++) {
 					this.items[i].check(event, x, y);
 				};
@@ -2743,7 +2739,6 @@ oList = function(object_name, playlist) {
 											p.list.dlitems.splice(0,p.list.dlitems.length);
 											p.list.dl_num -= p.list.dlitems.length;
 											toolbar.dlmode = false;
-											toolbar.disabled = properties.disableToolbar;
 											toolbar.repaint_dl();
 											toolbar.checkState("move", mouse_x, mouse_y);
 										}
@@ -2754,7 +2749,6 @@ oList = function(object_name, playlist) {
 								}
 							}
 							toolbar.dlmode = true;
-							toolbar.disabled = false;
 							toolbar.repaint_dl();
 						} else {
 							window.ClearInterval(toolbar.dl_timer);
