@@ -1,14 +1,14 @@
 /* 
 * nsi by Nanlon 2020-03-28
-* ½¨Òé±àÒë»·¾³ NSIS 3.05
-* ËùÓÃNSIS²å¼şÎª Unicode °æ
+* å»ºè®®ç¼–è¯‘ç¯å¢ƒ NSIS 3.05
+* æ‰€ç”¨NSISæ’ä»¶ä¸º Unicode ç‰ˆ
 */
 
 /************************
-* ÒıÈënsh ½Å±¾
+* å¼•å…¥nsh è„šæœ¬
 ************************/
 
-# Í·ÎÄ¼şÄ¿Â¼
+# å¤´æ–‡ä»¶ç›®å½•
 !addincludedir ".\nsisfiles\include"
 
 !include "MUI2.nsh"
@@ -16,7 +16,7 @@
 !include "WinVer.nsh"
 
 /************************
-* °²×°³ÌĞò³õÊ¼¶¨Òå³£Á¿ 
+* å®‰è£…ç¨‹åºåˆå§‹å®šä¹‰å¸¸é‡ 
 ************************/
 
 !define FB2K     "Foobar2000"
@@ -26,129 +26,129 @@
 !define FBOX_PUB "dreamawake"
 !define FBOX_WEB "https://www.cnblogs.com/foobox/"
 
-# ¶¨Òå×¢²á±í
+# å®šä¹‰æ³¨å†Œè¡¨
 !define FBOX_KEY_ROOT   "HKLM"
 !define FBOX_KEY_UNINST "Software\Microsoft\Windows\CurrentVersion\Uninstall\${FB2K}"
 !define FBOX_KEY_APPDIR "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\${FB2K}.exe"
 
 /************************
-* MUI Ô¤¶¨Òå³£Á¿
+* MUI é¢„å®šä¹‰å¸¸é‡
 ************************/
 
-# UI ÎÄ¼şÄ¿Â¼
+# UI æ–‡ä»¶ç›®å½•
 !define MUI_UI ".\nsisfiles\mui-ui\mui_sdesc.exe"
 
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
 
-/*** °²×°½çÃæ ***/
+/*** å®‰è£…ç•Œé¢ ***/
 !define MUI_ICON ".\resource\install.ico"
 
 !define MUI_WELCOMEFINISHPAGE_BITMAP ".\resource\wizard-fb2k.bmp"
 !define MUI_HEADERIMAGE_BITMAP ".\resource\header-fb2k-r.bmp"
 
 !define MUI_WELCOMEPAGE_TEXT "\
-${FB2K} ÊÇÒ»¸ö Windows Æ½Ì¨ÏÂµÄ¸ß¼¶ÒôÆµ²¥·ÅÆ÷£¬\
-Ö§³Ö¶àÖÖÒôÆµ¸ñÊ½²¥·ÅºÍ×ª»»¼°µÚÈı·½×é¼şÀ©Õ¹¡£$\n$\n\
-${FBOX} ÊÇ»ùÓÚ ${FB2K} ºº»¯°æ£¨µ±Ç°°æ±¾ ${FB2K_VER}£©µÄ CUI ½çÃæÅäÖÃ¡£$\n$\n\
-ÈôÑ¡×° Milkdrop2 ¿ÉÊÓ»¯²å¼ş£¬ÄúµÄÏµÍ³°æ±¾Ó¦²»µÍÓÚ Windows Vista£¬²¢°²×° DirectX 9.0¡£"
+${FB2K} æ˜¯ä¸€ä¸ª Windows å¹³å°ä¸‹çš„é«˜çº§éŸ³é¢‘æ’­æ”¾å™¨ï¼Œ\
+æ”¯æŒå¤šç§éŸ³é¢‘æ ¼å¼æ’­æ”¾å’Œè½¬æ¢åŠç¬¬ä¸‰æ–¹ç»„ä»¶æ‰©å±•ã€‚$\n$\n\
+${FBOX} æ˜¯åŸºäº ${FB2K} æ±‰åŒ–ç‰ˆï¼ˆå½“å‰ç‰ˆæœ¬ ${FB2K_VER}ï¼‰çš„ CUI ç•Œé¢é…ç½®ã€‚$\n$\n\
+è‹¥é€‰è£… Milkdrop2 å¯è§†åŒ–æ’ä»¶ï¼Œæ‚¨çš„ç³»ç»Ÿç‰ˆæœ¬åº”ä¸ä½äº Windows Vistaï¼Œå¹¶å®‰è£… DirectX 9.0ã€‚"
 
 !define MUI_FINISHPAGE_RUN "$INSTDIR\${FB2K}.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "ÔËĞĞ ${FBOX}"
+!define MUI_FINISHPAGE_RUN_TEXT "è¿è¡Œ ${FBOX}"
 
-/*** Ğ¶ÔØ½çÃæ ***/
+/*** å¸è½½ç•Œé¢ ***/
 !define MUI_UNICON ".\resource\uninst.ico"
 
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP ".\resource\wizard-fb2k.bmp"
 !define MUI_HEADERIMAGE_UNBITMAP ".\resource\header-fb2k-r.bmp"
 
 /************************
-* ³õÊ¼»¯¶¨Òå±äÁ¿
+* åˆå§‹åŒ–å®šä¹‰å˜é‡
 ************************/
 
-# Setup ±êÌâ
+# Setup æ ‡é¢˜
 Caption "${FBOX} ${FBOX_VER}"
 # Unicode Setup
 Unicode true
-# ÉèÖÃÎÄ¼ş¸²¸Ç±ê¼Ç
+# è®¾ç½®æ–‡ä»¶è¦†ç›–æ ‡è®°
 SetOverwrite try
-# ÉèÖÃÑ¹ËõÑ¡Ïî
+# è®¾ç½®å‹ç¼©é€‰é¡¹
 SetCompress auto
-# Ñ¡ÔñÑ¹Ëõ·½Ê½
+# é€‰æ‹©å‹ç¼©æ–¹å¼
 SetCompressor /SOLID lzma
 SetCompressorDictSize 32
-# ÉèÖÃÊı¾İ¿éÓÅ»¯
+# è®¾ç½®æ•°æ®å—ä¼˜åŒ–
 SetDatablockOptimize on
-# ÉèÖÃÔÚÊı¾İÖĞĞ´ÈëÎÄ¼şÊ±¼ä
+# è®¾ç½®åœ¨æ•°æ®ä¸­å†™å…¥æ–‡ä»¶æ—¶é—´
 SetDateSave on
-# ÇëÇóÓ¦ÓÃ³ÌĞò ¹ÜÀíÔ±È¨ÏŞ
+# è¯·æ±‚åº”ç”¨ç¨‹åº ç®¡ç†å‘˜æƒé™
 RequestExecutionLevel admin
-# ÉèÖÃÊÇ·ñÔÊĞí°²×°ÔÚ¸ùÄ¿Â¼ÏÂ
+# è®¾ç½®æ˜¯å¦å…è®¸å®‰è£…åœ¨æ ¹ç›®å½•ä¸‹
 AllowRootDirInstall false
-# ÉèÖÃÊÇ·ñÏÔÊ¾°²×°ÏêÏ¸ĞÅÏ¢
+# è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå®‰è£…è¯¦ç»†ä¿¡æ¯
 ShowInstDetails hide 
-# ÉèÖÃÊÇ·ñÏÔÊ¾Ğ¶ÔØÏêÏ¸ĞÅÏ¢
+# è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå¸è½½è¯¦ç»†ä¿¡æ¯
 ShowUnInstDetails hide 
 
-# ÉèÖÃ°²×°ÀàĞÍ
-InstType "±ê×¼°²×° (²»º¬¿ÉÊÓ»¯²å¼şMilkdrop2)"
-InstType "ÔöÇ¿°²×°"
-InstType "ÍêÈ«°²×°"
+# è®¾ç½®å®‰è£…ç±»å‹
+InstType "æ ‡å‡†å®‰è£… (ä¸å«å¯è§†åŒ–æ’ä»¶Milkdrop2)"
+InstType "å¢å¼ºå®‰è£…"
+InstType "å®Œå…¨å®‰è£…"
 
 /************************
-* ½çÃæÉèÖÃ
+* ç•Œé¢è®¾ç½®
 ************************/
 
-/*** ¼Ó¿ìÔØÈë½çÃæ×ÊÔ´ ***/
+/*** åŠ å¿«è½½å…¥ç•Œé¢èµ„æº ***/
 ReserveFile ".\resource\install.ico"
 ReserveFile ".\resource\licence.rtf"
 ReserveFile ".\resource\wizard-fb2k.bmp"
 ReserveFile ".\resource\header-fb2k-r.bmp"
 
 # dll
-# ²å¼şÄ¿Â¼
+# æ’ä»¶ç›®å½•
 !addplugindir  ".\nsisfiles\plugin"
 
 ReserveFile /plugin "System.dll"
 ReserveFile /plugin "Process.dll"
 ReserveFile /plugin "AccessControl.dll"
 
-/*** °²×°Ò³Ãæ ***/
+/*** å®‰è£…é¡µé¢ ***/
 
-# »¶Ó­Ò³Ãæ
+# æ¬¢è¿é¡µé¢
 !insertmacro MUI_PAGE_WELCOME
-# Ğí¿ÉĞ­ÒéÒ³Ãæ
+# è®¸å¯åè®®é¡µé¢
 !insertmacro MUI_PAGE_LICENSE ".\resource\licence.rtf"
-# ×é¼şÑ¡ÔñÒ³Ãæ
+# ç»„ä»¶é€‰æ‹©é¡µé¢
 !insertmacro MUI_PAGE_COMPONENTS
-# °²×°Ä¿Â¼Ñ¡ÔñÒ³Ãæ
+# å®‰è£…ç›®å½•é€‰æ‹©é¡µé¢
 !define MUI_PAGE_CUSTOMFUNCTION_show OnDirPageshow
 !insertmacro MUI_PAGE_DIRECTORY
-# °²×°¹ı³ÌÒ³Ãæ
+# å®‰è£…è¿‡ç¨‹é¡µé¢
 !insertmacro MUI_PAGE_INSTFILES
-# °²×°Íê³ÉÒ³Ãæ
+# å®‰è£…å®Œæˆé¡µé¢
 !insertmacro MUI_PAGE_FINISH
 
-/*** Ğ¶ÔØÒ³Ãæ ***/
+/*** å¸è½½é¡µé¢ ***/
 
-# Ğ¶ÔØ»¶Ó­Ò³Ãæ
+# å¸è½½æ¬¢è¿é¡µé¢
 !insertmacro MUI_UNPAGE_WELCOME
-# Ğ¶ÔØÄ¿Â¼Ñ¡ÔñÒ³Ãæ
+# å¸è½½ç›®å½•é€‰æ‹©é¡µé¢
 !insertmacro MUI_UNPAGE_DIRECTORY
-# Ğ¶ÔØ¹ı³ÌÒ³Ãæ
+# å¸è½½è¿‡ç¨‹é¡µé¢
 !insertmacro MUI_UNPAGE_INSTFILES
-# Ğ¶ÔØÍê³ÉÒ³Ãæ
+# å¸è½½å®Œæˆé¡µé¢
 !insertmacro MUI_UNPAGE_FINISH
 
 /*
-* *********** ÓïÑÔÎÄ¼ş *************
-* ½¨ÒéÊ¹ÓÃ".\resource\language\"ÏÂµÄ
-* ÓïÑÔÎÄ¼şÌæ»»NSIS×Ô´øµÄÖĞÎÄÓïÑÔÎÄ¼ş
+* *********** è¯­è¨€æ–‡ä»¶ *************
+* å»ºè®®ä½¿ç”¨".\resource\language\"ä¸‹çš„
+* è¯­è¨€æ–‡ä»¶æ›¿æ¢NSISè‡ªå¸¦çš„ä¸­æ–‡è¯­è¨€æ–‡ä»¶
 */
 !insertmacro MUI_LANGUAGE "SimpChinese"
 
 /************************
-* °æ±¾ÉùÃ÷
+* ç‰ˆæœ¬å£°æ˜
 ************************/
 
 VIProductVersion "${FBOX_VER}"
@@ -162,7 +162,7 @@ VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "FileVersion"     "${FBOX_VER}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "ProductVersion"  "${FBOX_VER}"
 
 /************************
-* °²×°ÎÄ¼ş¶¨Òå
+* å®‰è£…æ–‡ä»¶å®šä¹‰
 ************************/
 
 Name "${FBOX} ${FBOX_VER}"
@@ -173,25 +173,25 @@ InstallDirRegKey HKLM "${FBOX_KEY_UNINST}" "UninstallString"
 BrandingText "${FBOX} ${FBOX_VER}"
 
 /************************
-* °²×° Section ¶Î
+* å®‰è£… Section æ®µ
 ************************/
 
-!macro ProcessCleanup  # ½ø³ÌÇåÀí
+!macro ProcessCleanup  # è¿›ç¨‹æ¸…ç†
 ProcessFindNext:
   Process::Find "$INSTDIR\${FB2K}.exe"
-	Pop $R0
-	IntCmp $R0 0 ProcessFindDone
-	Process::Kill $R0
-	Pop $R1
-	IntCmp $R1 0 ProcessFindDone
-	Goto ProcessFindNext
+  Pop $R0
+  IntCmp $R0 0 ProcessFindDone
+  Process::Kill $R0
+  Pop $R1
+  IntCmp $R1 0 ProcessFindDone
+  Goto ProcessFindNext
 ProcessFindDone:
 !macroend
 
-Section "ºËĞÄ³ÌĞò×é¼ş" CoreFiles
+Section "æ ¸å¿ƒç¨‹åºç»„ä»¶" CoreFiles
   SectionIn 1 2 3 RO
   
-  # ½ø³ÌÇåÀí
+  # è¿›ç¨‹æ¸…ç†
   !insertmacro ProcessCleanup
   
   SetOutPath "$INSTDIR"
@@ -200,9 +200,9 @@ Section "ºËĞÄ³ÌĞò×é¼ş" CoreFiles
   WriteUninstaller "$INSTDIR\uninst.exe"
 SectionEnd
 
-SectionGroup "¿ÉÑ¡ÅäÖÃÎÄ¼ş(Éı¼¶Ğè±£ÁôÔ­ÅäÖÃÊ±ÎğÑ¡)" OptionalProfile
+SectionGroup "å¯é€‰é…ç½®æ–‡ä»¶(å‡çº§éœ€ä¿ç•™åŸé…ç½®æ—¶å‹¿é€‰)" OptionalProfile
 
-  Section "${FB2K} ºËĞÄÅäÖÃÎÄ¼ş" CoreProfile
+  Section "${FB2K} æ ¸å¿ƒé…ç½®æ–‡ä»¶" CoreProfile
     SectionIn 1 2 3
     
     SetOverwrite off
@@ -214,7 +214,7 @@ SectionGroup "¿ÉÑ¡ÅäÖÃÎÄ¼ş(Éı¼¶Ğè±£ÁôÔ­ÅäÖÃÊ±ÎğÑ¡)" OptionalProfile
     SetOverwrite try
   SectionEnd
 
-  Section "ESLyric ¸è´ÊÅäÖÃÎÄ¼ş" LyricsCfg
+  Section "ESLyric æ­Œè¯é…ç½®æ–‡ä»¶" LyricsCfg
     SectionIn 1 2 3
     
     SetOverwrite off
@@ -226,7 +226,7 @@ SectionGroup "¿ÉÑ¡ÅäÖÃÎÄ¼ş(Éı¼¶Ğè±£ÁôÔ­ÅäÖÃÊ±ÎğÑ¡)" OptionalProfile
     SetOverwrite try
   SectionEnd
 
-  Section "×ª»»Æ÷ÅäÖÃÎÄ¼ş" ConverterCfg
+  Section "è½¬æ¢å™¨é…ç½®æ–‡ä»¶" ConverterCfg
     SectionIn 1 2 3
     
     SetOverwrite off
@@ -240,29 +240,29 @@ SectionGroup "¿ÉÑ¡ÅäÖÃÎÄ¼ş(Éı¼¶Ğè±£ÁôÔ­ÅäÖÃÊ±ÎğÑ¡)" OptionalProfile
   
 SectionGroupEnd
 
-SectionGroup "¶îÍâ½âÂëÆ÷" ExtraDecoder
+SectionGroup "é¢å¤–è§£ç å™¨" ExtraDecoder
 
-  Section "APE ½âÂëÆ÷" DecAPE
+  Section "APE è§£ç å™¨" DecAPE
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_monkey"
     File "${FB2K}-extra\components\foo_input_monkey.dll"
   SectionEnd
 
-  Section "DTS ½âÂëÆ÷" DecDTS
+  Section "DTS è§£ç å™¨" DecDTS
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_dts"
     File "${FB2K}-extra\components\dts\*.*"
   SectionEnd
 
-  Section "SACD ½âÂëÆ÷" DecSACD
+  Section "SACD è§£ç å™¨" DecSACD
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_sacd"
     File /r "${FB2K}-extra\components\sacd\*.*"
     
-    # ×¢²á dsd_transcoder.dll
+    # æ³¨å†Œ dsd_transcoder.dll
     ${If} ${RunningX64}
     
     ${DisableX64FSRedirection}
@@ -279,14 +279,14 @@ SectionGroup "¶îÍâ½âÂëÆ÷" ExtraDecoder
     File "${FB2K}-extra\components\foo_dsd_converter.dll"
   SectionEnd
 
-  Section "TTA ½âÂëÆ÷" DecTTA
+  Section "TTA è§£ç å™¨" DecTTA
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_tta"
     File "${FB2K}-extra\components\foo_input_tta.dll"
   SectionEnd
 
-  Section "TAK ½âÂëÆ÷" DecTAK
+  Section "TAK è§£ç å™¨" DecTAK
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_tak"
@@ -294,7 +294,7 @@ SectionGroup "¶îÍâ½âÂëÆ÷" ExtraDecoder
     File "${FB2K}-extra\components\foo_input_tak.dll"
   SectionEnd
 
-  Section "DVD-Audio ½âÂëÆ÷" DecDVDA
+  Section "DVD-Audio è§£ç å™¨" DecDVDA
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\user-components\foo_input_dvda"
@@ -303,44 +303,44 @@ SectionGroup "¶îÍâ½âÂëÆ÷" ExtraDecoder
 
 SectionGroupEnd
 
-SectionGroup "¿ÉÑ¡×é¼ş" OptionalComponents
+SectionGroup "å¯é€‰ç»„ä»¶" OptionalComponents
 
-  Section "×ª»»Æ÷" Converter
+  Section "è½¬æ¢å™¨" Converter
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_converter.dll"
   SectionEnd
 
-  Section "ÎÄ¼ş²Ù×÷" FileOps
+  Section "æ–‡ä»¶æ“ä½œ" FileOps
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_fileops.dll"
   SectionEnd
 
-  Section "Ñ¹Ëõ°ü¶ÁÈ¡Æ÷" UnPack
+  Section "å‹ç¼©åŒ…è¯»å–å™¨" UnPack
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_unpack.dll"
   SectionEnd
 
-  Section "²¥·ÅÔöÒæÉ¨ÃèÆ÷" Rgscan
+  Section "æ’­æ”¾å¢ç›Šæ‰«æå™¨" Rgscan
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_rgscan.dll"
   SectionEnd
 
-  Section /o "Freedb ±êÇ©»ñÈ¡Æ÷" Freedb
+  Section /o "Freedb æ ‡ç­¾è·å–å™¨" Freedb
     SectionIn 2 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_freedb2.dll"
   SectionEnd
 
-  Section /o "UPnP\DLNA Ö§³Ö²å¼ş" UPnP
+  Section /o "UPnP\DLNA æ”¯æŒæ’ä»¶" UPnP
     SectionIn 3
     
     SetOutPath "$INSTDIR\user-components\foo_upnp"
@@ -349,16 +349,16 @@ SectionGroup "¿ÉÑ¡×é¼ş" OptionalComponents
   
 SectionGroupEnd
 
-SectionGroup "¸ñÊ½×ª»»±àÂëÆ÷" Encoders
+SectionGroup "æ ¼å¼è½¬æ¢ç¼–ç å™¨" Encoders
 
-  Section "MP3 ±àÂëÆ÷(lame)" EncMP3
+  Section "MP3 ç¼–ç å™¨(lame)" EncMP3
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\lame.exe"
   SectionEnd
 
-  Section "FLAC ±àÂëÆ÷(ÎŞËğ)" EncFLAC
+  Section "FLAC ç¼–ç å™¨(æ— æŸ)" EncFLAC
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
@@ -366,70 +366,70 @@ SectionGroup "¸ñÊ½×ª»»±àÂëÆ÷" Encoders
     File "${FB2K}-extra\encoders\metaflac.exe"
   SectionEnd
 
-  Section "WMA ±àÂëÆ÷" EncWMA
+  Section "WMA ç¼–ç å™¨" EncWMA
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\WMAEncode.exe"
   SectionEnd
 
-  Section "APE ±àÂëÆ÷(ÎŞËğ)" EncAPE
+  Section "APE ç¼–ç å™¨(æ— æŸ)" EncAPE
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\mac.exe"
   SectionEnd
 
-  Section "Opus ±àÂëÆ÷" EncOPUS
+  Section "Opus ç¼–ç å™¨" EncOPUS
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\opusenc.exe"
   SectionEnd
 
-  Section "AAC ±àÂëÆ÷(Nero)" EncAAC
+  Section "AAC ç¼–ç å™¨(Nero)" EncAAC
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\neroAacEnc.exe"
   SectionEnd
 
-  Section "OGG ±àÂëÆ÷" EncOGG
+  Section "OGG ç¼–ç å™¨" EncOGG
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\oggenc2.exe"
   SectionEnd
 
-  Section "WavePack ±àÂëÆ÷(ÎŞËğ)" EncWAV
+  Section "WavePack ç¼–ç å™¨(æ— æŸ)" EncWAV
     SectionIn 1 2 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\wavpack.exe"
   SectionEnd
 
-  Section /o "MPC ±àÂëÆ÷" EncMPC
+  Section /o "MPC ç¼–ç å™¨" EncMPC
     SectionIn 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\mpcenc.exe"
   SectionEnd
 
-  Section /o "TAK ±àÂëÆ÷" EncTAK
+  Section /o "TAK ç¼–ç å™¨" EncTAK
     SectionIn 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\Takc.exe"
   SectionEnd
 
-  Section /o "TTA ±àÂëÆ÷" EncTTA
+  Section /o "TTA ç¼–ç å™¨" EncTTA
     SectionIn 3
     
     SetOutPath "$INSTDIR\encoders"
     File "${FB2K}-extra\encoders\tta.exe"
   SectionEnd
 
-  Section /o "AAC ±àÂëÆ÷(fhgaacenc, ĞèÒªWinamp5.62+)" EncFHGAAC
+  Section /o "AAC ç¼–ç å™¨(fhgaacenc, éœ€è¦Winamp5.62+)" EncFHGAAC
     SectionIn 3
     
     SetOutPath "$INSTDIR\encoders"
@@ -437,7 +437,7 @@ SectionGroup "¸ñÊ½×ª»»±àÂëÆ÷" Encoders
     File "${FB2K}-extra\encoders\nsutil.dll"
   SectionEnd
 
-  Section /o "AAC ±àÂëÆ÷(faac)" EncFAAC
+  Section /o "AAC ç¼–ç å™¨(faac)" EncFAAC
     SectionIn 3
     
     SetOutPath "$INSTDIR\encoders"
@@ -446,9 +446,9 @@ SectionGroup "¸ñÊ½×ª»»±àÂëÆ÷" Encoders
 
 SectionGroupEnd
 
-SectionGroup "¸ß¼¶Êä³ö×é¼ş" AdvancedOutputComponents
+SectionGroup "é«˜çº§è¾“å‡ºç»„ä»¶" AdvancedOutputComponents
 
-  Section "WASAPI Êä³ö×é¼ş(Windows°æ±¾²»µÍÓÚVista)" WASAPI
+  Section "WASAPI è¾“å‡ºç»„ä»¶(Windowsç‰ˆæœ¬ä¸ä½äºVista)" WASAPI
     SectionIn 1 2 3
     
     ${If} ${AtLeastWinVista}
@@ -457,7 +457,7 @@ SectionGroup "¸ß¼¶Êä³ö×é¼ş" AdvancedOutputComponents
     ${EndIf}
   SectionEnd
 
-  Section /o "ASIO Êä³ö×é¼ş" ASIO
+  Section /o "ASIO è¾“å‡ºç»„ä»¶" ASIO
     SectionIn 3
     
     SetOutPath "$INSTDIR\user-components\foo_out_asio"
@@ -466,9 +466,9 @@ SectionGroup "¸ß¼¶Êä³ö×é¼ş" AdvancedOutputComponents
   
 SectionGroupEnd
 
-SectionGroup "ÔöÇ¿°æ¸½¼Ó×é¼şºÍ³ÌĞò" EnhancedAddOnsAndPrograms
+SectionGroup "å¢å¼ºç‰ˆé™„åŠ ç»„ä»¶å’Œç¨‹åº" EnhancedAddOnsAndPrograms
 
-  Section /o "Milkdrop2 ¿ÉÊÓ»¯²å¼ş(ÒªÇóDirectX 9.0)" Milkdrop2
+  Section /o "Milkdrop2 å¯è§†åŒ–æ’ä»¶(è¦æ±‚DirectX 9.0)" Milkdrop2
     SectionIn 2 3
     
     SetOutPath "$INSTDIR\components"
@@ -481,7 +481,7 @@ SectionGroup "ÔöÇ¿°æ¸½¼Ó×é¼şºÍ³ÌĞò" EnhancedAddOnsAndPrograms
     File /r "${FB2K}-extra\visualization\plugins\*.*"
   SectionEnd
 
-  Section /o "MusicTag ÒôÀÖ±êÇ©¹ÜÀí²å¼ş" MusicTag
+  Section /o "MusicTag éŸ³ä¹æ ‡ç­¾ç®¡ç†æ’ä»¶" MusicTag
     SectionIn 2 3
     
     SetOutPath "$INSTDIR\assemblies\MusicTag"
@@ -490,16 +490,16 @@ SectionGroup "ÔöÇ¿°æ¸½¼Ó×é¼şºÍ³ÌĞò" EnhancedAddOnsAndPrograms
   
 SectionGroupEnd
 
-SectionGroup "Ä¬ÈÏ½çÃæDUIÏà¹Ø" DefaultInterfaceDuiRelated
+SectionGroup "é»˜è®¤ç•Œé¢DUIç›¸å…³" DefaultInterfaceDuiRelated
 
-  Section /o "×¨¼­ÁĞ±í×é¼ş" AlbumList
+  Section /o "ä¸“è¾‘åˆ—è¡¨ç»„ä»¶" AlbumList
     SectionIn 3
     
     SetOutPath "$INSTDIR\components"
     File "${FB2K}-extra\components\foo_albumlist.dll"
   SectionEnd
 
-  Section /o "Ô¤ÖÃÖ÷Ìâ¼¯" DuiThemes
+  Section /o "é¢„ç½®ä¸»é¢˜é›†" DuiThemes
     SectionIn 3
     
     SetOutPath "$INSTDIR\themes"
@@ -508,35 +508,35 @@ SectionGroup "Ä¬ÈÏ½çÃæDUIÏà¹Ø" DefaultInterfaceDuiRelated
   
 SectionGroupEnd
 
-Section "¾ùºâÆ÷Ô¤ÖÃÎÄ¼ş" EqualizerPresets
+Section "å‡è¡¡å™¨é¢„ç½®æ–‡ä»¶" EqualizerPresets
   SectionIn 1 2 3
   
   SetOutPath "$INSTDIR\Equalizer Presets"
   File "${FB2K}-extra\Equalizer Presets\*.*"
 SectionEnd
 
-SectionGroup "¿ì½İ·½Ê½" Shortcuts
+SectionGroup "å¿«æ·æ–¹å¼" Shortcuts
 
-  Section "×ÀÃæ" ShortcutsDesktop
+  Section "æ¡Œé¢" ShortcutsDesktop
     SectionIn 1 2 3
 	
     SetShellVarContext current
     CreateShortCut "$DESKTOP\${FB2K}.lnk" "$INSTDIR\${FB2K}.exe"
   SectionEnd
   
-  Section "¿ªÊ¼²Ëµ¥" ShortcutsPrograms
+  Section "å¼€å§‹èœå•" ShortcutsPrograms
     SectionIn 1 2 3
     
     SetShellVarContext current
     CreateDirectory "$SMPROGRAMS\${FB2K}"
     CreateShortCut "$SMPROGRAMS\${FB2K}\${FB2K}.lnk" "$INSTDIR\${FB2K}.exe"
-    CreateShortCut "$SMPROGRAMS\${FB2K}\Ğ¶ÔØ${FB2K}.lnk" "$INSTDIR\uninst.exe"
+    CreateShortCut "$SMPROGRAMS\${FB2K}\å¸è½½${FB2K}.lnk" "$INSTDIR\uninst.exe"
   SectionEnd
   
 SectionGroupEnd
 
 Section -Post
-  # »ñÈ¡°²×°Ä¿Â¼¶ÁĞ´È¨ÏŞ
+  # è·å–å®‰è£…ç›®å½•è¯»å†™æƒé™
   AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
   
   SetRegView 32
@@ -548,56 +548,56 @@ Section -Post
   WriteRegStr   HKLM "${FBOX_KEY_UNINST}" "Publisher"       "${FBOX_PUB}"
   SetRegView lastused
   
-  # »ñÈ¡°²×°¶ÎµÄ´óĞ¡(KB)Ğ´Èë×¢²á±í
-	SectionGetSize ${CoreFiles} $R0
-	
-	SetRegView 32
-	WriteRegDWORD HKLM "${FBOX_KEY_UNINST}" "EstimatedSize" "$R0"
-	WriteRegStr   HKLM "${FBOX_KEY_APPDIR}" "" "$INSTDIR\${FB2K}.exe"
-	SetRegView lastused
-	
-	RMDir "$INSTDIR\backup"
+  # è·å–å®‰è£…æ®µçš„å¤§å°(KB)å†™å…¥æ³¨å†Œè¡¨
+  SectionGetSize ${CoreFiles} $R0
+  
+  SetRegView 32
+  WriteRegDWORD HKLM "${FBOX_KEY_UNINST}" "EstimatedSize" "$R0"
+  WriteRegStr   HKLM "${FBOX_KEY_APPDIR}" "" "$INSTDIR\${FB2K}.exe"
+  SetRegView lastused
+  
+  RMDir "$INSTDIR\backup"
 SectionEnd
 
 /************************
-* °²×°»Øµ÷º¯Êı
+* å®‰è£…å›è°ƒå‡½æ•°
 ************************/
 
 Function .onInit
-  # ³õÊ¼»¯²å¼şÄ¿Â¼
+  # åˆå§‹åŒ–æ’ä»¶ç›®å½•
   InitPluginsDir
   File "/oname=$PLUGINSDIR\install.ico"       ".\resource\install.ico"
   File "/oname=$PLUGINSDIR\licence.rtf"       ".\resource\licence.rtf"
-	File "/oname=$PLUGINSDIR\wizard-fb2k.bmp"   ".\resource\wizard-fb2k.bmp"
-	File "/oname=$PLUGINSDIR\header-fb2k-r.bmp" ".\resource\header-fb2k-r.bmp"
+  File "/oname=$PLUGINSDIR\wizard-fb2k.bmp"   ".\resource\wizard-fb2k.bmp"
+  File "/oname=$PLUGINSDIR\header-fb2k-r.bmp" ".\resource\header-fb2k-r.bmp"
 
-  # ´´½¨»¥³â·ÀÖ¹ÖØ¸´ÔËĞĞ
+  # åˆ›å»ºäº’æ–¥é˜²æ­¢é‡å¤è¿è¡Œ
   System::Call `kernel32::CreateMutex(i0,i0,t"${FBOX}_installer")i.r1?e`
   Pop $R0
   StrCmp $R0 0 +3
-  MessageBox MB_OK|MB_ICONEXCLAMATION "°²×°³ÌĞòÒÑ¾­ÔËĞĞ£¡"
+  MessageBox MB_OK|MB_ICONEXCLAMATION "å®‰è£…ç¨‹åºå·²ç»è¿è¡Œï¼"
   Abort
   
-  # ÒÑ°²×°°æ±¾¼ì²â¼°Ğ¶ÔØ
-	SetRegView 32
-	ClearErrors
-	ReadRegStr $R0 HKLM "${FBOX_KEY_UNINST}" "UninstallString"
-	${Unless} ${Errors}
-	ReadRegStr $R1 HKLM "${FBOX_KEY_UNINST}" "DisplayVersion"
-	SetRegView lastused
-	${AndUnless} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION \
-	"¼ì²âµ½±¾»úÒÑ¾­°²×°ÁË ${FBOX} v$R1 $\n \
-	$\n? È«ĞÂ°²×°ÇëÑ¡Ôñ¡¼ÊÇ(Y)¡½Ğ¶ÔØÔ­ÓĞ°æ±¾£»\
-	$\n? Éı¼¶°²×°ÇëÑ¡Ôñ¡¼·ñ(N)¡½Ö±½Ó¸²¸Ç°²×°¡£\
-	$\n$\nÊÇ·ñĞ¶ÔØÒÑ°²×°µÄ°æ±¾£¿" /SD IDYES IDNO`
-	System::Call "*(&t${NSIS_MAX_STRLEN}R0)p.r0"
-	System::Call "shlwapi::PathParseIconLocation(pr0)"
-	System::Call "shlwapi::PathRemoveFileSpec(pr0)"
-	System::Call "*$0(&t${NSIS_MAX_STRLEN}.R2)"
-	System::Free $0
-	${AndUnless} $R2 == ""
-	ExecWait `"$R0" /S _?=$R2` $0
-	${EndUnless}
+  # å·²å®‰è£…ç‰ˆæœ¬æ£€æµ‹åŠå¸è½½
+  SetRegView 32
+  ClearErrors
+  ReadRegStr $R0 HKLM "${FBOX_KEY_UNINST}" "UninstallString"
+  ${Unless} ${Errors}
+  ReadRegStr $R1 HKLM "${FBOX_KEY_UNINST}" "DisplayVersion"
+  SetRegView lastused
+  ${AndUnless} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION \
+  "æ£€æµ‹åˆ°æœ¬æœºå·²ç»å®‰è£…äº† ${FBOX} v$R1 $\n \
+  $\n? å…¨æ–°å®‰è£…è¯·é€‰æ‹©ã€–æ˜¯(Y)ã€—å¸è½½åŸæœ‰ç‰ˆæœ¬ï¼›\
+  $\n? å‡çº§å®‰è£…è¯·é€‰æ‹©ã€–å¦(N)ã€—ç›´æ¥è¦†ç›–å®‰è£…ã€‚\
+  $\n$\næ˜¯å¦å¸è½½å·²å®‰è£…çš„ç‰ˆæœ¬ï¼Ÿ" /SD IDYES IDNO`
+  System::Call "*(&t${NSIS_MAX_STRLEN}R0)p.r0"
+  System::Call "shlwapi::PathParseIconLocation(pr0)"
+  System::Call "shlwapi::PathRemoveFileSpec(pr0)"
+  System::Call "*$0(&t${NSIS_MAX_STRLEN}.R2)"
+  System::Free $0
+  ${AndUnless} $R2 == ""
+  ExecWait `"$R0" /S _?=$R2` $0
+  ${EndUnless}
 FunctionEnd
 
 Function .onSelChange
@@ -649,105 +649,105 @@ Function .onSelChange
   SectionSetFlags ${AlbumList} 1
 FunctionEnd
 
-Function OnDirPageshow  # °²×°Ä¿Â¼ÉèÖÃ
-	SetRegView 32
-	ReadRegStr $0 HKLM "${FBOX_KEY_APPDIR}" ""
-	SetRegView lastused
-	
-	${If} $0 != ""
-	FindWindow $R0 "#32770" "" $HWNDPARENT
+Function OnDirPageshow  # å®‰è£…ç›®å½•è®¾ç½®
+  SetRegView 32
+  ReadRegStr $0 HKLM "${FBOX_KEY_APPDIR}" ""
+  SetRegView lastused
+  
+  ${If} $0 != ""
+  FindWindow $R0 "#32770" "" $HWNDPARENT
 
-	# ½ûÓÃä¯ÀÀ°´Å¥
-	GetDlgItem $0 $R0 1001
-	EnableWindow $0 0
+  # ç¦ç”¨æµè§ˆæŒ‰é’®
+  GetDlgItem $0 $R0 1001
+  EnableWindow $0 0
 
-	# ½ûÓÃ±à¼­µÄÄ¿Â¼
-	GetDlgItem $0 $R0 1019
-	EnableWindow $0 0
+  # ç¦ç”¨ç¼–è¾‘çš„ç›®å½•
+  GetDlgItem $0 $R0 1019
+  EnableWindow $0 0
 
-	GetDlgItem $0 $R0 1006
-	SendMessage $0 ${WM_SETTEXT} 0 "STR:ÒÑ¾­¼ì²âµ½ÄúµÄ¼ÆËã»úÉÏ°²×°ÁË${FBOX}£¬ÏÖÔÚ½øĞĞµÄ¸²¸Ç°²×°²»ÄÜ¸ü¸Ä°²×°Ä¿Â¼¡£Èç¹ûÄúĞèÒª¸ü¸Ä°²×°Ä¿Â¼£¬ÇëÏÈĞ¶ÔØÒÑ¾­°²×°µÄ°æ±¾Ö®ºóÔÙÔËĞĞ´Ë°²×°³ÌĞò£¡"
+  GetDlgItem $0 $R0 1006
+  SendMessage $0 ${WM_SETTEXT} 0 "STR:å·²ç»æ£€æµ‹åˆ°æ‚¨çš„è®¡ç®—æœºä¸Šå®‰è£…äº†${FBOX}ï¼Œç°åœ¨è¿›è¡Œçš„è¦†ç›–å®‰è£…ä¸èƒ½æ›´æ”¹å®‰è£…ç›®å½•ã€‚å¦‚æœæ‚¨éœ€è¦æ›´æ”¹å®‰è£…ç›®å½•ï¼Œè¯·å…ˆå¸è½½å·²ç»å®‰è£…çš„ç‰ˆæœ¬ä¹‹åå†è¿è¡Œæ­¤å®‰è£…ç¨‹åºï¼"
 
-	${EndIf}
+  ${EndIf}
 FunctionEnd
 
 /************************
-* Çø¶Î×é¼şÃèÊö
+* åŒºæ®µç»„ä»¶æè¿°
 ************************/
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${CoreFiles}                  "°²×° ${FB2K}"
-  !insertmacro MUI_DESCRIPTION_TEXT ${CoreProfile}                "${FB2K} ºËĞÄÅäÖÃÎÄ¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${LyricsCfg}                  "ESLyric ¸è´ÊÅäÖÃÎÄ¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${ConverterCfg}               "×ª»»Æ÷ÅäÖÃÎÄ¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${ExtraDecoder}               "¶îÍâ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecAPE}                     "APE ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecDTS}                     "DTS ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecSACD}                    "SACD ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecTTA}                     "TTA ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecTAK}                     "TAK ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DecDVDA}                    "DVD-Audio ½âÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${OptionalComponents}         "¿ÉÑ¡×é¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Converter}                  "×ª»»Æ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${FileOps}                    "ÎÄ¼ş²Ù×÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${UnPack}                     "Ñ¹Ëõ°ü¶ÁÈ¡Æ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Rgscan}                     "²¥·ÅÔöÒæÉ¨ÃèÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Freedb}                     "Freedb ±êÇ©»ñÈ¡Æ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${UPnP}                       "UPnP\DLNA Ö§³Ö²å¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Encoders}                   "¸ñÊ½×ª»»±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncMP3}                     "MP3 ±àÂëÆ÷(lame)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncFLAC}                    "FLAC ±àÂëÆ÷(ÎŞËğ)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncWMA}                     "WMA ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncAPE}                     "APE ±àÂëÆ÷(ÎŞËğ)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncOPUS}                    "Opus ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncAAC}                     "AAC ±àÂëÆ÷(Nero)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncOGG}                     "OGG ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncWAV}                     "WavePack ±àÂëÆ÷(ÎŞËğ)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncMPC}                     "MPC ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncTAK}                     "TAK ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncTTA}                     "TTA ±àÂëÆ÷"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncFHGAAC}                  "AAC ±àÂëÆ÷(fhgaacenc, ĞèÒªWinamp5.62+)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EncFAAC}                    "AAC ±àÂëÆ÷(faac)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${AdvancedOutputComponents}   "¸ß¼¶Êä³ö×é¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${WASAPI}                     "WASAPI Êä³ö×é¼ş(Windows°æ±¾²»µÍÓÚVista)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${ASIO}                       "ASIO Êä³ö×é¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EnhancedAddOnsAndPrograms}  "ÔöÇ¿°æ¸½¼Ó×é¼şºÍ³ÌĞò"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Milkdrop2}                  "Milkdrop2 ¿ÉÊÓ»¯²å¼ş(ÒªÇóDirectX 9.0)"
-  !insertmacro MUI_DESCRIPTION_TEXT ${MusicTag}                   "MusicTag ÒôÀÖ±êÇ©¹ÜÀí²å¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DefaultInterfaceDuiRelated} "Ä¬ÈÏ½çÃæ DUI Ïà¹Ø×é¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${AlbumList}                  "×¨¼­ÁĞ±í×é¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${DuiThemes}                  "Ô¤ÖÃÖ÷Ìâ¼¯"
-  !insertmacro MUI_DESCRIPTION_TEXT ${EqualizerPresets}           "¾ùºâÆ÷Ô¤ÖÃÎÄ¼ş"
-  !insertmacro MUI_DESCRIPTION_TEXT ${Shortcuts}                  "´´½¨¿ì½İ·½Ê½"
-  !insertmacro MUI_DESCRIPTION_TEXT ${ShortcutsDesktop}           "´´½¨×ÀÃæ¿ì½İ·½Ê½"
-  !insertmacro MUI_DESCRIPTION_TEXT ${ShortcutsPrograms}          "´´½¨¿ªÊ¼²Ëµ¥³ÌĞò×é¿ì½İ·½Ê½"
+  !insertmacro MUI_DESCRIPTION_TEXT ${CoreFiles}                  "å®‰è£… ${FB2K}"
+  !insertmacro MUI_DESCRIPTION_TEXT ${CoreProfile}                "${FB2K} æ ¸å¿ƒé…ç½®æ–‡ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${LyricsCfg}                  "ESLyric æ­Œè¯é…ç½®æ–‡ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${ConverterCfg}               "è½¬æ¢å™¨é…ç½®æ–‡ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${ExtraDecoder}               "é¢å¤–è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecAPE}                     "APE è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecDTS}                     "DTS è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecSACD}                    "SACD è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecTTA}                     "TTA è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecTAK}                     "TAK è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DecDVDA}                    "DVD-Audio è§£ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${OptionalComponents}         "å¯é€‰ç»„ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Converter}                  "è½¬æ¢å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${FileOps}                    "æ–‡ä»¶æ“ä½œ"
+  !insertmacro MUI_DESCRIPTION_TEXT ${UnPack}                     "å‹ç¼©åŒ…è¯»å–å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Rgscan}                     "æ’­æ”¾å¢ç›Šæ‰«æå™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Freedb}                     "Freedb æ ‡ç­¾è·å–å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${UPnP}                       "UPnP\DLNA æ”¯æŒæ’ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Encoders}                   "æ ¼å¼è½¬æ¢ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncMP3}                     "MP3 ç¼–ç å™¨(lame)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncFLAC}                    "FLAC ç¼–ç å™¨(æ— æŸ)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncWMA}                     "WMA ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncAPE}                     "APE ç¼–ç å™¨(æ— æŸ)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncOPUS}                    "Opus ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncAAC}                     "AAC ç¼–ç å™¨(Nero)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncOGG}                     "OGG ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncWAV}                     "WavePack ç¼–ç å™¨(æ— æŸ)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncMPC}                     "MPC ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncTAK}                     "TAK ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncTTA}                     "TTA ç¼–ç å™¨"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncFHGAAC}                  "AAC ç¼–ç å™¨(fhgaacenc, éœ€è¦Winamp5.62+)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EncFAAC}                    "AAC ç¼–ç å™¨(faac)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${AdvancedOutputComponents}   "é«˜çº§è¾“å‡ºç»„ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${WASAPI}                     "WASAPI è¾“å‡ºç»„ä»¶(Windowsç‰ˆæœ¬ä¸ä½äºVista)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${ASIO}                       "ASIO è¾“å‡ºç»„ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EnhancedAddOnsAndPrograms}  "å¢å¼ºç‰ˆé™„åŠ ç»„ä»¶å’Œç¨‹åº"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Milkdrop2}                  "Milkdrop2 å¯è§†åŒ–æ’ä»¶(è¦æ±‚DirectX 9.0)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${MusicTag}                   "MusicTag éŸ³ä¹æ ‡ç­¾ç®¡ç†æ’ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DefaultInterfaceDuiRelated} "é»˜è®¤ç•Œé¢ DUI ç›¸å…³ç»„ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${AlbumList}                  "ä¸“è¾‘åˆ—è¡¨ç»„ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${DuiThemes}                  "é¢„ç½®ä¸»é¢˜é›†"
+  !insertmacro MUI_DESCRIPTION_TEXT ${EqualizerPresets}           "å‡è¡¡å™¨é¢„ç½®æ–‡ä»¶"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Shortcuts}                  "åˆ›å»ºå¿«æ·æ–¹å¼"
+  !insertmacro MUI_DESCRIPTION_TEXT ${ShortcutsDesktop}           "åˆ›å»ºæ¡Œé¢å¿«æ·æ–¹å¼"
+  !insertmacro MUI_DESCRIPTION_TEXT ${ShortcutsPrograms}          "åˆ›å»ºå¼€å§‹èœå•ç¨‹åºç»„å¿«æ·æ–¹å¼"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 /************************
-* Ğ¶ÔØ Section ¶Î
+* å¸è½½ Section æ®µ
 ************************/
 
 Section Uninstall
-	# ½ø³ÌÇåÀí
+  # è¿›ç¨‹æ¸…ç†
   !insertmacro ProcessCleanup
-	
-	# ·´×¢²ádll
-	${If} ${RunningX64}
+  
+  # åæ³¨å†Œdll
+  ${If} ${RunningX64}
 	
   ${DisableX64FSRedirection}
   ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder_x64.dll"`
   ${EnableX64FSRedirection}
   
   ${EndIf}
-	ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
-	
-	# ±¸·İÅäÖÃÎÄ¼ş
+  ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
+  
+  # å¤‡ä»½é…ç½®æ–‡ä»¶
   CreateDirectory "$INSTDIR\backup"
   CopyFiles "$INSTDIR\configuration\Core.cfg" "$INSTDIR\backup"
   CopyFiles "$INSTDIR\configuration\foo_uie_eslyric.dll.cfg" "$INSTDIR\backup"
   CopyFiles "$INSTDIR\configuration\foo_converter.dll.cfg" "$INSTDIR\backup"
   
-  # É¾³ı°²×°ÎÄ¼ş
+  # åˆ é™¤å®‰è£…æ–‡ä»¶
   RMDir /r "$INSTDIR\assemblies"
   RMDir /r "$INSTDIR\cache"
   RMDir /r "$INSTDIR\components"
@@ -781,63 +781,63 @@ Section Uninstall
   Delete "$INSTDIR\version.txt"
   Delete "$INSTDIR\zlib1.dll"
   Delete "$INSTDIR\${FB2K}.exe"
-  Delete "$INSTDIR\${FBOX}°ïÖú.CHM"
+  Delete "$INSTDIR\${FBOX}å¸®åŠ©.CHM"
   Delete "$INSTDIR\${FB2K} Shell Associations Updater.exe"
   
   Delete "$INSTDIR\uninst.exe"
 
-  # É¾³ı×ÀÃæ¿ì½İ·½Ê½
+  # åˆ é™¤æ¡Œé¢å¿«æ·æ–¹å¼
   SetShellVarContext current
   Delete "$DESKTOP\${FB2K}.lnk"
   
   SetShellVarContext current
   RMDir /r "$SMPROGRAMS\${FB2K}"
   
-  # É¾³ı×¢²á±í
-	SetRegView 32
-	DeleteRegKey HKLM "${FBOX_KEY_APPDIR}"
-	DeleteRegKey HKLM "${FBOX_KEY_UNINST}"
-	SetRegView lastused
-	
-	# ÊÇ·ñ±£ÁôÓÃ»§ÎÄ¼ş
-	MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1 \
-	"ÊÇ·ñ±£ÁôÃ½Ìå¿âÊı¾İ¡¢·âÃæ¡¢¸è´Ê¡¢ÏÂÔØ¼°ÅäÖÃÎÄ¼ş±¸·İ£¿ \
-	$\n$\nÈôÒª±£ÁôÕâĞ©ÎÄ¼ş£¬Çëµã»÷¡¼ÊÇ(Y)¡½°´Å¥¡£" \
-	IDYES NotDelete IDNO DeleteAll
-	
-	DeleteAll: 	
-	# É¾³ıÃ½Ìå¿âÊı¾İ¡¢·âÃæ¡¢¸è´Ê¡¢ÏÂÔØ¼°ÅäÖÃÎÄ¼ş±¸·İ
-	RMDir /r "$INSTDIR\Download"
-	RMDir /r "$INSTDIR\index-data"
-	RMDir /r "$INSTDIR\library"
-	RMDir /r "$INSTDIR\Lyrics"
-	RMDir /r "$INSTDIR\MusicArt"
-	RMDir /r "$INSTDIR\playlists-v1.4"
+  # åˆ é™¤æ³¨å†Œè¡¨
+  SetRegView 32
+  DeleteRegKey HKLM "${FBOX_KEY_APPDIR}"
+  DeleteRegKey HKLM "${FBOX_KEY_UNINST}"
+  SetRegView lastused
+  
+  # æ˜¯å¦ä¿ç•™ç”¨æˆ·æ–‡ä»¶
+  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1 \
+  "æ˜¯å¦ä¿ç•™åª’ä½“åº“æ•°æ®ã€å°é¢ã€æ­Œè¯ã€ä¸‹è½½åŠé…ç½®æ–‡ä»¶å¤‡ä»½ï¼Ÿ \
+  $\n$\nè‹¥è¦ä¿ç•™è¿™äº›æ–‡ä»¶ï¼Œè¯·ç‚¹å‡»ã€–æ˜¯(Y)ã€—æŒ‰é’®ã€‚" \
+  IDYES NotDelete IDNO DeleteAll
+  
+  DeleteAll: 	
+  # åˆ é™¤åª’ä½“åº“æ•°æ®ã€å°é¢ã€æ­Œè¯ã€ä¸‹è½½åŠé…ç½®æ–‡ä»¶å¤‡ä»½
+  RMDir /r "$INSTDIR\Download"
+  RMDir /r "$INSTDIR\index-data"
+  RMDir /r "$INSTDIR\library"
+  RMDir /r "$INSTDIR\Lyrics"
+  RMDir /r "$INSTDIR\MusicArt"
+  RMDir /r "$INSTDIR\playlists-v1.4"
   RMDir /r "$INSTDIR\backup"
-	
-	RMDir "$INSTDIR"
+  
+  RMDir "$INSTDIR"
   
   NotDelete:
-	RMDir "$INSTDIR"
+  RMDir "$INSTDIR"
 	
   SetAutoClose true
 SectionEnd
 
 /************************
-* Ğ¶ÔØ»Øµ÷º¯Êı
+* å¸è½½å›è°ƒå‡½æ•°
 ************************/
 
 Function un.onInit
-  # ³õÊ¼»¯²å¼şÄ¿Â¼
+  # åˆå§‹åŒ–æ’ä»¶ç›®å½•
   InitPluginsDir
   File "/oname=$PLUGINSDIR\uninst.ico"        ".\resource\uninst.ico"
   File "/oname=$PLUGINSDIR\wizard-fb2k.bmp"   ".\resource\wizard-fb2k.bmp"
-	File "/oname=$PLUGINSDIR\header-fb2k-r.bmp" ".\resource\header-fb2k-r.bmp"
+  File "/oname=$PLUGINSDIR\header-fb2k-r.bmp" ".\resource\header-fb2k-r.bmp"
   
-  # ´´½¨»¥³â·ÀÖ¹ÖØ¸´ÔËĞĞ
+  # åˆ›å»ºäº’æ–¥é˜²æ­¢é‡å¤è¿è¡Œ
   System::Call `kernel32::CreateMutex(i 0, i 0, t "${FBOX}_uninstaller") i .r1 ?e`
   Pop $R0
   StrCmp $R0 0 +3
-  MessageBox MB_OK|MB_ICONEXCLAMATION "Ğ¶ÔØ³ÌĞòÒÑ¾­ÔËĞĞ£¡"
+  MessageBox MB_OK|MB_ICONEXCLAMATION "å¸è½½ç¨‹åºå·²ç»è¿è¡Œï¼"
   Abort
 FunctionEnd
