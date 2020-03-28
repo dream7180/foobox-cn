@@ -156,7 +156,7 @@ VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "ProductName"     "${FBOX}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "Comments"        "CUI for ${FB2K}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "CompanyName"     "${FBOX_WEB}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "LegalTrademarks" "${FB2K}"
-VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "LegalCopyright"  "Copyright ? 2001-2019 Piotr Pawlowski"
+VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "LegalCopyright"  "Copyright © 2001-2019 Piotr Pawlowski"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "FileDescription" "${FBOX} CUI skin for ${FB2K}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "FileVersion"     "${FBOX_VER}"
 VIAddVersionKey /LANG=${LANG_SIMPCHINESE} "ProductVersion"  "${FBOX_VER}"
@@ -170,7 +170,7 @@ OutFile "${FBOX}_${FBOX_VER}.exe"
 InstallDir "$PROGRAMFILES\${FB2K}"
 
 InstallDirRegKey HKLM "${FBOX_KEY_UNINST}" "UninstallString"
-BrandingText "${FBOX} ${FBOX_VER}"
+BrandingText "${FBOX} by ${FBOX_PUB}"
 
 /************************
 * 安装 Section 段
@@ -270,6 +270,7 @@ SectionGroup "额外解码器" ExtraDecoder
     ${EnableX64FSRedirection}
     
     ${EndIf}
+    
     ExecWait `regsvr32 /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
     
     SetOutPath "$INSTDIR\user-components\foo_dsd_processor"
@@ -739,6 +740,7 @@ Section Uninstall
   ${EnableX64FSRedirection}
   
   ${EndIf}
+  
   ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
   
   # 备份配置文件
