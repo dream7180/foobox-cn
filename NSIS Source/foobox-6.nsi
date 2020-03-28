@@ -1,5 +1,5 @@
 /* 
-* nsi by Nanlon 2020-01-20
+* nsi by Nanlon 2020-03-28
 * 建议编译环境 NSIS 3.05
 * 所用NSIS插件为 Unicode 版
 */
