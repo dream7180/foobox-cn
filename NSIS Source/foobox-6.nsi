@@ -254,9 +254,11 @@ SectionGroup "额外解码器" ExtraDecoder
     
     # 注册 dsd_transcoder.dll
     ${If} ${RunningX64}
-    ExecWait `regsvr32 /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder_x64.dll"`
+	RegDLL "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"
+    ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder_x64.dll"'
     ${else}
-    ExecWait `regsvr32 /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
+	RegDLL "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"
+    ;ExecWait `regsvr32 /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
     ${EndIf}
     
     SetOutPath "$INSTDIR\user-components\foo_dsd_processor"
@@ -597,9 +599,11 @@ Section Uninstall
 	
 	# 反注册dll
 	${If} ${RunningX64}
-	ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder_x64.dll"`
+	UnRegDLL "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"
+	ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder_x64.dll"'
   ${else}
-  ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
+  UnRegDLL "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"
+  ;ExecWait `regsvr32 /s /u "$INSTDIR\user-components\foo_input_sacd\dsd_transcoder.dll"`
 	${EndIf}
 	
 	# 获取安装目录读写权限

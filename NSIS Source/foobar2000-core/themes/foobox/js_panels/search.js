@@ -485,10 +485,10 @@ function Show_Menu_Searchbox(x, y) {
 		SearchQualityMenu.AppendTo(_menu, MF_STRING, "搜索格式");*/
 
 		var WebSearchMenu = window.CreatePopupMenu();
-		WebSearchMenu.AppendMenuItem(MF_STRING, 11, "酷我音乐");
-		WebSearchMenu.AppendMenuItem(MF_STRING, 12, "千千音乐");
-		//WebSearchMenu.AppendMenuItem(MF_STRING, 13, "咪咕音乐");
-		WebSearchMenu.CheckMenuRadioItem(11, 12, ppt.webnb + 10);
+		WebSearchMenu.AppendMenuItem(MF_STRING, 11, "酷我音乐 (320K)");
+		WebSearchMenu.AppendMenuItem(MF_STRING, 12, "千千音乐 (320K)");
+		WebSearchMenu.AppendMenuItem(MF_STRING, 13, "咪咕音乐 (无损)");
+		WebSearchMenu.CheckMenuRadioItem(11, 13, ppt.webnb + 10);
 		WebSearchMenu.AppendTo(_menu, MF_STRING, "搜索来源");
 		_menu.AppendMenuSeparator();
 		
@@ -557,7 +557,7 @@ function Show_Menu_Searchbox(x, y) {
 		ppt.multiple = !ppt.multiple;
 		window.SetProperty("Search Box: Keep Playlist", ppt.multiple);
 		break;
-	case (idx >= 11 && idx <= 12):
+	case (idx >= 11 && idx <= 13):
 		window.SetProperty("Search Source: Web: Number", ppt.webnb = idx - 10);
 		if (ppt.source == 3) oldsearch = "";
 		break;
@@ -678,11 +678,11 @@ function NetSearch(searchtext, pageid, switchpage) {
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			TTSearch(searchtext, pageid, switchpage);
 			break;
-		/*case 3:
+		case 3:
 			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			MGSearch(searchtext, pageid, switchpage);
-			break;*/
+			break;
 		default:
 			break;
 	}
@@ -701,7 +701,7 @@ function KWSearch(searchtext, pageid, switchpage){
 					var songid = [];
 					var filedata = '<asx version="3.0">\r\n\r\n';
 					var ret = json(xmlHttp.responseText.replace(/'/g, '"'))["list"];
-					if(!ret){UpdateDone("已经是最后一页");return;}
+					if(!ret || ret.length == 0){UpdateDone("已经是最后一页");return;}
 					for (var i = 0; i < ret.length; i++) {
 						songid[i] = {
 							artist:ret[i].artist,
@@ -754,23 +754,23 @@ function KWSearch(searchtext, pageid, switchpage){
 		return;
 	}
 }
-/*
+
 function MGSearch(searchtext, pageid, switchpage){
-	var searchURL = "http://pd.musicapp.migu.cn/MIGUM2.0/v1.0/content/search_all.do?&ua=Android_migu&version=5.1&text=" + encodeURIComponent(StringFilter(searchtext)) + "&pageNo=" + pageid + "&pageSize=" + ppt.pagesize + "&searchSwitch={%22song%22:1,%22album%22:0,%22singer%22:0,%22tagSong%22:0,%22mvSong%22:0,%22songlist%22:0,%22bestShow%22:0}";
-	switch(ppt.quality){
-		case 1:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-		case 2:
+	var searchURL = "http://140.143.30.148:88/index.php?key=VG&class=miguSearch&ID=" + encodeURIComponent(StringFilter(searchtext)) +  "&k=" + pageid;
+	//switch(ppt.quality){
+	//	case 1:
+	//		var toneFlag = "HQ";
+	//		var resourceType = "2";
+	//		break;
+	//	case 2:
 			var toneFlag = "SQ";
 			var resourceType = "E";
-			break;
-		default:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-	}
+	//		break;
+	//	default:
+	//		var toneFlag = "HQ";
+	//		var resourceType = "2";
+	//		break;
+	//}
 	try {
 		xmlHttp.open("GET", searchURL, true);
 		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
@@ -780,13 +780,14 @@ function MGSearch(searchtext, pageid, switchpage){
 				if (xmlHttp.status == 200) {
 					var songid = [];
 					var filedata = '<asx version="3.0">\r\n\r\n';
-					var ret = json(xmlHttp.responseText).songResultData.result;
+					var ret = json(xmlHttp.responseText).songResultData.resultList;
+					if(!ret || ret.length == 0){UpdateDone("已经是最后一页");return;}
 					for (var i = 0; i < ret.length; i++) {
-						if(ret[i].vipType == ""){
+						if(ret[i][0].vipType == ""){
 							filedata = filedata + '<entry>\r\n'
-							 + '<title>' + ret[i].name + '</title>\r\n'
-							 + '<author>' + ret[i].singers[0].name + '</author>\r\n'
-							 + '<ref href="' + "http://app.pd.nf.migu.cn/MIGUM2.0/v1.0/content/sub/listenSong.do?toneFlag=" + toneFlag + "&netType=00&userId=15548614588710179085069&ua=Android_migu&version=5.1&copyrightId=0&contentId=" + ret[i].contentId + "&resourceType=" + resourceType + "&channel=0" + '"/>\r\n'
+							 + '<title>' + ret[i][0].name + '</title>\r\n'
+							 + '<author>' + ret[i][0].singers[0].name + '</author>\r\n'
+							 + '<ref href="' + "http://app.pd.nf.migu.cn/MIGUM2.0/v1.0/content/sub/listenSong.do?toneFlag=" + toneFlag + "&netType=00&userId=15548614588710179085069&ua=Android_migu&version=5.1&copyrightId=0&contentId=" + ret[i][0].contentId + "&resourceType=" + resourceType + "&channel=0" + '"/>\r\n'
 							 + '</entry>\r\n\r\n';
 						}
 					}
@@ -803,7 +804,7 @@ function MGSearch(searchtext, pageid, switchpage){
 		return;
 	}
 }
-*/
+
 function TTSearch(searchtext, pageid, switchpage){
 	var searchURL = 'http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.common&format=json&query='  + encodeURIComponent(StringFilter(searchtext)) + "&page_no=" + pageid + "&page_size=" + ppt.pagesize;
 	var qt = "320";
@@ -833,7 +834,7 @@ function TTSearch(searchtext, pageid, switchpage){
 					var songid = [];
 					var ret = json(reconvert(xmlHttp.responseText))["song_list"];
 					//debug && fb.trace("搜索到的数量 > " + ret.length);
-					if (ret.length > 0) {
+					if (ret && ret.length > 0) {
 						for (var i = 0; i < ret.length; i++) {
 							songid.push({
 								artist:ret[i].author,
@@ -938,6 +939,7 @@ function MGRankListid(id, listname){
 					var songid = [];
 					var filedata = '<asx version="3.0">\r\n\r\n';
 					var ret = json(xmlHttp.responseText).result.results;
+					if(!ret || ret.length == 0){UpdateDone("已经是最后一页");return;}
 					for (var i = 0; i < ret.length; i++) {
 						try {
 							filedata = filedata + '<entry>\r\n'
