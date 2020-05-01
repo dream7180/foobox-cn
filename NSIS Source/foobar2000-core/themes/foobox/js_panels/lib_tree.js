@@ -3027,16 +3027,18 @@ function menu_object() {
 		var _mf = _autopl ? MF_GRAYED : MF_STRING;
 		for (i = 0; i < 3; i++) {
 			this.NewMenuItem(Index, "Playlist", i + 1);
-			Menu.AppendMenuItem(xp ? _mf : MF_GRAYED, Index, n[i]);
+			Menu.AppendMenuItem(_mf, Index, n[i]);
 			Index++;
 		}
 		Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);
 		this.NewMenuItem(Index, "Playlist", 4);
 		Menu.AppendMenuItem(MF_STRING, Index, n[3]);
 		Index++;
-		this.NewMenuItem(Index, "Playlist", 5);
-		Menu.AppendMenuItem(xp ? MF_STRING : MF_GRAYED, Index, n[4]);
-		Index++;
+		if(xp){
+			this.NewMenuItem(Index, "Playlist", 5);
+			Menu.AppendMenuItem(MF_STRING, Index, n[4]);
+			Index++;
+		}
 		return Index;
 	}
 	this.FilterMenu = function(Menu, StartIndex) {

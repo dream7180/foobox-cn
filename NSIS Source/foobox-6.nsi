@@ -20,9 +20,9 @@
 ************************/
 
 !define FB2K     "Foobar2000"
-!define FB2K_VER "1.5.1"
+!define FB2K_VER "1.5.3"
 !define FBOX     "Foobox"
-!define FBOX_VER "6.1.5.1a"
+!define FBOX_VER "6.1.5.3"
 !define FBOX_PUB "dreamawake"
 !define FBOX_WEB "https://www.cnblogs.com/foobox/"
 
