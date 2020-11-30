@@ -1,0 +1,151 @@
+//窗口风格 详见http://msdn.microsoft.com/en-us/library/windows/desktop/ms632600%28v=vs.85%29.aspx
+//扩展窗口风格 详见http://msdn.microsoft.com/en-us/library/windows/desktop/ff700543%28v=vs.85%29.aspx
+
+
+interface IWindow{
+Properties:
+   (read,write) Left;//窗口左坐标
+   (read,write) Top; 
+   (read,write) Width; 
+   (read,write) Height; 
+   (read,write) Style; //窗口风格
+   (read,write) ExStyle;//窗口扩展风格
+   (read,write) Caption;//窗口标题
+Methods:
+	IWindow GetChild(class_name,index);//获取类名为class_name的第index个面板
+	//flag=1 同GetParent
+	//flag=2 获取根窗口句柄
+	//详见 http://msdn.microsoft.com/en-us/library/windows/desktop/ms633502%28v=vs.85%29.aspx
+	IWindow GetAncestor(flag = 1);
+	void SetParent(IWindow parent);
+	void SendMsg(msg,wp,lp);
+	//详细及flag见 http://msdn.microsoft.com/en-us/library/windows/desktop/ms633548%28v=vs.85%29.aspx 
+	void Show(flag);
+	void Move(x,y,w,h,redraw = false);
+	boolean IsVisible();
+	boolean IsMinimized();
+	boolean IsMaximized();
+	//vista+
+	//mode = 0时，l t r b对应左/上/右/底边距
+	//mode = 1时，对应点(l,t)与(r,b)为左上/右下的矩形区域
+	void CreateGlass( l, r, t , b, mode = 0);
+	//color 透明色
+	void SetWindowTransparency(opacity,color);
+	int MsgBox(caption,prompt,type);
+	String InputBox(caption="",prompt="",defval="",num_only = false);
+	//mode：
+	// 0 打开文件 1 保存文件 2 打开目录
+	// 打开目录时，参数除title 其他忽略
+	String FileDialog(mode = 0,title="Open",filetype="All Files|*.*",defext="*");
+	IGdiBitmap PrintWindow(client_only = false);
+}
+
+interface IPrivateFontCollection{
+Properties:
+	(readonly) FamilyCount;
+Methods:
+	int AddFont(path);
+	IGdiFont GetFont(name,size,style);
+}
+
+//实验性质
+interface IHttpRequest{
+Methods:
+    void AddHeader(str);
+    void AddPostData(name,value);
+    String Run(url);
+    int RunAsync(url);//异步url请求，返回cookie值，完成后调用on_http_run_done(cookie,string);
+}
+
+interface WSHUtils{
+Methods:
+	IWindow GetWND(class_name);
+	IWindow CreateWND(window_id);
+	IWindow ReleaseCapture();
+	boolean IsAeroEnabled();
+	IGdiBitmap DecodeBase64Image(str);
+	String GetClipboardText();
+	void SetClipboardText(str);
+	void PlaySound(path,flag);
+	HCURSOR LoadCursorX(path);
+	HCURSOR SetCursorX(handle);
+	void ReleaseCursorX(handle);
+	boolean IsVistaOrGreater();
+	//详见http://msdn.microsoft.com/en-us/library/windows/desktop/dd318700%28v=vs.85%29.aspx
+	String LCMapString(str,lcid,flag);
+	//type_str:
+	//"GET"
+	//"POST"
+	IHttpRequest CreateHttpRequest(type_str);
+	VBArray GetWindowsVersion();
+}
+
+interface IThemeManager {
+Methods:
+	//Vista+
+	void DrawThemeTextEx(IGdiGraphics, text, color, x, y, w, h, iGlowSize = 5 , format = 0);
+}
+
+interface IGdiUtils {
+Methods:
+	//返回值0：成功
+	int AddFontResEx( path,fl=0);
+	//fl必须与AddFontResEx中的值相同
+	int RemoveFontResEx( path,fl=0);
+	IPrivateFontCollection CreatePrivateFontCollection();
+	IGdiBitmap CloneGraphics(IGdiGraphics,x,y,w,h);
+}
+
+interface IGdiGraphics{
+Methods:
+  void FillPie(x,y,w,h,start_angle,sweep_angle,color);
+  void DrawPie(x,y,w,h,start_angle,sweep_angle,color);
+}
+
+interface IFbPlaylistManager {
+Methods:
+   string PlaylistGetAutoName(playlistIndex);//自动获取播放列表名称（根据列表曲目）
+   //锁定播放列表
+   //FLAGs:
+   //FLAG_ADD = 0x00000001
+   //FLAG_REMOVE = 0x00000002
+   //FLAG_REORDER  = 0x00000004
+   //FLAG_REPLACE  = 0x00000008
+   //FLAG_RENAME = 0x00000010
+   //FLAG_REMOVE_PLAYLIST = 0x00000020
+   void PlaylistLock(playlistIndex,flag);
+   //注：锁定后的播放列表index更改后，请使用更改后的new_index进行unlock
+   void PlaylistUnlock(playlistIndex);
+   void ProcessLocationsAsync(urls);//完成后调用on_process_locations_done(metadbs)
+}
+
+//improve
+interface IFbTitleFormat {
+Methods:
+    //对于foobar2000 v1.3.0 以上，请注意fromfile参数
+    String Eval(force = false,fromfile = false);
+    String EvalWithMetadb(IFbMetadbHandle,fromfile = false);
+    void Dispose();
+}
+
+interface IFbMetadbHandle {
+Methods:
+    //对于foobar2000 v1.3.0 以上，请注意参数
+    IFbFileInfo GetFileInfo(fromfile = false);
+    void UpdateFileInfo(IFbFileInfo,force = false);
+}
+
+interface IFbUtils {
+Methods:
+    void ShowPreferences(guid_str="");
+    boolean LoadPlaylistV2(path);
+    boolean SavePlaylistV2(path,handles,overwrite = false);//当overwrite=true时，将备份原文件为"原播放列表文件名.bak"
+}
+
+interface IWSHUtils {
+Methods:
+    //输出设置页面GUID至控制台
+    void PrintPreferencePageGUID();
+    //pattern: 设置项-显示-封面模板方式，即按行分割，e.g.   "c:\\%album%.jpg\ncover.jpg";
+    IGdiBitmap GetAlbumArtV3(metadb, pattern , art_id = 0, need_stub = true, load_embed = true , use_fallback = true);
+}

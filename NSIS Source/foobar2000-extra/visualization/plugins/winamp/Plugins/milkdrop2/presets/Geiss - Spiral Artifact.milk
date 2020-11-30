@@ -1,0 +1,286 @@
+MILKDROP_PRESET_VERSION=201
+PSVERSION=2
+PSVERSION_WARP=2
+PSVERSION_COMP=2
+[preset00]
+fRating=4.000
+fGammaAdj=1.000
+fDecay=1.000
+fVideoEchoZoom=2.000
+fVideoEchoAlpha=0.000
+nVideoEchoOrientation=0
+nWaveMode=6
+bAdditiveWaves=1
+bWaveDots=1
+bWaveThick=1
+bModWaveAlphaByVolume=0
+bMaximizeWaveColor=0
+bTexWrap=1
+bDarkenCenter=0
+bRedBlueStereo=0
+bBrighten=0
+bDarken=0
+bSolarize=0
+bInvert=0
+fWaveAlpha=100.000
+fWaveScale=3.630
+fWaveSmoothing=0.900
+fWaveParam=-0.300
+fModWaveAlphaStart=1.150
+fModWaveAlphaEnd=1.550
+fWarpAnimSpeed=1.000
+fWarpScale=1.331
+fZoomExponent=1.00000
+fShader=0.000
+zoom=0.96971
+rot=0.00000
+cx=0.500
+cy=0.500
+dx=0.00000
+dy=0.00000
+warp=0.00000
+sx=1.00000
+sy=1.00000
+wave_r=0.600
+wave_g=0.600
+wave_b=0.600
+wave_x=0.500
+wave_y=0.500
+ob_size=0.010
+ob_r=0.000
+ob_g=0.000
+ob_b=0.000
+ob_a=0.000
+ib_size=0.010
+ib_r=0.250
+ib_g=0.250
+ib_b=0.250
+ib_a=0.000
+nMotionVectorsX=64.000
+nMotionVectorsY=48.000
+mv_dx=0.000
+mv_dy=0.000
+mv_l=0.000
+mv_r=0.350
+mv_g=0.350
+mv_b=0.350
+mv_a=0.000
+b1n=0.000
+b2n=0.000
+b3n=0.000
+b1x=1.000
+b2x=1.000
+b3x=1.000
+b1ed=0.250
+wavecode_0_enabled=0
+wavecode_0_samples=512
+wavecode_0_sep=0
+wavecode_0_bSpectrum=0
+wavecode_0_bUseDots=0
+wavecode_0_bDrawThick=0
+wavecode_0_bAdditive=0
+wavecode_0_scaling=1.00000
+wavecode_0_smoothing=0.50000
+wavecode_0_r=1.000
+wavecode_0_g=1.000
+wavecode_0_b=1.000
+wavecode_0_a=1.000
+wavecode_1_enabled=0
+wavecode_1_samples=512
+wavecode_1_sep=0
+wavecode_1_bSpectrum=0
+wavecode_1_bUseDots=0
+wavecode_1_bDrawThick=0
+wavecode_1_bAdditive=0
+wavecode_1_scaling=1.00000
+wavecode_1_smoothing=0.50000
+wavecode_1_r=1.000
+wavecode_1_g=1.000
+wavecode_1_b=1.000
+wavecode_1_a=1.000
+wavecode_2_enabled=0
+wavecode_2_samples=512
+wavecode_2_sep=0
+wavecode_2_bSpectrum=0
+wavecode_2_bUseDots=0
+wavecode_2_bDrawThick=0
+wavecode_2_bAdditive=0
+wavecode_2_scaling=1.00000
+wavecode_2_smoothing=0.50000
+wavecode_2_r=1.000
+wavecode_2_g=1.000
+wavecode_2_b=1.000
+wavecode_2_a=1.000
+wavecode_3_enabled=0
+wavecode_3_samples=512
+wavecode_3_sep=0
+wavecode_3_bSpectrum=0
+wavecode_3_bUseDots=0
+wavecode_3_bDrawThick=0
+wavecode_3_bAdditive=0
+wavecode_3_scaling=1.00000
+wavecode_3_smoothing=0.50000
+wavecode_3_r=1.000
+wavecode_3_g=1.000
+wavecode_3_b=1.000
+wavecode_3_a=1.000
+shapecode_0_enabled=0
+shapecode_0_sides=4
+shapecode_0_additive=0
+shapecode_0_thickOutline=0
+shapecode_0_textured=0
+shapecode_0_num_inst=1
+shapecode_0_x=0.500
+shapecode_0_y=0.500
+shapecode_0_rad=0.10000
+shapecode_0_ang=0.00000
+shapecode_0_tex_ang=0.00000
+shapecode_0_tex_zoom=1.00000
+shapecode_0_r=1.000
+shapecode_0_g=0.000
+shapecode_0_b=0.000
+shapecode_0_a=1.000
+shapecode_0_r2=0.000
+shapecode_0_g2=1.000
+shapecode_0_b2=0.000
+shapecode_0_a2=0.000
+shapecode_0_border_r=1.000
+shapecode_0_border_g=1.000
+shapecode_0_border_b=1.000
+shapecode_0_border_a=0.100
+shapecode_1_enabled=0
+shapecode_1_sides=4
+shapecode_1_additive=0
+shapecode_1_thickOutline=0
+shapecode_1_textured=0
+shapecode_1_num_inst=1
+shapecode_1_x=0.500
+shapecode_1_y=0.500
+shapecode_1_rad=0.10000
+shapecode_1_ang=0.00000
+shapecode_1_tex_ang=0.00000
+shapecode_1_tex_zoom=1.00000
+shapecode_1_r=1.000
+shapecode_1_g=0.000
+shapecode_1_b=0.000
+shapecode_1_a=1.000
+shapecode_1_r2=0.000
+shapecode_1_g2=1.000
+shapecode_1_b2=0.000
+shapecode_1_a2=0.000
+shapecode_1_border_r=1.000
+shapecode_1_border_g=1.000
+shapecode_1_border_b=1.000
+shapecode_1_border_a=0.100
+shapecode_2_enabled=0
+shapecode_2_sides=4
+shapecode_2_additive=0
+shapecode_2_thickOutline=0
+shapecode_2_textured=0
+shapecode_2_num_inst=1
+shapecode_2_x=0.500
+shapecode_2_y=0.500
+shapecode_2_rad=0.10000
+shapecode_2_ang=0.00000
+shapecode_2_tex_ang=0.00000
+shapecode_2_tex_zoom=1.00000
+shapecode_2_r=1.000
+shapecode_2_g=0.000
+shapecode_2_b=0.000
+shapecode_2_a=1.000
+shapecode_2_r2=0.000
+shapecode_2_g2=1.000
+shapecode_2_b2=0.000
+shapecode_2_a2=0.000
+shapecode_2_border_r=1.000
+shapecode_2_border_g=1.000
+shapecode_2_border_b=1.000
+shapecode_2_border_a=0.100
+shapecode_3_enabled=0
+shapecode_3_sides=4
+shapecode_3_additive=0
+shapecode_3_thickOutline=0
+shapecode_3_textured=0
+shapecode_3_num_inst=1
+shapecode_3_x=0.500
+shapecode_3_y=0.500
+shapecode_3_rad=0.10000
+shapecode_3_ang=0.00000
+shapecode_3_tex_ang=0.00000
+shapecode_3_tex_zoom=1.00000
+shapecode_3_r=1.000
+shapecode_3_g=0.000
+shapecode_3_b=0.000
+shapecode_3_a=1.000
+shapecode_3_r2=0.000
+shapecode_3_g2=1.000
+shapecode_3_b2=0.000
+shapecode_3_a2=0.000
+shapecode_3_border_r=1.000
+shapecode_3_border_g=1.000
+shapecode_3_border_b=1.000
+shapecode_3_border_a=0.100
+per_frame_init_1=rot_sum = 0;
+per_frame_init_2=q2 = 0.07 + 0.04*rand(1000)*0.001 + 0.03*rand(1000)*0.001;
+per_frame_init_3=q3 = 1.035 + 0.06*(rand(1000)+rand(1000)+rand(1000))*0.000333;
+per_frame_1=wave_r = wave_r + 0.500*( 0.60*sin(1.980*time) + 0.40*sin(3.047*time) );
+per_frame_2=wave_g = wave_g + 0.500*( 0.60*sin(2.835*time) + 0.40*sin(2.081*time) );
+per_frame_3=wave_b = wave_b + 0.500*( 0.60*sin(3.814*time) + 0.40*sin(1.011*time) );
+per_frame_4=cx = 0.5;//cx + 0.110*( 0.60*sin(0.374*time) + 0.40*sin(0.294*time) );
+per_frame_5=cy = 0.5;//cy + 0.110*( 0.60*sin(0.393*time) + 0.40*sin(0.223*time) );
+per_frame_6=
+per_frame_7=rot = q2;//0.13;//6.28*(rand(737)/737.0 - 0.5) * 0.03;
+per_frame_8=zoom = zoom-1 + q3;
+per_frame_9=rot_sum = rot_sum + rot;
+per_frame_10=q1 = -rot_sum;
+per_frame_11=q5 = cos(rot_sum);
+per_frame_12=q6 = sin(rot_sim);
+per_frame_13=monitor = q2;
+per_frame_14=
+per_frame_15=// custom beat detection code: (fps-independent; quiet songs don't freak out)
+per_frame_16=min_att    = 2.5;               // lower # = quieter songs can declare beats
+per_frame_17=decay_to   = 0.8;               // lower # = more hasty to declare a beat
+per_frame_18=decay_rate = pow(0.9990, fps);  // lower # = more hasty to declare a beat
+per_frame_19=beat =           bass/max(min_att,bass_att);
+per_frame_20=beat = max(beat, mid /max(min_att,mid_att ));
+per_frame_21=beat = max(beat, treb/max(min_att,treb_att));
+per_frame_22=beat = max( beat, (prev_beat-decay_to)*decay_rate + decay_to );
+per_frame_23=beat_level     = (beat - prev_beat - 0.02)*24;
+per_frame_24=is_beat = above(beat_level, 0.5);
+per_frame_25=prev_beat = beat;
+per_frame_26=  // put your beat responses HERE:
+per_frame_27=  wave_a = beat_level;
+warp_1=`shader_body
+warp_2=`{
+warp_3=`    // sample previous frame
+warp_4=`    ret = tex2D( sampler_pw_main, uv ).xyz;
+warp_5=`
+warp_6=`    // darken over time
+warp_7=`    ret -= 0.004;//*= 0.95; //or try: ret -= 0.004;
+warp_8=`}
+comp_1=`shader_body
+comp_2=`{
+comp_3=`    float2 orig = uv;
+comp_4=`
+comp_5=`    float inv_zoom = min(aspect.x,aspect.y)*0.8;
+comp_6=`    //float t = saturate(time*0.33);
+comp_7=`    //t = t*t*(3 - 2*t);
+comp_8=`    //inv_zoom = lerp(1, inv_zoom, t);
+comp_9=`
+comp_10=`    uv -= 0.5;
+comp_11=`    uv *= inv_zoom;
+comp_12=`    uv *= aspect.xy;
+comp_13=`
+comp_14=`    float2 uv2;  
+comp_15=`    uv2.x = uv.x*cos(q1) - uv.y*sin(q1);
+comp_16=`    uv2.y = uv.x*sin(q1) + uv.y*cos(q1);
+comp_17=`    uv2 *= aspect.zw;
+comp_18=`    uv2 += 0.5;
+comp_19=`
+comp_20=`    ret = abs( tex2D(sampler_main, uv2).xyz*2.65
+comp_21=`                            + GetBlur1(uv2)*-2 );
+comp_22=`
+comp_23=`    ret.xyz *= 1.5;
+comp_24=`}
+comp_25=`
+comp_26=`

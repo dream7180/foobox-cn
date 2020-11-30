@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTM L 1.0 Strict//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh"
+ lang="zh" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>查询表达式帮助</title>
+  <link rel="stylesheet" type="text/css" href="titleformat_help.css" />
+</head>
+<body>
+<div class="dokuwiki export">
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header">目录</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="level1"><div class="li"><span class="li"><a href="#query_syntax_help" class="toc">查询表达式帮助</a></span></div>
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#conventions_in_this_document" class="toc">文档约定</a></span></div></li>
+<li class="level2">
+  <div class="li"><span class="li"><a href="#simple_search" class="toc">简单查询</a></span></div>
+</li>
+<li class="level2"><div class="li"><span class="li"><a href="#advanced_search" class="toc">高级查询</a></span></div>
+<ul class="toc">
+<li class="level3"><div class="li"><span class="li"><a href="#text_expressions" class="toc">文本表达式</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#numeric_expressions" class="toc">数字表达式</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#metadata_expressions" class="toc">元数据表达式</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#time_expressions" class="toc">时间表达式</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#composed_queries" class="toc">组合查询</a></span></div></li>
+</ul>
+</li>
+<li class="level2"><div class="li"><span class="li"><a href="#sorting_results" class="toc">查询结果排序</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#notes" class="toc">注意事项</a></span></div></li></ul>
+</li></ul>
+</div>
+</div>
+
+
+
+<h1><a name="query_syntax_help" id="query_syntax_help">查询表达式帮助</a></h1>
+<div class="level1">
+
+</div>
+<!-- SECTION "Query Syntax Help" [1-37] -->
+<h2><a name="conventions_in_this_document" id="conventions_in_this_document">文档约定</a></h2>
+<div class="level2">
+
+<p>
+ 查询表达式以斜体表示。
+</p>
+
+<p>例: <em>%rating% GREATER 3</em>
+</p>
+
+<p>
+查询示例可能包含在半角尖括号中的占位符。它们需要在实际的查询中替换为有实际意义的名称。如果在示例中有多个同一类型占位符，在占位符后将会加上数字以示区别。</p>
+
+<p>例: <em>&lt;field&gt; GREATER &lt;number&gt;</em></p>
+
+<p>
+本文档包含的占位符类型的说明:</p>
+<ul>
+<li class="level1"><div class="li"> <em>&lt;field&gt;</em><br/>
+ 一条对字段名(Tag Field)的引用。可以为纯字段名称或标题格式化表达式(title formatting)。参见 <a href="#notes" title="help:query &crarr;" class="wikilink1">注意事项 </a>获取详细信息。</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;number&gt;</em><br/>
+  一个整数。</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;string&gt;</em><br/>
+ 一条含在双引号中的文本。参见 <a href="#notes" title="help:query &crarr;" class="wikilink1">注意事项</a> 获取详细信息。</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;time&gt;</em><br/>
+ 一条时间数据或计算时间的标题格式化表达式。参见 <a href="#time_expressions" title="help:query &crarr;" class="wikilink1">时间表达式</a> 获取详细信息。</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;expression&gt;</em><br/>
+ 一条在组合查询中的查询表达式。规则遵循下面的 <a href="#advanced_search" title="help:query &crarr;" class="wikilink1">高级查询</a> 一节。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Conventions in this Document" [38-1102] -->
+<h2><a name="simple_search" id="simple_search">简单查询</a></h2>
+<div class="level2">
+
+<p>简单查询模式不使用任何关键字.</p>
+<ul>
+<li class="level1"><div class="li"> <em>&lt;any string&gt;</em><br/>
+ 返回元数据或文件路径包含指定全部字句的项目。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Simple Search" [1103-1297] -->
+<h2><a name="advanced_search" id="advanced_search">高级查询</a></h2>
+<div class="level2">
+
+<p>
+ 高级查询允许建立更复杂的查询。它提供了一些关键字以对指定类型进行比较和组合多个查询表达式。
+</p>
+
+</div>
+<!-- SECTION "Advanced Search" [1298-1507] -->
+<h3><a name="text_expressions" id="text_expressions">文本表达式</a></h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> <em>&lt;field&gt; HAS &lt;string&gt;</em><br/>
+ 返回在指定元数据字段 <em>&lt;field&gt;</em> 中包含全部字句的项目。<br/>
+ 例
+ : <em>title HAS blah</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;field&gt; IS &lt;string&gt;</em><br/>
+ 返回指定元数据字段 <em>&lt;field&gt;</em> 中等于 <em>&lt;string&gt;</em> 的项目。<br/>
+ 例: <em>artist IS blah</em></div>
+</li>
+<li class="level1"><div class="li"> <em>* HAS &lt;string&gt;</em><br/>
+ 与简单查询效果相同，但可以与逻辑运算符结合 (参见后文)。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Text Expressions" [1508-1949] -->
+<h3><a name="numeric_expressions" id="numeric_expressions">数字表达式</a></h3>
+<div class="level3">
+
+<p>
+ 在数值 <em>&lt;field&gt;</em> 和 <em>&lt;number&gt;</em> 之间执行整数比较Performs integral number comparison between the value of a <em>&lt;field&gt;</em> and a <em>&lt;number&gt;</em>, 例: ”<em>%rating% GREATER 3</em>”。</p>
+<ul>
+<li class="level1"><div class="li"> <em>&lt;field&gt; GREATER &lt;number&gt;</em><br/>
+大于。
+</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;field&gt; LESS &lt;number&gt;</em><br/>
+小于。</div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;field&gt; EQUAL &lt;number&gt;</em><br/>
+等于。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Numeric Expressions" [1950-2198] -->
+<h3><a name="metadata_expressions" id="metadata_expressions">元数据表达式</a></h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> <em>&lt;field&gt; MISSING</em><br/>
+ 返回不存在指定元数据字段 <em>&lt;field&gt;</em> 的项目。<br/>
+ 例: <em>genre MISSING</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;field&gt; PRESENT</em><br/>
+ 返回存在元数据字段 <em>&lt;field&gt;</em> 的项目。<br/>
+ 例: <em>genre PRESENT</em></div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Metadata Expressions" [2199-2477] -->
+<h3><a name="time_expressions" id="time_expressions">时间表达式</a></h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> <em>&lt;time1&gt; BEFORE &lt;time2&gt;</em><br/>
+ 返回时间 <em>&lt;time1&gt;</em> 在 <em>&lt;time2&gt;</em> 之前的项目。<br/>
+ 例: <em>%last_modified% BEFORE 2008</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;time1&gt; AFTER &lt;time2&gt;</em><br/>
+ 返回时间 <em>&lt;time1&gt;</em> 在 <em>&lt;time2&gt;</em> 之后的项目。<br/>
+ 例: <em>%last_modified% AFTER 2008</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;time1&gt; SINCE &lt;time2&gt;</em><br/>
+ 返回时间 <em>&lt;time1&gt;</em> 不在 <em>&lt;time2&gt;</em> 之前的项目。<br/>
+ 例: <em>%last_modified% SINCE 2007</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;time1&gt; DURING &lt;time2&gt;</em><br/>
+ 返回时间 <em>&lt;time1&gt;</em> 在 <em>&lt;time2&gt;</em> 之内的项目。<br/>
+ 例: <em>%last_modified% DURING 2007</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;time&gt; DURING LAST &lt;number&gt; &lt;time-unit&gt;</em><br/>
+ 返回时间  <em>&lt;time&gt;</em> 属于最近指定时间段的项目。 <br/>
+ <em>&lt;time-unit&gt;</em>为 <em>SECONDS</em>, <em>MINUTES</em>, <em>HOURS</em>, <em>DAYS</em>,  <em>WEEKS </em>之一，分别代表秒、分、时、日、周。 <br/>
+ 例: <em>%last_modified% DURING LAST 2 WEEKS</em><br/>
+ 若
+ <em>&lt;number&gt;</em> 为 1，表达式可以简化为: <em>&lt;time&gt; DURING LAST SECOND/MINUTE/HOUR/DAY/WEEK</em></div>
+</li>
+</ul>
+
+<p>
+ 用于这些表达式的时间的格式必须为以下格式之一:  YYYY, YYYY-MM, YYYY-MM-DD, YYYY-MM-DD hh, YYYY-MM-DD hh:mm, YYYY-MM-DD hh:mm:ss，其中&quot;Y&quot;、&quot;M&quot;、&quot;D&quot;、&quot;h&quot;、&quot;m&quot;、&quot;s&quot;分别代表&quot;年&quot;、&quot;月&quot;、表&quot;日&quot;、&quot;时&quot;、&quot;分&quot;、&quot;秒&quot;，而其中的个数表示了它们所占的位数。</p>
+
+</div>
+<!-- SECTION "Time Expressions" [2478-3629] -->
+<h3><a name="composed_queries" id="composed_queries">组合查询</a></h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> <em>&lt;expression1&gt; AND &lt;expression2&gt;</em><br/>
+ 返回两个表达式返回值都为真的项目。<br/>
+ 例: <em>artist IS blah AND title HAS blah</em><br/>
+ 你可以将表达式使用圆括号括起来以提升运算的优先级。<br/>
+ 例: <em>( (artist IS blah) AND (title HAS blah) ) OR (%rating% GREATER 3)</em></div>
+</li>
+<li class="level1"><div class="li"> <em>&lt;expression1&gt; OR &lt;expression2&gt;</em><br/>
+ 返回两个表达式中返回值至少有一个为真的项目。</div>
+</li>
+<li class="level1"><div class="li"> <em>NOT &lt;expression&gt;</em><br/>
+ 返回表达式为假的项目。<br/>
+ 例: <em>NOT %last_played% AFTER %first_played%</em></div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Composed Queries" [3630-4195] -->
+<h2><a name="sorting_results" id="sorting_results">查询结果排序</a></h2>
+<div class="level2">
+
+<p>
+ 你可以在查询表达式结尾放入 <em>SORT BY</em> 运算符对查询结果使用标题格式化表达式进行排序。 
+</p>
+<ul>
+<li class="level1"><div class="li"> <em>SORT BY &lt;sort-pattern&gt;</em><br/>
+ 对查询结果进行升序排列。</div>
+</li>
+<li class="level1"><div class="li"> <em>SORT REVERSE BY &lt;sort-pattern&gt;</em><br/>
+ 对查询结果进行降序排列。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Sorting Results" [4196-4516] -->
+<h2><a name="notes" id="notes">注意事项</a></h2>
+<div class="level2">
+<ul>
+<li class="level1">
+  <div class="li">若表达式使用了 <em>HAS</em> 或 <em>IS</em> 中的 <em>&lt;field&gt;</em> 和 <em>&lt;string&gt;</em> 字段中含有空格，需要用半角双引号(&quot;)括起来。<br/>
+  例: title HAS &quot;blah blah&quot;</div>
+</li>
+<li class="level1">
+  <div class="li">若在<em> HAS</em>, <em>IS</em>, <em>GREATER</em>, <em>LESS</em>, <em>EQUAL</em> 中的 <em>&lt;field&gt;</em> 含有 #$% 中的任一字符，将会被处理为标题格式化表达式。<br/>
+ 例: <em>%codec% IS <acronym title="Motion Picture Experts Group Layer 3">MP3</acronym></em></div>
+</li>
+<li class="level1">
+  <div class="li"> 若在含有庞大媒体库收藏中使用标题格式化表达式而不是使用简单的字段名将会大幅降低查询速度，并且在使用 <em>IS</em> 运算符时将会忽略字段多值 的情况。</div>
+</li>
+<li class="level1">
+  <div class="li">若在 <em>HAS</em>, <em>IS</em>, <em>GREATER</em>, <em>LESS</em>, <em>EQUAL</em> 中的 <em>&lt;field&gt;</em> 不含 #$% 中的任一字符，将会视为元数据字段对待。<br/>
+  例: <em>artist IS Radiohead</em></div>
+</li>
+<li class="level1">
+  <div class="li"> 不应访问技术信息字段（比如编码格式的规格）或插件动态提供的字段。</div>
+</li>
+<li class="level1">
+  <div class="li"> 所有查询表达式忽略大小写。所有关键字必须为大写。</div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "Notes" [4560-5496] -->
+<h2><a name="operator_summary" id="operator_summary">运算符摘要</a></h2>
+<div class="level2">
+<table class="inline">
+	<tr>
+		<th> 运算符 </th>
+		<th> 语法 </th>
+		<th> 注释 </th>
+	</tr>
+	<tr>
+		<td> <em>AFTER</em> </td><td> <em>&lt;time1&gt; AFTER &lt;time2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>AND</em> </td><td> <em>&lt;expression1&gt; AND &lt;expression2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>BEFORE</em> </td><td> <em>&lt;time1&gt; BEFORE &lt;time2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>DURING</em> </td><td> <em>&lt;time1&gt; DURING &lt;time2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>DURING LAST</em> </td><td> <em>&lt;time&gt; DURING LAST &lt;number&gt; SECONDS/MINUTES/HOURS/DAYS/WEEKS</em><br/>
+ <em>&lt;time&gt; DURING LAST SECOND/MINUTE/HOUR/DAY/WEEK</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>EQUAL</em> </td><td> <em>&lt;field&gt; EQUAL &lt;number&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>GREATER</em> </td><td> <em>&lt;field&gt; GREATER &lt;number&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>HAS</em> </td><td> <em>&lt;field&gt; HAS &lt;string&gt;</em><br/>
+ <em>* HAS &lt;string&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>IS</em> </td><td> <em>&lt;field&gt; IS &lt;string&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>LESS</em> </td><td> <em>&lt;field&gt; LESS &lt;number&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>MISSING</em> </td><td> <em>&lt;field&gt; MISSING</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>NOT</em> </td><td> <em>NOT &lt;expression&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>OR</em> </td><td> <em>&lt;expression1&gt; OR &lt;expression2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>PRESENT</em> </td><td> <em>&lt;field&gt; PRESENT</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>SINCE</em> </td><td> <em>&lt;time1&gt; SINCE &lt;time2&gt;</em> </td><td> </td>
+	</tr>
+	<tr>
+		<td> <em>SORT BY</em> </td><td> <em>SORT BY &lt;sort-pattern&gt;</em><br/>
+ <em>SORT DESCENDING BY &lt;sort-pattern&gt;</em> </td>
+		<td> 必须处于查询表达式结尾。 </td>
+	</tr>
+</table>
+
+</div>
+<!-- SECTION "Operator Summary" [5497-] --></div>
+</body>
+</html>

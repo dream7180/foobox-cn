@@ -1,0 +1,1427 @@
+<HTML>
+<HEAD>
+<TITLE>MilkDrop Documentation</TITLE>
+</HEAD>
+<BODY>
+<PRE>
+<A NAME="milkdrop_top">
+<B>MILKDROP 2.1 (February 2009)</B>
+    a Winamp visualization plug-in by Ryan Geiss
+    copyright (c) 2001-2009 Nullsoft, Inc.
+
+
+Useful Links:
+    <A HREF="http://www.nullsoft.com/free/milkdrop/">official milkdrop homepage</A>
+    <A HREF="http://forums.winamp.com/forumdisplay.php?forumid=81">online forums</A> - for preset sharing, troubleshooting, 
+      comments, and feature requests
+    <A HREF="http://www.winamp.com/">Nullsoft Winamp</A>
+    <A HREF="http://www.microsoft.com/windows/directx/">Microsoft DirectX</A>
+    <A HREF="http://www.milkdrop.co.uk/">milkdrop.co.uk</A> - an excellent third-party preset community site
+
+  
+
+<B>What is MilkDrop?</B>
+-----------------------
+<B>MilkDrop</B> is a music-visualization "plug-in" for the Winamp music player.  
+As you listen to music through Winamp, MilkDrop renders the soundwaves in a 
+visual feedback loop, driven by 3D graphics hardware, to create a 
+rich visual journey through sound.  MilkDrop can also be driven by a live 
+audio feed (microphone or line-in) - see the documentation for details.
+
+<B>MilkDrop 2</B> is a major upgrade to the original MilkDrop visualizer, opening up 
+the power of modern graphics chips and programmable pixel shaders to the realm 
+of music visualization.  Pixel shaders allow dozens, even hundreds of complex 
+instructions to be executed for every pixel on the screen, every frame.  
+Other new features include jpg textures, gaussian blurring, a preset "mash-up" 
+feature, and a prest "back" button.  MilkDrop 2 is backwards-compatible with 
+presets from MilkDrop 1.
+
+
+
+<B>Section Listing</B>
+-----------------------
+    1. <A HREF="#1">requirements</A>
+    2. <A HREF="#2">installation</A>
+    3. <A HREF="#3">tweaking</A>
+    4. <A HREF="#4">usage</A>
+        4.a. <A HREF="#4a">keyboard commands</A>
+        4.b. <A HREF="#4b">config panel</A>
+        4.c. <A HREF="#4c">preset authoring</A>
+        4.d. <A HREF="#4d">rating system</A>
+        4.e. <A HREF="#4e">custom messages</A>
+        4.f. <A HREF="#4f">sprites</A>
+    5. <A HREF="#5">troubleshooting</A>
+    6. <A HREF="#6">known issues / misc. / tips</A>
+    7. <A HREF="#7">using line-in</A> (for live audio input)
+    8. <A HREF="#8">acknowledgements</A>
+    9. <A HREF="#9">version history</A>
+
+
+
+<A NAME="1">
+<B>1. Requirements</B>
+-----------------------
+    1. Windows 98, ME, 2000, XP, or later.
+    2. Hardware-based 3D graphics acceleration (i.e. a video card with 3D support)
+        supporting DirectX 9 with at least 8 MB of video memory; 
+        however, we strongly recommend a GeForce 5700 (or better), 
+        or a Radeon 9600 (or better).
+    3. Winamp 5.12 or later ( <A HREF="http://www.winamp.com/">http://www.winamp.com/</A> ).
+    4. DirectX 9.0 or later ( <A HREF="http://www.microsoft.com/windows/directx/">http://www.microsoft.com/windows/directx/</A> ).
+
+
+
+<A NAME="2">
+<B>2. Installation</B>
+-----------------------
+    MilkDrop 2 comes with Winamp.  To install it, just download and
+    install the latest version of Winamp.  During the installation,
+    make sure the "MilkDrop 2" visualizer option is checked, so that 
+    it gets installed, too.  
+
+    Once Winamp is installed, launch it.  Load some music files into
+    your playlist and start playing some music.  (Be sure to play some music 
+    before trying to launch the visualizer - otherwise you'll just see a 
+    black screen.)  
+    
+    Once music is playing, hit <B>CTRL+K</B> and a list of visualization 
+    plug-ins will appear.  Select "MilkDrop 2" from the list.  Then click 
+    the "Start" button, and it will launch the visualizer.  
+
+    Quick Tips:    
+      * If you want to go full-screen, double-click on the visualizer itself.
+      * CTRL+SHIFT+K starts or stops the visualizer.
+      * To configure MilkDrop's options, exit the visualizer and hit ALT+K.
+    
+    If you have trouble getting MilkDrop to run properly after installation, 
+    try installing various recent WHQL drivers for your video card, or installing 
+    DirectX; doing these two things (especially the first) will fix 99% of
+    problems. See the Troubleshooting section of the documentation for more
+    information. 
+
+
+    
+<A NAME="3">
+<B>3. Tweaking to achieve the best image quality</B>
+-----------------------
+    a) Fullscreen Display Mode   [first tab of config screen]
+        
+        When you run MilkDrop fullscreen, it changes the display
+        mode to whatever you select here.  Generally speaking,
+        the speed (framerate) and smoothness of MilkDrop will drop
+        as the resolution (number of pixels on the screen)
+        increases.  So, if it's running to slow in fullscreen 
+        mode, try selecting a smaller fullscreen display mode. 
+        
+    b) Canvas Stretch  [second tab]
+    
+        This option lets you trade resolution [crispness] for
+        speed.  If MilkDrop runs too slow, in any mode (windowed/
+        fullscreen/desktop), try cranking up the canvas stretch
+        to, say, 1.5X or 2X.  The image will not look as crisp,
+        but MilkDrop will probably run much faster.  (Assuming
+        that your graphics chip was the bottleneck.)
+
+    c) Mesh Size  [second tab]
+
+        This is the main option that affects how much processor
+        (CPU) MilkDrop uses.  If you crank it up far beyond the
+        default, expect to be CPU-bound (where your framerate drops
+        because the CPU is the bottleneck).  To get MilkDrop to
+        speed up, drop the Mesh Size back down.  The Mesh Size 
+        decides how many points on the screen the per-vertex
+        equations will be executed for; the higher the mesh size,
+        the more fidelity you will see in the motion.  
+        
+    d) tips for LCD and laptop users
+
+        LCD screens: Note that most LCD screens (flatpanels) usually run 
+        at a fixed frequency only - usually 60 Hz - meaning that they update 
+        the screen 60 times per second.  However, sometimes the video driver 
+        reports that it supports other refresh rates, such as 72, 75, 85, etc.  
+        It is strongly recommended that [for fullscreen mode, and for Windows 
+        in general] you choose a display mode with a 60 Hz refresh rate, for 
+        the smoothest possible animation.  For this plugin, you will also want 
+        to choose Maximum Framerates that divide evenly into 60 - such as 60, 
+        30, 20, 15, 12, 10, 6, 5, and so on - so that the # of times the LCD 
+        shows each frame of animation remains constant, resulting in the 
+        smoothest possible animation.
+
+    e) color (bit) depth: 16 or 32?
+    
+        The answer, nowadays, is a resounding "32".  Video memory
+        is plentiful these days; use 32 bit color, for both your 
+        windows desktop (...so that MilkDrop's windowed mode can
+        run at 32 bits) and for MilkDrop's Fullscreen Display Mode
+        setting (where "8888" denotes 32 bits).
+        
+        Some ancient video cards don't have enough memory to run MilkDrop
+        properly (or smoothly) in 32 bits, though; you might want to 
+        try 16-bit color if your card has less than 32 MB of video 
+        memory, if you are using a laptop, or if your video card is 
+        significantly old.  In the MilkDrop config panel, 16-bit modes
+        show up as "555" or "565".
+
+        If you find that your card runs best in 32-bit color, you should
+        have no problems with brightness levels while running MilkDrop.
+        However, if your card runs best in 16-bit color, you should 
+        then adjust the Brightness slider on the second tab of the config 
+        panel (which only affects 16-bit color video modes!).  The goal 
+        is to make the image as bright as possible, without oversaturating 
+        it (washing it out, often to bright pink or white).  This setting 
+        also varies for different cards, depending on how the card rounds 
+        color values, so we recommend seeing how bright you can set the 
+        slider (closer to '0') without oversaturating the image.  Usually,
+        a setting of '0' or '2' works the best.
+
+            
+    
+
+<A NAME="4">
+<B>4. Usage</B>
+-----------------------
+    <A NAME="4a">
+    <B>4.a. Keyboard Commands</B>
+    
+        The following keys can be used to control MilkDrop while it is running.
+        (Note: pressing F1 while MilkDrop is running will show you this list)
+            <FONT SIZE="3">
+            <B>GENERAL</B>
+            escape: exit to winamp
+            
+            <B>PRESET LOADING</B>
+            BACKSPACE: return to previous preset
+            SPACE: transition to next preset
+            H: instant Hard cut (to next preset)
+            R: toggle random (vs. sequential) preset traversal
+            L: load a specific preset (invokes the 'Load' menu)
+            +/-: rate current preset (better/worse)
+            scroll lock: lock/unlock current preset 
+                (keyboard light on means preset is locked)
+                (prevents random switch to new preset)
+            A: aggregate preset - loads a random preset,
+                steals the warp shader from a different random preset,
+                and steals the composite shader from a third random preset.
+            D: cycle between various lock-states for the warp and
+                composite shaders.  When one of these shaders is locked,
+                loading a new preset will load everything *except* the
+                locked shaders, creating a mix between the two presets.
+
+            <B>PRESET EDITING AND SAVING</B>
+            M: show/hide the preset-editing menu
+            S: save new preset (asks you for the new filename)
+            N: show per-frame variable moNitor
+                (see <A HREF="milkdrop_preset_authoring.html">milkdrop_preset_authoring.html</A>)
+
+            <B>MUSIC PLAYBACK</B>
+            z/x/c/v/b: navigate playlist (prev/play/pause/stop/next)
+            U: toggle shuffle
+            P: show playlist
+            up/down arrows: volume up/down
+            left/right arrows: rewind/ffwd 5 seconds
+            SHIFT + left/right arrows: rewind/ffwd 30 seconds
+
+            <B>FUNCTION KEYS</B>                                
+            F1: show help screen
+            F2: show song title
+            F3: show song length
+            F4: show preset name
+            F5: show fps (frames per second)
+            F6: show rating of current preset
+            F7: re-read custom message file (milk_msg.ini) from disk
+            F8: jump to new directory (for presets)
+            F9: toggle stereo 3D on/off
+
+            <B>SPRITES AND CUSTOM MESSAGES (FOR VJ's)</B>
+            T: launch song title animation
+            Y: enter custom message mode
+                ##: load message ## (where ## is a 2-digit numeric code (00-99) 
+                    of a message defined in <B>milk_msg.ini</B>)
+                *: clear any digits entered.
+                DELETE: clear message (if visible)
+                F7: re-read <B>milk_msg.ini</B> from disk
+            K: enter sprite mode
+                ##: load sprite ## (where ## is a 2-digit numeric code (00-99) 
+                    of a sprite defined in <B>milk_img.ini</B>)
+                *: clear any digits entered.
+                DELETE: clear newest sprite 
+                SHIFT + DELETE: clear oldest sprite
+                CTRL+SHIFT+DELETE: clear all sprites
+                F7: no effect (<B>milk_img.ini</B> is never cached)
+            SHIFT + K: enter sprite kill mode
+                ##: clear all sprites with code ##
+                *: clear any digits entered.
+            CTRL + T/Y: kill song title and/or any custom messages
+            CTRL + K: kill all sprites
+            </FONT>
+            Note that there are more keys available, but because many
+            are only relevant to people designing their own presets, 
+            they are listed in the <A HREF="milkdrop_preset_authoring.html">preset authoring guide</A> instead.
+            
+            
+    <A NAME="4b">
+    <B>4.b. config panel</B>
+    
+        The configuration panel lets you customize the way MilkDrop runs.
+        To learn how to get to the configuration panel, see the "Installation"
+        section above.
+        
+        Once you're in the config panel, you'll see a number of tabs
+        at the top, some dropdown boxes, and some checkboxes.  Each
+        of the tabs at the top brings you to a different page of 
+        configuration options.  To get help on a setting, simply click
+        on the '?' in the upper-right corner of the config panel, 
+        and then click on the setting you want help with.
+
+            
+
+    <A NAME="4c">
+    <B>4.c. preset authoring</B>
+    
+        Please see the included text file, <A HREF="milkdrop_preset_authoring.html">milkdrop_preset_authoring.html</A>,
+        for instructions on how to create and save your own presets.
+
+
+    <A NAME="4d">
+    <B>4.d. rating system</B>
+
+        The built-in rating system allows you to rate each preset on a scale 
+        from 0 to 5.  A rating of 5 is very good, while a rating of 0 is
+        the worst.  The ratings decide how often the presets will be randomly
+        loaded.  If a preset has a rating of 0, it will never be randomly
+        loaded (unless they're all zero; then they all have an equal chance).
+        
+        To show the rating for a preset, press F6.  You can adjust the 
+        rating for a preset with the +/- keys.  When you make adjustments,
+        they save automatically; there's no need to save the preset to make
+        the rating change permanent.
+        
+        Here's a recommended interpretation of the numeric values:
+            0 = I never want to see this preset again
+            1 = very ugly
+            2 = mediocre
+            3 = fair
+            4 = good
+            5 = downright stimulating
+            
+        If a preset seems "lost" because you set its rating to 0 and it
+        won't ever come back, you can always load it up by hitting 'L'
+        to conjure the 'Load Preset' menu, finding the preset you want,
+        loading it, then hitting +.
+            
+    
+    
+    <A NAME="4e">
+    <B>4.e. custom messages</B>
+
+        ABOUT CUSTOM MESSAGES
+            The "Custom Message" feature of MilkDrop allows you to display
+            short text messages on the screen while MilkDrop is running.
+            They are highly configurable; you can set all of the following
+            parameters: the font, the size, the positioning, color, bold 
+            state, italic state, and so on; and you can even have it 
+            randomize some of these properties.
+
+        CREATING THE MESSAGES
+            You can save up to 100 messages in the file MILK_MSG.INI in
+            your Winamp\Plugins\ folder.  To open this file, go to the 
+            MilkDrop configuration screen (ALT+K from Winamp) and click the
+            "Edit Custom Messages" button.  Or, you can just edit it 
+            manually if you know how; it's plain-text.
+            
+            The first thing you see when you open the file is a bunch of
+            lines that start with two forward slashes (//).  These are
+            comment lines, and they explain the syntax for adding a font
+            or a message to the file.  This is your main reference for
+            finding out what all the parameters do for the fonts & messages;
+            it is recommended that you leave this information in the file,
+            although it can be removed or (modified) and the messages will
+            still work.
+
+            After the comments come first the fonts, then the messages.
+            The fonts are simply a way to specify a typeface, bold state,
+            italics state, and red/green/blue color for the font.  You can 
+            configure up to 16 fonts like this (numbered 00-15). These fonts
+            will serve as template fonts for the custom messages.
+
+            The next section is the actual messages.  Each one has a
+            text message (the 'text' parameter) that will be shown to the
+            user, and each one references one of the 16 fonts that were
+            defined in the previous section.  You can also specify the
+            size (size), position (x,y), a growth factor (growth) that
+            will grow/shrink the message over its lifetime, the number
+            of seconds to show the message (time), and the fraction of that
+            time that is spent fading in (fade).  
+
+            You can also randomize some of these values: 'randx' and 'randy'
+            will randomly perturb the (x,y) coordinates every time the message
+            is shown to the user, and 'randr'/'randg'/'randb' will randomly
+            perturb the (r,g,b) color in the same way.
+
+            Finally, you can override any of the default properties for the
+            font that this message uses: (face, bold, ital, r, g, b).
+
+        INVOCATION AND USAGE
+            There are two ways to invoke custom messages: one automatic,
+            the other manual.  
+
+            The automatic way is to go to the MilkDrop config panel (ALT+K),
+            click the 'More Options' button, and set the value in the
+            'Time between RANDOM custom messages' box to something greater
+            than zero.  This will cause MilkDrop to randomly display custom 
+            messages while it is running, and the average time (in seconds) 
+            between messages will be the value you entered here.  If you 
+            wish to disable random custom messages, set this value to -1
+            (or any negative number).  Note that all messages in the file
+            have an equal change of being picked.
+
+            The manual way is to type in the two-digit code (00-99) of the 
+            message while MilkDrop is running.  However, you can't use the 
+            numeric keypad for this - you have to use the numbers at the 
+            TOP of your keyboard to do it.  If you mess up while entering
+            the first digit, just press the '*' key to start over.
+            
+            Note that if you change the MILK_MSG.INI file while MilkDrop
+            is running, you will not be able to see the changes until
+            you hit F7, which tells MilkDrop to re-read the MILK_MSG.INI 
+            file from disk.
+
+
+    <A NAME="4f">
+    <B>4.f. sprites</B>
+
+        ABOUT SPRITES
+            The "Sprite" feature of MilkDrop allows you to display
+            any image of your choice in the foreground (on top of 
+            MilkDrop) while it runs.  The sprites can fade in and out,
+            move around, respond to the music, and so on.  You define
+            them in a file - <B>milk_img.ini</B> in your winamp\plugins
+            directory - much like you define custom messages, each 
+            having an identifying code number from 00 through 99 (used
+            to invoke them).  However, the way the individual sprites
+            are defined is different; <EM>you write code for them</EM>, instead
+            of just setting parameter values.  This is a little bit 
+            tougher to do (it's very much like preset authoring), but
+            adds a great deal of flexibility to what you can do with
+            the sprites.
+
+        CREATING THE SPRITES
+            You can define up to 100 sprites in the file MILK_IMG.INI in
+            your Winamp\Plugins\ folder.  To open this file, go to the 
+            MilkDrop configuration screen (ALT+K from Winamp) and click the
+            "Edit Sprites" button.  Or, you can just edit it manually if 
+            you know how; it's plain-text.
+            
+            The first thing you see when you open the file is a bunch of
+            lines that start with two forward slashes (//).  These are
+            comment lines, and they explain the syntax for creating a sprite. 
+            This is your main reference for finding out what all the 
+            parameters do for the fonts & messages; it is recommended that 
+            you leave this information in the file, although it can be removed 
+            (or modified) and the sprites will still work.
+
+            After the comments come the sprite definitions.  Each sprite is
+            made up of one parameter that indicates the image file to use
+            (this is the 'img=...' line), and two types of code: initialization
+            code, and regular code.  
+            
+            The first - initialization code - is executed only once, when you 
+            launch the sprite.  Use it to do one-time initialization of variables
+            (such as the opacity (a), rotation angle (rot), position (x,y),
+            and so on) or to invent new variables that you will access later.
+            This code is marked by the 'init_1=...', 'init_2=...', etc. lines.
+            
+            The second type of code - marked by 'code_1=...', 'code_2=...', etc.
+            - is executed every frame, just prior to plastering the sprite on 
+            the screen.  Use it to animate the sprite, moving it around (changing
+            x,y), scaling it up and down (sx,sy), fading it in and out (a),
+            changing its color, and so on.
+            
+            Please see the comments included in the sample milk_img.ini file
+            for full details and examples on how to author sprites.
+
+        INVOCATION AND USAGE
+            There is currently only one way to invoke sprites: manually.
+            To do this, first press 'K' to enter 'sprite mode' (while 
+            running MilkDrop).  Now, whenever you type in a two-digit 
+            code (00-99), MilkDrop will try to find & launch the sprite
+            you've requested, from the milk_img.ini file.  If there is
+            an error, it will display an error message in the upper-right
+            corner.  Note that to enter the two-digit code, you can't use 
+            the numeric keypad; you have to use the numbers at the TOP of 
+            your keyboard.  
+
+            If you make an error entering the first digit of the code, 
+            just press '*' to start over.  If you want to
+            clear the most recently-invoked sprite, press DELETE.  If you
+            want to clear the oldest sprite, press SHIFT + DELETE.  If you
+            want to clear all sprites, press SHIFT + CTRL + DELETE.
+            
+            If you want to clear sprites by their 2-digit code, press
+            SHIFT + K (instead of just 'K') to enter 'sprite kill mode.'
+            Now, when you enter a two-digit code, instead of invoking
+            the sprite, MilkDrop clears all running sprites with that
+            two-digit code.
+
+    
+
+<A NAME="5">
+<B>5. TROUBLESHOOTING</B>
+-----------------------
+    
+    If MilkDrop has a critical problem (e.g. fails to load, freezes, etc.)
+    or if the image is distorted, torn, corrupted, or all one solid color,
+    try the following two suggestions to resolve the problem.  In 90% 
+    of these cases it can be fixed.  If you have a different problem, 
+    scroll down past this part and try to find the appropriate symptom 
+    and its solution.
+
+    1. UPDATE YOUR VIDEO DRIVER, OR TRY OTHER DRIVERS
+    
+        Almost all display problems are caused by buggy video drivers!
+        
+        A "driver" is a piece of software that translates graphics-related 
+        commands from programs, like MilkDrop, into the native language of 
+        your specific graphics hardware.
+
+        For desktop machines, there are typically three sources for video drivers: 
+            1) those from the *chip* manufacturer's website (usually 
+                nvidia.com or ati.com) (best source) 
+            2) those from the card manufacturer's website (LeadTEK, PNY, etc.)
+            3) those that shipped with Windows (yuck)
+        
+        For laptops:
+            1) the driver from the *laptop* manufacturer
+            2) (maybe) the driver from the graphics chip manufacturer 
+                (ATI, Nvidia, etc) - however, it's fairly common to find 
+                that the laptop requires a custom driver written by the
+                laptop manufacturer.
+            3) the driver that shipped with Windows (yuck)
+
+        Give them all a shot.  Track down every driver you can find for
+        your card, and try it.  Try the WHQL ones first - these versions of
+        the drivers have passed "Windows Hardware Quality Labs" certification
+        and are usually the more stable and reliable ones.  
+        
+        In general, it's a very good idea to use only Microsoft-certified 
+        WHQL drivers for your video card.  Often people want to get the newest, 
+        fastest beta drivers, but these drivers are almost ALWAYS riddled 
+        with new bugs.  You can also watch the version number of the drivers
+        a company releases - if the version number just jumped to a new
+        series (such as from the 70's to the 80's), watch out, it probably 
+        has a lot of bugs that need worked out - give it 3-4 months before
+        expecting the new driver series to work well.  With video drivers,
+        the newest isn't always the best!
+
+        Here is a list of some common card/chip manufacturers and where 
+        to get their drivers.  Don't forget to choose the WHQL driver!
+        
+            [ <A HREF="http://www.nvidia.com/page/drivers.html">NVIDIA driver</A> ]
+                Card manufacturers using NVIDIA (GeForce) graphics chips:
+                (note - most of these just link you to the nvidia driver above)
+                [ <A HREF="http://www.xfxforce.com/web/support/showSearchDriversProductCode.jspa">XFX</A> ]
+                [ <A HREF="http://www.evga.com/support/drivers/">EVGA</A> ]
+                [ <A HREF="http://www.bfgtech.com/driverdownload.aspx">BFG</A> ]
+                [ <A HREF="http://www2.pny.com/support/support.aspx">PNY</A> ]  
+            [ <A HREF="http://ati.amd.com/support/driver.html">ATI driver</A> ] 
+                Card manufacturers using ATI (Radeon) graphics chips:
+                [ <A HREF="http://www.visiontek.com/teksupport/drivers/drivers.html">VisionTek</A> ]              
+                [ <A HREF="http://www.dmmdownload.com/current.php">Diamond</A> ]                
+            [ <A HREF="http://downloadcenter.intel.com/">Intel</A> ] - then click 'graphics' on the left
+            [ <A HREF="http://www.sis.com/download/">SiS</A> ] - agree, then select 'graphics drivers'
+            [ <A HREF="http://www.s3graphics.com/">S3</A> ] - then click 'drivers'
+            [ <A HREF="http://www.via.com.tw/en/products/graphics/">VIA</A> ]    
+            [ <A HREF="http://www.matrox.com/graphics/en/corpo/support/drivers/home.php">Matrox</A> ]
+            [ <A HREF="http://www.creative.com/language.asp?sDestUrl=/support/downloads">Creative Labs</A> ]
+            
+            For others - or in general - if your graphics chip is made by Trident, 
+            for example, then try a <A HREF="http://www.google.com/">google</A> search for:
+            
+                Trident graphics driver
+                        
+            Then click on "support", then "drivers" (or "downloads"), then
+            "graphics driver", and so on.
+                        
+
+    2. [RE]INSTALL DIRECTX
+    
+        Make sure you have a quasi-recent version of <A HREF="http://www.microsoft.com/windows/directx/">Microsoft DirectX</A>
+        installed.  In reality, though, almost every PC in the world has
+        DirectX 9 on it at this point, so this shouldn't be a problem.
+        If you go to download it, you'll only be able to find DirectX 10 -
+        this is fine to install, though, as it includes DirectX 9 inside 
+        it.  As a last resort, though, if you are having problems,
+        you could try re-installing DirectX to see if it helps.
+    
+    
+    If you're having a non-critical problem, browse the following list of
+    common problems and their causes and solutions.  Note that for each symptom-
+    cause-solution block, there can be multiple symptoms with the same cause and 
+    solution, and the same symptom might be listed in multiple blocks.
+  
+    If the solutions below don't work for you, please visit the forums at
+    <A HREF="http://www.nullsoft.com/free/milkdrop">http://www.nullsoft.com/free/milkdrop</A>, where you can read the most
+    recent troubleshooting issues and solutions.
+        
+
+    ENTRY 1
+    SYMPTOM:
+        -any error message saying "Failed to create ..." 
+            or "not enough memory...", or
+        -only a portion of the screen displays correctly; the rest is 
+            either filled with garbage or badly flickering
+    CAUSE:
+        1) Your video card might not have enough memory to run MilkDrop at 
+        the resolution (screen width and height) you've picked, 
+        2) your drivers might be out of date, 
+        3) you might need to reinstall DirectX (very very rare), or
+        4) your graphics card might be to crappy to *actually* run
+             pixel shaders well.
+    SOLUTION:    
+        1) To battle video memory problems:
+
+            Go to the config panel and try smaller video modes (e.g.,
+            320x240 is smaller than 640x480).  Even better is to try
+            a lower color bit depth; if you'd selected a 32-bit ("8888") 
+            video mode before, try a 16- ("565" or "555") or 24-bit ("888") 
+            one, for example.  Note that it might only work in one of them; 
+            so make sure you try them all.  Trying these things is especially 
+            important on laptops with limited video memory, or older video 
+            cards with a small amount of video memory.
+        
+            Finally, you can try locking the texture size (or "canvas size") 
+            to 256x256 pixels, just to see if that fixes the problem.  
+            If it does, try using a smaller fullscreen video mode to
+            free up some memory, or if running windowed, close other
+            graphics-hungry applications.
+        
+        2,3) for instructions on how to reinstall DirectX or update 
+            drivers, <A HREF="#5">go here</A>.
+            
+        4) Go to the MilkDrop config panel (hit ALT+K) and on the second tab, 
+            in the "Pixel Shaders" box, select "None."  Now does MilkDrop run 
+            ok?  If so, your video card probably just can't reliably run
+            pixel shaders, due to either inferior hardware, or it could
+            be the driver.  You can always try setting "Pixel Shaders" 
+            back to "Auto" and then installing a newer (preferably WHQL) 
+            video driver.
+
+
+    ENTRY 2
+    SYMPTOM:
+        -When I go to the Load Preset menu ('L') in MilkDrop, some of the
+            presets on disk are missing.
+        -I downloaded some new presets and put them in my Plugins\MilkDrop2\Presets
+            directory, but I can't access them from within MilkDrop.
+    CAUSE:
+        You probably have an older video card that can't handle the pixel
+        shaders needed to run some of the presets.  MilkDrop automatically
+        hides any presets from you that you can't run.
+    SOLUTION:
+        * You could buy a new graphics card - one that meets the minimum
+        recommendation for MilkDrop 2.  These cost less than $40.
+        * You could try forcing MilkDrop to try to run these presets.
+        Sometimes MilkDrop just hides them from you because it predicts
+        they will run horribly slow on your graphics card; in case it
+        is wrong about that, try this.  Go into the MilkDrop config
+        panel (ALT+K) and go to the More Settings tab.  Under the 
+        "Pixel Shaders" option, change it from "Auto" to "Shader Model 2"
+        or "Shader Model 3".  Then try to run MilkDrop and see if the
+        presets appear.  If they do, you're in luck; if they don't, your
+        GPU really doesn't support those shader models.
+    
+
+    ENTRY 3
+    SYMPTOM:
+        MilkDrop always looks the same - it's always showing the same
+        preset, and it never changes to a new preset unless I tell it to.
+    CAUSE:
+        Scroll Lock is on.
+    SOLUTION:
+        The Scroll Lock key is how you tell MilkDrop to lock the current
+        preset - i.e. don't randomly transition to a new preset unless you 
+        do it.  The state of the Scroll Lock key is remembered when you
+        start or stop MilkDrop, too, so be careful of that.  If you are
+        experiencing this problem, you can fix it in any of the following
+        three ways:
+          1. hit Scroll Lock while MilkDrop is running (and the viz window is active);
+          2. load up the MilkDrop config panel (ALT+K), go to the More Settings
+              tab, and uncheck the "Start milkdrop with preset lock (scroll lock) 
+              key ON" box;
+          3. if you're using a modern skin, there is a "random" button on
+              the frame of the window, which is the inverse of the Scroll Lock
+              state - i.e. you probably have Scroll Lock on and "random" off.
+              Click the "Random" button to turn random transitions back on
+              (and notice that scroll lock gets turned off as a result).
+       
+    ENTRY 4
+    SYMPTOM:
+        I was browsing for presets from within MilkDrop ('L') key and 
+        got lost.  How do I get back to my presets?
+    SOLUTION:   
+        Two ways to fix this.  The easiest is to just reset MilkDrop
+        to its defaults - hit ALT+K to load the MilkDrop config panel,
+        then click the 'Defaults' button.  The next time you launch
+        MilkDrop, it will start you in the default preset directory.
+        
+        To fix it manually (and preserve all your settings), run
+        MilkDrop, hit F8, and paste in this path:
+          C:\Program Files\Winamp\Plugins\Milkdrop2\presets
+        [or equivalent].
+        
+        Another way to fix it is to hit 'L', and browse all the way 
+        down to the root folder (repeatedly select ".."), then
+        go into Program Files, Winamp, Plugins, MilkDrop2, and finally,
+        presets.
+        
+            
+    ENTRY 5
+    SYMPTOM:
+        -things flicker through (such as my AIM window ticker, taskbar
+        clock, web page animations, etc.) when I'm running MilkDrop
+        in fullscreen mode.
+    CAUSE:
+        You're probably running MilkDrop fullscreen at the same
+        resolution & color depth as your desktop, and Windows isn't 
+        properly handling MilkDrop's request for exclusive access to the
+        screen, and is still letting other applications paint (draw)
+        themselves.
+    SOLUTION:
+        Change either your Windows desktop resolution or color depth, or 
+        MilkDrop's fullscreen resolution or color depth, so that there
+        is some difference between the two.   (To change your Windows 
+        display settings, go to the Start Menu -> Settings -> Control 
+        Panel -> Display -> Settings tab, and then change the "colors" 
+        or "screen area" settings from there.)  Also make sure you're
+        not using "fake" fullscreen mode (...uncheck this box on the
+        main screen of the config panel).
+
+
+
+<A NAME="6">
+<B>6. Known Issues / Misc. / Tips:</B>
+---------------
+    a. Tip for video capture: if you'd like to save sequences of video 
+        from this plugin, there are several programs out there that will 
+        let you do this.  Warning: you will need a ton of free hard drive 
+        space, and a fast CPU helps.  A few of these programs are:
+            "FRAPS"               <A HREF="http://www.fraps.com/">http://www.fraps.com/</A>
+            "Hypercam"            <A HREF="http://www.hyperionics.com">http://www.hyperionics.com</A>
+    
+    b. Close other apps:
+        For the best graphics performance, try to close as many other 
+        applications as you can, before running the plugin, especially 
+        those that tend to work in the background, such as anti-virus 
+        or file-swapping software.  Also, if you must leave other 
+        applications open, try to minimize them (i.e. shrink the window 
+        down to the taskbar) so that they stay out of the painting loop.
+    
+    c. Windows Vista / Winamp with per-user settings
+        Be aware that if you're running Vista as a non-admin user,
+        you can't write to (or delete from) files in the Program Files
+        directory, which is were MilkDrop 2 is installed.  So, anything
+        you try to write or save (like milkdrop's settings file, milk2.ini; 
+        or presets) will probably end up deep in some user-specific, 
+        virtualized "Program Files" directory somewhere on your hard 
+        drive.  Yell at Microsoft for this one!
+        
+        Also, if you installed Winamp with per-user settings (instead of 
+        shared settings) - on any OS, not just Vista - be aware that your
+        .INI files (milk2.ini, milk2_img.ini, milk2_cfg.ini) are all
+        stored in a folder like this:
+            
+            C:\Documents and Settings\<username>\Application Data\Winamp\Plugins         
+            
+        (Note that 'Application Data' is a hidden folder.)  However,
+        presets, textures, and things like that are all shared between
+        users, in the real [c:\Program Files]\winamp\plugins\milkdrop2 folder. 
+        If you want to keep your presets separate, you can still do that, 
+        though - just put them in a personal folder, and then seek to it
+        from within MilkDrop.  If you're using per-user settings in Winamp,
+        it will remember which folder you last used.
+        
+
+<A NAME="7">
+<B>7. Using Line-In</B>
+-----------------------
+    If you want to use your sound card's Line-In or CD Audio inputs for
+    sound data (instead of mp3 files), you can do this.  Do the following:
+        1. CONNECT WIRES
+            Connect your audio source (a stereo, a live feed, whatever) into
+            the line-in (or microphone) 1/8" jack on your sound card.  You
+            might want to test & verify that your cable is good before doing 
+            this.
+        2. SELECT SOUND INPUT CHANNEL & ADJUST VOLUME
+            In Windows, double-click the speaker icon in your systray (where
+            the clock is).  Then, on the menu, go to Options -> Properties
+            and select the "Recording" option.  Then make sure the Line In
+            (or Microphone) input channel (whichever is appropriate for
+            your case) is SELECTED (with a check mark) and that the volume 
+            is close to, or at, the maximum.  Hit OK.           
+        3. TELL WINAMP TO USE LINE-IN
+            Open Winamp, and hit CTRL+L (the "Open Location" hotkey).  Now
+            type in "linein://" as the location you want to open.  (Leave out
+            the quotes and make sure you use FORWARD slashes.)  Hit PLAY
+            ('x' key for the lazy), and the little built-in oscilloscope (or 
+            spectrum analyzer) in Winamp should start showing your signal.
+        4. RUN MILKDROP
+            Run MilkDrop as usual.  If the waves are too small or large, 
+            either adjust the volume from Windows' Volume Control, or adjust
+            the sound level at the source.       
+   
+    If you are doing shows using live audio, and if you have a multiple monitor
+    setup, you might also want to use the "VJ mode" feature, which lets you 
+    control MilkDrop (even editing shaders on the fly, etc.) via a separate monitor.
+
+
+
+<A NAME="8">
+<B>8. Acknowledgements</B>
+-----------------------
+    A very special thanks & triple word scores out to Francis Gastellu
+    and Justin Frankel for the use of their quite-excellent 
+    realtime mathematical expression evaluation library, evallib. 
+
+    A huge thanks to Rovastar for running milkdrop.co.uk and all
+    of the work and passion he has put into making MilkDrop great.
+
+    Also, a super special thanks go out to the following preset 
+    authors for their excellent artistic & mathematical work:
+
+        Aderrasi
+        Bill Melgren
+        Che
+        CTho
+        Idiot
+        Illusion
+        Krash
+        Mstress
+        Rovastar
+        Rozzor
+        Studiomusic
+        Telek
+        Tobias Wolf Boi
+        Unchained
+        Zylot
+
+        ...and to everyone else who has contributed.
+
+
+
+
+<A NAME="9">
+<B>9. Version History</B>
+-----------------------
+2.2 - November 2009
+    - updated to use ns-eel2 (thanks Justin)
+
+2.1 - January 2009
+    -pixel shader 2.0 & 3.0 support tweaks
+    -unicode support for F2 key feature
+    -removed some older Milkdrop presets and added some newer ones to Winamp installer
+
+2.0e - August 2008
+    -added localization support    
+    -unicode support for milkdrop playlist and title    
+    -tweaked menus
+
+2.0d - January 2008
+    -worked around colossal Intel driver bugs.  See (or skip) long description in next item.    
+    -tightened up various uses of the DX9 api, to decrease the chances of bugs due to poor DX9 compliance
+        by drivers for lower-end graphics chips (namely Intel integrated graphics).  Most importantly,
+        all Intel drivers seem to implement DrawIndexedPrimitiveUP() incorrectly, which was killing
+        MilkDrop.  Since Intel has has this collosal failure in their driver for eons, I decided to work
+        around it, and removed all calls to this function.  MilkDrop should now run properly on Intel
+        graphics chips.
+    -also did the following little things to help decrease chances of buggy driver interactions:
+        -now using more exact D3DFVF_TEXCOORDSIZE2(0,1,2) specifiers, in addition to _TEX2, etc.
+        -cleaned up headers (vertex declarations) in data\*.fx files to more closely match the vertex buffers.
+        -set z==0 for all vertices during the composite shader
+    -fixed some bugs w/giant mesh sizes
+
+2.0c - December 2007 (bundled with winamp 5.51)
+    -if a texture (used in a shader) is not found, MilkDrop now also looks in the current preset folder
+        to try and find it.  This makes it so that preset downloaders can be lazy and just put 
+        the presets, along with the textures that come with them, into the same directory.
+    -fixed a bug where blur textures weren't always being sampled with bilinear filtering
+    -fixed a bug where it would sometimes crash when exiting fullscreen mode while using a modern skin
+        (needed to tell Winamp that we were the viz window, via SET_EMBED_GUID(avs_guid))
+    -desktop mode no longer causes explorer to crash in Windows Vista; it instead just shuts 
+        off the icon-re-creation code.
+    -desktop mode: fixed default placement of icons, when taskbar is on the left/top side of the screen.
+    -removed Winamp version check, so people can run it with older winamps (within reason)
+        -if warand() function can't be found (older winamps), it calls a wrapper fn to rand()
+    -fixed font face for custom messages - was errantly using song title font face for custom msgs
+    -song title texture size is now based on max of screen width vs. height, rather than just width.
+    -simple waveform no longer draws itself when its alpha is less than 1/256 (0.004).
+    -added some cool new presets / filtered out some old crummy ones & repeats
+    -changes of note for preset authors:
+        -added "pixelsx" and "pixelsy" to preset's main per-frame and per-vertex equations. 
+            (equiv. of "texsize.xy" in shaders)
+        -custom waves: you can now vary the # of samples from the custom wave per-frame code.
+            Added new var, "samples", to custom wave init code [read only] and per-frame code [r/w] - 
+            tells you (and lets you set) the # of samples to draw for the wave.
+        -'time' value in shaders now wraps back to 0, after 10,000 seconds spent on a preset 
+            (to avoid precision jitters)
+        -fixed bug where 'Draw Thick' was never working for custom waves.
+        -added "#define tex3d tex3D" to include.fx
+    ---( changes after this point were made in v2.0a, 25 Oct 2007, which wasn't officially released... )--- 
+    -Preset list scan (when milkdrop launches) now happens in a background thread, 
+        so there is no drop in framerate while the scan is done.
+    -added instancing to custom shapes!!
+        -you can now set the # of instances for each of the 4 custom shapes
+           [1..1024]
+        -the per-frame code will actually be called 'num_inst' times,
+           and each time, the variable 'instance' will increment (0,1,2,... num_inst-1).
+    -lots of new presets
+    -plugin no longer has a taskbar icon when running in desktop mode
+    -shader writing: tex2d() now works (before only tex2D() worked)
+    -fixed default fullscreen display mode (...if you'd never gone to the config
+        panel and saved your settings, it defaulted you to 1024x768; now it
+        defaults you to your desktop res).
+    -fixed a few blending bugs (and greatly cleaned up the code) 
+        for transitioning between presets with mixed pixel shader versions
+    -transitions: when booleans from the old comp shader interpolate 
+        during a blend, if the old & new shaders did & didn't use a comp shader 
+        (or vice versa), then it will now be smart about when it switches the 
+        boolean, so you don't see any avoidable jumps.  (mostly for darken, 
+        video echo orientation, brighten, solarize, etc.)
+    -presets now save with a few less decimal places for most of the values (less waste)
+    -finally fixed seldom-seen wave bug; it was due to per-frame code "wave_mystery = time*0.03;" when used with wave types 0,1,4.  Now those wave types repeat the waveparam value in the [-1..1] range, so it always looks good.
+    -fixed preset list selected pos after preset delete
+    -found and fixed bug with custom wave/shape import
+    -Fixes to documentation, driver link updates, etc.
+    -Fixed bug with the 'texture wrap' and 'sustain level' menu items'
+        visibility (...they should, and now only do, show if the current preset 
+        doesn't use pixel shaders).
+    -fixed bug with 'edit sprites' and 'edit custom messages' buttons on the config
+        panel - they were trying to edit the milkdrop 1.0 ini files (milk_*.ini 
+        rather than milk2_*.ini). 
+    -fixed bug with desktop mode - when paused, if you dragged the mouse around
+        on the desktop, milkdrop would update [new] frames instead of just redrawing
+        the exact same last [paused] frame.
+    -fixed bug with desktop mode - if you made winamp run just in the systray,
+        then ran MD2 in desktop mode, then minimized winamp to the systray,
+        then used a global hotkey to pause the song, then clicked on some
+        random window (say, calc.exe) and then clicked back on milkdrop,
+        the taskbar would disappear.  This no longer happens because the
+        viz window, in desktop mode, now only covers the visible portion
+        of the desktop, and not the area occupied by the taskbar.
+    -docs: updated links & text for drivers section
+    
+2.0 - 10 October 2007 (bundled with winamp 5.5)
+    -MilkDrop has been upgraded from DirectX 8 to DirectX 9.
+    -This means it now supports Pixel Shaders.
+      -Each preset can now have two shaders in it: a warp shader
+        and a composite shader.
+      -The "warp" shader performs the frame-to-frame image-warping operation.
+      -The "composite" shader performs the final display of the feedback
+        image to the user.  
+      -See the <A HREF="milkdrop_preset_authoring.html">preset authoring guide</A> for more information.        
+    -Added a "back" button for presets!  You can now use the 'backspace' key 
+      to go back to up to 64 presets that recently played.
+    -Presets can now load textures (jpg, png, etc.) from disk and use them
+      (in shaders) for whatever they want.
+    -Also added several built-in 2D and 3D procedural noise textures.
+    -You can edit the warp & composite shaders on-screen.  
+    -Per-pixel equations have been renamed to per-vertex equations, because
+      that's what they really were.  These equations determine how each point
+      moves - on a big grid that covers the screen.  For all the pixels in between,
+      the motion was interpolated.  Now, that motion data comes into the warp
+      shader as a "uv" coordinate, and you can use it like before, or you can
+      do more work on top of it - but because the pixel shader truly executes
+      (independently) on each pixel, the warp shader truly operates at a "per-pixel"
+      resolution.
+    -When editing per You can now copy and paste to and from the *Windows* clipboard.
+      CTRL+C copy
+      CTRL+X cut
+      CTRL+V paste
+		-The internal canvas (texture) size is no longer locked to power-of-2 squares;
+			it can now match the window size perfectly (...or you can override it
+			to use the old NP2 method).
+		-Max gridsize is up from 128 to 192.
+		-Added 'A' key (aggregate) - loads a random preset, then loads the warp shader 
+		  from another random preset, and then loads the composite shader from
+		  a third random preset.
+		-Added 'D' key - cycles between various lock-states for the warp and
+      composite shaders.  When one of these shaders is locked,
+      loading a new preset will load everything *except* the
+      locked shaders, creating a mix between the two presets.
+    -Ditched 'stereo 3D' mode.  It never worked that well anyway.
+    -Added "aspectx" and "aspecty" (read-only) to per-frame and per-vertex variables,
+      to help presets deal with widescreen display modes properly.
+      Multiply an X,Y coord by these to make it fit the window properly.
+    -The q1-q8 variables have been expanded; the range is now q1-q32.
+    
+1.04L - 04 May 2007	
+        -added localization support
+        -fixed Milkdrop DEP incompatibility
+        -fixed theming of preferences under XP+
+	   
+1.04d - 13 February 2007
+        -fixed some multi-user issues 
+		
+1.04c - 21 June 2006
+        -added missing files to Winamp installer
+        -added multi user support
+        -fixed 100% cpu usage when paused
+        -added over 200 new Milkdrop presets to Winamp installer!
+
+
+1.04b - 10 October 2003
+        -slimmed down the presets for bundling w/Winamp 5
+        -fixed blurry text when running in wa5 w/skinning, 
+            before first window resize
+        -can now start plugin w/o music (Winamp 5+)
+        -(hopefully Justin shrank the DLL some, too)
+
+1.04 - 31 July 2003
+        -upgraded to VMS (VisMegaSDK) 1.05 and DirectX 8.  That means a revolutionized 
+            Desktop Mode, better driver support, better multimon support, winamp
+            skinning (when running in windowed mode), increased general stability, 
+            and much, much more.
+        -added CUSTOM SHAPES and CUSTOM WAVEFORMS.            
+        -added the following variables for per-frame scripting: (all booleans, except 
+            'gamma') wave_usedots, wave_thick, wave_additive, wave_brighten
+            gamma, darken_center, wrap, invert, brighten, darken, solarize
+            (also, note that echo_zoom, echo_alpha, and echo_orient were already in there,
+             but weren't covered in the documentation!)
+        -added 'meshx' and 'meshy' [read-only] variables to the preset init, per-frame, 
+            and per-pixel equations
+        -cranked max. mesh size up to 128x96
+        -added alphanumeric seeking to the playlist; while playlist is up,
+            you can now press A-Z and 0-9 to seek to the next song in the playlist
+            that starts with that character.  SHIFT+A-Z seeks upward (while lowercase/
+            regular a-z seeks downward).
+        -added some options to config panel
+        -sprites & custom messages: added 'kill' keys
+            -CTRL+K kills all running sprites
+            -CTRL+T kills current song title anim
+            -CTRL+Y kills current custom message
+        -sprites:
+            -for sprites, color key can't be a range anymore; it's
+                now limited to just a single color.  'colorkey_lo' and 
+                'colorkey_hi' have been replaced with just one setting, 
+                'colorkey'.
+            -also, behavior of the 'burn' variable has changed; now,
+                a sprite can be burned in on any frame, not just on the
+                last frame before it dies.  See the sample sprite config
+                file, milk_img.ini, for more information.
+        -preset ratings are no longer read in all at once; instead, they are scanned in
+            1 per frame until they're all in.  This fixes the long pauses when you switch
+            to a directory that has many hundreds of presets.  If you want to switch
+            back to the old way (read them all in at once), there is an option for it
+            in the config panel.
+        -internal texture size now has a little more bias toward a finer texture, 
+            based on the window size, when set to 'Auto'.  (Before, for example,
+            to reach 1024x1024, the window had to be 768x768 or greater; now, it
+            only has to be 640x640 (25% of the way there).  I adjusted it because
+            before, at in-between resolutions like 767x767, it looked very grainy;
+            now it will always look nice and crisp, at any window size, but still
+            won't cause too much aliasing (due to downsampling for display).
+        -..and much many massive amounts of more!
+
+1.03 final - 19 June 2002
+        -fixed bug with motion vectors; when there were 64 of them on X
+            and 48 and Y (the upper limits), stray lines would sometimes
+            be drawn along the top and right edges of the screen.
+        -revamped the help screen
+        -added some cool new presets
+        -touched up the documentation
+
+1.03 beta 3 - 15 May 2002
+        -letter 'g' no longer gets cut off in custom messages
+        -(oops... it's 'wave_mode', not 'wave_type'.)
+        -fixed 'q1'..'q8' in the preset init code.
+        -revamped the way presets are loaded & blended; transitions
+            should be cleaner now.  
+        -made motion vectors morph more smoothly during transitions;
+            if the old preset had motion vectors on but the new one
+            doesn't, then the #, drift speed, length, and color 
+            of motion vectors does not change as they fade out; 
+            and vice versa if the mv's are fading in.
+        -added optional 'burn-in' for sprites, so when they are finished, 
+            they leave an imprint in the background.  The sprite will
+            burn into the background at the end of its lifetime 
+            if the variable 'burn' is set to a nonzero value; if 'burn'
+            is zero, the sprite will not burn in.
+        -motion vectors: reverted to 1.02 functionality, following 
+            krash's advice.  So mv's should now be backwards-compatible 
+            (with 1.02 versions and earlier).  Now, dx and dy are constant
+            offsets for the motion vectors; if you want them to scroll,
+            alter dx and dy based on the time (or frame).
+        -finished writing critical notes in milk_img.ini.
+        -revamped the keyboard interface for custom messages & sprites.
+            see the documentation.  The realtime help screen won't
+            provide too useful, though (not enough space to lay it all
+            down there).
+                
+1.03 beta 2 - 1 May 2002
+        -preset comments are in; start them with '//' anywhere on the line,
+          and the rest of the line will be ignored.
+        -added variables:
+            -fps (read-only)
+            -video echo options: echo_zoom (0..1..+inf), echo_alpha (0..1), 
+                echo_orient (0,1,2,3)
+            -motion vector drift: mv_dx, mv_dy (a la geiss)
+            -wave_mode[0-7], wave_a(0..?)
+        -fixed texel alignment
+            -nVidia: dx|dy += -1/(texsize*2)    
+            -same for:         http://forums.winamp.com/showthread.php?threadid=83401 
+                All nVidia Cards (Many confirmed tested), 
+                3dfx Voodoo Cards (Voodoo 3 confirmed tested), 
+                ATI Cards (ATI All-In-Wonder confirmed Tested) 
+                Kyro II Confirmed Tested 
+                even Illusion's antiquated Intel Card needs it. 
+            -(untested: the matrox cards)
+            -super thanks to Rovastar for researching & cracking this one
+        -added option for thicker waves; see wave menu.
+            -note: only takes effect when texture size is >= 512x512!
+        -modified presets for new texel alignment fix:
+            -Zylot - Tunnel of Illusion
+            -Zylot - S. Pulse Virus
+            -Most of Krash' s presets
+            -Illusion and Rovastar - Grand Odyssey Mod
+            -Unchained: Goo Kung Foo and Perverted dialect.
+            -optimized some, thanks to Rovastar for pointing out lines in
+                per-pixel code that could be migrated into per-frame code.
+            -many of my own: made waveforms thick
+        -some new presets
+            -(bipolar 4,5; supernova 2; calligraphy; others from milkdrop.co.uk)
+        -fixed bug with sound analysis where sound variables in expressions
+            (bass, bass_att, treb, etc.) could be NAN on the first frame
+            that milkdrop ran.  (symptoms could be bad if the value was
+            used over & over in subsequent frames!)
+        -saved about 100k on the installer by updating to NSIS 1.98 and
+            using the new bzip2 compression. (thanks again to rovastar)
+        -made the texture used for song titles & custom messages take 1/4
+            as much video memory (was square before, blech - now it tries
+            4:1; if that fails it tries 2:1; then 1:1 as a last resort.)
+        -added config panel option to mute all errors/warnings that might 
+            appear in the upper-right corner.
+        -revamped the configuration for desktop mode w/software blit.  
+            Now, you have a choice of 3 different ways to bring the image 
+            across the bus (from video to system memory).  Then the image
+            is converted from RGB to YUV on the cpu, and then you also get
+            to select how to send the image across the bus again, back to
+            video memory, for display on the desktop.  The 3 methods are
+            1) copy the data using an mmx-accelerated memory copy routine
+                (never-fail cornbread)
+            2) use directx to blit from one surface to another 
+                (sometimes drivers flake out on this)
+            3) skip it; read/write directly to/from video memory
+                (never-fail cornbread)
+            Regarding 1 vs. 3: they'll both always work; usually #1 is
+            faster going from video to system memory, and #3 is faster
+            going from system back to video; but not always.  Try different
+            combinations out on your card and see what happens.
+        -sprites!
+            users can edit 'milk_img.ini' and write their own code to control
+            the sprites.  Each sprite is an instance of a jpeg image from disk,
+            displayed according to the code in the .ini file.  Up to 16 sprites 
+            can be running at once.  
+        -stole Y + K keys for use with custom messages & sprites.
+            Hit 'y' to enter custom message mode, then enter two-digit
+            codes to launch custom messages.  Hit 'k' to enter sprite
+            mode, then enter three-digit codes to launch sprites.
+        -added 'preset initialization code', so you can initialize
+            your custom variables when the preset is first loaded.
+        -increased number of 'q' variables from 5 to 8.  (q1..q8 are
+            used to carry values from the per-frame equations to the
+            per-pixel equations.  Note that they can now also carry
+            values from the preset init equations, on to the per-frame
+            AND per-pixel equations!)
+		-automated the brightness slider in the config panel; now there's
+			a checkbox that says, 'guess, based on my video card'.  Currently,
+			the auto-brightness algorithm is simple: if you have an nVidia
+			card, it will set it to 2; otherwise, it sets it to 0.
+        
+1.02 - 2/7/02
+        -added CUSTOM MESSAGES - you can edit them in the file MILK_MSG.INI in your
+            WINAMP\PLUGINS directory.  They are displayed by either keying in their
+            2-digit numerical code ('##') at runtime, or randomly if you choose this
+            option from the config panel (see the 'More Options' dialog).
+        -also added RANDOMIZATION FOR SONG TITLE ANIMATIONS (also see the 'More 
+            Options' dialog from the config panel).
+        -added INSTANT HARD CUT HOTKEY: 'H'
+        -for preset authors:
+            -per_frame and per_pixel code use to get cut off if they didn't fit 
+                on the screen; this is now fixed (flips to next page as needed)
+            -when editing per-frame/per-pixel equations, the line that the cursor 
+                is on is now highlighted!
+            -fixed an old bug where if the per-pixel or per-frame code had nothing 
+                in it except spaces & linefeeds, it would display an error message 
+                saying "error in per-{pixel|frame} code".
+            -added a 'trail length' parameter to the motion vectors. 
+            -added a bunch of per-frame variables to control the motion vectors: 
+                mv_x, mv_y, mv_l, mv_r, mv_g, mv_b, mv_a.  Also got rid of the 
+                motion vectors on/off setting; now the opacity controls this.
+            -cranked up max. # of user variables from 23 to 33.  (Added 16 slots, 
+                but used 6 of them for motion vectors.)
+            -added a per-frame variable called 'monitor'.  Set the value of this 
+                variable in the per-frame code, and then press 'N' to monitor (show) 
+                its value in the top-right corner of the screen.  Should be very 
+                useful for debugging.  (Thanks to Krash for the great suggestion 
+                on how to implement this!)
+            -added the int() function, which turns the argument into an integer 
+                (whole number).  Rounding is toward zero.  Examples: 
+                    int(-1.1) -> -1, int(-1) -> -1, int(-0.9) -> 0;
+                    int(0.9) -> 0, int (1.0) -> 1, int(1.1) -> 1;
+                    int (2.1) -> 2.
+        -improved 3D mode:
+            -drastically improved quality of stereo 3D images by changing default 
+                3d colors to CYAN (full green + blue; was just full blue) for the 
+                left eye and RED for the right eye.  It turns out that this provides 
+                an equivalent 3d image, but gives you the full range of colors for 
+                all presets, which in turn probably makes the 3Dness more visible 
+                to your brain anyway.
+            -also, when in 3D mode, made the waveforms 60% white and 40% their 
+                original color (used to be 100% white because so much color was lost 
+                in the green channel).
+        -song titles:
+            -(added randomization, as mentioned above)
+            -improved max. resolution of song titles by increasing the max. 
+                allowable GDI font size
+            -fixed longstanding bug with the "burning in" of song titles after 
+                they're done displaying; the old, floating location wouldn't exactly 
+                match where the title would be burned into the background & melt away.
+        -timing & animation:
+            -protected against milkdrop's animation running super-fast because the 
+                clock jumped way ahead when no frames were rendered (i.e. milkdrop 
+                got stalled somehow).
+            -smoothed the animation by assuming the time for each frame to be 80% 
+                of 1/fps and 20% the actual time reported.
+        -misc:
+            -converted ANSI_CHARSET to DEFAULT_CHARSET in CreateFont() calls (should 
+                fix some display of funky/foreign character sets)
+            -added 'R' key to toggle random vs. sequential order for loading presets
+            -fixed alphanumeric sorting of presets (used to have minor errors such 
+                as putting "galaxy 2" before "galaxy", and so forth - unfortunately 
+                this is how strcmp() - even Windows Explorer - sorts them.  I rewrote 
+                strcmp() to make it sort in a more 'natural' order.)
+            -'&' characters in preset filenames no longer show up as an '_' character, 
+                although it still looks funny if you try to save one with an '&' already 
+                in it, but don't worry, it will preserve the '&' (even though it looks 
+                messed up).  Note that you still can't type a *new* '&' into the filename 
+                when you go to save a preset.  It is safe to rename it from outside 
+                MilkDrop, though, and use it in MilkDrop later. 
+            -fixed preset-to-preset blending bugs for the 10 border variables.
+            -fixed a bug in blending from a preset using waveform #7 (two horizontal 
+                waveforms) to waveform #0 (a circular waveform), where the right edge 
+                of the top horizonal wave would get connected (via a straight line) 
+                to the left edge of the bottom horizontal wave, as soon as the blend 
+                began.
+            -m_debug.txt: added some caps detection info at init time; screened out 
+                logging of WM_MOUSEMOVE, WM_NCHITTEST, and WM_SETCURSOR messages.
+            -improved motion vector motion prediction so that the tips of the motion 
+                vectors should be perfectly matched from frame to frame, when the 
+                trail length is set to 1.  **Note that it defaults to 0.9, so that 
+                the look is similar to the old, mismatched version! (so the presets 
+                are backwards compatible.)  **Also note that for video cards that 
+                do not support anti-aliased edges, there could be up to 1 pixel of 
+                error here.  Check m_debug.txt for whether or not your driver/card 
+                supports anti-aliased edges for lines.)
+
+1.01 - 12/7/01
+        -playlist feature ('p' key) no longer crashes on Windows ME/98SE.
+        -fixed problems with ampersand ('&') character in song titles/playlist
+        -fixed bug with previous max. of 23 user variables per session.  (Now, 
+            it's a max of 23 user variables per preset, as it should be.)
+        
+1.0 - 10/30/01
+        -added a section to the documentation on using "line-in" as your 
+            audio source (instead of mp3's)
+        -lowered minimum frame time (enforced by winamp) from 25 ms to 10ms, 
+            so now, the max. possible fps is 100 instead of 40.
+        -tightened A/V sync by 5 ms (raised audio latency from 25 to 30 ms).
+        -fixed &'s in song titles (as displayed when you hit F2)
+        -F7,F8 were switched in the help screen (F1)
+        -when running in desktop mode, if you have a pattern on your windows 
+            background, it gets nuked.  Before, if you had a pattern, the 
+            pattern would remain and you'd only be able to see milkdrop through 
+            the small boxes of your desktop icons' background text.  I didn't 
+            bother restoring the pattern upon exit because I am lazy and assume 
+            that nobody intentionally uses these things anymore.  =)
+        -improved warning message for windowed/desktop modes, when auto-texture-
+            size is scaled down due to insufficient video memory.  It previously 
+            just reported the downsizing, but now, it also recommends that you 
+            drop your color depth to 16 bits (if you haven't already) and that 
+            you try decreasing your screen resolution.
+        -might have fixed a bug with the playlist feature ('p') crashing people's 
+            machines.
+
+0.99g - 9/11/01
+        -added playlist browsing (hit 'p')
+        -added checkbox to fix slow text (finally!)
+        -song titles fixed too (on some cards, they were garbled) (also, in low 
+            video mem. situations, they might have never appeared - that's fixed too)
+        -added checkbox to allow double buffering for desktop mode; default is 
+            UNCHECKED; can provide significant speed boost, but you might see some 
+            tearing during the vertical retrace; if so, enable double-buffering.  
+            It used to always be double-buffered, which is slower, though it is 
+            page-tearing-artifact-free.
+        -added always-on-top option for windowed mode
+        -added "page x of y" footnote to the preset and playlist menus
+        -improved the auto-texture-size management code, so users will be less 
+            likely to get the "couldn't create offscreen surface #1" (or #2) error.  
+            Instead, the textures are continally downsized until there is enough 
+            memory for them.  This might mean blockier images, but at least it will run.
+        -desktop mode can now do software blit when an RGB overlay surface is created. 
+            (before, software blit was really only available for YUV-type overlays.)
+        -desktop mode compatibility improved: more likely to work at higher resolutions now
+        -desktop mode: fixed YUV-type *non-mmx* software blits when Windows is in 16-bit color.  
+            (weren't implemented before; it just assumed windows was in 32-bit color, 
+            and the result would look munged.)
+        -improved mmx memcpy: will now copy as long as the (difference between two 
+            pointers) % 8 is zero.  (before, they both had to be a multiple of 8).
+        -reorganized the config panel; nice
+        -centered the config panel on the screen (by removing winamp as hwndparent - der)
+        -centered the 3 color picker dialogs (by specifying current dialog window 
+            as the parent - der)
+        -(also cleaned up redundant code for color picker dialogs)
+        -super-slight optimizations to speed of waveform blending
+        -tweaked the way the "clear screen at startup" option works, since some 
+            users had problems with it
+        -fixed aspect ratio, so when window is at an extreme AR, it clips the extra 
+            (instead of fitting the image to the window)
+        -fixed a fullscreen lost surface bug introduced in 0.99f that blacked 
+            the screen out if you ALT-TABBED out of milkdrop & returned.
+        -fixed bug where tooltips were lost on some systems (left variable in, 
+            but no way to change it - locked to TRUE for now)
+        -fixed bug where 'try for RGB overlay...' and 'try for YUV overlay...' 
+            checkboxes were disabled when software blit was on.  (Don't know what 
+            I was thinking there!)
+        -tweaked presets; added some cool shift-on-beat effects
+
+0.99f - 8/22/01
+        -added graphical song titles
+        -added screen borders; can be used to create interesting feedback patterns when 
+            zooming out
+        -waveforms now blend smoothly!
+        -finally gave milkdrop an application icon
+        -added 'U' key to toggle winamp's shuffle feature on/off
+        -fixed bug with handling of 'r' key when preset menu is up; now, to rename a file, 
+            use INSERT
+        -fixed a 1-frame-delay bug for warping (caused a lag for audio-driven 'warps')
+        -fixed bug where 'progress' variable's value was always 0 in per-pixel eq's 
+            (thanks rovastar)
+        -removed "F7: show tooltips for menu items" hotkey (needed it for title animations)
+        -removed U, I keys (for warp)
+        -moved T key (for zoom) to I (i=zoom in, I=zoom out) (T is now used for song titles)
+        -speed optimization: now using memcpy_MMX to copy 576*2*4=4608 bytes of sound data 
+            per frame
+        -size optimizations: painstakingly shaved 8k off the .dll
+        -in windowed mode, when a user resizes the window to a size that's too large and 
+            there's not enough video memory and MilkDrop closes, it now resets the size 
+            of the window for the next time you run MilkDrop.  (before it would just try 
+            to start the next time with the same window position/size and keep failing.)
+        -added 'try for RGB overlay before trying YUV-types' checkbox
+        -added 'try for YUY2 overlay surface before trying UYVY' checkbox
+        -added "stereo 3d always on" option (unchecked by default)
+        -added "clear screen at startup" option (checked by default)
+        -made soft cut timer reset on hard cuts
+
+0.99e - 7/5/01
+        -added beat-driven HARD CUTS; very cool
+        -added a VJ mode, where you can make all the text draw in a separate 
+            window instead of to the main graphics display; should be very 
+            handy for concerts
+        -added preset rating; use + and - keys (volume control is only available 
+            w/up,down arrows now); use F6 to show rating of current preset
+        -you can now use any color lenses for left/right stereo vision; just tell 
+            it what color you've got (by speaking aloud)
+        -desktop mode optimization: block copy from video memory is now optional, 
+            because on 5-10% of systems, it actually makes things slower.
+        -transitions between 2 presets both using video echo, but in different 
+            orientations, are now smooth
+        -added 'progress' variable to per-frame and per-pixel equations; tells you 
+            how far through the preset you are (temporally) (0..1), so you can make 
+            gradually-shifting effects
+        -added mystery param to per-frame eq's (variable name is 'wave_mystery')
+        -settings such as showing song titles, times, fps, ratings, tooltips, etc. 
+            are all now preserved from session to session
+        -when Load menu is up, added seeking by typing in first char of name
+             -also disabled left/right arrows when Load menu is up, so music 
+              won't skip on you
+        -windowed mode now remembers the window's final size, position between sessions
+             -safe for 2nd monitor, too
+        -fixed bug with ALT-TABBING in and out of fullscreen mode
+        -fixed bug with vertical spacing of song title/time readout when the fancy 
+            font size was set to anything but "normal"
+        -plugin listing (in Winamp prefs screen) and the window title now show the 
+            version #
+        -fonts now scale with the window
+        -protected against trying to run MilkDrop while the config panel is still open
+        -fixed the 1-pixel-wide garbage that sometimes sat at the right and bottom 
+            edges, in windowed mode
+        -fixed bug where after going to another app, fullscreen, while in Desktop Mode,
+            upon your return from fullscreen the overlay surface was lost (and just sat 
+            there, black).
+        -stopped sending WM_KEYUPs to Winamp (oops; never sent WM_KEYDOWNS to begin 
+            with anyway)
+        -load menu: '[..]' now reads '[..] (parent directory)'
+        -config panel: broke some stuff off into a 'more options' dialog
+
+0.99d - 6/5/01
+        -desktop mode is officially in
+        -added new waveforms
+        -added temporal wave alignment
+        -added fps limiting
+        -added "view documentation" button to config panel
+        -added UP/DOWN keys for volume up/down
+        -improved seeking for CTRL-LEFT, CTRL_RIGHT: now seeks by breaks between groups of 
+            alphabetic characters, instead of just looking for spaces.
+        -added 5 new variables (q1..q5) for passing values from the per-frame to the per-pixel 
+            equations (user-defined variables don't carry over like permanent variables)
+        -added brighten (square root), darken (square), invert, and solarize filters
+        -tweak: made transitions slightly sharper (10% more toward a cosine curve than a 
+            linear curve now)
+        -now setting D3DRENDERSTATE_SHADEMODE to D3DSHADE_GOURAUD (used to be FLAT, 
+            and combined with per-vertex coloration, which seemed to be asking for trouble)
+        -added warning messagebox for if first call to SetRenderTarget fails
+        -fixed bugs with the values of "x" and "y" for per-pixel equations
+                -x: range was -1..1; should have been 0..1
+                -y: range was 0..2; should have been 0..1
+                -(all presets using x,y in their per-pixel equations had to be adjusted)
+        -fixed bug where if the previous preset folder disappeared, you couldn't hit 'L' 
+            to browse to a new folder
+        -fixed a potential bug with dither not being a hardware capability
+        -fixed a bug with scroll lock (didn't reset the LED state when MilkDrop started)
+        -fixed a bug with loading presets with blank lines in the per-frame or per-pixel 
+            equations
+                -(the blank line, and everything after it, would not be read in)
+        -revamped gamma loop
+
+0.99c - 5/21/01
+        -added red-blue stereo; use F9 to toggle it on/off
+            -note: you need those cheesy glasses with the red & blue plastic 
+             lenses for this to work!
+        -added a bunch of 3D presets in the \3D subdir
+        -added the ability to browse the directory structure
+        -added F8 to jump to new directory (or drive)
+        -changed the 'fix pink/white color saturation artifact' checkbox
+            into a simple brightness slider, so you have more freedom with it
+        -"+", "-" keys now work for the numeric keypad and regular keys.
+        -fixed a video memory leak for windowed mode (the manually-created backbuffer wasn't 
+            being released; once you exited winamp, though, the memory was freed)
+        -fixed a bug with closing Winamp while milkdrop was running in windowed mode
+        -fixed a weird bug with hitting ESC from the config panel sometimes doing nothing
+        -fixed a weird bug where when milkdrop was launched in windowed mode, 
+            keystrokes to winamp don't work until you moused-over the winamp window
+
+0.99b - 5/16/01
+        -added windowed mode
+        -added +/- keys for volume control
+        -added SHIFT + left/right arrows to rewind/ffwd 30 seconds
+        -improved various error messages
+        -protected vs. running config panel while MilkDrop is running
+        -protected vs. running milkdrop without music playing
+
+0.99 - 5/11/01
+        -first version
+
+
+<A HREF="#milkdrop_top">return to top</A>
+</PRE>
+</BODY>
+</HTML>

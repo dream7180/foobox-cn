@@ -1,0 +1,27 @@
+//plus helpers
+
+//windows version helpers
+function IsWin2KOrGreater(){
+    var arr = utils.GetWindowsVersion().toArray();
+    return arr[0] > 4;
+}
+
+function IsVistaOrGreater(){
+    var arr = utils.GetWindowsVersion().toArray();
+    return arr[0] > 5;
+}
+
+function IsWin7OrGreater(){
+    var arr = utils.GetWindowsVersion().toArray();
+    return arr[0] > 5 && arr[1] > 0;
+}
+
+function IsWin8OrGreater(){
+    var arr = utils.GetWindowsVersion().toArray();
+    return arr[0] > 5 && arr[1] > 1;
+}
+
+//misc helpers
+function GetFBWnd(){
+    return utils.CreateWND(window.ID).GetAncestor(2);
+}
