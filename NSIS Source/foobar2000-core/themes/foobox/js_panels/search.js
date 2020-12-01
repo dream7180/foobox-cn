@@ -795,7 +795,7 @@ function GetQTFMRadiolist(){
 					var listid = "";
 					var c = 0;
 					var ret = json(xmlHttp.responseText)["Data"];
-					if (ret.length > 0) {
+					if (ret && ret.length > 0) {
 						if(c == 0) c = ret.length + 1;
 						l = 0;
 						url = "http://rapi.qingting.fm/categories/" + 409 + "/channels?page=1&pagesize=50";
