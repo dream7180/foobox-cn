@@ -3579,7 +3579,9 @@ function on_playback_stop(reason) {
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
 	if(ppt.sourceMode == 0 || !window.IsVisible) {
-		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+		try{
+			playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+		} catch (e) {};
 		return;	
 	}
 	try {
@@ -3608,7 +3610,9 @@ function on_playback_new_track(metadb) {
 		};
 	};
 	catch (e) {};
-	playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+	try{
+		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+	} catch (e) {};
 };
 
 function on_playback_starting(cmd, is_paused) {};
