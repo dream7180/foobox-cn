@@ -40,10 +40,6 @@ images = {
 	noart: null,
 	sw_btn_n0: null,
 	sw_btn_n1: null,
-	sw_btn_h0: null,
-	sw_btn_h1: null,
-	sw_btn_d0: null,
-	sw_btn_d1: null,
 	stream: null,
 	down_all: null
 };
@@ -339,8 +335,11 @@ image_cache = function() {
 							} else {
 								this.albumArtId = ppt.albumArtId;
 							}
-							brw.groups[albumIndex].load_requested = 1;
-							utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+							try {
+								brw.groups[albumIndex].load_requested = 1;
+								utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+							}
+							catch(e) {}
 						};
 						timers.coverLoad && window.ClearTimeout(timers.coverLoad);
 						timers.coverLoad = false;
@@ -1543,16 +1542,16 @@ oBrowser = function(name) {
 	this.init_swbtn = function(){
 		switch(ppt.tagMode){
 			case 1:
-			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至简单专辑模式");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至高级专辑模式");
+			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "切换至简单专辑模式");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至高级专辑模式");
 			break;
 			case 2:
-			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至艺术家");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至专辑艺术家");
+			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "切换至艺术家");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至专辑艺术家");
 			break;
 			case 3:
-			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至文件夹");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至流派");
+			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "切换至文件夹");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至流派");
 			break;
 		}
 	}
@@ -1562,28 +1561,28 @@ oBrowser = function(name) {
 		switch(ppt.tagMode){
 			case 1:
 			if (ppt.albumMode ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "切换至简单专辑模式";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "切换至高级专辑模式";
 			}
 			break;
 			case 2:
 			if (ppt.artistMode ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "切换至艺术家";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "切换至专辑艺术家";
 			}
 			break;
 			case 3:
 			if (ppt.genre_dir ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "切换至文件夹";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "切换至流派";
 			}
 			break;
@@ -2540,7 +2539,7 @@ var g_color_highlight = 0;
 var g_syscolor_window_bg = 0;
 var g_scroll_color = 0;
 var g_color_grid_bg = 0;
-var g_btn_color1, g_btn_color2, g_btn_color3, g_btn_color4;
+var g_btn_color1, g_btn_color2;
 // boolean to avoid callbacks
 var g_avoid_on_playlists_changed = false;
 var g_avoid_on_playlist_switch = false;
@@ -3145,113 +3144,47 @@ function get_images() {
 	gb.DrawImage(stream_1, 0, 0, stream_1.width, stream_1.height, 0, 0, stream_1.width, stream_1.height);
 	images.stream.ReleaseGraphics(gb);
 	
-	var x3 = Math.floor(3 * zdpi),
-		x18 = Math.floor(18 * zdpi);
-	var col_1 = g_btn_color1 & 0xbbffffff, col_2 = g_btn_color2 & 0xbbffffff;
+	var x5 = 5 * zdpi;
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	images.sw_btn_n0.ReleaseGraphics(gb);
-	images.sw_btn_h0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_h0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, g_btn_color4);
-	images.sw_btn_h0.ReleaseGraphics(gb);
-	images.sw_btn_d0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_d0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, col_1);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, col_2);
-	images.sw_btn_d0.ReleaseGraphics(gb);
 	
-	var x8 =  Math.floor(13 * zdpi)-1;
 	images.sw_btn_n1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	images.sw_btn_n1.ReleaseGraphics(gb);
-	images.sw_btn_h1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_h1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, g_btn_color4);
-	images.sw_btn_h1.ReleaseGraphics(gb);
-	images.sw_btn_d1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_d1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, col_1);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, col_2);
-	images.sw_btn_d1.ReleaseGraphics(gb);
-
+	
+	var points = Array(10*zdpi,4*zdpi, 14*zdpi,4*zdpi, 14*zdpi,9*zdpi, 17*zdpi,9*zdpi, 12*zdpi,13.5*zdpi, 7*zdpi,9*zdpi, 10*zdpi,9*zdpi);
 	col_2 =g_btn_color2 & 0xccffffff;
 	images.down_all = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all.GetGraphics();
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, g_btn_color2);
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
+	gb.DrawPolygon(g_btn_color2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, g_btn_color2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
 	images.down_all.ReleaseGraphics(gb);
 	
 	images.down_all_h = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all_h.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x20ffffff);
+	gb.DrawPolygon(g_btn_color2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, g_btn_color2);
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, g_btn_color2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
 	images.down_all_h.ReleaseGraphics(gb);
 	
 	images.down_all_d = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all_d.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x35ffffff);
+	gb.DrawPolygon(col_2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, col_2);
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, col_2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, col_2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, col_2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, col_2);
 	images.down_all_d.ReleaseGraphics(gb);
 };
 
@@ -3280,10 +3213,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x15ffffff;
-		g_btn_color1 = RGBA(0, 0, 0, 40);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
 		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
 		break;
 	case (2):
 		g_syscolor_window_bg = fbx_set[3];
@@ -3294,10 +3225,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x15ffffff;
-		g_btn_color1 = RGBA(0, 0, 0, 40);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
 		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
 		break;
 	case (3):
 		g_syscolor_window_bg = fbx_set[0];
@@ -3308,10 +3237,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x12ffffff;
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		break;
 	case (4):
 		g_syscolor_window_bg = fbx_set[2];
@@ -3322,10 +3249,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 55);
 		g_color_selected_bg = (random_mode == 1 || g_syscolor_window_bg == RGB(10, 10, 10)) ? RGBA(255, 255, 255, 30) : fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x12ffffff;
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		break;
 	}
 	g_color_highlight = fbx_set[6];

@@ -345,10 +345,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[0];
-		g_btn_color1 = RGBA(0, 0, 0, 40);
-		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
+		g_btn_color2 = RGBA(0, 0, 0, 90)
 		g_color_topbar = fontcolor & 0x15ffffff;
 		break;
 	case(2):
@@ -358,10 +356,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[0];
-		g_btn_color1 = RGBA(0, 0, 0, 40);
-		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
+		g_btn_color2 = RGBA(0, 0, 0, 90)
 		g_color_topbar = fontcolor & 0x15ffffff;
 		break;
 	case (3):
@@ -371,10 +367,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[5];
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		g_color_topbar = fontcolor & 0x12ffffff;
 		break;
 	case (4):
@@ -384,10 +378,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 55);
 		g_color_selected_bg = (random_mode == 1 || bgcolor == RGB(20, 20, 20)) ? RGBA(255, 255, 255, 30) : fbx_set[7];
 		g_scroll_color = fbx_set[5];
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		g_color_topbar = fontcolor & 0x12ffffff;
 		break;
 	}
@@ -463,63 +455,27 @@ function update_swBtn(){
 
 function get_imgs() {
 	var gb,
-	x3 = Math.floor(3 * zdpi),
-	x18 = Math.floor(18 * zdpi);
+		x5 = 5 * zdpi;
 	img_plsw = gdi.CreateImage(btn_w, btn_h * 3);
 	gb = img_plsw.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3, x3 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3 * 2 + 1, x3 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3, x3 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 2 + 2 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 3 + 4 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 4 + 6 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3 * 2 + 1, x3 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi,x5 + btn_h, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi,x5 + btn_h * 2, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	img_plsw.ReleaseGraphics(gb)
 	
-	x8 =  Math.floor(13 * zdpi)-1,
 	img_plsw_2 = gdi.CreateImage(btn_w, btn_h * 3);
 	gb = img_plsw_2.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3, x3 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6 + btn_h, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x8, x3 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 2 + 2 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 3 + 4 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 4 + 6 + btn_h, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3, x3 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 2 + 2 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 3 + 4 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x3, x3 * 4 + 6 + btn_h * 2, x18, 3, g_btn_color1 & 0xbbffffff);
-	gb.FillSolidRect(x8, x3 + btn_h * 2, x3 + 2, 2, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x8, x3 * 2 + 2 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x8, x3 * 3 + 4 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
-	gb.FillSolidRect(x8, x3 * 4 + 6 + btn_h * 2, x3 + 2, 3, g_btn_color2 & 0xbbffffff);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi,x5 + btn_h, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi,x5 + btn_h * 2, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	img_plsw_2.ReleaseGraphics(gb)
 }
 

@@ -521,7 +521,7 @@ function panel_operations() {
 		grps = [],
 		i = 0,
 		sort = "";
-	var view_ppt = getview(1, this.separt);;
+	var view_ppt = getview(1, this.separt);
 	var nm = "",
 		ppt_l = view_ppt.length + 1;
 	for (i = ppt_l; i < ppt_l + 93; i++) {
@@ -3209,7 +3209,7 @@ function menu_object() {
 			SettingMenu.AppendMenuItem(MF_STRING, 5801, "自动折叠");
 			SettingMenu.CheckMenuItem(5801, pop.auto ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5802, "显示根节点");
-			SettingMenu.CheckMenuItem(5802, p.separt ? 1 : 0);
+			SettingMenu.CheckMenuItem(5802, p.base ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5812, "多艺术家时进行分割");
 			SettingMenu.CheckMenuItem(5812, p.separt ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5803, "显示节点音轨");

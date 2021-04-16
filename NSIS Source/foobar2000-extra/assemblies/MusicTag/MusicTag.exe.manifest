@@ -54,50 +54,50 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicTag.exe" size="1836032">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicTag.exe" size="1859072">
       <assemblyIdentity name="MusicTag" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>YkG2wzuk6+zxGgJovitJKXyPfpVdAUSnLTDnRhfcZyM=</dsig:DigestValue>
+        <dsig:DigestValue>49kqhFk8mzCF0FzC9frixIaksHEN3318CK+kgXz8H00=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="en\MusicTag.resources.dll" size="16896">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="en\MusicTag.resources.dll" size="17920">
       <assemblyIdentity name="MusicTag.resources" version="1.0.0.0" language="en" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>vkSV3upTx9pWCdRwmshuzZFqfwJIMQJvt98mKp5e93c=</dsig:DigestValue>
+        <dsig:DigestValue>moQuqsUG9nqjm6Hq/nYDrbCcEFhc0I1Ga37oJ6PmNHI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHS\MusicTag.resources.dll" size="29184">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHS\MusicTag.resources.dll" size="30720">
       <assemblyIdentity name="MusicTag.resources" version="1.0.0.0" language="zh-CHS" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>vdbMH3hI2HfFU9M9RZROpFT2raIAgYGMmR+NaK3mgaM=</dsig:DigestValue>
+        <dsig:DigestValue>iB5T+YcZG5zAvyfa2rQY/LsaUObhJewMNmT4NpH3xe8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHT\MusicTag.resources.dll" size="29184">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHT\MusicTag.resources.dll" size="30720">
       <assemblyIdentity name="MusicTag.resources" version="1.0.0.0" language="zh-CHT" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>705GkpC3ITN4Ziu9ceGrbXthqJ9VLB3H1LLLtSdgdL0=</dsig:DigestValue>
+        <dsig:DigestValue>uaeVXWLP6pX0HHMLbBsnyge8WnEoqhpIEz7f+oDIYqU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -137,13 +137,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="MusicTag.exe.config" size="7676">
+  <file name="MusicTag.exe.config" size="7988">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>t5xXqxS++hgBrKPDNvKWyhYspPII2bJJyb59e3mBA9U=</dsig:DigestValue>
+      <dsig:DigestValue>gsMJsbK/AlnoWXm5sHU0KMT++tv7e53ZzXGYgOrEg9w=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\AppIcon.ico" size="351470">

@@ -7,6 +7,50 @@ client = utils.CreateHttpRequestEx(window.ID);
 
 function search_album(idx, title,artist,album, path, filename){
 	downloaded = 0;
+	var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	url = "https://itunes.apple.com/search?term=" + encodeURIComponent(artist) + encodeURIComponent(album) + "&entity=album";
+	var pic= "";
+	//fb.trace(url);
+	try {
+		xmlhttp.open("GET", url, true);
+		xmlhttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+		xmlhttp.send(null);
+		xmlhttp.onreadystatechange = function () {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				//fb.trace(xmlhttp.responseText);
+				var _json_obj = json(xmlhttp.responseText);
+				//fb.trace(_json_obj.resultCount);
+				if (_json_obj.resultCount > 0){
+					var _coverdates = _json_obj["results"];
+					for (var i = 0; i < _coverdates.length; ++i) {
+						//fb.trace(compare(utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(Album_Name, 0x0804, 0x02000000)),utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(Album_Name, 0x0804, 0x02000000));
+						if (compare(utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(album, 0x0804, 0x02000000)) > 70){
+							pic = _coverdates[i].artworkUrl100;
+							//fb.trace(i,"专辑名称相同，下载");
+							//fb.trace("O:",pic);
+							pic = pic.replace("100x100bb","1200x1200bb")
+							//fb.trace("F:",pic);
+						}//else{
+							//fb.trace(i,"专辑名称不同，不下载");
+						//}
+					}
+					fb.trace("PICPIC: "+pic);
+					if(pic == ""){
+						search_album_163(idx, title,artist,album, path, filename);
+						return;
+					}
+					client.SavePath = path;
+					client.RunAsync(idx, pic, filename);
+				} else search_album_163(idx, title,artist,album, path, filename);
+			}
+		}
+	} catch (e) {
+		search_album_163(idx, title,artist,album, path, filename);
+	}
+}
+
+function search_album_163(idx, title,artist,album, path, filename){
+	downloaded = 0;	
 	var xmlHttp = new ActiveXObject("Microsoft.XMLHTTP"), xmlHttp2 = new ActiveXObject("WinHttp.WinHttpRequest.5.1");
 	var searchURL, infoURL;
 	var limit = 3;

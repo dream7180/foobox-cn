@@ -480,12 +480,12 @@ function Show_Menu_Searchbox(x, y) {
 		_menu.AppendMenuSeparator();
 
 		_menu.AppendMenuItem(MF_STRING, 11, "酷我音乐 (320K)");
-		_menu.AppendMenuItem(MF_STRING, 12, "咪咕音乐 (320K)");
-		_menu.AppendMenuItem(MF_STRING, 13, "咪咕音乐 (无损)");
-		_menu.CheckMenuRadioItem(11, 13, ppt.webnb + 10);
+		//_menu.AppendMenuItem(MF_STRING, 12, "咪咕音乐 (320K)");
+		//_menu.AppendMenuItem(MF_STRING, 13, "咪咕音乐 (无损)");
+		_menu.CheckMenuRadioItem(11, 11, ppt.webnb + 10);
 		_menu.AppendMenuSeparator();
 		
-		_menu.AppendMenuSeparator();
+		//_menu.AppendMenuSeparator();
 		var WebQTRadioMenu = window.CreatePopupMenu();
 		if(ppt.webkqtradioarr.length > 1){
 			for (var k = 0; k < ppt.webkqtradioarr.length; k++) {
@@ -642,11 +642,12 @@ function NetSearch(searchtext, pageid, switchpage) {
 	SetBoxText("正在搜索网络...");
 	switch (ppt.webnb) {
 		case 1:
+		default:
 			cachefile = fb.ProfilePath + "\\cache\\KWSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			KWSearch(searchtext, pageid, switchpage);
 			break;
-		case 2:
+/*		case 2:
 			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			MGSearch(searchtext, pageid, switchpage, 1);
@@ -656,8 +657,7 @@ function NetSearch(searchtext, pageid, switchpage) {
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			MGSearch(searchtext, pageid, switchpage, 2);
 			break;
-		default:
-			break;
+			*/
 	}
 	Deltempfile(cachefile);
 }
@@ -727,7 +727,7 @@ function KWSearch(searchtext, pageid, switchpage){
 		return;
 	}
 }
-
+/*
 function MGSearch(searchtext, pageid, switchpage, quality){
 	var searchURL = "http://140.143.30.148:88/index.php?key=VG&class=miguSearch&ID=" + encodeURIComponent(StringFilter(searchtext)) +  "&k=" + pageid;
 	switch(quality){
@@ -777,7 +777,7 @@ function MGSearch(searchtext, pageid, switchpage, quality){
 		return;
 	}
 }
-
+*/
 //=================================================// 蜻蜓FM
 
 function GetQTFMRadiolist(){
