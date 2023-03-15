@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="x-ua-compatible" content="IE=8"/>
+        <link rel="stylesheet" type="text/css" href="styles10.css">
+        <style type="text/css">
+			html,body{padding:0;margin:0}		
+            .container {
+				font:caption;
+				padding: 10px 25px;
+				word-wrap: break-word;
+				white-space: pre-wrap; 
+			} 
+			.line_name {
+				font-weight: bold;
+				text-align: center;
+				padding: 10px 25px;
+				word-wrap: break-word;
+				white-space: pre-wrap; 
+			} 
+			#btn_container {
+				padding:10px; background:#e5e5e5;
+				border-top:1px solid #d0d0d0;
+				position:absolute;bottom:0; right:0; left:0;
+				text-align:center;
+			}
+			#div_text{ 
+				padding-top:10px; padding-bottom:20px; 
+				background: #ffffff; /* Old browsers */
+				background: -moz-linear-gradient(top,  #ffffff 0%, #f0f0f0 100%); /* FF3.6-15 */
+				background: -webkit-linear-gradient(top,  #ffffff 0%,#f0f0f0 100%); /* Chrome10-25,Safari5.1-6 */
+				background: linear-gradient(to bottom,  #ffffff 0%,#f0f0f0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f0f0',GradientType=0 ); /* IE6-9 */
+			}			
+            .button_ok { display:inline-block; } 
+            .button_cancel { display:inline-block; } 
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="div_text" class="container"></div>
+		<div id="btn_container"> 
+			<button id="btn_ok" class="button">Yes</button>	
+			<button id="btn_cancel" class="button">No</button>
+		</div>		
+        <script>   
+
+            // helpers
+            function close_window() {
+                window.open('', '_self', '');
+                window.close();
+            }
+
+            // parse data
+            var parsed_args;
+            var callback_fn;
+            try {
+                parsed_args = window.external.dialogArguments.toArray();
+            }
+            catch(e) {
+            }
+            if (parsed_args) {
+                document.title = parsed_args[0];
+				window.div_text.insertAdjacentHTML('beforeend',parsed_args[1]);
+                var labelInnerHtml = window.btn_ok.innerHTML;
+                window.btn_ok.innerHTML = parsed_args[2];//labelInnerHtml.replace(/Yes/g, parsed_args[2]);
+                var labelInnerHtml = window.btn_cancel.innerHTML;
+                window.btn_cancel.innerHTML = parsed_args[3];//labelInnerHtml.replace(/No/g, parsed_args[3]);				
+                callback_fn = parsed_args[4];
+            }
+
+            // main script
+			function resize(){			
+				var window_w = 420;
+				window_h = window.div_text.offsetHeight + window.btn_container.offsetHeight;
+				window_h = window_h*1.15;
+				if (window_w < window_h + 50) window_w += 50;
+				window.resizeTo(window_w, window_h);
+				//alert(window.div_text.offsetHeight+' - '+window.btn_container.offsetHeight+' - '+window_h);
+            }
+			resize();
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.document.activeElement.onclick) {
+					window.document.activeElement.onclick();
+				}
+			};			
+            window.btn_ok.onclick = function () {
+                callback_fn && callback_fn("ok", true);
+                close_window();
+            };
+            window.btn_cancel.onclick = function () {
+				callback_fn && callback_fn("ok", false);
+                close_window();
+            };
+            window.document.body.focus();
+            window.btn_ok.focus();
+        </script>
+    </body>
+</html>

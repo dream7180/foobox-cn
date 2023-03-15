@@ -1,0 +1,13 @@
+body { color: WindowText; background-color: Menu; } 
+input { font:caption; border: 1px solid #7A7A7A; width: 100%; } 
+input:focus { outline: none !important; border:1px solid #0078D7; } 
+input:hover:focus { outline: none !important; border:1px solid #0078D7; } 
+input:hover { outline: none !important; border:1px solid #000000; } 
+label { font:caption; } 
+button { font:caption; background: #E1E1E1; color:ButtonText; border: 1px solid #ADADAD; margin: 5px; padding: 3px; width: 70px; } 
+button:focus { border: 1px solid #0078D7; padding: 3px; } 
+button:hover { background: #e5f1fb; border: 1px solid #0078D7; padding: 3px; } 
+button:focus:hover { background: #e5f1fb; border:1px solid #0078D7; padding: 3px; } 
+button[disabled] { background: #CCCCCC; color:#EBEBE4; } 
+/* --Suppress button:hover manually, since not() is not working =( */
+button[disabled]:hover { border: 1px solid #ADADAD; padding: 3px; } 
