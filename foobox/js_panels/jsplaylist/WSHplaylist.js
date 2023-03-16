@@ -18,7 +18,7 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 		this.rowsToAdd = 0;
 	};
 	// Add extra rows to the total rows of the group
-	this.rowsToAdd += cGroup.extra_rows;
+	//this.rowsToAdd += cGroup.extra_rows;
 	this.rowCount = this.rowsToAdd + this.count;
 
 	if (properties.autocollapse) {
@@ -97,7 +97,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				this.r1 = fb.TitleFormat(p.list.groupby[cGroup.pattern_idx].r1).EvalWithMetadb(this.metadb);
 				this.l2 = fb.TitleFormat(p.list.groupby[cGroup.pattern_idx].l2).EvalWithMetadb(this.metadb);
 				this.r2 = fb.TitleFormat(p.list.groupby[cGroup.pattern_idx].r2).EvalWithMetadb(this.metadb);
-				this.l4 = fb.TitleFormat(p.list.groupby[cGroup.pattern_idx].l4).EvalWithMetadb(this.metadb);
 			};
 		};
 	};
@@ -663,7 +662,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				break;
 			case 2:
 				if(this.obj && l2_addinfo){
-					this.r2 = this.obj.count + "首";
+					this.r2 = this.obj.count + "音轨";
 				}
 				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
 				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
@@ -678,7 +677,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + "首, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + "音轨, " + this.obj.total_group_duration_txt;
 				}
 				else {
 					var lg3_left_field = "";
@@ -687,24 +686,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				var lg3_right_field_w = gr.CalcTextWidth(lg3_right_field, g_font) + cList.borderWidth * 2;
 				gr.GdiDrawText(lg3_left_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8 - lg3_right_field_w, cTrack.height, lcs_txt);
 				gr.GdiDrawText(lg3_right_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z10 + 01, cTrack.height, rcs_txt);
-				break;
-			case 4:
-				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
-				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
-				gr.GdiDrawText(this.l2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z8 - lg2_right_field_w, cTrack.height, lcs_txt);
-				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
-				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
-				if (this.obj) {
-					var lg3_left_field = this.obj.count + "首, " + this.obj.total_group_duration_txt;
-				}
-				else {
-					var lg3_left_field = "";
-				}
-				var lg3_right_field = (this.group_index + 1) + " / " + p.list.groups.length;
-				var lg3_right_field_w = gr.CalcTextWidth(lg3_right_field, g_font) + cList.borderWidth * 2;
-				gr.GdiDrawText(lg3_left_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2, this.w - cover.w - g_z8 - lg3_right_field_w, cTrack.height, lcs_txt);
-				gr.GdiDrawText(lg3_right_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2, this.w - cover.w - g_z10 + 01, cTrack.height, rcs_txt);
-				gr.GdiDrawText(this.l4, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 3 - vpadding, this.w - cover.w - g_z8, cTrack.height, lcs_txt);
 				break;
 			};
 
@@ -1283,7 +1264,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 	};
 };
 
-oGroupBy = function(label, tf, sortOrder, ref, playlistFilter, extraRows, collapsedHeight, expandedHeight, showCover, autoCollapse, l1, r1, l2, r2, l4, collapseGroupsByDefault) {
+oGroupBy = function(label, tf, sortOrder, ref, playlistFilter, collapsedHeight, expandedHeight, showCover, autoCollapse, l1, r1, l2, r2, collapseGroupsByDefault) {
 	this.label = label;
 	this.tf = tf;
 	this.sortOrder = sortOrder;
@@ -1292,11 +1273,9 @@ oGroupBy = function(label, tf, sortOrder, ref, playlistFilter, extraRows, collap
 	this.r1 = r1;
 	this.l2 = l2;
 	this.r2 = r2;
-	this.l4 = l4;
 	this.playlistFilter = playlistFilter;
 	this.collapsedHeight = collapsedHeight;
 	this.expandedHeight = expandedHeight;
-	this.extraRows = extraRows;
 	this.showCover = showCover;
 	this.autoCollapse = autoCollapse;
 	this.collapseGroupsByDefault = collapseGroupsByDefault;
@@ -1335,7 +1314,7 @@ oList = function(object_name, playlist) {
 	this.saveGroupBy = function() {
 		var tmp;
 		var fin = this.groupby.length;
-		for (var j = 0; j < 16; j++) {
+		for (var j = 0; j < 14; j++) {
 			tmp = "";
 			for (var i = 0; i < fin; i++) {
 				switch (j) {
@@ -1355,36 +1334,30 @@ oList = function(object_name, playlist) {
 					tmp = tmp + this.groupby[i].playlistFilter;
 					break;
 				case 5:
-					tmp = tmp + this.groupby[i].extraRows;
-					break;
-				case 6:
 					tmp = tmp + this.groupby[i].collapsedHeight;
 					break;
-				case 7:
+				case 6:
 					tmp = tmp + this.groupby[i].expandedHeight;
 					break;
-				case 8:
+				case 7:
 					tmp = tmp + this.groupby[i].showCover;
 					break;
-				case 9:
+				case 8:
 					tmp = tmp + this.groupby[i].autoCollapse;
 					break;
-				case 10:
+				case 9:
 					tmp = tmp + this.groupby[i].l1;
 					break;
-				case 11:
+				case 10:
 					tmp = tmp + this.groupby[i].r1;
 					break;
-				case 12:
+				case 11:
 					tmp = tmp + this.groupby[i].l2;
 					break;
-				case 13:
+				case 12:
 					tmp = tmp + this.groupby[i].r2;
 					break;
-				case 14:
-					tmp = tmp + this.groupby[i].l4;
-					break;
-				case 15:
+				case 13:
 					tmp = tmp + this.groupby[i].collapseGroupsByDefault;
 					break;
 				};
@@ -1410,36 +1383,30 @@ oList = function(object_name, playlist) {
 				window.SetProperty("SYSTEM.GroupBy.playlistFilter", tmp);
 				break;
 			case 5:
-				window.SetProperty("SYSTEM.GroupBy.extraRows", tmp);
-				break;
-			case 6:
 				window.SetProperty("SYSTEM.GroupBy.collapsedHeight", tmp);
 				break;
-			case 7:
+			case 6:
 				window.SetProperty("SYSTEM.GroupBy.expandedHeight", tmp);
 				break;
-			case 8:
+			case 7:
 				window.SetProperty("SYSTEM.GroupBy.showCover", tmp);
 				break;
-			case 9:
+			case 8:
 				window.SetProperty("SYSTEM.GroupBy.autoCollapse", tmp);
 				break;
-			case 10:
+			case 9:
 				window.SetProperty("SYSTEM.GroupBy.l1", tmp);
 				break;
-			case 11:
+			case 10:
 				window.SetProperty("SYSTEM.GroupBy.r1", tmp);
 				break;
-			case 12:
+			case 11:
 				window.SetProperty("SYSTEM.GroupBy.l2", tmp);
 				break;
-			case 13:
+			case 12:
 				window.SetProperty("SYSTEM.GroupBy.r2", tmp);
 				break;
-			case 14:
-				window.SetProperty("SYSTEM.GroupBy.l4", tmp);
-				break;
-			case 15:
+			case 13:
 				window.SetProperty("SYSTEM.GroupBy.collapseGroupsByDefault", tmp);
 				break;
 			};
@@ -1454,7 +1421,7 @@ oList = function(object_name, playlist) {
 			var fields = [],
 				tmp, fin;
 
-			for (var i = 0; i < 16; i++) {
+			for (var i = 0; i < 14; i++) {
 				switch (i) {
 				case 0:
 					fields.push(new Array("专辑 (简单)", "专辑艺术家 | 专辑 | 光盘", "专辑艺术家", "艺术家", "流派", "目录结构"));
@@ -1473,46 +1440,38 @@ oList = function(object_name, playlist) {
 					fields.push(new Array("null", "null", "null", "null", "null", "null"));
 					break;
 				case 5:
-					// extra rows
-					fields.push(new Array("0", "0", "0", "0", "0", "0"));
-					break;
-				case 6:
 					// collapsed height
 					fields.push(new Array("1", "1", "1", "1", "1", "1"));
 					break;
-				case 7:
+				case 6:
 					// expanded height
 					fields.push(new Array("1", "1", "1", "1", "1", "1"));
 					break;
-				case 8:
+				case 7:
 					// show cover
 					fields.push(new Array("1", "1", "1", "1", "1", "1"));
 					break;
-				case 9:
+				case 8:
 					// auto collapse
 					fields.push(new Array("0", "0", "0", "0", "0", "0"));
 					break;
-				case 10:
+				case 9:
 					// l1
 					fields.push(new Array("$if2(%album%,'未知专辑')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [光盘 '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'单曲','网络电台'))", "$if2(%album artist%,'未知艺术家')", "$if2(%artist%,'未知艺术家')", "$if2(%genre%,'未知流派')", "$directory(%path%,1)"));
 					break;
-				case 11:
+				case 10:
 					// r1
 					fields.push(new Array("$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')"));
 					break;
-				case 12:
+				case 11:
 					// l2
 					fields.push(new Array("$if(%album%, $if2(%album artist%,'未知艺术家'),$if2(%album artist%,'未知艺术家')...)", "$if2(%album artist%,'未知艺术家')", "", "", "", "$directory(%path%,2)"));
 					break;
-				case 13:
+				case 12:
 					// r2
 					fields.push(new Array("$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "", "", "$if2(%genre%,'未知流派')"));
 					break;
-				case 14:
-					// l4
-					fields.push(new Array("$if2(%comment%,' ')", "$if2(%comment%,' ')", "$if2(%comment%,' ')", "$if2(%comment%,' ')", "$if2(%comment%,' ')", "$if2(%comment%,' ')"));
-					break;
-				case 15:
+				case 13:
 					// collapseGroupsByDefault
 					fields.push(new Array("0", "0", "0", "0", "0", "0"));
 					break;
@@ -1544,36 +1503,30 @@ oList = function(object_name, playlist) {
 					window.SetProperty("SYSTEM.GroupBy.playlistFilter", tmp);
 					break;
 				case 5:
-					window.SetProperty("SYSTEM.GroupBy.extraRows", tmp);
-					break;
-				case 6:
 					window.SetProperty("SYSTEM.GroupBy.collapsedHeight", tmp);
 					break;
-				case 7:
+				case 6:
 					window.SetProperty("SYSTEM.GroupBy.expandedHeight", tmp);
 					break;
-				case 8:
+				case 7:
 					window.SetProperty("SYSTEM.GroupBy.showCover", tmp);
 					break;
-				case 9:
+				case 8:
 					window.SetProperty("SYSTEM.GroupBy.autoCollapse", tmp);
 					break;
-				case 10:
+				case 9:
 					window.SetProperty("SYSTEM.GroupBy.l1", tmp);
 					break;
-				case 11:
+				case 10:
 					window.SetProperty("SYSTEM.GroupBy.r1", tmp);
 					break;
-				case 12:
+				case 11:
 					window.SetProperty("SYSTEM.GroupBy.l2", tmp);
 					break;
-				case 13:
+				case 12:
 					window.SetProperty("SYSTEM.GroupBy.r2", tmp);
 					break;
-				case 14:
-					window.SetProperty("SYSTEM.GroupBy.l4", tmp);
-					break;
-				case 15:
+				case 13:
 					window.SetProperty("SYSTEM.GroupBy.collapseGroupsByDefault", tmp);
 					break;
 				};
@@ -1582,9 +1535,8 @@ oList = function(object_name, playlist) {
 			this.totalGroupBy = fields[0].length;
 			window.SetProperty("SYSTEM.Groups.TotalGroupBy", this.totalGroupBy);
 			for (var k = 0; k < this.totalGroupBy; k++) {
-				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k], fields[8][k], fields[9][k], fields[10][k], fields[11][k], fields[12][k], fields[13][k], fields[14][k], fields[15][k]));
-			};
-
+				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k], fields[8][k], fields[9][k], fields[10][k], fields[11][k], fields[12][k], fields[13][k]));
+			}
 		}
 		else {
 			var fields = [];
@@ -1608,43 +1560,37 @@ oList = function(object_name, playlist) {
 					tmp = window.GetProperty("SYSTEM.GroupBy.playlistFilter", "?;?");
 					break;
 				case 5:
-					tmp = window.GetProperty("SYSTEM.GroupBy.extraRows", "?;?");
-					break;
-				case 6:
 					tmp = window.GetProperty("SYSTEM.GroupBy.collapsedHeight", "?;?");
 					break;
-				case 7:
+				case 6:
 					tmp = window.GetProperty("SYSTEM.GroupBy.expandedHeight", "?;?");
 					break;
-				case 8:
+				case 7:
 					tmp = window.GetProperty("SYSTEM.GroupBy.showCover", "?;?");
 					break;
-				case 9:
+				case 8:
 					tmp = window.GetProperty("SYSTEM.GroupBy.autoCollapse", "?;?");
 					break;
-				case 10:
+				case 9:
 					tmp = window.GetProperty("SYSTEM.GroupBy.l1", "?;?");
 					break;
-				case 11:
+				case 10:
 					tmp = window.GetProperty("SYSTEM.GroupBy.r1", "?;?");
 					break;
-				case 12:
+				case 11:
 					tmp = window.GetProperty("SYSTEM.GroupBy.l2", "?;?");
 					break;
-				case 13:
+				case 12:
 					tmp = window.GetProperty("SYSTEM.GroupBy.r2", "?;?");
 					break;
-				case 14:
-					tmp = window.GetProperty("SYSTEM.GroupBy.l4", "?;?");
-					break;
-				case 15:
+				case 13:
 					tmp = window.GetProperty("SYSTEM.GroupBy.collapseGroupsByDefault", "?;?");
 					break;
 				};
 				fields.push(tmp.split("^^"));
 			};
 			for (var k = 0; k < this.totalGroupBy; k++) {
-				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k], fields[8][k], fields[9][k], fields[10][k], fields[11][k], fields[12][k], fields[13][k], fields[14][k], fields[15][k]));
+				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k], fields[8][k], fields[9][k], fields[10][k], fields[11][k], fields[12][k], fields[13][k]));
 			};
 		};
 	};
@@ -1728,7 +1674,6 @@ oList = function(object_name, playlist) {
 		tf_group_key = fb.TitleFormat(this.groupby[m].tf);
 		cover.show = (this.groupby[m].showCover == "1" ? true : false);
 		properties.autocollapse = (this.groupby[m].autoCollapse == "1" ? true : false);
-		cGroup.extra_rows = Math.floor(this.groupby[m].extraRows);
 		cGroup.default_collapsed_height = Math.floor(this.groupby[m].collapsedHeight);
 		cGroup.collapsed_height = cGroup.default_collapsed_height;
 		cGroup.default_expanded_height = Math.floor(this.groupby[m].expandedHeight);
@@ -1795,7 +1740,7 @@ oList = function(object_name, playlist) {
 		}
 		else {
 			tf_group_key = fb.TitleFormat(this.groupby[cGroup.pattern_idx].tf);
-			cGroup.extra_rows = 0;
+			//cGroup.extra_rows = 0;
 		};
 		// if status just updated in settings, iscollapsed parameter to force
 		//iscollapsed = properties.collapseGroupsByDefault;
@@ -2564,12 +2509,14 @@ oList = function(object_name, playlist) {
 		};
 		Context.BuildMenu(_menu, 3, -1);
 		
-		if(fso.FileExists(track_edit_app) && (g_track_type < 2)){
-			_menu.AppendMenuSeparator();
-			var idx1 = track_edit_app.lastIndexOf(".");
-			var idx2 = track_edit_app.lastIndexOf("\\");
-			var app_txt = track_edit_app.substr(idx2+1, idx1-idx2-1);
-			_menu.AppendMenuItem(MF_STRING, 1012, "用 "+app_txt+" 编辑");
+		if(track_edit_app != ""){
+			if(fso.FileExists(track_edit_app) && (g_track_type < 2)){
+				_menu.AppendMenuSeparator();
+				var idx1 = track_edit_app.lastIndexOf(".");
+				var idx2 = track_edit_app.lastIndexOf("\\");
+				var app_txt = track_edit_app.substr(idx2+1, idx1-idx2-1);
+				_menu.AppendMenuItem(MF_STRING, 1012, "用 "+app_txt+" 编辑");
+			}
 		}
 		if(properties.selectionmenu){
 			_child01.AppendTo(_menu, MF_STRING, "选择...");

@@ -9,7 +9,7 @@ var rating2tag = window.GetProperty("foobox.rating.write.to.file", false);
 var genre_cover_dir = fb.FoobarPath + "themes\\foobox\\Genre";
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
-var track_edit_app = window.GetProperty("foobox.track.editor", "D:\\MusicTag\\MusicTag.exe");
+var track_edit_app = window.GetProperty("foobox.track.editor", "");
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 let dark_mode = 0;
 // GLOBALS

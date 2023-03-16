@@ -128,7 +128,7 @@ function settings_checkboxes_action(id, status, parentId) {
 	case 2:
 		// page 2 : Groups
 		switch (id) {
-		case 16:
+		case 13:
 			if (status) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].showCover = "1";
 			}
@@ -136,9 +136,9 @@ function settings_checkboxes_action(id, status, parentId) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].showCover = "0";
 			};
 			p.list.saveGroupBy();
-			p.settings.pages[parentId].elements[16].repaint();
+			p.settings.pages[parentId].elements[13].repaint();
 			break;
-		case 17:
+		case 14:
 			if (status) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].autoCollapse = "1";
 			}
@@ -146,9 +146,9 @@ function settings_checkboxes_action(id, status, parentId) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].autoCollapse = "0";
 			};
 			p.list.saveGroupBy();
-			p.settings.pages[parentId].elements[17].repaint();
+			p.settings.pages[parentId].elements[14].repaint();
 			break;
-		case 22:
+		case 19:
 			if (status) {
 				l2_addinfo = true;
 			}
@@ -156,7 +156,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				l2_addinfo = false;
 			};
 			window.SetProperty("SYSTEM.GroupBy.l2.AdditionalInfo", status);
-			p.settings.pages[parentId].elements[22].repaint();
+			p.settings.pages[parentId].elements[19].repaint();
 			break;
 		};
 		break;
@@ -259,186 +259,136 @@ function settings_radioboxes_action(id, status, parentId) {
 		var selectedPatternId = p.settings.pages[2].elements[0].selectedId;
 		switch (id) {
 			// collapsed height
-		case 6:
-			p.settings.pages[pid].elements[6].status = true;
+		case 5:
+			p.settings.pages[pid].elements[5].status = true;
+			p.settings.pages[pid].elements[6].status = false;
 			p.settings.pages[pid].elements[7].status = false;
 			p.settings.pages[pid].elements[8].status = false;
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = false;
-			if (!p.settings.pages[pid].elements[11].status) {
-				p.settings.pages[pid].elements[11].status = true;
+			if (!p.settings.pages[pid].elements[9].status) {
+				p.settings.pages[pid].elements[9].status = true;
+				p.settings.pages[pid].elements[10].status = false;
+				p.settings.pages[pid].elements[11].status = false;
 				p.settings.pages[pid].elements[12].status = false;
-				p.settings.pages[pid].elements[13].status = false;
-				p.settings.pages[pid].elements[14].status = false;
-				p.settings.pages[pid].elements[15].status = false;
 				p.list.groupby[selectedPatternId].expandedHeight = 0;
 			};
 			p.list.groupby[selectedPatternId].collapsedHeight = 0;
 			p.list.saveGroupBy();
 			break;
-		case 7:
-			p.settings.pages[pid].elements[6].status = false;
-			p.settings.pages[pid].elements[7].status = true;
+		case 6:
+			p.settings.pages[pid].elements[5].status = false;
+			p.settings.pages[pid].elements[6].status = true;
+			p.settings.pages[pid].elements[7].status = false;
 			p.settings.pages[pid].elements[8].status = false;
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = false;
-			if (p.settings.pages[pid].elements[11].status) {
+			if (p.settings.pages[pid].elements[9].status) {
+				p.settings.pages[pid].elements[9].status = false;
+				p.settings.pages[pid].elements[10].status = true;
 				p.settings.pages[pid].elements[11].status = false;
-				p.settings.pages[pid].elements[12].status = true;
-				p.settings.pages[pid].elements[13].status = false;
-				p.settings.pages[pid].elements[14].status = false;
-				p.settings.pages[pid].elements[15].status = false;
+				p.settings.pages[pid].elements[12].status = false;
 				p.list.groupby[selectedPatternId].expandedHeight = 1;
 			};
 			p.list.groupby[selectedPatternId].collapsedHeight = 1;
 			p.list.saveGroupBy();
 			break;
-		case 8:
+		case 7:
+			p.settings.pages[pid].elements[5].status = false;
 			p.settings.pages[pid].elements[6].status = false;
-			p.settings.pages[pid].elements[7].status = false;
-			p.settings.pages[pid].elements[8].status = true;
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = false;
-			if (p.settings.pages[pid].elements[11].status) {
-				p.settings.pages[pid].elements[11].status = false;
+			p.settings.pages[pid].elements[7].status = true;
+			p.settings.pages[pid].elements[8].status = false;
+			if (p.settings.pages[pid].elements[9].status) {
+				p.settings.pages[pid].elements[9].status = false;
+				p.settings.pages[pid].elements[10].status = false;
+				p.settings.pages[pid].elements[11].status = true;
 				p.settings.pages[pid].elements[12].status = false;
-				p.settings.pages[pid].elements[13].status = true;
-				p.settings.pages[pid].elements[14].status = false;
-				p.settings.pages[pid].elements[15].status = false;
 				p.list.groupby[selectedPatternId].expandedHeight = 2;
 			};
 			p.list.groupby[selectedPatternId].collapsedHeight = 2;
 			p.list.saveGroupBy();
 			break;
-		case 9:
+		case 8:
+			p.settings.pages[pid].elements[5].status = false;
 			p.settings.pages[pid].elements[6].status = false;
 			p.settings.pages[pid].elements[7].status = false;
-			p.settings.pages[pid].elements[8].status = false;
-			p.settings.pages[pid].elements[9].status = true;
-			p.settings.pages[pid].elements[10].status = false;
-			if (p.settings.pages[pid].elements[11].status) {
+			p.settings.pages[pid].elements[8].status = true;
+			if (p.settings.pages[pid].elements[9].status) {
+				p.settings.pages[pid].elements[9].status = false;
+				p.settings.pages[pid].elements[10].status = false;
 				p.settings.pages[pid].elements[11].status = false;
-				p.settings.pages[pid].elements[12].status = false;
-				p.settings.pages[pid].elements[13].status = false;
-				p.settings.pages[pid].elements[14].status = true;
-				p.settings.pages[pid].elements[15].status = false;
+				p.settings.pages[pid].elements[12].status = true;
 				p.list.groupby[selectedPatternId].expandedHeight = 3;
 			};
 			p.list.groupby[selectedPatternId].collapsedHeight = 3;
 			p.list.saveGroupBy();
 			break;
-		case 10:
-			p.settings.pages[pid].elements[6].status = false;
-			p.settings.pages[pid].elements[7].status = false;
-			p.settings.pages[pid].elements[8].status = false;
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = true;
-			if (p.settings.pages[pid].elements[11].status) {
-				p.settings.pages[pid].elements[11].status = false;
-				p.settings.pages[pid].elements[12].status = false;
-				p.settings.pages[pid].elements[13].status = false;
-				p.settings.pages[pid].elements[14].status = false;
-				p.settings.pages[pid].elements[15].status = true;
-				p.list.groupby[selectedPatternId].expandedHeight = 4;
-			};
-			p.list.groupby[selectedPatternId].collapsedHeight = 4;
-			p.list.saveGroupBy();
-			break;
 			// expanded height
-		case 11:
-			p.settings.pages[pid].elements[11].status = true;
+		case 9:
+			p.settings.pages[pid].elements[9].status = true;
+			p.settings.pages[pid].elements[10].status = false;
+			p.settings.pages[pid].elements[11].status = false;
 			p.settings.pages[pid].elements[12].status = false;
-			p.settings.pages[pid].elements[13].status = false;
-			p.settings.pages[pid].elements[14].status = false;
-			p.settings.pages[pid].elements[15].status = false;
-			if (!p.settings.pages[pid].elements[6].status) {
-				p.settings.pages[pid].elements[6].status = true;
+			if (!p.settings.pages[pid].elements[5].status) {
+				p.settings.pages[pid].elements[5].status = true;
+				p.settings.pages[pid].elements[6].status = false;
 				p.settings.pages[pid].elements[7].status = false;
 				p.settings.pages[pid].elements[8].status = false;
-				p.settings.pages[pid].elements[9].status = false;
-				p.settings.pages[pid].elements[10].status = false;
 				p.list.groupby[selectedPatternId].collapsedHeight = 0;
 			};
 			p.list.groupby[selectedPatternId].expandedHeight = 0;
 			p.list.saveGroupBy();
 			break;
-		case 12:
+		case 10:
+			p.settings.pages[pid].elements[9].status = false;
+			p.settings.pages[pid].elements[10].status = true;
 			p.settings.pages[pid].elements[11].status = false;
-			p.settings.pages[pid].elements[12].status = true;
-			p.settings.pages[pid].elements[13].status = false;
-			p.settings.pages[pid].elements[14].status = false;
-			p.settings.pages[pid].elements[15].status = false;
-			if (p.settings.pages[pid].elements[6].status) {
-				p.settings.pages[pid].elements[6].status = false;
-				p.settings.pages[pid].elements[7].status = true;
+			p.settings.pages[pid].elements[12].status = false;
+			if (p.settings.pages[pid].elements[5].status) {
+				p.settings.pages[pid].elements[5].status = false;
+				p.settings.pages[pid].elements[6].status = true;
+				p.settings.pages[pid].elements[7].status = false;
 				p.settings.pages[pid].elements[8].status = false;
-				p.settings.pages[pid].elements[9].status = false;
-				p.settings.pages[pid].elements[10].status = false;
 				p.list.groupby[selectedPatternId].collapsedHeight = 1;
 			};
 			p.list.groupby[selectedPatternId].expandedHeight = 1;
 			p.list.saveGroupBy();
 			break;
-		case 13:
-			p.settings.pages[pid].elements[11].status = false;
+		case 11:
+			p.settings.pages[pid].elements[9].status = false;
+			p.settings.pages[pid].elements[10].status = false;
+			p.settings.pages[pid].elements[11].status = true;
 			p.settings.pages[pid].elements[12].status = false;
-			p.settings.pages[pid].elements[13].status = true;
-			p.settings.pages[pid].elements[14].status = false;
-			p.settings.pages[pid].elements[15].status = false;
-			if (p.settings.pages[pid].elements[6].status) {
+			if (p.settings.pages[pid].elements[5].status) {
+				p.settings.pages[pid].elements[5].status = false;
 				p.settings.pages[pid].elements[6].status = false;
-				p.settings.pages[pid].elements[7].status = false;
-				p.settings.pages[pid].elements[8].status = true;
-				p.settings.pages[pid].elements[9].status = false;
-				p.settings.pages[pid].elements[10].status = false;
+				p.settings.pages[pid].elements[7].status = true;
+				p.settings.pages[pid].elements[8].status = false;
 				p.list.groupby[selectedPatternId].collapsedHeight = 2;
 			};
 			p.list.groupby[selectedPatternId].expandedHeight = 2;
 			p.list.saveGroupBy();
 			break;
-		case 14:
+		case 12:
+			p.settings.pages[pid].elements[9].status = false;
+			p.settings.pages[pid].elements[10].status = false;
 			p.settings.pages[pid].elements[11].status = false;
-			p.settings.pages[pid].elements[12].status = false;
-			p.settings.pages[pid].elements[13].status = false;
-			p.settings.pages[pid].elements[14].status = true;
-			p.settings.pages[pid].elements[15].status = false;
-			if (p.settings.pages[pid].elements[6].status) {
+			p.settings.pages[pid].elements[12].status = true;
+			if (p.settings.pages[pid].elements[5].status) {
+				p.settings.pages[pid].elements[5].status = false;
 				p.settings.pages[pid].elements[6].status = false;
 				p.settings.pages[pid].elements[7].status = false;
-				p.settings.pages[pid].elements[8].status = false;
-				p.settings.pages[pid].elements[9].status = true;
-				p.settings.pages[pid].elements[10].status = false;
+				p.settings.pages[pid].elements[8].status = true;
 				p.list.groupby[selectedPatternId].collapsedHeight = 3;
 			};
 			p.list.groupby[selectedPatternId].expandedHeight = 3;
 			p.list.saveGroupBy();
 			break;
-		case 15:
-			p.settings.pages[pid].elements[11].status = false;
-			p.settings.pages[pid].elements[12].status = false;
-			p.settings.pages[pid].elements[13].status = false;
-			p.settings.pages[pid].elements[14].status = false;
-			p.settings.pages[pid].elements[15].status = true;
-			if (p.settings.pages[pid].elements[6].status) {
-				p.settings.pages[pid].elements[6].status = false;
-				p.settings.pages[pid].elements[7].status = false;
-				p.settings.pages[pid].elements[8].status = false;
-				p.settings.pages[pid].elements[9].status = false;
-				p.settings.pages[pid].elements[10].status = true;
-				p.list.groupby[selectedPatternId].collapsedHeight = 4;
-			};
-			p.list.groupby[selectedPatternId].expandedHeight = 4;
-			p.list.saveGroupBy();
-			break;
-		case 24:
-			p.settings.pages[pid].elements[24].status = true;
-			p.settings.pages[pid].elements[25].status = false;
+		case 20:
+			p.settings.pages[pid].elements[20].status = true;
+			p.settings.pages[pid].elements[21].status = false;
 			p.list.groupby[selectedPatternId].collapseGroupsByDefault = "1";
 			p.list.saveGroupBy();
 			break;
-		case 25:
-			p.settings.pages[pid].elements[24].status = false;
-			p.settings.pages[pid].elements[25].status = true;
+		case 21:
+			p.settings.pages[pid].elements[20].status = false;
+			p.settings.pages[pid].elements[21].status = true;
 			p.list.groupby[selectedPatternId].collapseGroupsByDefault = "0";
 			p.list.saveGroupBy();
 			break;
@@ -546,12 +496,10 @@ function settings_listboxes_action(pageId, id, selectedId) {
 				p.settings.pages[2].elements[2].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[3].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[4].inputbox.check("down", 0, 0);
-				p.settings.pages[2].elements[5].inputbox.check("down", 0, 0);
+				p.settings.pages[2].elements[15].inputbox.check("down", 0, 0);
+				p.settings.pages[2].elements[16].inputbox.check("down", 0, 0);
+				p.settings.pages[2].elements[17].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[18].inputbox.check("down", 0, 0);
-				p.settings.pages[2].elements[19].inputbox.check("down", 0, 0);
-				p.settings.pages[2].elements[20].inputbox.check("down", 0, 0);
-				p.settings.pages[2].elements[21].inputbox.check("down", 0, 0);
-				p.settings.pages[2].elements[23].inputbox.check("down", 0, 0);
 				// update textboxes values / selected column Id in the listbox
 				p.settings.pages[2].elements[0].selectedId = selectedId;
 				//
@@ -568,115 +516,86 @@ function settings_listboxes_action(pageId, id, selectedId) {
 				txtbox_value = p.list.groupby[selectedId].playlistFilter;
 				p.settings.pages[2].elements[4].inputbox.text = txtbox_value;
 				p.settings.pages[2].elements[4].inputbox.default_text = txtbox_value;
-				txtbox_value = p.list.groupby[selectedId].extraRows;
-				p.settings.pages[2].elements[5].inputbox.text = txtbox_value;
-				p.settings.pages[2].elements[5].inputbox.default_text = txtbox_value;
 
 				txtbox_value = p.list.groupby[selectedId].l1;
+				p.settings.pages[2].elements[15].inputbox.text = txtbox_value;
+				p.settings.pages[2].elements[15].inputbox.default_text = txtbox_value;
+				txtbox_value = p.list.groupby[selectedId].r1;
+				p.settings.pages[2].elements[16].inputbox.text = txtbox_value;
+				p.settings.pages[2].elements[16].inputbox.default_text = txtbox_value;
+				txtbox_value = p.list.groupby[selectedId].l2;
+				p.settings.pages[2].elements[17].inputbox.text = txtbox_value;
+				p.settings.pages[2].elements[17].inputbox.default_text = txtbox_value;
+				txtbox_value = p.list.groupby[selectedId].r2;
 				p.settings.pages[2].elements[18].inputbox.text = txtbox_value;
 				p.settings.pages[2].elements[18].inputbox.default_text = txtbox_value;
-				txtbox_value = p.list.groupby[selectedId].r1;
-				p.settings.pages[2].elements[19].inputbox.text = txtbox_value;
-				p.settings.pages[2].elements[19].inputbox.default_text = txtbox_value;
-				txtbox_value = p.list.groupby[selectedId].l2;
-				p.settings.pages[2].elements[20].inputbox.text = txtbox_value;
-				p.settings.pages[2].elements[20].inputbox.default_text = txtbox_value;
-				txtbox_value = p.list.groupby[selectedId].r2;
-				p.settings.pages[2].elements[21].inputbox.text = txtbox_value;
-				p.settings.pages[2].elements[21].inputbox.default_text = txtbox_value;
-				txtbox_value = p.list.groupby[selectedId].l4;
-				p.settings.pages[2].elements[23].inputbox.text = txtbox_value;
-				p.settings.pages[2].elements[23].inputbox.default_text = txtbox_value;
 
 				// update radio buttons values / selected column Id in the listbox
 				switch (Math.floor(p.list.groupby[selectedId].collapsedHeight)) {
 					// collapsed height
 				case 0:
+					p.settings.pages[2].elements[5].status = true;
+					p.settings.pages[2].elements[6].status = false;
+					p.settings.pages[2].elements[7].status = false;
+					p.settings.pages[2].elements[8].status = false;
+					break;
+				case 1:
+					p.settings.pages[2].elements[5].status = false;
 					p.settings.pages[2].elements[6].status = true;
 					p.settings.pages[2].elements[7].status = false;
 					p.settings.pages[2].elements[8].status = false;
-					p.settings.pages[2].elements[9].status = false;
-					p.settings.pages[2].elements[10].status = false;
 					break;
-				case 1:
+				case 2:
+					p.settings.pages[2].elements[5].status = false;
 					p.settings.pages[2].elements[6].status = false;
 					p.settings.pages[2].elements[7].status = true;
 					p.settings.pages[2].elements[8].status = false;
-					p.settings.pages[2].elements[9].status = false;
-					p.settings.pages[2].elements[10].status = false;
 					break;
-				case 2:
+				case 3:
+					p.settings.pages[2].elements[5].status = false;
 					p.settings.pages[2].elements[6].status = false;
 					p.settings.pages[2].elements[7].status = false;
 					p.settings.pages[2].elements[8].status = true;
-					p.settings.pages[2].elements[9].status = false;
-					p.settings.pages[2].elements[10].status = false;
-					break;
-				case 3:
-					p.settings.pages[2].elements[6].status = false;
-					p.settings.pages[2].elements[7].status = false;
-					p.settings.pages[2].elements[8].status = false;
-					p.settings.pages[2].elements[9].status = true;
-					p.settings.pages[2].elements[10].status = false;
-					break;
-				case 4:
-					p.settings.pages[2].elements[6].status = false;
-					p.settings.pages[2].elements[7].status = false;
-					p.settings.pages[2].elements[8].status = false;
-					p.settings.pages[2].elements[9].status = false;
-					p.settings.pages[2].elements[10].status = true;
 					break;
 				};
 				switch (Math.floor(p.list.groupby[selectedId].expandedHeight)) {
 					// expanded height
 				case 0:
-					p.settings.pages[2].elements[11].status = true;
+					p.settings.pages[2].elements[9].status = true;
+					p.settings.pages[2].elements[10].status = false;
+					p.settings.pages[2].elements[11].status = false;
 					p.settings.pages[2].elements[12].status = false;
-					p.settings.pages[2].elements[13].status = false;
-					p.settings.pages[2].elements[14].status = false;
-					p.settings.pages[2].elements[15].status = false;
 					break;
 				case 1:
+					p.settings.pages[2].elements[9].status = false;
+					p.settings.pages[2].elements[10].status = true;
 					p.settings.pages[2].elements[11].status = false;
-					p.settings.pages[2].elements[12].status = true;
-					p.settings.pages[2].elements[13].status = false;
-					p.settings.pages[2].elements[14].status = false;
-					p.settings.pages[2].elements[15].status = false;
+					p.settings.pages[2].elements[12].status = false;
 					break;
 				case 2:
-					p.settings.pages[2].elements[11].status = false;
+					p.settings.pages[2].elements[9].status = false;
+					p.settings.pages[2].elements[10].status = false;
+					p.settings.pages[2].elements[11].status = true;
 					p.settings.pages[2].elements[12].status = false;
-					p.settings.pages[2].elements[13].status = true;
-					p.settings.pages[2].elements[14].status = false;
-					p.settings.pages[2].elements[15].status = false;
 					break;
 				case 3:
+					p.settings.pages[2].elements[9].status = false;
+					p.settings.pages[2].elements[10].status = false;
 					p.settings.pages[2].elements[11].status = false;
-					p.settings.pages[2].elements[12].status = false;
-					p.settings.pages[2].elements[13].status = false;
-					p.settings.pages[2].elements[14].status = true;
-					p.settings.pages[2].elements[15].status = false;
-					break;
-				case 4:
-					p.settings.pages[2].elements[11].status = false;
-					p.settings.pages[2].elements[12].status = false;
-					p.settings.pages[2].elements[13].status = false;
-					p.settings.pages[2].elements[14].status = false;
-					p.settings.pages[2].elements[15].status = true;
+					p.settings.pages[2].elements[12].status = true;
 					break;
 				};
 				switch (Math.floor(p.list.groupby[selectedId].collapseGroupsByDefault)) {
 					// default group status
 					case 0:
-						p.settings.pages[2].elements[24].status = false;
-						p.settings.pages[2].elements[25].status = true;
+						p.settings.pages[2].elements[20].status = false;
+						p.settings.pages[2].elements[21].status = true;
 						break;
 					case 1:
-						p.settings.pages[2].elements[24].status = true;
-						p.settings.pages[2].elements[25].status = false;
+						p.settings.pages[2].elements[20].status = true;
+						p.settings.pages[2].elements[21].status = false;
 						break;
-				};
-
+				}
 			} catch (e) {
 				console.log("WSH Error catched: settings_listboxes_action");
 			};
@@ -693,11 +612,8 @@ function settings_textboxes_action(pageId, elementId) {
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
 		switch (elementId) {
 		case 6:
-			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_dir != ""){
-				track_edit_app = new_dir;
-				window.SetProperty("foobox.track.editor", track_edit_app);
-			}
+			track_edit_app = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			window.SetProperty("foobox.track.editor", track_edit_app);
 			break;
 		}
 		break;
@@ -797,16 +713,7 @@ function settings_textboxes_action(pageId, elementId) {
 				p.list.saveGroupBy();
 			};
 			break;
-		case 5:
-			var extraRows = p.list.groupby[selectedColumnId].extraRows;
-			var new_extraRows = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_extraRows == "") new_extraRows = extraRows;
-			if (new_extraRows) {
-				p.list.groupby[selectedColumnId].extraRows = new_extraRows;
-				p.list.saveGroupBy();
-			};
-			break;
-		case 18:
+		case 15:
 			var l1 = p.list.groupby[selectedColumnId].l1;
 			var new_l1 = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_l1 == "") new_l1 = l1;
@@ -815,7 +722,7 @@ function settings_textboxes_action(pageId, elementId) {
 				p.list.saveGroupBy();
 			};
 			break;
-		case 19:
+		case 16:
 			var r1 = p.list.groupby[selectedColumnId].r1;
 			var new_r1 = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_r1 == "") new_r1 = r1;
@@ -824,7 +731,7 @@ function settings_textboxes_action(pageId, elementId) {
 				p.list.saveGroupBy();
 			};
 			break;
-		case 20:
+		case 17:
 			var l2 = p.list.groupby[selectedColumnId].l2;
 			var new_l2 = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_l2 == "") new_l2 = l2;
@@ -833,21 +740,12 @@ function settings_textboxes_action(pageId, elementId) {
 				p.list.saveGroupBy();
 			};
 			break;
-		case 21:
+		case 18:
 			var r2 = p.list.groupby[selectedColumnId].r2;
 			var new_r2 = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_r2 == "") new_r2 = r2;
 			if (new_r2) {
 				p.list.groupby[selectedColumnId].r2 = new_r2;
-				p.list.saveGroupBy();
-			};
-			break;
-		case 23:
-			var l4 = p.list.groupby[selectedColumnId].l4;
-			var new_l4 = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_l4 == "") new_l4 = l4;
-			if (new_l4) {
-				p.list.groupby[selectedColumnId].l4 = new_l4;
 				p.list.saveGroupBy();
 			};
 			break;
@@ -937,7 +835,7 @@ oLink = function (){
 					fb.RunMainMenuCommand("文件/参数选项");
 					break;
 				case 2:
-					this.ShellExecute("https://www.cnblogs.com/foobox/p/15195908.html", "", "", "open", 1);
+					this.ShellExecute("https://dream7180.gitee.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 				case 3:
 					this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
@@ -1563,18 +1461,16 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			var c1 = p.list.groupby[id].tf;
 			var c2 = p.list.groupby[id].sortOrder;
 			var c3 = p.list.groupby[id].playlistFilter;
-			var c4 = p.list.groupby[id].extraRows;
-			var c5 = p.list.groupby[id].collapsedHeight;
-			var c6 = p.list.groupby[id].expandedHeight;
-			var c7 = p.list.groupby[id].showCover;
-			var c8 = p.list.groupby[id].autoCollapse;
-			var c9 = p.list.groupby[id].l1;
-			var c10 = p.list.groupby[id].r1;
-			var c11 = p.list.groupby[id].l2;
-			var c12 = p.list.groupby[id].r2;
-			var c13 = p.list.groupby[id].l4;
+			var c4 = p.list.groupby[id].collapsedHeight;
+			var c5 = p.list.groupby[id].expandedHeight;
+			var c6 = p.list.groupby[id].showCover;
+			var c7 = p.list.groupby[id].autoCollapse;
+			var c8 = p.list.groupby[id].l1;
+			var c9 = p.list.groupby[id].r1;
+			var c10 = p.list.groupby[id].l2;
+			var c11 = p.list.groupby[id].r2;
 
-			p.list.groupby.push(new oGroupBy(c0 + " 副本", c1, c2, "自定义", c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13));
+			p.list.groupby.push(new oGroupBy(c0 + " 副本", c1, c2, "自定义", c3, c4, c5, c6, c7, c8, c9, c10, c11));
 			p.list.totalGroupBy++;
 			window.SetProperty("SYSTEM.Groups.TotalGroupBy", p.list.totalGroupBy);
 			var arr = [];
@@ -1697,56 +1593,50 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.5), oTextBox_1, cHeaderBar.height, "排序 (输入 'null' ：不排序)", txtbox_value, "settings_textboxes_action", this.id));
 
 			txtbox_value = p.list.groupby[listBoxCurrentId].playlistFilter;
-			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 13.0), oTextBox_1, cHeaderBar.height, "播放列表过滤 (定义自动启用本分组依据的播放列表, '*' = 所有播放列表, 'null' = 不过滤, 多个列表以分号隔开)", txtbox_value, "settings_textboxes_action", this.id));
-			txtbox_value = p.list.groupby[listBoxCurrentId].extraRows;
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.0), 30, cHeaderBar.height, "添加附加行", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.5), oTextBox_1, cHeaderBar.height, "播放列表过滤 (定义自动启用本分组依据的播放列表, '*' = 所有播放列表, 'null' = 不过滤, 多个列表以分号隔开)", txtbox_value, "settings_textboxes_action", this.id));
 			// Create radio buttons / group header COLLAPSED height
 			var spaceBetween_w = zoom(50, zdpi);
-			// force value if set to an unauthirized one [0;4]
-			if (p.list.groupby[listBoxCurrentId].collapsedHeight < 0 || p.list.groupby[listBoxCurrentId].collapsedHeight > 4) {
-				p.list.groupby[listBoxCurrentId].collapsedHeight = (p.list.groupby[listBoxCurrentId].collapsedHeight < 0 ? 0 : 4);
+			// force value if set to an unauthirized one [0;3]
+			if (p.list.groupby[listBoxCurrentId].collapsedHeight < 0 || p.list.groupby[listBoxCurrentId].collapsedHeight > 3) {
+				p.list.groupby[listBoxCurrentId].collapsedHeight = (p.list.groupby[listBoxCurrentId].collapsedHeight < 0 ? 0 : 3);
 				p.list.saveGroupBy();
 			};
 			var v = p.list.groupby[listBoxCurrentId].collapsedHeight;
-			this.elements.push(new oRadioButton(6, txtbox_x, cSettings.topBarHeight + rh * 18.0, "0", (v == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(7, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 18.0, "1", (v == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(8, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 18.0, "2", (v == 2), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(9, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 18.0, "3", (v == 3), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(10, txtbox_x + spaceBetween_w * 4, cSettings.topBarHeight + rh * 18.0, "4", (v == 4), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, txtbox_x, cSettings.topBarHeight + rh * 15.75, "0", (v == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(6, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 15.75, "1", (v == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(7, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 15.75, "2", (v == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(8, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 15.75, "3", (v == 3), "settings_radioboxes_action", this.id));
 			// Create radio buttons / group header EXPANDED height
 			var spaceBetween_w = zoom(50, zdpi);
-			// force value if set to an unauthirized one [0;4]
-			if (p.list.groupby[listBoxCurrentId].expandedHeight < 0 || p.list.groupby[listBoxCurrentId].expandedHeight > 4) {
-				p.list.groupby[listBoxCurrentId].expandedHeight = (p.list.groupby[listBoxCurrentId].expandedHeight < 0 ? 0 : 4);
+			// force value if set to an unauthirized one [0;3]
+			if (p.list.groupby[listBoxCurrentId].expandedHeight < 0 || p.list.groupby[listBoxCurrentId].expandedHeight > 3) {
+				p.list.groupby[listBoxCurrentId].expandedHeight = (p.list.groupby[listBoxCurrentId].expandedHeight < 0 ? 0 : 3);
 				p.list.saveGroupBy();
 			};
 			var v = p.list.groupby[listBoxCurrentId].expandedHeight;
-			this.elements.push(new oRadioButton(11, txtbox_x, cSettings.topBarHeight + rh * 19.5, "0", (v == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(12, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 19.5, "1", (v == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(13, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 19.5, "2", (v == 2), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(14, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 19.5, "3", (v == 3), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(15, txtbox_x + spaceBetween_w * 4, cSettings.topBarHeight + rh * 19.5, "4", (v == 4), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(9, txtbox_x, cSettings.topBarHeight + rh * 17.5, "0", (v == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(10, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 17.5, "1", (v == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(11, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 17.5, "2", (v == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(12, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 17.5, "3", (v == 3), "settings_radioboxes_action", this.id));
 			// Create checkbox Cover Art in Group Header ON/OFF
-			this.elements.push(new oCheckBox(16, txtbox_x, cSettings.topBarHeight + rh * 21.5, "显示", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].showCover == 0 ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(13, txtbox_x, cSettings.topBarHeight + rh * 19.5, "显示", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].showCover == 0 ? false : true", "settings_checkboxes_action", this.id));
 			// Create checkbox Auto-Collpase ON/OFF
-			this.elements.push(new oCheckBox(17, txtbox_x, cSettings.topBarHeight + rh * 23.25, "启用", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].autoCollapse == 0 ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(14, txtbox_x, cSettings.topBarHeight + rh * 21.5, "启用", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].autoCollapse == 0 ? false : true", "settings_checkboxes_action", this.id));
 
-			var GHF_delta = 13.0;
+			var GHF_delta = 12.0;
 			var txtbox_value = p.list.groupby[listBoxCurrentId].l1;
-			this.elements.push(new oTextBox(18, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (14.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(15, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (13.5 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].r1;
-			this.elements.push(new oTextBox(19, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (16.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (15.5 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].l2;
-			this.elements.push(new oTextBox(20, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (18.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (17.5 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].r2;
-			this.elements.push(new oTextBox(21, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (20.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(22, txtbox_x, cSettings.topBarHeight + rh * 35.0, "第 2 行右侧显示音轨数 (选中时上面一栏的定义无效, 此选项仅作用于分组标题高度为两行时)", ("l2_addinfo == true ? true : false"), "settings_checkboxes_action", this.id));
-			txtbox_value = p.list.groupby[listBoxCurrentId].l4;
-			this.elements.push(new oTextBox(23, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (23.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 4 行字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(18, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (19.5 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(19, txtbox_x, cSettings.topBarHeight + rh * 33.5, "第 2 行右侧显示音轨数 (选中时上面一栏的定义无效, 此选项仅作用于分组标题高度为两行时)", ("l2_addinfo == true ? true : false"), "settings_checkboxes_action", this.id));
 			// Create radio buttons for Defaul Group Status (Collapsed OR Expanded)
 			var spaceBetween_w = zoom(90, zdpi);
-			this.elements.push(new oRadioButton(24, txtbox_x, cSettings.topBarHeight + rh * 25.0, "折叠", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "1"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(25, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 25.0, "展开", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "0"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(20, txtbox_x, cSettings.topBarHeight + rh * 23.5, "折叠", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "1"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(21, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 23.5, "展开", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "0"), "settings_radioboxes_action", this.id));
 			break;
 		case 3:
 			//foobox options
@@ -1756,7 +1646,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "封面信息面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "高亮色跟随封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，以分号 \";\" 来分隔", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，以分号 ';' 来分隔", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};
 	};
@@ -1793,6 +1683,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("例如：D:\\MusicTag\\MusicTag.exe", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
@@ -1843,14 +1734,12 @@ oPage = function(id, objectName, label, nbrows) {
 			else {
 				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
 			};
-			gr.GdiDrawText("折叠高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("展开高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("封面", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("自动折叠", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("默认分组状态", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 24.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-
-			var GHF_delta = 13.0;
-			gr.GdiDrawText("分组标题字段", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * (13.0 + GHF_delta) - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("折叠高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 15 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("展开高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("封面", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("自动折叠", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("默认分组状态", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("分组标题字段", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 24.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 3:
 			gr.GdiDrawText("滚动条宽度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
@@ -2008,7 +1897,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				// action
-				p.list.groupby.push(new oGroupBy("自定义模版", "null", "null", "自定义", "null", "0", "2", "3", "1", "0", "-", "-", "-", "-", "-", "0"));
+				p.list.groupby.push(new oGroupBy("自定义模版", "null", "null", "自定义", "null", "2", "2", "1", "0", "-", "-", "-", "-", "0"));
 				p.list.totalGroupBy++;
 				window.SetProperty("SYSTEM.Groups.TotalGroupBy", p.list.totalGroupBy);
 				var arr = [];
@@ -2327,9 +2216,9 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 11));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 12));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "列", 18));
-			this.pages.push(new oPage(2, "p.settings.pages[2]", "分组", 38));
+			this.pages.push(new oPage(2, "p.settings.pages[2]", "分组", 34));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 12));
 		};
 		var fin = this.pages.length;
