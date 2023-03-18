@@ -2261,7 +2261,7 @@ oSettings = function() {
 		this.closebutton.draw(gr, this.x + 13, this.y + 10, 255);
 		// draw Panel Title
 		var title_x = this.x + this.closebutton.w + 20;
-		gr.GdiDrawText("foobox设置", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, this.closebutton.h, lc_txt);
+		gr.GdiDrawText("foobox 设置", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, this.closebutton.h, lc_txt);
 		gr.GdiDrawText("Version " + g_script_version, g_font_queue_idx, this.color1, this.x, this.y, this.w - 8, ty + th - 4, rb_txt);
 
 		// draw page switcher (tabs!)
