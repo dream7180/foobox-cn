@@ -2928,13 +2928,13 @@ function get_images() {
 }
 
 function get_images_loading() {
-	images.img_loading = gdi.CreateImage(512, 512);
+	images.img_loading = gdi.CreateImage(300, 300);
 	gb = images.img_loading.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(233,186, 46, 46, g_color_highlight&0x75ffffff);//256,209
-	gb.FillEllipse(186,233, 46, 46, g_color_highlight&0x55ffffff);//209,256
-	gb.FillEllipse(233,280, 46, 46, g_color_highlight&0x35ffffff);//256,303
-	gb.FillEllipse(280,233, 46, 46, g_color_highlight&0x15ffffff);//303,256
+	gb.FillEllipse(136,108, 28, 28, g_color_highlight&0x75ffffff);
+	gb.FillEllipse(108,136, 28, 28, g_color_highlight&0x55ffffff);
+	gb.FillEllipse(136,164, 28, 28, g_color_highlight&0x35ffffff);
+	gb.FillEllipse(164,136, 28, 28, g_color_highlight&0x15ffffff);
 	gb.SetSmoothingMode(0);
 	images.img_loading.ReleaseGraphics(gb);
 	

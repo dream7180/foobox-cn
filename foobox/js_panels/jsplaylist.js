@@ -125,9 +125,7 @@ images = {
 	selected_ico: null,
 	mood_ico: null,
 	sortdirection: null,
-	//glass_reflect: null,
 	nocover: null,
-	noartist: null,
 	stream: null,
 	beam: null,
 	loading: null,
@@ -244,7 +242,7 @@ cover = {
 	keepaspectratio: window.GetProperty("CUSTOM.Cover keep ration aspect", true),
 	load_timer: false,
 	repaint_timer: false,
-	margin: 7,
+	margin: 2,
 	w: 0,
 	max_w: cGroup.default_collapsed_height > cGroup.default_expanded_height ? cGroup.default_collapsed_height * cTrack.height : cGroup.default_expanded_height * cTrack.height,
 	h: 0,
@@ -2220,48 +2218,39 @@ function get_colors() {
 function get_images_color() {
 	var color_ico_bg = blendColors(g_color_normal_bg, g_color_normal_txt, 0.065);
 	var color_ico = blendColors(g_color_normal_bg, g_color_normal_txt, 0.13);
-	images.nocover = gdi.CreateImage(150, 150);
+
+	images.nocover = gdi.CreateImage(300, 300);
 	gb = images.nocover.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, color_ico_bg);
+	gb.FillSolidRect(0, 0, 300, 300, color_ico_bg);
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(20, 20, 110, 110, color_ico);
-	gb.FillEllipse(55, 55, 40, 40, color_ico_bg);
+	gb.FillEllipse(40, 40, 220, 220, color_ico);
+	gb.FillEllipse(110, 110, 80, 80, color_ico_bg);
 	gb.SetSmoothingMode(0);
 	images.nocover.ReleaseGraphics(gb);
-
-	images.noartist = gdi.CreateImage(150, 150);
-	gb = images.noartist.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, color_ico_bg);
-	gb.SetSmoothingMode(2);
-	gb.FillEllipse(20, 20, 110, 110, color_ico);
-	gb.FillEllipse(55, 35, 40, 40, color_ico_bg);
-	gb.FillEllipse(45, 80, 80, 120, color_ico_bg);
-	gb.SetSmoothingMode(0);
-	images.noartist.ReleaseGraphics(gb);
 	
-	stream_1 = gdi.CreateImage(50, 150);
+	stream_1 = gdi.CreateImage(100, 300);
 	gb = stream_1.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(30, 35, 60, 60, 6, color_ico);
+	gb.DrawEllipse(70, 80, 100, 100, 10, color_ico);
 	gb.SetSmoothingMode(0);
 	stream_1.ReleaseGraphics(gb);
 
-	stream_2 = gdi.CreateImage(50, 150);
+	stream_2 = gdi.CreateImage(100, 300);
 	gb = stream_2.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(-40, 35, 60, 60, 6, color_ico);
+	gb.DrawEllipse(-70, 80, 100, 100, 10, color_ico);
 	gb.SetSmoothingMode(0);
 	stream_2.ReleaseGraphics(gb);
 
-	images.stream = gdi.CreateImage(150, 150);
+	images.stream = gdi.CreateImage(300, 300);
 	gb = images.stream.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, color_ico_bg);
-	gb.DrawImage(stream_1, 0, 0, 50, 150, 0, 0, 50, 150, 0, 255);
-	gb.DrawImage(stream_2, 100, 0, 50, 150, 0, 0, 50, 150, 0, 255);
+	gb.FillSolidRect(0, 0, 300, 300, color_ico_bg);
+	gb.DrawImage(stream_1, 0, 0, 100, 300, 0, 0, 100, 300, 0, 255);
+	gb.DrawImage(stream_2, 200, 0, 100, 300, 0, 0, 100, 300, 0, 255);
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(60, 50, 30, 30, 6, color_ico);
+	gb.DrawEllipse(125, 105, 50, 50, 10, color_ico);
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(71, 85, 6, 40, color_ico);
+	gb.FillSolidRect(145, 165, 10, 55, color_ico);
 	images.stream.ReleaseGraphics(gb);
 	
 	imgh = Math.floor(15*zdpi);
@@ -2305,13 +2294,17 @@ function get_images_color() {
 	
 	images.beam = draw_beam_image();
 	
-	images.loading = gdi.CreateImage(512, 512);
+	var load_1 = gdi.CreateImage(92, 92);
+	gb = load_1.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.DrawEllipse(0, -20, 86, 86, 6, color_ico);
+	gb.SetSmoothingMode(0);
+	load_1.ReleaseGraphics(gb);
+	
+	images.loading = gdi.CreateImage(300, 300);
 	gb = images.loading.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(233,186, 46, 46, g_color_highlight&0x75ffffff);//256,209
-	gb.FillEllipse(186,233, 46, 46, g_color_highlight&0x55ffffff);//209,256
-	gb.FillEllipse(233,280, 46, 46, g_color_highlight&0x35ffffff);//256,303
-	gb.FillEllipse(280,233, 46, 46, g_color_highlight&0x15ffffff);//303,256
+	gb.DrawImage(load_1, 104, 124, load_1.Width, load_1.Height, 0, 0, load_1.Width, load_1.Height, 0, 255);
 	gb.SetSmoothingMode(0);
 	images.loading.ReleaseGraphics(gb);
 }
