@@ -653,7 +653,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
 				var l1_x1 = gr.CalcTextWidth(this.l1, g_font_group1);
 				var txt_l2 = "";
-				if(this.l2 != "") {
+				if(this.l2 != "" && !(cGroup.pattern_idx == 0 && this.l1 == "单曲" && this.obj.count > 1)) {
 					txt_l2 = " | " + this.l2;
 					gr.GdiDrawText(txt_l2, g_font_group2, this.l2_color, line_x + l1_x1, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
 				}
@@ -665,7 +665,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				break;
 			case 2:
 				if(this.obj && l2_addinfo){
-					this.r2 = this.obj.count + "音轨";
+					this.r2 = this.obj.count + "首";
 				}
 				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
 				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
@@ -680,7 +680,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + "音轨, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + "首, " + this.obj.total_group_duration_txt;
 				}
 				else {
 					var lg3_left_field = "";
@@ -1460,7 +1460,7 @@ oList = function(object_name, playlist) {
 					break;
 				case 9:
 					// l1
-					fields.push(new Array("$if2(%album%,'未知专辑')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [光盘 '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'单曲','网络电台'))", "$if2(%album artist%,'未知艺术家')", "$if2(%artist%,'未知艺术家')", "$if2(%genre%,'未知流派')", "$directory(%path%,1)"));
+					fields.push(new Array("$if2(%album%,'单曲')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [光盘 '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'单曲','网络电台'))", "$if2(%album artist%,'未知艺术家')", "$if2(%artist%,'未知艺术家')", "$if2(%genre%,'未知流派')", "$directory(%path%,1)"));
 					break;
 				case 10:
 					// r1
@@ -1468,7 +1468,7 @@ oList = function(object_name, playlist) {
 					break;
 				case 11:
 					// l2
-					fields.push(new Array("$if(%album%, $if2(%album artist%,'未知艺术家'),$if2(%album artist%,'未知艺术家')...)", "$if2(%album artist%,'未知艺术家')", "", "", "", "$directory(%path%,2)"));
+					fields.push(new Array("$if2(%album artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "", "", "", "$directory(%path%,2)"));
 					break;
 				case 12:
 					// r2
