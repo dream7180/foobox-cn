@@ -71,9 +71,9 @@ var window_visible = false;
 var scroll_ = 0,
 	scroll = 0,
 	scroll_prev = 0;
-var time222;
 var g_start_ = 0,
 	g_end_ = 0;
+var g_rightClickedIndex = -1;
 
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
@@ -172,7 +172,7 @@ timers = {
 	saveCover: false,
 	mouseDown: false,
 	movePlaylist: false,
-	rightClick: false,
+	//rightClick: false,
 	addPlaylistDone: false
 };
 
@@ -245,9 +245,8 @@ function get_windows_version() {
     }
     return '6.1';
 }
-//===================================================================================================
-//    Objects
-//===================================================================================================
+
+//==============Objects======================================================
 oPlaylist = function(idx, rowId, name) {
 	this.idx = idx;
 	this.rowId = rowId;
@@ -307,7 +306,6 @@ oBrowser = function(name) {
 	};
 
 	this.repaint = function() {
-		if (!window.IsVisible) return;
 		repaint_main1 = repaint_main2;
 	};
 
@@ -463,12 +461,15 @@ oBrowser = function(name) {
 						if (this.rows[i].idx == plman.ActivePlaylist || (arrayContains(PlaylistExcludedIdx, plman.ActivePlaylist) && this.rows[i].idx == DefaultPlaylistIdx && DefaultPlaylistIdx > -1)) {
 							track_color_txt = g_color_normal_txt;
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
-						};
+						} else if (i==g_rightClickedIndex && g_rightClickedIndex > -1){
+							track_color_txt = g_color_normal_txt;
+							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg &0x75ffffff)
+						}
 						if (this.rows[i].idx == plman.PlayingPlaylist && fb.IsPlaying) {
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
 						}
 						// hover item
-						if ((i == this.activeRow && !g_dragndrop_status && !(cPlaylistManager.drag_clicked && cPlaylistManager.drag_source_id != i)) || (cPlaylistManager.drag_clicked && cPlaylistManager.drag_source_id == i && !g_dragndrop_status)) {
+						if (((g_rightClickedIndex > -1 && g_rightClickedIndex == i) || i == this.activeRow) && !g_dragndrop_status && !(cPlaylistManager.drag_clicked && cPlaylistManager.drag_source_id != i)) {
 							gr.FillSolidRect(ax, ay, 4, ah, g_color_highlight);
 						};
 						// target location mark
@@ -773,6 +774,7 @@ oBrowser = function(name) {
 			this.new_menu.checkstate("move", x, y);
 			break;
 		case "right":
+			g_rightClickedIndex = this.activeRow;
 			if (this.inputboxID >= 0) {
 				this.inputbox.check("bidon", x, y);
 				if (!this.inputbox.hover) {
@@ -789,13 +791,13 @@ oBrowser = function(name) {
 						if (!utils.IsKeyPressed(VK_SHIFT)) {
 							this.repaint();
 							this.selectedRow = this.activeRow;
-							if (!timers.rightClick) {
-								timers.rightClick = window.SetTimeout(function() {
+							//if (!timers.rightClick) {
+								//timers.rightClick = window.SetTimeout(function() {
 									brw.context_menu(m_x, m_y, brw.selectedRow);
-									timers.rightClick && window.ClearTimeout(timers.rightClick);
-									timers.rightClick = false;
-								}, 50);
-							};
+									//timers.rightClick && window.ClearTimeout(timers.rightClick);
+									//timers.rightClick = false;
+								//}, 50);
+							//};
 						};
 						this.repaint();
 					}
@@ -809,6 +811,7 @@ oBrowser = function(name) {
 						brw.scrollbar && brw.scrollbar.on_mouse(event, x, y);
 					};
 				};
+				g_rightClickedIndex = -1;
 			};
 			break;
 		case "wheel":
@@ -913,14 +916,14 @@ oBrowser = function(name) {
 		var total = plman.PlaylistCount;
 		
 		if (!add_mode) {
-			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 8, "移除");
+			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 8, "移除");
 			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 3, "重命名");
+			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 3, "重命名");
 			_menu.AppendMenuItem(MF_STRING, 5, "复制");
 			if (plman.IsAutoPlaylist(id)) {
 				_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 				_menu.AppendMenuItem(MF_STRING, 6, "智能列表属性...");
-				_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 7, "转换为普通列表");
+				_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 7, "转换为普通列表");
 			};
 			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		}

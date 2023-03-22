@@ -1,4 +1,4 @@
-body { color: WindowText; background-color: Menu; } 
+body { color: WINDOWTEXT; background-color: THREEDFACE; } 
 input { font:caption; border: 1px solid #7A7A7A; width: 100%; } 
 input:focus { outline: none !important; border:1px solid #0078D7; } 
 input:hover:focus { outline: none !important; border:1px solid #0078D7; } 
