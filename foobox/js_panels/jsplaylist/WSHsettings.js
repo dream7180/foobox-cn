@@ -612,7 +612,15 @@ function settings_textboxes_action(pageId, elementId) {
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
 		switch (elementId) {
 		case 6:
-			track_edit_app = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			p.settings.ext_app[0] = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
+			else track_edit_app = "";
+			window.SetProperty("foobox.track.editor", track_edit_app);
+			break;
+		case 7:
+			p.settings.ext_app[1] = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
+			else track_edit_app = "";
 			window.SetProperty("foobox.track.editor", track_edit_app);
 			break;
 		}
@@ -1515,9 +1523,8 @@ oPage = function(id, objectName, label, nbrows) {
 	this.init = function() {
 		var txtbox_x = 20;
 		var oTextBox_1 = 600*zdpi;//ww - txtbox_x * 2 - this.scrollbarWidth;
-		var oTextBox_2 = oTextBox_1 - 60;
-		var oTextBox_3 = Math.min(oTextBox_1, 250*zdpi);
-		var oTextBox_4 = Math.min(oTextBox_2 - 100*zdpi, 450*zdpi);
+		var oTextBox_2 = 350*zdpi;
+		var oTextBox_3 = 250*zdpi;
 		switch (this.id) {
 		case 0:
 			// General
@@ -1533,7 +1540,8 @@ oPage = function(id, objectName, label, nbrows) {
 
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "顺序播放时自动播放下一个播放列表 (遇到空列表停止)", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_2, cHeaderBar.height, "外部音轨编辑程序 (可选，设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等)", track_edit_app, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_2, cHeaderBar.height, "音轨外部编辑程序路径", p.settings.ext_app[0], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x+oTextBox_2+p.settings.btn_off.Width+11*zdpi, Math.ceil(cSettings.topBarHeight + rh * 9.75), 115*zdpi, cHeaderBar.height, "程序名称", p.settings.ext_app[1], "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1683,7 +1691,10 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("例如：D:\\MusicTag\\MusicTag.exe", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			var bx = txtbox_x+356*zdpi, by = Math.ceil(cSettings.topBarHeight + rh * 10.55);
+			p.settings.browsebutton.draw(gr, bx, by, 255);
+			gr.GdiDrawText("浏览", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
@@ -1694,21 +1705,25 @@ oPage = function(id, objectName, label, nbrows) {
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
 			if (p.headerBar.columns.length < properties.max_columns) {
 				p.settings.newbutton.draw(gr, nx, ny, 255);
+				gr.GdiDrawText("新建", g_font_b, p.settings.color2, nx, ny, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			}
 			else {
-				gr.DrawImage(p.settings.new_no, nx, ny, p.settings.new_no.Width, p.settings.new_no.Height, 0, 0, p.settings.new_no.Width, p.settings.new_no.Height, 0, 255);
+				gr.DrawImage(p.settings.btn_no, nx, ny, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 0, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 255);
+				gr.GdiDrawText("新建", g_font_b, p.settings.color4, nx, ny, p.settings.btn_no.Width, p.settings.btn_no.Height, cc_txt);
 			};
 			// delete user column button
 			var spaceBetween_w = g_z10;
 			var dx = 20 + listBoxWidth + g_z30;
-			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
+			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.btn_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[1].elements[0].selectedId;
 			var ref = p.headerBar.columns[idx].ref;
 			if (ref.substr(0, 3) == "自定义") {
 				p.settings.delbutton.draw(gr, dx, dy, 255);
+				gr.GdiDrawText("删除", g_font_b, p.settings.color2, dx, dy, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			}
 			else {
-				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
+				gr.DrawImage(p.settings.btn_no, dx, dy, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 0, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 255);
+				gr.GdiDrawText("删除", g_font_b, p.settings.color4, dx, dy, p.settings.btn_no.Width, p.settings.btn_no.Height, cc_txt);
 			};
 			break;
 		case 2:
@@ -1718,21 +1733,25 @@ oPage = function(id, objectName, label, nbrows) {
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
 			if (p.headerBar.columns.length < properties.max_columns) {
 				p.settings.newbuttonPattern.draw(gr, nx, ny, 255);
+				gr.GdiDrawText("新建", g_font_b, p.settings.color2, nx, ny, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			}
 			else {
-				gr.DrawImage(p.settings.new_no, nx, ny, p.settings.new_no.Width, p.settings.new_no.Height, 0, 0, p.settings.new_no.Width, p.settings.new_no.Height, 0, 255);
+				gr.DrawImage(p.settings.btn_no, nx, ny, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 0, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 255);
+				gr.GdiDrawText("新建", g_font_b, p.settings.color4, nx, ny, p.settings.btn_no.Width, p.settings.btn_no.Height, cc_txt);
 			};
 			// delete pattern button
 			var spaceBetween_w = g_z10;
 			var dx = 20 + listBoxWidth + g_z30;
-			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
+			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.btn_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[2].elements[0].selectedId;
 			var ref = p.list.groupby[idx].ref;
 			if (ref.substr(0, 3) == "自定义") {
 				p.settings.delbuttonPattern.draw(gr, dx, dy, 255);
+				gr.GdiDrawText("删除", g_font_b, p.settings.color2, dx, dy, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			}
 			else {
-				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
+				gr.DrawImage(p.settings.btn_no, dx, dy, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 0, p.settings.btn_no.Width, p.settings.btn_no.Height, 0, 255);
+				gr.GdiDrawText("删除", g_font_b, p.settings.color4, dx, dy, p.settings.btn_no.Width, p.settings.btn_no.Height, cc_txt);
 			};
 			gr.GdiDrawText("折叠高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 15 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("展开高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
@@ -1969,6 +1988,37 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 		return state;
 	};
+	
+	this.browseButtonCheck = function(event, x, y) {
+		var state = p.settings.browsebutton.checkstate(event, x, y);
+		switch (event) {
+		case "up":
+			if (state == ButtonStates.hover) {
+				let shellObj = new ActiveXObject("Shell.Application");
+				let fso = new ActiveXObject("Scripting.FileSystemObject");
+				let Folder = shellObj.BrowseForFolder(window.ID, "选择编辑程序的路径", 0, 0x11);
+				if (Folder != null) {
+					let FolderItem = Folder.Items().Item().Path;
+					if(FolderItem.substr(FolderItem.length-1, 1) != "\\") FolderItem += "\\";
+					p.settings.pages[0].elements[6].inputbox.text = FolderItem;
+					p.settings.ext_app[0] = FolderItem;
+					if (fso.FileExists(FolderItem + "MusicTag.exe")) {
+						p.settings.ext_app[1] = "MusicTag.exe";
+						p.settings.pages[0].elements[7].inputbox.text = "MusicTag.exe";
+					} else if(fso.FileExists(FolderItem + "Mp3tag.exe")){
+						p.settings.ext_app[1] = "Mp3tag.exe";
+						p.settings.pages[0].elements[7].inputbox.text = "Mp3tag.exe";
+					}
+					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
+					else track_edit_app = "";
+					window.SetProperty("foobox.track.editor", track_edit_app);
+					full_repaint();
+				}
+			};
+			break;
+		};
+		return state;
+	};
 
 	this.on_mouse = function(event, x, y, delta) {
 		this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
@@ -2002,6 +2052,14 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 
 		switch (this.id) {
+		case 0:
+			if(this.browseButtonCheck(event, x, y) != ButtonStates.hover) {
+				var fin = this.elements.length;
+				for (var i = 0; i < fin; i++) {
+					this.elements[i].on_mouse(event, x, y, delta);
+				};
+			};
+			break;
 		case 1:
 			if (this.delButtonCheck(event, x, y) != ButtonStates.hover) {
 				if (this.newButtonCheck(event, x, y) != ButtonStates.hover) {
@@ -2066,10 +2124,10 @@ oSettings = function() {
 
 	this.setColors = function() {
 		// colors
-		this.color0 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.2);
+		this.color0 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.15);
 		this.color1 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 		this.color2 = g_color_normal_txt;
-		this.color3 = g_color_normal_bg;
+		this.color3 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.30);
 		this.color4 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.35);
 	};
 	this.setColors();
@@ -2077,6 +2135,19 @@ oSettings = function() {
 	this.repaint = function() {
 		full_repaint();
 	};
+	
+	this.ext_app = [];
+	this.get_ext_app = function() {
+		if(track_edit_app != ""){
+			let arr = utils.SplitFilePath(track_edit_app);
+			this.ext_app[0] = arr[0];
+			this.ext_app[1] = arr[1] + arr[2];
+		} else {
+			this.ext_app[0] = "";
+			this.ext_app[1] = "";
+		}
+	}
+	this.get_ext_app();
 
 	this.setButtons = function() {
 		var x28 = zoom(28, zdpi), x32 = zoom(32, zdpi);
@@ -2089,63 +2160,37 @@ oSettings = function() {
 		var lineWidth = zoom(1.5, zdpi);
 
 		rect_w = gpic.CalcTextWidth("删除", g_font_b) + g_z30;
-		this.new_off = gdi.CreateImage(rect_w, x32);
-		gb = this.new_off.GetGraphics();
+		this.btn_off = gdi.CreateImage(rect_w, x32);
+		gb = this.btn_off.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.new_off.ReleaseGraphics(gb);
+		this.btn_off.ReleaseGraphics(gb);
 
-		this.new_ov = gdi.CreateImage(rect_w, x32);
-		gb = this.new_ov.GetGraphics();
+		this.btn_ov = gdi.CreateImage(rect_w, x32);
+		gb = this.btn_ov.GetGraphics();
 		gb.SetSmoothingMode(2);
-		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
+		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color3);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.new_ov.ReleaseGraphics(gb);
+		this.btn_ov.ReleaseGraphics(gb);
 
-		this.new_no = gdi.CreateImage(rect_w, x32);
-		gb = this.new_no.GetGraphics();
+		this.btn_no = gdi.CreateImage(rect_w, x32);
+		gb = this.btn_no.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.new_no.ReleaseGraphics(gb);
-
-		
-		this.del_off = gdi.CreateImage(rect_w, x32);
-		gb = this.del_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.del_off.ReleaseGraphics(gb);
-
-		this.del_ov = gdi.CreateImage(rect_w, x32);
-		gb = this.del_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.del_ov.ReleaseGraphics(gb);
-
-		this.del_no = gdi.CreateImage(rect_w, x32);
-		gb = this.del_no.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.del_no.ReleaseGraphics(gb);
+		this.btn_no.ReleaseGraphics(gb);
 		
 		// Add a Custom Column
-		this.newbutton = new button(this.new_off, this.new_ov, this.new_ov);
+		this.newbutton = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		// Delete a Custom Column
-		this.delbutton = new button(this.del_off, this.del_ov, this.del_ov);
+		this.delbutton = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		// Add a Custom "Group By" Pattern
-		this.newbuttonPattern = new button(this.new_off, this.new_ov, this.new_ov);
+		this.newbuttonPattern = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		// Delete a Custom "Group By" Pattern
-		this.delbuttonPattern = new button(this.del_off, this.del_ov, this.del_ov);
+		this.delbuttonPattern = new button(this.btn_off, this.btn_ov, this.btn_ov);
+		//browse ext Apple
+		this.browsebutton = new button(this.btn_off, this.btn_ov, this.btn_ov);
 
 		// Close Settings Button (BACK)
 		this.close_off = gdi.CreateImage(75, 75);

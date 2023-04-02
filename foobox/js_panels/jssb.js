@@ -4,7 +4,6 @@
 // mod for foobox https://github.com/dream7180
 var zdpi = 1;
 var dark_mode = 0;
-	var genre_cover_dir = fb.FoobarPath + "themes\\foobox\\Genre";
 //}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var CACHE_FOLDER = fb.ProfilePath + "cache\\CoverCache\\";
@@ -58,16 +57,16 @@ ppt = {
 	//enableDiskCache: window.GetProperty("SYSTEM Disk Cache", true),
 	cache_size: window.GetProperty("Cover image cache dimension (100-500)", 250),
 	scrollRowDivider: window.GetProperty("SYSTEM Scroll Row Divider", 1),
-	tf_groupkey_genre: fb.TitleFormat("$if2(%genre%,未知流派)"),
-	tf_groupkey_dir: fb.TitleFormat("$directory_path(%path%)"),
-	tf_groupkey_albumartist: fb.TitleFormat("$if2(%album artist%,未知艺术家)"),
-	tf_groupkey_artist: fb.TitleFormat("$if2(%artist%,未知艺术家)"),
+	tf_groupkey_genre: fb.TitleFormat("$if2(%genre%,未知流派) ## %title%"),
+	tf_groupkey_dir: fb.TitleFormat("$directory_path(%path%) ## %title%"),
+	tf_groupkey_albumartist: fb.TitleFormat("$if2(%album artist%,未知艺术家) ## %title%"),
+	tf_groupkey_artist: fb.TitleFormat("$if2(%artist%,未知艺术家) ## %title%"),
 	tf_groupkey_album: fb.TitleFormat("%album artist% ^^ %album% ## %title%"),
-	tf_groupkey_album_lt: fb.TitleFormat("$if2(%album%,单曲)"),
-	tf_path_genre: genre_cover_dir + "\\",
+	tf_groupkey_album_lt: fb.TitleFormat("$if2(%album%,单曲) ## %title%"),
+	tf_path_genre: fb.FoobarPath + "themes\\foobox\\Genre\\",
 	tf_path_dir: fb.TitleFormat("$directory_path(%path%)\\"),
 	tf_crc: fb.TitleFormat("$crc32('aa'%album artist%-%album%)"),
-	tf_crc_dir: fb.TitleFormat("$crc32('directories'$directory(%path%,1))"),
+	tf_crc_dir: fb.TitleFormat("$crc32($directory_path(%path%))"),
 	tf_crc_albumartist: fb.TitleFormat("$crc32('artists'%album artist%)"),
 	tf_crc_artist: fb.TitleFormat("$crc32('artists'%artist%)"),
 	tf_crc_genre: fb.TitleFormat("$crc32('genres'%genre%)"),
@@ -907,7 +906,12 @@ oGroup = function(index, start, handle, groupkey) {
 			break;
 		case 3:
 			this.cachekey = ppt.genre_dir? process_cachekey(ppt.tf_crc_dir.EvalWithMetadb(handle)) : process_cachekey(ppt.tf_crc_genre.EvalWithMetadb(handle));
-			if (ppt.genre_dir == 1) this.dir_name = fb.TitleFormat("$directory(%path%,1)").EvalWithMetadb(handle);
+			if (ppt.genre_dir == 1) {
+				this.groupkey = fb.TitleFormat("$directory(%path%,1)").EvalWithMetadb(handle);
+				if(this.groupkey.length < 6 && this.groupkey.indexOf("CD") == 0){
+					this.groupkey = fb.TitleFormat("$directory(%path%,2)").EvalWithMetadb(handle) + " | " + this.groupkey;
+				}
+			}
 			break;
 		}
 		this.tracktype = TrackType(handle.RawPath.substring(0, 4));
@@ -1765,12 +1769,7 @@ oBrowser = function(name) {
 									gr.GdiDrawText(album_name, g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 									gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + ppt.botTextRowHeight), coverWidth, ppt.botTextRowHeight, lt_txt);
 								}
-								else if(ppt.tagMode == 3 && ppt.genre_dir == 1){
-									gr.GdiDrawText(this.groups[i].dir_name, (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-								}
-								else {
-									gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-								};
+								else gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 							} catch (e) {}
 						};
 					}
@@ -1799,12 +1798,7 @@ oBrowser = function(name) {
 										gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + 10, (coverTop + 5 + coverWidth + ppt.botTextRowHeight) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
 									}
 								}
-								else if(ppt.tagMode == 3 && ppt.genre_dir == 1){
-									gr.GdiDrawText(this.groups[i].dir_name, (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
-								}
-								else {
-									gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
-								};
+								else gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
 							} catch (e) {}
 						};
 					};
@@ -2353,7 +2347,7 @@ oBrowser = function(name) {
 
 	this.incrementalSearch = function() {
 		var count = 0;
-		var groupkey;
+		var groupkey = [];
 		var chr;
 		var gstart;
 		var pid = -1;
@@ -2369,9 +2363,7 @@ oBrowser = function(name) {
 
 		// which start point for the search
 		if (total > 1000) {
-			if(ppt.tagMode == 3 && ppt.genre_dir == 1) groupkey = this.groups[Math.floor(total / 2)].dir_name;
-			else groupkey = this.groups[Math.floor(total / 2)].groupkey;
-			chr = groupkey.substring(0, 1);
+			chr = this.groups[Math.floor(total / 2)].groupkey.substring(0, 1);
 			if (first_chr.charCodeAt(first_chr) > chr.charCodeAt(chr)) {
 				gstart = Math.floor(total / 2);
 			}
@@ -2385,18 +2377,21 @@ oBrowser = function(name) {
 
 		var format_str = "";
 		for (var i = gstart; i < total; i++) {
-			if(ppt.tagMode == 3 && ppt.genre_dir == 1) groupkey = this.groups[i].dir_name;
-			else groupkey = this.groups[i].groupkey;
-			if (len <= groupkey.length) {
-				format_str = groupkey.substring(0, len);
+			if(ppt.tagMode == 1 && ppt.albumMode == 0) groupkey = this.groups[i].groupkey.split(" ^^ ");
+			else groupkey[0] = this.groups[i].groupkey;
+			for (var j = 0; j < groupkey.length; j++) {
+				if (len <= groupkey[j].length) {
+					format_str = groupkey[j].substring(0, len);
+				}
+				else {
+					format_str = groupkey[j];
+				};
+				if (format_str.toLowerCase() == cList.search_string.toLowerCase()) {
+					pid = i;
+					break;
+				};
 			}
-			else {
-				format_str = groupkey;
-			};
-			if (format_str.toLowerCase() == cList.search_string.toLowerCase()) {
-				pid = i;
-				break;
-			};
+			if(pid >= 0) break;
 		};
 
 		if (pid >= 0) { // found

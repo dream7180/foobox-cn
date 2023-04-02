@@ -65,7 +65,7 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 				tf_crc = fb.TitleFormat("$crc32('genres'%genre%)");
 				break;
 			case 5:
-				tf_crc = fb.TitleFormat("$crc32('directories'$directory(%path%,1))");
+				tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
 				break;
 			default:
 				tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
