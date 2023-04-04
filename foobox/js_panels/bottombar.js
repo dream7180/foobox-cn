@@ -1,6 +1,6 @@
 ﻿//foobox https://github.com/dream7180
 var time_length = 0;
-var zdpi, c_background, c_font, c_normal, c_shadow, c_shadow_h, c_seek_bg, c_tip_bg, c_seekoverlay, c_default_hl, c_seeker_core,
+var zdpi, c_background, c_font, c_normal, c_shadow, c_shadow_h, c_seek_bg, c_tip_bg, c_seekoverlay, c_default_hl, c_seeker_core, c_pb_ov, c_pb_down,
 	img_play, img_pause, img_next, img_previous, img_vol, img_pbo = [], img_list, img_cover, img_lib,
 	align_center = 1;
 
@@ -20,7 +20,7 @@ var LIST = window.GetPanel('list'),
 	active_pid = 0;
 LIST.ShowCaption = BRW.ShowCaption = LIB.ShowCaption = false;
 	
-//======================================================
+//=====================================================
 oSwitchbar = function() {
 	this.btw = z(28);
 	this.bth = z(24);
@@ -295,7 +295,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	gb.FillSolidRect(0, z(7), 100, z(4), overlay_frame);
 	vol_frame.ReleaseGraphics(gb);
 	
-	imgh = Math.floor(18*zdpi);
+	let imgh = Math.floor(18*zdpi);
 	seeker = gdi.CreateImage(imgh, imgh);
 	gb = seeker.GetGraphics();
 	gb.SetSmoothingMode(2);
@@ -306,6 +306,69 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	
 	seekbar = new UISlider(seek_frame, seek_time, seeker);
 	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, vol_div);
+	
+	let c_pb_ov = blendColors(RGB(255,255,255), c_seekoverlay, 0.85);
+	let c_pb_down = blendColors(RGB(0,0,0), c_seekoverlay, 0.85);
+	imgh = z(34);
+	let imgh2 = imgh * 2;
+	let _x1 = z(1), _x2 = 2*zdpi, _x12 = z(12), _x30 = z(30);
+	let point_arr = new Array(_x12, z(9), _x12, z(23),z(22), z(16));
+		
+	let im_bg = gdi.CreateImage(imgh, imgh);
+	gb = im_bg.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillEllipse(_x1, _x1, _x30, _x30, overlay_seek);
+	gb.SetSmoothingMode(0);
+	im_bg.ReleaseGraphics(gb);
+		
+	let im_bgov = gdi.CreateImage(imgh, imgh);
+	gb = im_bgov.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillEllipse(_x1, _x1, _x30, _x30, c_pb_ov);
+	gb.SetSmoothingMode(0);
+	im_bgov.ReleaseGraphics(gb);
+		
+	let im_bgdown = gdi.CreateImage(imgh, imgh);
+	gb = im_bgdown.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillEllipse(_x1, _x1, _x30, _x30, c_pb_down);
+	gb.SetSmoothingMode(0);
+	im_bgdown.ReleaseGraphics(gb);
+		
+	let im_playico = gdi.CreateImage(imgh, imgh);
+	gb = im_playico.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillPolygon(RGB(255,255,255), 0, point_arr);
+	gb.SetSmoothingMode(0);
+	im_playico.ReleaseGraphics(gb);
+		
+	let im_pauseico = gdi.CreateImage(imgh, imgh);
+	gb = im_pauseico.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.DrawLine(_x12, z(10), _x12, z(22), 3, RGB(255,255,255));
+	gb.DrawLine(z(20), z(10), z(20), z(22), 3, RGB(255,255,255));
+	gb.SetSmoothingMode(0);
+	im_pauseico.ReleaseGraphics(gb);
+		
+	img_play = gdi.CreateImage(imgh, imgh * 3);
+	gb = img_play.GetGraphics();
+	gb.DrawImage(im_bg, 0, 0, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_playico, 0, 0, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_bgov, 0, imgh, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_playico, 0, imgh, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_bgdown, 0, imgh2, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_playico, 0, imgh2, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	img_play.ReleaseGraphics(gb);
+		
+	img_pause = gdi.CreateImage(imgh, imgh * 3);
+	gb = img_pause.GetGraphics();
+	gb.DrawImage(im_bg, 0, 0, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_pauseico, 0, 0, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_bgov, 0, imgh, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_pauseico, 0, imgh, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_bgdown, 0, imgh2, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	gb.DrawImage(im_pauseico, 0, imgh2, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+	img_pause.ReleaseGraphics(gb);
 }
 
 function init_obj() {
@@ -347,39 +410,14 @@ function setSize(){
 function get_images() {
 	//creat static images
 	var gb;
-	var imgh = z(34), imgh2 = imgh * 2;
 	let _x2 = 2*zdpi, _x3 = 3*zdpi, _x4 = 4*zdpi, _x5 = 5*zdpi, _x6 = 6*zdpi,  _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, 
 		_x10 = 10*zdpi, _x12 = 12*zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, 
 		_x20 = 20*zdpi, _x21 = 21*zdpi, _x22 = 22*zdpi, _x24 = 24*zdpi, _x30 = 30*zdpi;
-	img_play = gdi.CreateImage(imgh, imgh * 3);
-	gb = img_play.GetGraphics();
-	time_length = gb.CalcTextWidth("00:00:00", g_font);
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(zdpi, zdpi, _x30, _x30, 2, c_normal);
-	gb.DrawLine(_x12, _x8, 25*zdpi, _x16, 2, c_normal);
-	gb.DrawLine(_x12, _x8, _x12, _x24, 2, c_normal);
-	gb.DrawLine(25*zdpi, _x16, _x12, _x24, 2, c_normal);
-	gb.FillEllipse(0, imgh, imgh-_x2, imgh-_x2, c_shadow_h);
-	gb.FillEllipse(0, imgh2, imgh-_x2, imgh-_x2, c_shadow);
-	gb.SetSmoothingMode(0);
-	img_play.ReleaseGraphics(gb);
-	
-	img_pause = gdi.CreateImage(imgh, imgh * 3);
-	gb = img_pause.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(zdpi, zdpi, _x30, _x30, 2, c_normal);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x12, _x9, _x12, Math.floor(23*zdpi)+1, 2, c_normal);
-	gb.DrawLine(_x21, _x9, _x21, Math.floor(23*zdpi)+1, 2, c_normal);
-	gb.SetSmoothingMode(2);
-	gb.FillEllipse(0, imgh, imgh-_x2, imgh-_x2, c_shadow_h);
-	gb.FillEllipse(0, imgh2, imgh-_x2, imgh-_x2, c_shadow);
-	gb.SetSmoothingMode(0);
-	img_pause.ReleaseGraphics(gb);
 
-	imgh = z(28), imgh2 = imgh * 2;
+	let imgh = z(28), imgh2 = imgh * 2;
 	img_stop = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_stop.GetGraphics();
+	time_length = gb.CalcTextWidth("00:00:00", g_font);
 	gb.SetSmoothingMode(0);
 	gb.DrawRect(_x6+1, _x6, Math.round(15*zdpi-1), Math.round(15*zdpi-1), 2, c_normal);
 	gb.SetSmoothingMode(2);
@@ -615,8 +653,8 @@ get_font();
 get_color();
 get_images();
 get_panel();
-initbuttons();
 init_overlay_obj(c_seek_bg, c_seekoverlay);
+initbuttons();
 
 function on_size() {
 	ww = window.Width;
@@ -830,6 +868,7 @@ function on_notify_data(name, info) {
 		else c_seekoverlay = c_default_hl;
 		if(c_seekoverlay != c_ol_tmp){
 			init_overlay_obj(c_seek_bg, c_seekoverlay);
+			PBPlay.img = (fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play;
 			setSize();
 			window.Repaint();
 		}
