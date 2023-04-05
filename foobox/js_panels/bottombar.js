@@ -279,6 +279,7 @@ function initbuttons(){
 
 function init_overlay_obj(overlay_frame, overlay_seek) {
 	var gb;
+	let _x1 = zdpi, _x12 = 12*zdpi, _x30 = 30*zdpi;
 	seek_frame = gdi.CreateImage(100, z(20));
 	gb = seek_frame.GetGraphics();
 	gb.SetSmoothingMode(0);
@@ -299,7 +300,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seeker = gdi.CreateImage(imgh, imgh);
 	gb = seeker.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(3*zdpi, 3*zdpi, 12*zdpi, 12*zdpi, overlay_seek);
+	gb.FillEllipse(3*zdpi, 3*zdpi, _x12, _x12, overlay_seek);
 	gb.FillEllipse(7*zdpi, 7*zdpi, 4*zdpi, 4*zdpi, c_seeker_core);
 	gb.SetSmoothingMode(0);
 	seeker.ReleaseGraphics(gb);
@@ -311,8 +312,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	let c_pb_down = blendColors(RGB(0,0,0), c_seekoverlay, 0.85);
 	imgh = z(34);
 	let imgh2 = imgh * 2;
-	let _x1 = z(1), _x2 = 2*zdpi, _x12 = z(12), _x30 = z(30);
-	let point_arr = new Array(_x12, z(9), _x12, z(23),z(22), z(16));
+	let point_arr = new Array(_x12, 9*zdpi, _x12, 23*zdpi,22*zdpi, 16*zdpi);
 		
 	let im_bg = gdi.CreateImage(imgh, imgh);
 	gb = im_bg.GetGraphics();
@@ -344,10 +344,9 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 		
 	let im_pauseico = gdi.CreateImage(imgh, imgh);
 	gb = im_pauseico.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x12, z(10), _x12, z(22), 3, RGB(255,255,255));
-	gb.DrawLine(z(20), z(10), z(20), z(22), 3, RGB(255,255,255));
 	gb.SetSmoothingMode(0);
+	gb.DrawLine(_x12, 10*zdpi, _x12, Math.floor(22*zdpi)+1, Math.floor(3*zdpi), RGB(255,255,255));
+	gb.DrawLine(22*zdpi-2, 10*zdpi, 22*zdpi-2, Math.floor(22*zdpi)+1,  Math.floor(3*zdpi), RGB(255,255,255));
 	im_pauseico.ReleaseGraphics(gb);
 		
 	img_play = gdi.CreateImage(imgh, imgh * 3);
