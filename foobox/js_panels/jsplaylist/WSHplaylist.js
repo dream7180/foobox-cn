@@ -1464,7 +1464,8 @@ oList = function(object_name, playlist) {
 					break;
 				case 10:
 					// r1
-					fields.push(new Array("$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')"));
+					if(Number(fb.Version.substr(0, 1)) > 1) fields.push(new Array("$if(%year%,%year%,' ')", "$if(%year%,%year%,' ')", "$if2(%genre%,' ')", "$if2(%genre%,' ')", "", "$if(%year%,%year%,' ')"));
+					else fields.push(new Array("$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if2(%genre%,' ')", "$if2(%genre%,' ')", "", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')"));
 					break;
 				case 11:
 					// l2
@@ -1472,7 +1473,7 @@ oList = function(object_name, playlist) {
 					break;
 				case 12:
 					// r2
-					fields.push(new Array("$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "", "", "$if2(%genre%,'未知流派')"));
+					fields.push(new Array("$if2(%genre%,' ')", "$if2(%genre%,' ')", "", "", "", "$if2(%genre%,' ')"));
 					break;
 				case 13:
 					// collapseGroupsByDefault

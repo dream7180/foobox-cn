@@ -17,13 +17,13 @@ function settings_checkboxes_action(id, status, parentId) {
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("SYSTEM.Enable Touch Scrolling", status);
 			p.settings.pages[parentId].elements[id].repaint();
-		case 4:
+		case 6:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("CUSTOM Enable Selection Menu", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 			break;
-		case 5:
+		case 7:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("PLAYBACK: Repeat playlists", status);
 			p.settings.pages[parentId].elements[id].repaint();
@@ -213,15 +213,15 @@ function settings_radioboxes_action(id, status, parentId) {
 	switch (pid) {
 	case 0:
 		switch (id) {
-		case 2:
-			p.settings.pages[pid].elements[2].status = true;
-			p.settings.pages[pid].elements[3].status = false;
+		case 4:
+			p.settings.pages[pid].elements[4].status = true;
+			p.settings.pages[pid].elements[5].status = false;
 			properties.defaultPlaylistItemAction = "播放";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
-		case 3:
-			p.settings.pages[pid].elements[2].status = false;
-			p.settings.pages[pid].elements[3].status = true;
+		case 5:
+			p.settings.pages[pid].elements[4].status = false;
+			p.settings.pages[pid].elements[5].status = true;
 			properties.defaultPlaylistItemAction = "添加到播放队列";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
@@ -611,13 +611,25 @@ function settings_textboxes_action(pageId, elementId) {
 	case 0:
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
 		switch (elementId) {
-		case 6:
+		case 2:
+			cList.scrollstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(cList.scrollstep < 0) cList.scrollstep = 1;
+			else if(cList.scrollstep > 20) cList.scrollstep = 20;
+			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
+			break;
+		case 3:
+			cList.touchstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(cList.touchstep < 0) cList.touchstep = 1;
+			else if(cList.touchstep > 20) cList.touchstep = 20;
+			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.touchstep);
+			break;
+		case 8:
 			p.settings.ext_app[0] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
 			window.SetProperty("foobox.track.editor", track_edit_app);
 			break;
-		case 7:
+		case 9:
 			p.settings.ext_app[1] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
@@ -1532,16 +1544,18 @@ oPage = function(id, objectName, label, nbrows) {
 			// Behaviour options
 			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "平滑滚动", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "触屏滚动控制 (禁用拖放)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
-
+			
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "滚轮滚动步长", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x + 160*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = zoom(70, zdpi);
-			this.elements.push(new oRadioButton(2, txtbox_x, cSettings.topBarHeight + rh * 5.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(3, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 5.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
 
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "顺序播放时自动播放下一个播放列表 (遇到空列表停止)", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_2, cHeaderBar.height, "音轨外部编辑程序路径", p.settings.ext_app[0], "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 9.75), 115*zdpi, cHeaderBar.height, "程序名称", p.settings.ext_app[1], "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 9.25, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 10.25, "顺序播放时自动播放下一个播放列表", "repeat_pls", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(8, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.75), oTextBox_2, cHeaderBar.height, "音轨外部编辑程序路径", p.settings.ext_app[0], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(9, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 11.75), 115*zdpi, cHeaderBar.height, "程序名称", p.settings.ext_app[1], "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1689,10 +1703,11 @@ oPage = function(id, objectName, label, nbrows) {
 		switch (this.id) {
 		case 0:
 			gr.GdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			var bx = txtbox_x+350*zdpi, by = Math.ceil(cSettings.topBarHeight + rh * 10.55);
+			gr.GdiDrawText("(范围: 1-20)", g_font, p.settings.color1, txtbox_x + 72*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			var bx = txtbox_x+350*zdpi, by = Math.ceil(cSettings.topBarHeight + rh * 12.55);
 			p.settings.browsebutton.draw(gr, bx, by, 255);
 			gr.GdiDrawText("浏览", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
@@ -2000,17 +2015,17 @@ oPage = function(id, objectName, label, nbrows) {
 				if (Folder != null) {
 					let FolderItem = Folder.Items().Item().Path;
 					if(FolderItem.substr(FolderItem.length-1, 1) != "\\") FolderItem += "\\";
-					p.settings.pages[0].elements[6].inputbox.text = FolderItem;
+					p.settings.pages[0].elements[8].inputbox.text = FolderItem;
 					p.settings.ext_app[0] = FolderItem;
 					if (fso.FileExists(FolderItem + "MusicTag.exe")) {
 						p.settings.ext_app[1] = "MusicTag.exe";
-						p.settings.pages[0].elements[7].inputbox.text = "MusicTag.exe";
+						p.settings.pages[0].elements[9].inputbox.text = "MusicTag.exe";
 					} else if(fso.FileExists(FolderItem + "Mp3tag.exe")){
 						p.settings.ext_app[1] = "Mp3tag.exe";
-						p.settings.pages[0].elements[7].inputbox.text = "Mp3tag.exe";
+						p.settings.pages[0].elements[9].inputbox.text = "Mp3tag.exe";
 					} else if(p.settings.ext_app[1] == "MusicTag.exe" || p.settings.ext_app[1] == "Mp3tag.exe"){
 						p.settings.ext_app[1] = "";
-						p.settings.pages[0].elements[7].inputbox.text = "";
+						p.settings.pages[0].elements[9].inputbox.text = "";
 					}
 					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 					else track_edit_app = "";
@@ -2264,7 +2279,7 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 12));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "列", 18));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "分组", 34));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 12));
