@@ -859,7 +859,9 @@ function on_mouse_lbtn_down(x, y) {
 						cScrollBar.timerID2 = window.SetInterval(function() {
 							if (p.scrollbar.hover) {
 								if (mouse_x > p.scrollbar.x && p.scrollbar.cursorPos > mouse_y) {
-									p.list.scrollItems(1, scrollstep);
+									try{
+										p.list.scrollItems(1, scrollstep);
+									} catch(e) {};
 								};
 							};
 						}, 60);

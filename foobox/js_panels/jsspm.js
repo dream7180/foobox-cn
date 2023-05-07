@@ -1416,12 +1416,12 @@ function on_mouse_wheel(step) {
 		cTouch.timer = false;
 	};
 
-	var rowStep = ppt.rowScrollStep;
-	if(g_start_) {
-		var voffset = brw.rows[g_start_].y - ppt.rowHeight - ppt.headerBarHeight;
-		scroll -= step * ppt.rowHeight * (rowStep - step/Math.abs(step)) - voffset;
+	var g_start_y = brw.rows[g_start_].y;
+	if(g_start_ && g_start_y) {
+		var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
+		scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
 	}
-	else scroll -= step * ppt.rowHeight * rowStep;
+	else scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
 	scroll = check_scroll(scroll);
 };
 
