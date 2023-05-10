@@ -32,7 +32,7 @@ row_height = default_row_height;
 var pidx = -1;
 var g_font, g_font2;
 var bgcolor, fontcolor, fontcolor2, g_color_line, g_color_topbar, g_color_line_div, c_default_hl;
-var scrollstep = window.GetProperty("List: Scroll step", 6);
+var scrollstep = window.GetProperty("List: Scroll step", 3);
 get_colors();
 get_font();
 
@@ -587,6 +587,10 @@ function on_notify_data(name, info) {
 		break;
 	case "LibviewUpdated":
 		load_pl(20);
+		break;
+	case "ScrollStep":
+		scrollstep = info;
+		window.SetProperty("List: Scroll step", scrollstep);
 		break;
 	}
 }

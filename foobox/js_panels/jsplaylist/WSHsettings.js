@@ -616,6 +616,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
 			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
+			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
 			cList.touchstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
@@ -1545,8 +1546,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "平滑滚动", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "触屏滚动控制 (禁用拖放)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
 			
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "滚轮滚动步长", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(3, txtbox_x + 160*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "滚轮滚动步长（全局）", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x + 180*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = zoom(70, zdpi);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
@@ -1703,7 +1704,7 @@ oPage = function(id, objectName, label, nbrows) {
 		switch (this.id) {
 		case 0:
 			gr.GdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("(范围: 1-20)", g_font, p.settings.color1, txtbox_x + 72*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("(范围: 1-20)", g_font, p.settings.color1, txtbox_x + 82*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);

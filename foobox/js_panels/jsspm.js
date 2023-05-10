@@ -78,7 +78,7 @@ var g_rightClickedIndex = -1;
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
 	rowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
-	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 6),
+	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
 	scrollSmoothness: 3.0,
 	refreshRate: 20,
 	showFilter: window.GetProperty("_DISPLAY: Show Filter", false),
@@ -2134,6 +2134,10 @@ function on_notify_data(name, info) {
 	case "Sorting format change":
 		default_sort = info;
 		window.SetProperty("_PROPERTY: New playlist sortorder", default_sort);
+		break;
+	case "ScrollStep":
+		ppt.rowScrollStep = info;
+		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
 		break;
 	}
 };
