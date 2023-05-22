@@ -13,7 +13,12 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 	this.setSize = function (x, y, w, h){
 		this.X = x;
 		this.Y = y;
-		this.Width = w;
+		this.sub_w = Math.round((w - 9)/10);
+		if(ImgDiv) {
+			this.Width = this.sub_w * 10 + 9;
+		} else {
+			this.Width = w;
+		}
 		this.Height = h;
 	}
 
@@ -31,7 +36,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
 			if(ImgDiv) {
 				for (var i = 1; i < 10; i++) {
-					gr.DrawImage(ImgDiv, Math.ceil(this.X + this.Width/10*i), this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
+					gr.DrawImage(ImgDiv, this.X + this.sub_w * i + i - 1, this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
 				}
 			}
 			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);

@@ -13,6 +13,7 @@ var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, re
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn;
+var show_extrabtn = window.GetProperty("Show Open & Stop Buttons", true);
 var LIST = window.GetPanel('list'),
 	BRW = window.GetPanel('brw'),
 	LIB = window.GetPanel('lib'),
@@ -371,7 +372,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 }
 
 function init_obj() {
-	vol_len = z(80);
+	vol_len = z(70);
 	seek_h = z(20);
 	win_y = wh - z(58);
 	var btn_space = z(12) + 3;
@@ -667,11 +668,13 @@ if(!ww) on_size(); //panel locked, has to manually get size, 快速设置布局�
 
 function on_paint(gr) {
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
-	PBOpen.Paint(gr);
 	PBPrevious.Paint(gr);
 	PBPlay.Paint(gr);
 	PBNext.Paint(gr);
-	PBStop.Paint(gr);
+	if(show_extrabtn){
+		PBOpen.Paint(gr);
+		PBStop.Paint(gr);
+	}
 	PlaybackTimeText.Paint(gr);
 	PlaybackLengthText.Paint(gr);
 	seekbar.Paint(gr);
@@ -704,11 +707,13 @@ function on_mouse_move(x, y) {
 	}
 	if(y < win_y) return;
 	var _x = 0;
-	if (PBOpen.MouseMove(x, y)) hbtn = true;
+	if(show_extrabtn){
+		if (PBOpen.MouseMove(x, y)) hbtn = true;
+		if (PBStop.MouseMove(x, y)) hbtn = true;
+	}
 	if (PBPrevious.MouseMove(x, y)) hbtn = true;
 	if (PBPlay.MouseMove(x, y)) hbtn = true;
 	if (PBNext.MouseMove(x, y)) hbtn = true;
-	if (PBStop.MouseMove(x, y)) hbtn = true;
 	if (MuteBtn.MouseMove(x, y)) hbtn = true;
 	if (PBOBtn.MouseMove(x, y)) hbtn = true;
 	g_switchbar.on_mouse("move", x, y);
@@ -717,11 +722,13 @@ function on_mouse_move(x, y) {
 function on_mouse_lbtn_down(x, y) {
 	if(y < win_y) return;
 	var _x = 0;
-	PBOpen.MouseDown(x, y);
+	if(show_extrabtn){
+		PBOpen.MouseDown(x, y);
+		PBStop.MouseDown(x, y);
+	}
 	PBPrevious.MouseDown(x, y);
 	PBPlay.MouseDown(x, y);
 	PBNext.MouseDown(x, y);
-	PBStop.MouseDown(x, y);
 	MuteBtn.MouseDown(x, y);
 	g_switchbar.on_mouse("lbtn_down", x, y);
 	if (PBOBtn.MouseDown(x, y)) {
@@ -755,11 +762,13 @@ function on_mouse_lbtn_up(x, y) {
 		VolumeTip.Deactivate();
 	}
 	if(y < win_y) return;
-	if (PBOpen.MouseUp()) fb.RunMainMenuCommand("打开...")
+	if(show_extrabtn){
+		if (PBOpen.MouseUp()) fb.RunMainMenuCommand("打开...");
+		if (PBStop.MouseUp()) fb.Stop();
+	}
 	if (PBPrevious.MouseUp()) fb.Prev();
 	if (PBPlay.MouseUp()) fb.PlayOrPause();
 	if (PBNext.MouseUp()) fb.Next();
-	if (PBStop.MouseUp()) fb.Stop();
 	if (MuteBtn.MouseUp()) fb.VolumeMute();
 	g_switchbar.on_mouse("lbtn_up", x, y);
 	PBOBtn.MouseUp();
@@ -771,11 +780,13 @@ function on_mouse_leave() {
 	g_switchbar.on_mouse("leave");
 	if (!hbtn) return;
 	else {
-		PBOpen.Reset();
+		if(show_extrabtn){
+			PBOpen.Reset();
+			PBStop.Reset();
+		}
 		PBPrevious.Reset();
 		PBPlay.Reset();
 		PBNext.Reset();
-		PBStop.Reset();
 		MuteBtn.Reset();
 		PBOBtn.Reset();
 	}
@@ -871,6 +882,11 @@ function on_notify_data(name, info) {
 			setSize();
 			window.Repaint();
 		}
+		break;
+	case "Show_open_stop_buttons":
+		show_extrabtn = info;
+		window.GetProperty("Show Open & Stop Buttons", true);
+		window.Repaint();
 		break;
 	}
 }
