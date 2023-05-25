@@ -11,7 +11,7 @@ var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;f
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var track_edit_app = window.GetProperty("foobox.track.editor", "");
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
-var show_extrabtn = window.GetProperty("oobox.show.Open.Stop.buttons", true);
+var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 let dark_mode = 0;
 // GLOBALS
 var g_script_version = "7.9";

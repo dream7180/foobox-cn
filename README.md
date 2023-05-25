@@ -4,7 +4,7 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 > **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。
 
 你可以到 foobar2000 汉化版作者 [**Asion 的博客**](https://www.cnblogs.com/asionwu) 下载整合了foobox 的 foobar2000 汉化版 **plus**。
-> **Note** foobar2000 汉化版 plus 目前只集成至 foobox 7.8。
+> **Note** foobar2000 汉化版 plus 目前无最新 2.0 版并只集成至 foobox 7.8，要使用最新版，请参考 release 包里的“foobar2000_2.0中使用foobox.pdf”。
 
 也可以下载最新的 Release 包，解压后：
 * 复制 themes 文件夹到已有的 foobar2000 中文汉化版目录下;

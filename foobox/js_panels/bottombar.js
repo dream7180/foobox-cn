@@ -13,7 +13,7 @@ var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, re
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn;
-var show_extrabtn = window.GetProperty("Show Open & Stop Buttons", true);
+var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var LIST = window.GetPanel('list'),
 	BRW = window.GetPanel('brw'),
 	LIB = window.GetPanel('lib'),
@@ -885,7 +885,7 @@ function on_notify_data(name, info) {
 		break;
 	case "Show_open_stop_buttons":
 		show_extrabtn = info;
-		window.GetProperty("Show Open & Stop Buttons", true);
+		window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
 		window.Repaint();
 		break;
 	}
