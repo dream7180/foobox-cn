@@ -573,19 +573,15 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			// if dragging items, draw line at top of the hover items to show where dragged items will be inserted on mouse button up
 			if (!properties.enableTouchControl) {
 				if (this.empty_row_index == 0) {
-					if (dragndrop.drag_in && this.ishover && p.list.ishover) {
+					if (g_dragndrop_status && dragndrop.drop_id == this.track_index && p.list.ishover && !g_dragndrop_bottom) {
 						if (!plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
 							if (this.track_index > dragndrop.drag_id) {
 								gr.FillSolidRect(tcolumn_x, this.cal_y1, this.w - cover.w, cList.borderWidth, g_color_normal_txt);
-								//gr.FillSolidRect(tcolumn_x, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								//gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								dragndrop.drop_id = this.track_index;
+								//dragndrop.drop_id = this.track_index;
 							}
 							else if (this.track_index < dragndrop.drag_id) {
 								gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half, this.w - cover.w, cList.borderWidth, g_color_normal_txt);
-								//gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								//gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								dragndrop.drop_id = this.track_index;
+								//dragndrop.drop_id = this.track_index;
 							};
 						}
 						else {
@@ -594,14 +590,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					};
 				};
 			};
-
-			/*if (this.ishover && g_dragndrop_status && g_dragndrop_rowId > -1) {
-				if (this.row_index == g_dragndrop_rowId) {
-					gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half, this.w - cover.w, cList.borderWidth, g_color_normal_txt);
-					gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-					gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-				};
-			};*/
 			break;
 		case 1:
 			// ===============
@@ -781,35 +769,17 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			// if dragging items, draw line at top of the hover items to show where dragged items will be inserted on mouse button up
 			if (this.obj) {
 				if (!properties.enableTouchControl) {
-					if (dragndrop.drag_in && this.ishover && p.list.ishover && this.obj.collapsed) {
+					if (g_dragndrop_status && this.ishover && p.list.ishover && this.obj.collapsed) {
 						if (!plman.IsPlaylistItemSelected(plman.ActivePlaylist, this.track_index)) {
-							//var cover_w = (p.headerBar.columns[0].percent > 0 ? p.headerBar.columns[0].w : 0);
-							if (this.track_index <= dragndrop.drag_id) {
+							if (this.track_index <= dragndrop.drag_id  && !g_dragndrop_bottom) {
 								if (this.groupRowDelta == 0) {
 									gr.FillSolidRect(this.x, this.y - cList.borderWidth_half, this.w, cList.borderWidth, g_color_normal_txt);
-									//gr.FillSolidRect(this.x + cover_w, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-									//gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
 								}
-								//if (this.obj.collapsed) {
-									dragndrop.drop_id = this.track_index;
-								//}
-								//else {
-								//	dragndrop.drop_id = this.track_index;
-								//};
+								//dragndrop.drop_id = this.track_index;
 							}
 							else {
-								//if (this.obj.collapsed) {
-									gr.FillSolidRect(this.x, this.cal_y1, this.w, cList.borderWidth, g_color_normal_txt);
-									//gr.FillSolidRect(this.x + cover_w, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-									//gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-									dragndrop.drop_id = this.track_index + this.obj.count - 1;
-								//}
-								//else {
-								//	gr.FillSolidRect(this.x + cover_w, this.cal_y1, this.w - cover_w, cList.borderWidth, g_color_normal_txt);
-								//	gr.FillSolidRect(this.x + cover_w, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								//	gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.cal_y1 - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-								//	dragndrop.drop_id = this.track_index - 1;
-								//};
+								gr.FillSolidRect(this.x, this.cal_y1, this.w, cList.borderWidth, g_color_normal_txt);
+								dragndrop.drop_id = this.track_index + this.obj.count - 1;
 							};
 						}
 						else {
@@ -818,14 +788,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					};
 				};
 			};
-
-			/*if (this.ishover && g_dragndrop_status && g_dragndrop_rowId > -1  && this.obj.collapsed) {
-				if (this.row_index == g_dragndrop_rowId) {
-					gr.FillSolidRect(this.x, this.y - cList.borderWidth_half, this.w, cList.borderWidth, g_color_normal_txt);
-					gr.FillSolidRect(this.x, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-					gr.FillSolidRect(this.x + this.w - cList.borderWidth, this.y - cList.borderWidth_half - 3 * cList.borderWidth, cList.borderWidth, 7 * cList.borderWidth, g_color_normal_txt);
-				};
-			};*/
 			break;
 		};
 	};
@@ -834,11 +796,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		var groupDelta = this.groupRowDelta * cTrack.height;
 		var col_cover_w = (p.headerBar.columns[0].percent > 0 ? p.headerBar.columns[0].w : 0);
 		this.ishover = (x >= this.x + col_cover_w && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
-		if (this.ishover) { // p.list.count is mandatory > 0 (if not with couldn't be in Item section)
+		if(this.ishover) dragndrop.drop_id = this.track_index;
+		/*if (this.ishover) { // p.list.count is mandatory > 0 (if not with couldn't be in Item section)
 			var trackId = p.list.getTrackId(this.row_index);
 			g_dragndrop_trackId = this.track_index;
 			g_dragndrop_rowId = this.row_index;
-		};
+		};*/
 	};
 
 	this.check = function(event, x, y) {
@@ -888,18 +851,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							p.list.SHIFT_start_id = null;
 							if (p.list.metadblist_selection.Count >= 1) {
 								dragndrop.clicked = true;
-								dragndrop.moved = false;
-								dragndrop.x = x;
-								dragndrop.y = y;
 								dragndrop.drag_id = this.track_index;
-								//dragndrop.drag_out = true;
-								if (!isQueuePlaylistActive()) {
-									dragndrop.timerID = window.SetTimeout(function() {
-										dragndrop.drag_in = true;
-										dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
-										dragndrop.timerID = false;
-									}, 250);
-								};
 							};
 						};
 						if (this.obj && properties.autocollapse) {
@@ -921,10 +873,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
 								if (p.list.metadblist_selection.Count >= 1) {
 									dragndrop.clicked = true;
-									dragndrop.moved = false;
-									dragndrop.x = x;
-									dragndrop.y = y;
-									//dragndrop.drag_out = true;
 									if (p.list.metadblist_selection.Count > 1) {
 										// test if selection is contigus, if not, drag'n drop disable
 										var first_item_selected_id = p.list.handleList.Find(p.list.metadblist_selection[0]);
@@ -937,24 +885,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									if (p.list.metadblist_selection.Count == 1 || (p.list.metadblist_selection.Count > 1 && p.list.metadblist_selection.Count == contigus_count)) {
 										dragndrop.contigus_sel = true;
 										dragndrop.drag_id = this.track_index;
-										if (!isQueuePlaylistActive()) {
-											dragndrop.timerID = window.SetTimeout(function() {
-												dragndrop.drag_in = true;
-												dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
-												dragndrop.timerID = false;
-											}, 250);
-										};
 									}
 									else if (p.list.metadblist_selection.Count > 1) {
 										dragndrop.contigus_sel = false;
 										dragndrop.drag_id = this.track_index;
-										if (!isQueuePlaylistActive()) {
-											dragndrop.timerID = window.SetTimeout(function() {
-												dragndrop.drag_in = true;
-												dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
-												dragndrop.timerID = false;
-											}, 250);
-										};
 									};
 								};
 								if (utils.IsKeyPressed(VK_SHIFT)) {
@@ -1082,7 +1016,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					else if (!cTouch.down) {
 						if (!p.list.drawRectSel && plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
 							if (!utils.IsKeyPressed(VK_SHIFT) && !utils.IsKeyPressed(VK_CONTROL)) {
-								if (!dragndrop.drag_in) {
+								if (!g_dragndrop_status && !dragndrop.leave_flag) {
 									if (this.type == 0) { // track
 										plman.SetPlaylistFocusItem(p.list.playlist, this.track_index);
 										plman.ClearPlaylistSelection(p.list.playlist);
@@ -1097,7 +1031,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			this.drawRectSel_click = false;
 			this.drawRectSel = false;
 			dragndrop.clicked = false;
-			dragndrop.moved = false;
 			columns.rating_drag = false;
 			columns.mood_drag = false;
 			break;
@@ -1243,8 +1176,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				};
 			};
 			if (dragndrop.clicked) {
-				dragndrop.moved = true;
-				//g_dragndrop_status = true;
+				g_dragndrop_status = true;
+				dragndrop.leave_flag = true;
 				var items = plman.GetPlaylistSelectedItems(p.list.playlist);
 				if(this.track_index > -1){
 					var line1 = items.Count+" 音轨";
@@ -2216,19 +2149,17 @@ oList = function(object_name, playlist) {
 		//	gr.FillsolidRect(this.x, this.y, this.w, this.h, RGBA(0, 0, 0, 100));
 		//}
 		//else {
-			if (g_dragndrop_status && g_dragndrop_bottom) {
-				var rowId = fin - 1;
-				var item_height_row = (this.items[rowId].type == 0 ? 1 : this.items[rowId].heightInRow);
-				var item_height = item_height_row * cTrack.height;
-				var limit = this.items[rowId].y + item_height;
-				var rx = this.items[rowId].x;
-				var ry = this.items[rowId].y;
-				var rw = this.items[rowId].w;
+		if (g_dragndrop_status && g_dragndrop_bottom) {
+			var rowId = fin - 1;
+			var item_height_row = (this.items[rowId].type == 0 ? 1 : this.items[rowId].heightInRow);
+			var item_height = item_height_row * cTrack.height;
+			var limit = this.items[rowId].y + item_height;
+			var rx = this.items[rowId].x;
+			var ry = this.items[rowId].y;
+			var rw = this.items[rowId].w;
 
-				gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half, rw - cover.w, cList.borderWidth, g_color_selected_bg);
-				gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half - 4 * cList.borderWidth, cList.borderWidth, 9 * cList.borderWidth, g_color_selected_bg);
-				gr.FillSolidRect(rx + rw - cList.borderWidth, ry + item_height - cList.borderWidth_half - 4 * cList.borderWidth, cList.borderWidth, 9 * cList.borderWidth, g_color_selected_bg);
-			};
+			gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half * 2, rw, cList.borderWidth, g_color_normal_txt);
+		};
 		//};
 
 		// Draw rect selection
@@ -2325,18 +2256,13 @@ oList = function(object_name, playlist) {
 				};
 				var rowId = fin - 1;
 				var item_height_row = (this.items[rowId].type == 0 ? 1 : this.items[rowId].heightInRow);
-				var limit = this.items[rowId].y + item_height_row * cTrack.height;
+				var limit = this.items[rowId].y + item_height_row * cTrack.height - cTrack.height/2;
 				if (y > limit) {
 					g_dragndrop_bottom = true;
-					var trackId = p.list.getTrackId(rowId);
-					g_dragndrop_trackId = this.items[rowId].track_index;
-					g_dragndrop_rowId = trackId;
 				};
 			}
 			else {
 				g_dragndrop_bottom = true;
-				g_dragndrop_trackId = 0;
-				g_dragndrop_rowId = 0;
 			};
 			break;
 		case "move":

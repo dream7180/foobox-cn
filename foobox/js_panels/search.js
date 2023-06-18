@@ -6,20 +6,9 @@ ppts = {
 	multiple: window.GetProperty("Search Box: Keep Playlist", true),
 	historymaxitems: 10,
 	historytext: window.GetProperty("Search Box: Search History", ""),
-	showreset: window.GetProperty("Search Box: Always Show Reset Button", false),
-	webkqtradioarr: "",
+	showreset: window.GetProperty("Search Box: Always Show Reset Button", false)
 };
-
-//=================================================// 定义变量
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var xmlHttp = new ActiveXObject("Msxml2.XMLHTTP.6.0"),
-xmlHttp2 = new ActiveXObject("Msxml2.XMLHTTP.6.0");
-var debug = false;
 var oldsearch = oldpid = 0;
-var SearchListName, cachefile;
-var qtfm_arr = fb.ProfilePath + "\\cache\\qtfm.arr";
-if (fso.FileExists(qtfm_arr))
-	ppts.webkqtradioarr = utils.ReadTextFile(qtfm_arr).split("|");
 //=================================================// 搜索框
 var g_searchbox = null;
 searchbox = function() {
@@ -412,15 +401,7 @@ function Show_Menu_Searchbox(x, y) {
 	_menu.AppendMenuItem(MF_STRING, 22, "媒体库搜索");
 	_menu.CheckMenuRadioItem(21, 22, ppts.source + 20);
 	_menu.AppendMenuSeparator();
-	var WebQTRadioMenu = window.CreatePopupMenu();
-	if(ppts.webkqtradioarr.length > 1){
-		for (var k = 0; k < ppts.webkqtradioarr.length; k++) {
-			WebQTRadioMenu.AppendMenuItem(MF_STRING, 501+k, ppts.webkqtradioarr[k].split(":")[0]);
-		}
-		WebQTRadioMenu.AppendMenuSeparator();
-	}
-	WebQTRadioMenu.AppendMenuItem(MF_STRING, 500, "更新蜻蜓FM菜单");
-	WebQTRadioMenu.AppendTo(_menu, MF_STRING, "蜻蜓FM");
+	_menu.AppendMenuItem(MF_STRING, 30, "载入网络电台");
 	_menu.AppendMenuSeparator();
 	
 	var SearchHistoryMenu = window.CreatePopupMenu();
@@ -515,11 +496,8 @@ function Show_Menu_Searchbox(x, y) {
 	case (idx == ppts.historymaxitems + 60):
 		g_searchbox.historyreset();
 		break;
-	case (idx == 500):
-		GetQTFMRadiolist();
-		break;
-	case ((idx >= 501 && idx <= 501+ppts.webkqtradioarr.length)):
-		QTFMRadiolist(ppts.webkqtradioarr[idx-501].split(";"),ppts.webkqtradioarr[idx-501].split(":")[0]);
+	case (idx == 30):
+		LoadRadio("网络电台", "https://ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u");
 		break;
 	}
 }
@@ -571,102 +549,8 @@ function trimstr(str) {
 	return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 }
 
-//=================================================// 蜻蜓FM
-
-function GetQTFMRadiolist(){
-	g_searchbox.inputbox.edit = false;
-	SetBoxText("正在更新电台菜单...");
-	var qtlistid = "";
-	var listid = "";
-	var ret = {
-		id: [433,442,429,439,432,441,430,431,440,438,435,436,434],
-		title: ["资讯台","音乐台","交通台","经济台","文艺台","都市台","体育台","双语台","综合台","生活台","旅游台","曲艺台","方言台"],
-		count:[300,300,300,100,100,100,20,20,500,100,50,20,50]
-	};
-	var c = ret.id.length;
-	var l = 0;
-	url = "http://rapi.qingting.fm/categories/" + ret.id[l] + "/channels?page=1&pagesize="+ret.count[l];
-	try{
-		xmlHttp2.open("GET", url, true);
-		xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp2.send(null);
-		xmlHttp2.onreadystatechange = function() {
-			if (xmlHttp2.readyState == 4) {
-				if (xmlHttp2.status == 200) {
-					var ret1 = json(xmlHttp2.responseText)["Data"];
-					listid = ret.title[l] + ": g;";
-					if(ret1 != null){
-						for (var k = 0; k < ret1.length; k++) {
-							listid += ret1[k].title + ":" + ret1[k].content_id + ";"
-						}
-						if(listid.charAt(listid.length-1) == ";") qtlistid += listid.slice(0,listid.length-1) + "|";
-						if(l+1==c) {
-							try {fso.DeleteFile(qtfm_arr);}catch(e) {};
-							qtlistid = qtlistid.slice(0,qtlistid.length-1);
-							SaveAs(qtlistid, qtfm_arr);
-							ppts.webkqtradioarr = qtlistid.split("|");
-						};
-					}
-				}
-				l++;
-				if (l < c){
-					var URL_Timer = window.SetTimeout(function () {
-						url = "http://rapi.qingting.fm/categories/" + ret.id[l] + "/channels?page=1&pagesize="+ret.count[l];
-						xmlHttp2.open("GET", url, true);
-						xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-						xmlHttp2.send(null);
-						URL_Timer && window.ClearTimeout(URL_Timer);
-					}, 5);
-				}
-			}
-		}
-		UpdateDone("电台更新成功!");
-	} catch(e) {
-		console.log("更新失败");
-		return;
-	}
-}
-
-function QTFMRadiolist(id, listname){
-	g_searchbox.inputbox.edit = false;
-	SetBoxText("正在获取电台列表...");
-	cachefile = fb.ProfilePath + "\\cache\\" + listname + ".asx";
-	try {
-		var filedata = '<asx version="3.0">\r\n\r\n';
-		for (var i = 1; i < id.length; i++) {
-			filedata = filedata + '<entry>\r\n'
-			 + '<title>' + id[i].split(":")[0] + '</title>\r\n'
-			 + '<author>' + listname + '</author>\r\n'
-			 + '<ref href="' + "http://lhttp.qingting.fm/live/" + id[i].split(":")[1] + "/64k.mp3" + '"/>\r\n'
-			 + '</entry>\r\n\r\n';
-		}
-		filedata = filedata + "</asx>";
-		SaveAs(filedata, cachefile);
-		UpdateList("电台 | " + listname);
-		SetBoxText(null);
-	} catch(e) {
-		console.log("获取电台失败");
-		return;
-	}
-	Deltempfile(cachefile);
-}
-
-function SetBoxText(text){
-	if(text == null) text ="";
-	g_searchbox.inputbox.text = text;
-	g_searchbox.repaint();
-}
-
-function UpdateDone(text){
-	SetBoxText(text);
-	var Done = window.SetTimeout(function() {
-		SetBoxText(null);
-		Done && window.ClearTimeout(Done);
-		Done = false;
-	}, 4000);
-}
-
-function UpdateList(listname){
+//=================================================//
+function LoadRadio(listname, url){
 	var isFound = false;
 	var total = plman.PlaylistCount;
 	for (var i = 0; i < total; i++) {
@@ -684,41 +568,6 @@ function UpdateList(listname){
 		plIndex = total;
 		plman.CreatePlaylist(plIndex, listname);
 	}
-	plman.AddLocations(plIndex, [cachefile]);
+	plman.AddLocations(plIndex, [url]);
 	plman.ActivePlaylist = plIndex;
-}
-
-function Deltempfile(tmpfile){
-	var DelFile = window.SetTimeout(function() {
-		try {
-			fso.DeleteFile(tmpfile);
-		} catch(e) {};
-		DelFile && window.ClearTimeout(DelFile);
-		DelFile = false;
-	}, 6000);
-}
-
-function SaveAs(str, file) {
-	var ado = new ActiveXObject("ADODB.Stream");
-	ado.Type = 2;
-	ado.Mode = 3;
-	ado.Charset = "UTF-8";
-	ado.Open();
-	try {
-		ado.WriteText(str);
-		ado.SaveToFile(file);
-	} catch (e) {
-		console.log("ADODB.Stream:写入文件失败。");
-	}
-	ado.Flush();
-	ado.Close();
-}
-
-function json(text) {
-	try {
-		var data = JSON.parse(text);
-		return data;
-	} catch (e) {
-		return false;
-	}
 }

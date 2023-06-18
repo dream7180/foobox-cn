@@ -14,7 +14,7 @@ var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.9";
+var g_script_version = "7.10";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -38,15 +38,7 @@ var fso = new ActiveXObject("Scripting.FileSystemObject");
 var setting_init = false;
 // drag'n drop from windows system
 var g_dragndrop_status = false;
-//var g_dragndrop_x = -1;
-//var g_dragndrop_y = -1;
 var g_dragndrop_bottom = false;
-var g_dragndrop_timer = false;
-var g_dragndrop_trackId = -1;
-var g_dragndrop_rowId = -1;
-//var g_dragndrop_targetPlaylistId = -1;
-//var g_dragndrop_total_before = 0;
-//var g_dragndrop_drop_forbidden = false;
 // font vars
 var g_fname, g_fsize, g_fstyle;
 var g_font = null;
@@ -276,15 +268,11 @@ cList = {
 dragndrop = {
 	enabled: true,
 	contigus_sel: null,
-	x: 0,
-	y: 0,
 	drag_id: -1,
 	drop_id: -1,
 	timerID: false,
-	drag_in: false,
-	//drag_out: false,
 	clicked: false,
-	moved: false
+	leave_flag: false
 };
 
 columns = {
@@ -963,29 +951,30 @@ function on_mouse_lbtn_up(x, y) {
 
 		// Drop items after a drag'n drop INSIDE the playlist
 		if (!properties.enableTouchControl) {
-			if (p.list.ishover && dragndrop.drag_in) {
+			if (p.list.ishover && g_dragndrop_status) {
 				if (dragndrop.drag_id >= 0 && dragndrop.drop_id >= 0) {
 					var save_focus_handle = fb.GetFocusItem();
 					var drop_handle = p.list.handleList[dragndrop.drop_id];
 					var nb_selected_items = p.list.metadblist_selection.Count;
 
 					if (dragndrop.contigus_sel && nb_selected_items > 0) {
-						if (dragndrop.drop_id > dragndrop.drag_id) {
-							// on pointe sur le dernier item de la selection si on move vers le bas
-							var new_drag_pos = p.list.handleList.Find(p.list.metadblist_selection[nb_selected_items - 1]);
-							var move_delta = dragndrop.drop_id - new_drag_pos;
+						if(nb_selected_items == 1){
+							var move_delta = dragndrop.drop_id - dragndrop.drag_id;
+							plman.MovePlaylistSelection(p.list.playlist, move_delta);
+						} else {
+							if (dragndrop.drop_id > dragndrop.drag_id) {
+								// on pointe sur le dernier item de la selection si on move vers le bas
+								var new_drag_pos = p.list.handleList.Find(p.list.metadblist_selection[nb_selected_items - 1]);
+								var move_delta = dragndrop.drop_id - new_drag_pos;
+							}
+							else {
+								// on pointe sur le 1er item de la selection si on move vers le haut
+								var new_drag_pos = p.list.handleList.Find(p.list.metadblist_selection[0]);
+								var move_delta = dragndrop.drop_id - new_drag_pos;
+							};
+							plman.MovePlaylistSelection(p.list.playlist, move_delta);
 						}
-						else {
-							// on pointe sur le 1er item de la selection si on move vers le haut
-							var new_drag_pos = p.list.handleList.Find(p.list.metadblist_selection[0]);
-							var move_delta = dragndrop.drop_id - new_drag_pos;
-						};
-
-						plman.MovePlaylistSelection(p.list.playlist, move_delta);
-
-					}
-					else {
-
+					} else {
 						// 1st: move selected item at the full end of the playlist to make then contigus
 						g_avoid_on_item_focus_change = true;
 						g_avoid_on_playlist_items_reordered = true;
@@ -1007,15 +996,11 @@ function on_mouse_lbtn_up(x, y) {
 				};
 			};
 		};
+		g_dragndrop_status = false;
+		dragndrop.leave_flag = false;
 		dragndrop.drag_id = -1;
 		dragndrop.drop_id = -1;
-		dragndrop.drag_in = false;
-		//dragndrop.drag_out = false;
-		dragndrop.moved = false;
 		dragndrop.clicked = false;
-		dragndrop.moved = false;
-		dragndrop.x = 0;
-		dragndrop.y = 0;
 		dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
 		dragndrop.timerID = false;
 		//window.SetCursor(IDC_ARROW);
@@ -1124,76 +1109,6 @@ function on_mouse_move(x, y) {
 				};
 				cover.previous_max_size = p.headerBar.columns[0].w;
 			};
-
-			// check headerbar for mouse icon dragging mode ***
-			if (p.list.mclicked && !p.headerBar.borderDragged && !p.headerBar.columnDragged) {
-				if (p.list.ishover) {
-					if (dragndrop.enabled && (dragndrop.drag_in || dragndrop.moved)) {
-						window.SetCursor(IDC_HELP);
-					}
-					else {
-						window.SetCursor(IDC_ARROW);
-					};
-				}
-				else {
-					if (dragndrop.enabled && (dragndrop.drag_in || dragndrop.moved)) {
-						if (x < 0 && y > 0 && y < wh) window.SetCursor(IDC_HELP);
-						else window.SetCursor(IDC_NO);
-					}
-					else {
-						window.SetCursor(IDC_ARROW);
-					};
-				};
-			};
-
-			// if Dragging Track on playlist, scroll playlist if required
-		/*	if (dragndrop.drag_in) {
-				// Dragn Drop
-				if (y < p.list.y) {
-					if (!p.list.buttonclicked) {
-						p.list.buttonclicked = true;
-						//
-						var scroll_speed_ms = 5;
-						//
-						if (!cScrollBar.timerID1) {
-							cScrollBar.timerID1 = window.SetInterval(function() {
-								on_mouse_wheel(1);
-							}, scroll_speed_ms);
-						};
-					}
-					else {
-						full_repaint();
-					};
-				}
-				else if (y > p.list.y + p.list.h) {
-					if (!p.list.buttonclicked) {
-						p.list.buttonclicked = true;
-						//
-						var scroll_speed_ms = 5;
-						//
-						if (!cScrollBar.timerID1) {
-							cScrollBar.timerID1 = window.SetInterval(function() {
-								on_mouse_wheel(-1);
-							}, scroll_speed_ms);
-						};
-					}
-					else {
-						full_repaint();
-					};
-				}
-				else {
-					cScrollBar.timerID1 && window.ClearInterval(cScrollBar.timerID1);
-					cScrollBar.timerID1 = false;
-					p.list.buttonclicked = false;
-					if (!dragndrop.timerID) {
-						dragndrop.timerID = window.SetTimeout(function() {
-							full_repaint();
-							dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
-							dragndrop.timerID = false;
-						}, 75);
-					};
-				};
-			};*/
 		};
 	};
 	// save coords
@@ -1268,48 +1183,25 @@ function on_mouse_wheel(delta) {
 			// timer to tell to other functions (on cover load asynch done, ...) that a repaint is already running
 			if (!g_mouse_wheel_timer) {
 				// set scroll speed / mouse y offset from panel limits
-				/*if (g_dragndrop_status) {
-					if (g_dragndrop_y < p.list.y + cTrack.height) {
-						var s = Math.abs(g_dragndrop_y - (p.list.y + cTrack.height));
-						var h = Math.ceil(cTrack.height / 2);
-						if (s > h) s = h;
-						var t = h - s + 1;
-						var r = Math.round(500 / h);
-						var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
-					}
-					else if (g_dragndrop_y > p.list.y + p.list.h - cTrack.height) {
-						var s = Math.abs(g_dragndrop_y - (p.list.y + p.list.h - cTrack.height));
-						var h = Math.ceil(cTrack.height / 2);
-						if (s > h) s = h;
-						var t = h - s + 1;
-						var r = Math.round(500 / h);
-						var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
-					}
-					else {
-						scroll_speed_ms = 20;
-					};
-				}*/
-				//else {
-					if (mouse_y < p.list.y) {
-						var s = Math.abs(mouse_y - p.list.y);
-						var h = Math.ceil(cTrack.height / 2);
-						if (s > h) s = h;
-						var t = h - s + 1;
-						var r = Math.round(500 / h);
-						var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
-					}
-					else if (mouse_y > p.list.y + p.list.h) {
-						var s = Math.abs(mouse_y - (p.list.y + p.list.h));
-						var h = Math.ceil(cTrack.height / 2);
-						if (s > h) s = h;
-						var t = h - s + 1;
-						var r = Math.round(500 / h);
-						var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
-					}
-					else {
-						scroll_speed_ms = 20;
-					};
-				//};
+				if (mouse_y < p.list.y) {
+					var s = Math.abs(mouse_y - p.list.y);
+					var h = Math.ceil(cTrack.height / 2);
+					if (s > h) s = h;
+					var t = h - s + 1;
+					var r = Math.round(500 / h);
+					var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
+				}
+				else if (mouse_y > p.list.y + p.list.h) {
+					var s = Math.abs(mouse_y - (p.list.y + p.list.h));
+					var h = Math.ceil(cTrack.height / 2);
+					if (s > h) s = h;
+					var t = h - s + 1;
+					var r = Math.round(500 / h);
+					var scroll_speed_ms = ((t * r) < 10 ? 10 : (t * r));
+				}
+				else {
+					scroll_speed_ms = 20;
+				};
 					//
 				g_mouse_wheel_timer = window.SetTimeout(function() {
 					var cw = cover.column ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
@@ -1394,15 +1286,13 @@ function on_playlists_changed() {
 		};
 
 		// close timers if dragging tracks is running
-		if (dragndrop.drag_in || dragndrop.moved) {
+		if (g_dragndrop_status) {
 			if (dragndrop.timerID) {
 				window.ClearTimeout(dragndrop.timerID);
 				dragndrop.timerID = false;
 			};
-			dragndrop.drag_in = false;
-			dragndrop.moved = false;
-			dragndrop.x = 0;
-			dragndrop.y = 0;
+			g_dragndrop_status = false;
+			dragndrop.leave_flag = false;
 			on_mouse_move(mouse_x + 1, mouse_y); // to reset window cursor style to a simple arrow
 		};
 
@@ -1537,7 +1427,7 @@ function on_key_down(vkey) {
 		};
 	}
 	else {
-		if (dragndrop.drag_in) return true;
+		if (g_dragndrop_status) return true;
 
 		var act_pls = plman.ActivePlaylist;
 
@@ -2678,20 +2568,18 @@ function on_playback_queue_changed(origin) {
 
 function on_drag_enter() {
 	g_dragndrop_status = true;
+	dragndrop.leave_flag = true;
 };
 
 function on_drag_leave() {
 	g_dragndrop_status = false;
-	g_dragndrop_trackId = -1;
-	g_dragndrop_rowId = -1;
-	//g_dragndrop_targetPlaylistId = -1;
 	p.list.buttonclicked = false;
 	cScrollBar.timerID1 && window.ClearInterval(cScrollBar.timerID1);
 	cScrollBar.timerID1 = false;
 };
 
 function on_drag_over(action, x, y, mask) {
-	if (dragndrop.drag_in && g_dragndrop_status) {
+	if (g_dragndrop_status) {
 		// Dragn Drop
 		if (y < p.list.y) {
 			action.Effect = 0;
@@ -2705,36 +2593,38 @@ function on_drag_over(action, x, y, mask) {
 			} else {
 				full_repaint();
 			};
-		} else if (y > p.list.h) {
-			action.Effect = 0;
-			if (!p.list.buttonclicked) {
-				p.list.buttonclicked = true;
-				if (!cScrollBar.timerID1) {
-					cScrollBar.timerID1 = window.SetInterval(function() {
-					on_mouse_wheel(-1);
-					}, 5);
-				};
-			} else {
-				full_repaint();
-			};
 		} else {
 			cScrollBar.timerID1 && window.ClearInterval(cScrollBar.timerID1);
 			cScrollBar.timerID1 = false;
 			p.list.buttonclicked = false;
 			
-			//if(action.IsInternal) action.Effect = 2;
+			if(!action.IsInternal) {
+				dragndrop.drag_id = plman.PlaylistItemCount(plman.ActivePlaylist);
+				plman.ClearPlaylistSelection(plman.ActivePlaylist);
+			}
 			action.Effect = 1;
-			g_dragndrop_trackId = -1;
-			g_dragndrop_rowId = -1;
 			//g_dragndrop_bottom = false;
 			if (!dragndrop.timerID) {
 				dragndrop.timerID = window.SetTimeout(function() {
 				p.list.check("drag_over", x, y);
+				if(g_dragndrop_bottom) {
+					dragndrop.drop_id = plman.PlaylistItemCount(plman.ActivePlaylist) - 1;
+				}
 				full_repaint();
 				dragndrop.timerID && window.ClearTimeout(dragndrop.timerID);
 				dragndrop.timerID = false;
-				}, 75);
+				}, 50);
 			};
+			if (y > p.list.h && !g_dragndrop_bottom) {
+				if (!p.list.buttonclicked) {
+					p.list.buttonclicked = true;
+					if (!cScrollBar.timerID1) {
+						cScrollBar.timerID1 = window.SetInterval(function() {
+						on_mouse_wheel(-1);
+						}, 5);
+					};
+				}
+			}
 		};
 	};
 };
@@ -2744,7 +2634,7 @@ function on_drag_drop(action, x, y, mask) {
 		action.Effect = 0;
 	} else if (action.IsInternal) {
 		action.Effect = 0; 
-		on_mouse_lbtn_up(x, y);
+		//if(g_dragndrop_bottom) plman.SetPlaylistFocusItem(plman.ActivePlaylist, plman.PlaylistItemCount(plman.ActivePlaylist) - 1);
     } else {
 		if (plman.ActivePlaylist > -1 && plman.IsPlaylistLocked(plman.ActivePlaylist)) {
 			action.Effect = 0;
@@ -2757,25 +2647,22 @@ function on_drag_drop(action, x, y, mask) {
 			action.ToSelect = true;
 			action.Effect = 1;
 		} else {
-			plman.ClearPlaylistSelection(plman.ActivePlaylist);
-			plman.UndoBackup(plman.ActivePlaylist);
 			action.Playlist = plman.ActivePlaylist;
-			action.Base = plman.PlaylistItemCount(plman.ActivePlaylist);
+			if(g_dragndrop_bottom) action.Base = dragndrop.drop_id + 1;
+			else action.Base = dragndrop.drop_id;
 			action.ToSelect = true;
 			action.Effect = 1;
-			g_dragndrop_timer = setTimeout(function(){
-                plman.SetPlaylistFocusItem(plman.ActivePlaylist, plman.PlaylistItemCount(plman.ActivePlaylist));
-                p.list.showFocusedItem();
-                clearTimeout(g_dragndrop_timer);
-                g_dragndrop_timer = false;
-            },75);
+			if(g_dragndrop_bottom) plman.SetPlaylistFocusItem(plman.ActivePlaylist, plman.PlaylistItemCount(plman.ActivePlaylist) - 1);
 		}
 		
 	}
-	//g_dragndrop_targetPlaylistId = -1;
-	g_dragndrop_trackId = -1;
-	g_dragndrop_rowId = -1;
+	cScrollBar.timerID1 && window.ClearInterval(cScrollBar.timerID1);
+	cScrollBar.timerID1 = false;
+	p.list.buttonclicked = false;
 	g_dragndrop_bottom = false;
+	g_dragndrop_status = false;
+	dragndrop.leave_flag = false;
+	dragndrop.drop_id = -1;
 	full_repaint();
 };
 

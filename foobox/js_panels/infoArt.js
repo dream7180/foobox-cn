@@ -59,7 +59,8 @@ g_tfo = {
 	album: fb.TitleFormat("$if2(%album%,)"),
 	mood: fb.TitleFormat("%mood%"),
 	codec: fb.TitleFormat("%codec%"),
-	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)")
+	codec_profile: fb.TitleFormat("$if(%codec_profile%, | %codec_profile%,)"),
+	bitrate: fb.TitleFormat("$if(%bitrate%, | %bitrate%K,)")
 }
 var rating, txt_title, txt_info, txt_profile, show_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
@@ -201,7 +202,7 @@ function OnMetadbChanged() {
 		if(txt_info_album) txt_info = txt_info + "  |  " + txt_info_album;
 	}else if(txt_info_album) txt_info = txt_info_album;
 	else txt_info = "";
-	txt_profile = g_tfo.codec.EvalWithMetadb(currentMetadb) + g_tfo.bitrate.EvalWithMetadb(currentMetadb) + "K";
+	txt_profile = g_tfo.codec.EvalWithMetadb(currentMetadb) + g_tfo.codec_profile.EvalWithMetadb(currentMetadb) + g_tfo.bitrate.EvalWithMetadb(currentMetadb);
 	l_mood = g_tfo.mood.EvalWithMetadb(currentMetadb);
 	tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
 	show_info = true;
@@ -2333,7 +2334,7 @@ function on_mouse_wheel(delta) {
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(currentMetadb && currentMetadb.Compare(handles[0])) {
+	if(!fromhook && currentMetadb && currentMetadb.Compare(handles[0])) {
 		MainController.Refresh(true, handles[0]);
 		OnMetadbChanged();
 	}

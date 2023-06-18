@@ -186,7 +186,7 @@ function arrayContains(array, name) {
 
 function renamePlaylist() {
 	if (!brw.inputbox.text || brw.inputbox.text == "" || brw.inputboxID == -1) brw.inputbox.text = brw.rows[brw.inputboxID].name;
-	if (brw.inputbox.text.length > 1) {
+	if (brw.inputbox.text.length > 0) {
 		brw.rows[brw.inputboxID].name = brw.inputbox.text;
 		plman.RenamePlaylist(brw.rows[brw.inputboxID].idx, brw.inputbox.text);
 		window.SetCursor(IDC_ARROW);
@@ -1116,7 +1116,8 @@ oBrowser = function(name) {
 			fb.RunMainMenuCommand("编辑/移除重复项");
 			break;
 		case (idx == 12):
-			fb.RunMainMenuCommand("编辑/移除无效项");
+			if(Number(fb.Version.substr(0, 1)) > 1) fb.RunMainMenuCommand("编辑/移除失效项目");
+			else fb.RunMainMenuCommand("编辑/移除无效项");
 			break;
 		case (idx == 15):
 			window.ShowProperties();
@@ -1462,6 +1463,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 			else return images.icon_auto_pl_hl;
 		}else{
 			if (name.substr(0, 2) == "电台") return images.radios_icon_hl;
+			else if(name.substr(0, 4) == "网络电台") return images.radios_icon_hl;
 			else return images.icon_normal_pl_playing_hl;
 		}
 	} else {
@@ -1474,6 +1476,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 			else return images.icon_auto_pl;
 		} else{
 			if (name.substr(0, 2) == "电台") return images.radios_icon;
+			else if(name.substr(0, 4) == "网络电台") return images.radios_icon;
 			else return images.icon_normal_pl;
 		}
 	}

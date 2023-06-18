@@ -3228,8 +3228,8 @@ function on_item_focus_change(playlist_idx, from, to) {
 	};
 };
 
-function on_metadb_changed() {
-	brw.populate();
+function on_metadb_changed(handles, fromhook) {
+	if(!fromhook) brw.populate();
 };
 
 function on_playlist_items_selection_change() {
