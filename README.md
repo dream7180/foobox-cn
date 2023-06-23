@@ -12,13 +12,15 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 * 复制 profile 里的文件夹到 foobar2000 用户配置目录下。
 
 > **Note** 便携版，profile 位于 foobar2000 根目录下。目录结构如下:
-> ![alt](info/portable.png#pic_left)
 
-> **Note** 非便携版，即各用户使用独立配置文件，用户配置文件夹位于：
-> **C:\Users\用户名\AppData\Roaming\foobar2000**  (1.x版)
-> **C:\Users\用户名\AppData\Roaming\foobar2000-v2**  (2.x版)
+<span style="display:block;text-align:left">![](info/portable.png)</span>
+
+> **Note** 非便携版，即各用户使用独立配置文件，用户配置文件夹位于：\
+> **C:\Users\用户名\AppData\Roaming\foobar2000**  (1.x版)\
+> **C:\Users\用户名\AppData\Roaming\foobar2000-v2**  (2.x版)\
 > 目录结构如下 (2.x版为例):
-> ![alt](info/nonportable.png#pic_left)
+
+<span style="display:block;text-align:left">![](info/nonportable.png)</span>
 
 [**查看 foobox 帮助**](https://dream7180.gitee.io/2023/foobox-release/)
 
