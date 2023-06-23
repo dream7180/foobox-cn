@@ -2351,7 +2351,6 @@ var g_font = null, g_font_b = null, g_font_s = null, g_font_bb = null;
 //
 var ww = 0,
 	wh = 0;
-var g_metadb = null;
 var g_focus = false;
 clipboard = {
 	selection: null
@@ -3080,11 +3079,9 @@ function on_char(code) {
 function on_playback_stop(reason) {
 	brw.playingIndex = -1;
 	brw.repaint();
-	g_metadb = null;
 };
 
 function on_playback_new_track(metadb) {
-	g_metadb = metadb;
 	if(ppt.sourceMode == 0) {
 		try{
 			playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
@@ -3094,9 +3091,9 @@ function on_playback_new_track(metadb) {
 	try {
 		if (!ppt.locklibpl) {//pure playlist mode
 			if (plman.PlayingPlaylist != plman.ActivePlaylist) {
-				g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;
-			};
-			if(ppt.forceSorting){
+				//g_active_playlist = plman.ActivePlaylist = plman.PlayingPlaylist;
+				brw.playingIndex = -1;
+			} else if(ppt.forceSorting){
 				brw.nowplaying = plman.GetPlayingItemLocation();
 				var gid = brw.getItemIndexFromTrackIndex(brw.nowplaying.PlaylistItemIndex);
 				if (gid > -1) {
@@ -3162,7 +3159,10 @@ function on_playlists_changed() {
 
 function on_playlist_switch() {
 
-	if (!ppt.locklibpl) g_active_playlist = plman.ActivePlaylist;
+	if (!ppt.locklibpl) {
+		g_active_playlist = plman.ActivePlaylist;
+		if(g_active_playlist != plman.PlayingPlaylist) brw.playingIndex = -1;
+	}
 	if (ppt.sourceMode == 1 && !ppt.locklibpl) {
 		scroll = scroll_ = 0;
 		brw.populate();

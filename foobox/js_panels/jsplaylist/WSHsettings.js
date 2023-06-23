@@ -870,7 +870,8 @@ oLink = function (){
 					this.ShellExecute("https://dream7180.gitee.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 				case 3:
-					this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
+					if(Number(fb.Version.substr(0, 1)) > 1) this.ShellExecute("https://www.esnpc.com/foobar2000-20-simplified-chinese-version/", "", "", "open", 1);
+					else this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
 					break;
 			};
 			this.link_hover = 0;
