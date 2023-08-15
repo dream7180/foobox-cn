@@ -1242,7 +1242,6 @@ function update_playlist(iscollapsed) {
 };
 
 function on_playlist_switch() {
-	var old_layout = layout.uid;
 	var old_extraline = layout.enableExtraLine;
 	var old_columnwidth = layout.columnWidth[layout.index];
 	layout.playlistName = plman.GetPlaylistName(plman.ActivePlaylist);
@@ -2737,6 +2736,7 @@ function get_layout(plname){
 }
 
 function get_layout_cache(plname){
+	var old_index = layout.index;
 	layout.index = layout.ids.indexOf(plname);
 	if(layout.index > -1)
 		layout.uid = plname;
@@ -2744,8 +2744,10 @@ function get_layout_cache(plname){
 		layout.uid = "默认布局";
 		layout.index = 0;
 	}
-	layout.gopts = layout.config[layout.index];
-	assign_gopts();
+	if(old_index != layout.index){
+		layout.gopts = layout.config[layout.index];
+		assign_gopts();
+	}
 }
 
 function assign_gopts(){
