@@ -185,12 +185,14 @@ function arrayContains(array, name) {
 }
 
 function renamePlaylist() {
+	var org_name = brw.rows[brw.inputboxID].name;
 	if (!brw.inputbox.text || brw.inputbox.text == "" || brw.inputboxID == -1) brw.inputbox.text = brw.rows[brw.inputboxID].name;
 	if (brw.inputbox.text.length > 0) {
 		brw.rows[brw.inputboxID].name = brw.inputbox.text;
 		plman.RenamePlaylist(brw.rows[brw.inputboxID].idx, brw.inputbox.text);
 		window.SetCursor(IDC_ARROW);
 		brw.repaint();
+		window.NotifyOthers("Playlist_Renamed", [org_name, brw.inputbox.text]);
 	};
 	brw.inputboxID = -1;
 }
@@ -207,7 +209,7 @@ function DeletePlaylist(delete_pid){
 }
 
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
-	utils.ShowHtmlDialog(window.ID, htmlCode(fb.FoobarPath + "themes\\foobox\\html","ConfirmDialog.html"), {
+	utils.ShowHtmlDialog(window.ID, htmlCode(fb.ProfilePath + "foobox\\script\\html","ConfirmDialog.html"), {
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],
 	});
 }
@@ -631,8 +633,7 @@ oBrowser = function(name) {
 					var total = plman.PlaylistCount;
 					var pl_idx = total;
 					var id = this.rowsCount;
-					plman.CreatePlaylist(total, "");
-					plman.MovePlaylist(total, pl_idx);
+					plman.CreatePlaylist(pl_idx, "");
 					plman.ActivePlaylist = pl_idx;
 					// set rename it
 					var rh = ppt.rowHeight - 10;
@@ -682,7 +683,6 @@ oBrowser = function(name) {
 						this.selectedRow = cPlaylistManager.drag_target_id;
 					};
 				};
-
 				if (timers.movePlaylist) {
 					timers.movePlaylist && window.ClearInterval(timers.movePlaylist);
 					timers.movePlaylist = false;
@@ -1016,13 +1016,7 @@ oBrowser = function(name) {
 			this.repaint();
 			break;
 		case (idx == 101):
-			var total = plman.PlaylistCount;
-			g_avoid_on_playlists_changed = true;
-			plman.CreatePlaylist(total, "");
-			var new_label = plman.GetPlaylistName(total);
-			plman.RemovePlaylist(total);
-			g_avoid_on_playlists_changed = false;
-			plman.CreateAutoPlaylist(total, new_label, "在这里输入你的查询", "", 0);
+			plman.CreateAutoPlaylist(total, "", "在这里输入你的查询", "", 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			plman.ShowAutoPlaylistUI(pl_idx);
@@ -1095,9 +1089,9 @@ oBrowser = function(name) {
 		case (idx == 8):
 			if (brw.rowsCount > 0) {
 				if(ppt.confirmRemove){
-					DeletePlaylist(brw.selectedRow);
+					DeletePlaylist(pl_idx);
 				} else {
-					plman.RemovePlaylistSwitch(brw.selectedRow);
+					plman.RemovePlaylistSwitch(pl_idx);
 					brw.selectedRow = plman.ActivePlaylist;
 				}
 			}
@@ -1833,11 +1827,12 @@ function on_key_down(vkey) {
 				};
 				break;
 			case VK_DELETE:
+				if(ppt.showFilter && g_filterbox.inputbox.edit) return;
 				if (brw.rowsCount > 0 && brw.selectedRow > (ppt.lockReservedPlaylist ? 0 : -1)) {
 					if(ppt.confirmRemove){
-						DeletePlaylist(brw.selectedRow);
+						DeletePlaylist(brw.rows[brw.selectedRow].idx);
 					} else {
-						plman.RemovePlaylistSwitch(brw.selectedRow);
+						plman.RemovePlaylistSwitch(brw.rows[brw.selectedRow].idx);
 						brw.selectedRow = plman.ActivePlaylist;
 					}
 				}
@@ -2133,10 +2128,6 @@ function on_notify_data(name, info) {
 		brw.scrollbar.setSize();
 		brw.setSize(0, ppt.rowHeight +  ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.rowHeight - ppt.headerBarHeight);
 		brw.repaint();
-		break;
-	case "Sorting format change":
-		default_sort = info;
-		window.SetProperty("_PROPERTY: New playlist sortorder", default_sort);
 		break;
 	case "ScrollStep":
 		ppt.rowScrollStep = info;

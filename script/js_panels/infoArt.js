@@ -4,7 +4,7 @@
 //mod for foobox https://github.com/dream7180
 var zdpi = 1;
 var g_fname, g_fsize;
-var genre_cover_dir = fb.FoobarPath + "themes\\foobox\\Genre";
+var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var Caption_Pack = {
 	"Front": "封面",
 	"Back": "封底",
@@ -1288,8 +1288,8 @@ function Display(x, y, w, h, prop) {
 		// Draw default cover ----------------
 		cover_default = gdi.CreateImage(w, h);
 		var g = cover_default.GetGraphics();
-		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.FoobarPath + "themes\\foobox\\images\\cover_w.jpg");
-		else var cover_img_default = gdi.Image(fb.FoobarPath + "themes\\foobox\\images\\cover_default.jpg");
+		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_w.jpg");
+		else var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_default.jpg");
 		var ratio = Math.min(w/cover_img_default.Width, h/cover_img_default.Height);
 		var img_ww = Math.round(ratio * cover_img_default.Width), img_hh = Math.round(ratio * cover_img_default.Height);
 		g.DrawImage(cover_img_default, Math.round((w-img_ww)/2), Math.round((h-img_hh)/2), img_ww, img_hh, 0, 0, cover_img_default.Width, cover_img_default.Height);
@@ -1974,14 +1974,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		}else{
 			var imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
 			imgColor = toRGB(imgColorData[0].col);
-			if(imgColor[0]>160 && imgColor[1]>160 && imgColor[2]>160){
-				if(!dark_mode && imgColor[0]>240 && imgColor[1]>240 && imgColor[2]>240) imgColor = false;
-				else{
-					var reduction = Math.round((imgColor[0]+imgColor[1]+imgColor[2] - 480) / 3);
-					imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-					imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-					imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-				}
+			var c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
+			if(!dark_mode && c_aggr > 732) imgColor = false;
+			else if(c_aggr > 450){
+				var reduction = Math.round((c_aggr - 450) / 3);
+				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
+				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
+				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
 			}
 			else if(dark_mode && imgColor[0]<75 && imgColor[1]<75 && imgColor[2]<75){
 				var reduction = Math.round((225-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
@@ -2114,11 +2113,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.Init();
 }
 
-
 // ===================================================
-
-var themePath = fb.FoobarPath + "themes\\foobox\\js_panels";
-//------------------------------------------------
 var VBE;
 try {
 	VBE = new ActiveXObject("ScriptControl");

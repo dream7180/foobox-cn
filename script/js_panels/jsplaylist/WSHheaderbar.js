@@ -36,10 +36,10 @@ oColumn = function() {
 	this.label = arguments[0];
 	this.tf = arguments[1];
 	this.tf2 = arguments[2];
-	this.percent = arguments[3];
-	this.ref = arguments[4];
-	this.align = Math.round(arguments[5]);
-	this.sortOrder = arguments[6];
+	this.ref = arguments[3];
+	this.align = Math.round(arguments[4]);
+	this.sortOrder = arguments[5];
+	this.percent = arguments[6];
 	this.DT_align = (this.align == 0 ? DT_LEFT : (this.align == 2 ? DT_RIGHT : DT_CENTER));
 	this.minWidth = zoom(32, zdpi);
 	this.drag = false;
@@ -67,7 +67,7 @@ oHeaderBar = function() {
 	//this.visible = true;
 	this.columns = [];
 	this.borders = [];
-	this.totalColumns = window.GetProperty("SYSTEM.HeaderBar.TotalColumns", 0);
+	this.totalColumns = 0;
 	this.borderDragged = false;
 	this.borderDraggedId = -1;
 	this.columnDragged = 0;
@@ -135,7 +135,7 @@ oHeaderBar = function() {
 			if (this.columns[i].percent > 0) {
 				this.columns[i].x = tmp;
 				this.columns[i].y = this.y;
-				this.columns[i].w = Math.abs(this.w * this.columns[i].percent / 100000);
+				this.columns[i].w = Math.abs(this.w * this.columns[i].percent / 10000);
 				this.columns[i].h = this.h;
 				if (i != this.columnDraggedId || (this.columnDragged == 1)) {
 					// start >> on last column, adjust width of last drawn column to fit headerbar width!
@@ -157,10 +157,6 @@ oHeaderBar = function() {
 			};
 		};
 	};
-
-	//this.drawHiddenPanel = function(gr) {
-	//	gr.FillSolidRect(this.x, this.y, this.w + cScrollBar.width, 1, g_color_normal_bg); //g_color_normal_txt & 0x09ffffff);
-	//}
 
 	this.drawColumns = function(gr) {
 		var j = 0,
@@ -275,14 +271,9 @@ oHeaderBar = function() {
 		if (this.columnDragged > 1 && this.columnDraggedId != null) {
 			cx = Math.floor(mouse_x - this.clickX) + 2;
 			cy = this.y + 3;
-			// shadow
-			//gr.FillSolidRect(cx + 4, cy + 3, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 10));
-			//gr.FillSolidRect(cx + 3, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 15));
-			//gr.FillSolidRect(cx + 2, cy + 1, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 30));
 			// header bg
 			gr.FillSolidRect(cx, cy, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h-2, g_color_normal_txt & 0x80ffffff);
 			gr.DrawRect(cx, cy + 1, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h - 2, 2.0, g_color_normal_txt);
-			//gr.DrawRect(cx + 1, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 5), this.h - 5, 1.0, blendColors(g_color_normal_txt, g_color_normal_bg, 0.55));
 			// header text info
 			gr.GdiDrawText(this.columns[this.columnDraggedId].label, g_font_b, g_color_normal_bg, cx + (this.borderWidth * 2), cy + 1, this.columns[this.columnDraggedId].w - (this.borderWidth * 4) - 2, this.h, this.columns[this.columnDraggedId].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		};
@@ -290,9 +281,10 @@ oHeaderBar = function() {
 		this.button.draw(gr, this.x + this.w, this.y, 255);
 	};
 
-	this.saveColumns = function() {
+	this.saveColumns = function(col_num_changed) {
 		var tmp;
-		for (var j = 0; j < 7; j++) {
+		var config_col = "";
+		for (var j = 0; j < 6; j++) {
 			tmp = "";
 			for (var i = 0; i < this.columns.length; i++) {
 				switch (j) {
@@ -306,83 +298,104 @@ oHeaderBar = function() {
 					tmp = tmp + this.columns[i].tf2;
 					break;
 				case 3:
-					tmp = tmp + this.columns[i].percent;
-					break;
-				case 4:
 					tmp = tmp + this.columns[i].ref;
 					break;
-				case 5:
+				case 4:
 					tmp = tmp + this.columns[i].align;
 					break;
-				case 6:
+				case 5:
 					tmp = tmp + this.columns[i].sortOrder;
 					break;
 				};
-				// add separator ';'
 				if (i < this.columns.length - 1) {
 					tmp = tmp + "^^";
 				};
 			};
 			switch (j) {
 			case 0:
-				window.SetProperty("SYSTEM.HeaderBar.label", tmp);
+				config_col = tmp;
 				break;
 			case 1:
-				window.SetProperty("SYSTEM.HeaderBar.tf", tmp);
+				config_col = config_col + "##" + tmp;
 				break;
 			case 2:
-				window.SetProperty("SYSTEM.HeaderBar.tf2", tmp);
+				config_col = config_col + "##" + tmp;
 				break;
 			case 3:
-				window.SetProperty("SYSTEM.HeaderBar.percent", tmp);
+				config_col = config_col + "##" + tmp;
 				break;
 			case 4:
-				window.SetProperty("SYSTEM.HeaderBar.ref", tmp);
+				config_col = config_col + "##" + tmp;
 				break;
 			case 5:
-				window.SetProperty("SYSTEM.HeaderBar.align", tmp);
-				break;
-			case 6:
-				window.SetProperty("SYSTEM.HeaderBar.sort", tmp);
+				config_col = config_col + "##" + tmp;
 				break;
 			};
 		};
+		utils.WriteTextFile(config_dir + "columns", config_col);
+		if(col_num_changed) {
+			tmp = "";
+			layout.columnWidth.splice(0, layout.columnWidth.length);
+			for (var j = 0; j < layout.ids.length - 1; j++){
+				for (var i = 0; i < this.columns.length; i++) {
+					tmp = tmp + this.columns[i].percent;
+					if (i < this.columns.length - 1) tmp = tmp + "^^"
+				}
+			layout.columnWidth.push(tmp);
+			}
+			save_config("columnWidth");
+		}
 		this.initColumns();
 	};
+
+	this.saveColumnsWidth = function() {
+		var tmp = "";
+		for (var i = 0; i < this.columns.length; i++) {
+			tmp = tmp + this.columns[i].percent;
+			if (i < this.columns.length - 1)
+				tmp = tmp + "^^";
+		}
+		layout.columnWidth[layout.index] = tmp;
+		save_config("columnWidth");
+	}
 
 	this.initColumns = function() {
 		var borderPercent = 0;
 		var previousColumnToDrawId = -1;
-		var totalColumnsToDraw = 0;
+		//var totalColumnsToDraw = 0;
 		this.columns.splice(0, this.columns.length);
 		this.borders.splice(0, this.borders.length);
-		if (this.totalColumns == 0) {
+		var config_col = "";
+		try{
+			config_col = utils.ReadTextFile(config_dir + "columns", 0);
+		}catch(e){}
+		if (config_col == "") {
 			// INITIALIZE columns and Properties
 			var fields = [];
-			var tmp, percent;
+			var tmp;
 			for (var i = 0; i < 7; i++) {
 				switch (i) {
 				case 0:
 					fields.push(new Array("封面", "状态", "索引", "#", "标题", "年份", "艺术家", "专辑艺术家", "专辑", "流派", "喜爱", "等级", "播放次数", "比特率", "编码", "采样率", "时间"));
 					break;
 				case 1:
-					if(Number(fb.Version.substr(0, 1)) > 1) fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%year%,%year%,'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$div(%samplerate%,1000).$sub($div(%samplerate%,100),$mul($div(%samplerate%,1000),10))kHz", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
-					else fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$div(%samplerate%,1000).$sub($div(%samplerate%,100),$mul($div(%samplerate%,1000),10))kHz", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
+					if(Number(fb.Version.substr(0, 1)) > 1) fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%year%,%year%,'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$if(%mood%,1,0)", "$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$div(%samplerate%,1000).$sub($div(%samplerate%,100),$mul($div(%samplerate%,1000),10))kHz", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
+					else fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$if(%mood%,1,0)", "$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$div(%samplerate%,1000).$sub($div(%samplerate%,100),$mul($div(%samplerate%,1000),10))kHz", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
 					break;
 				case 2:
 					fields.push(new Array("null", "null", "null", "$if2(%play_count%,0)", "$if2(%album artist%,'未知艺术家')", "null", "null", "null", "$if2(%genre%,'其他')", "null", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
 					break;
 				case 3:
-					fields.push(new Array("10000", "5000", "0", "5000", "37000", "0", "26000", "0", "0", "0", "0", "10000", "0", "0", "0", "0", "7000"));
-					break;
-				case 4:
 					fields.push(new Array("封面", "状态", "索引", "音轨号", "标题", "日期", "艺术家", "专辑艺术家", "专辑", "流派", "喜爱", "等级", "播放次数", "比特率", "编码类型", "采样率", "持续时间"));
 					break;
-				case 5:
+				case 4:
 					fields.push(new Array("1", "1", "1", "2", "0", "2", "0", "0", "0", "0", "1", "1", "2", "1", "1", "1", "2"));
 					break;
+				case 5:
+					fields.push(new Array("null", sort_pattern_queue, "null", sort_pattern_tracknumber, sort_pattern_title, sort_pattern_date, sort_pattern_artist, sort_pattern_albumartist, sort_pattern_album, sort_pattern_genre, "%mood% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", sort_pattern_rating, sort_pattern_playcount, sort_pattern_bitrate, sort_pattern_codec, "%samplerate% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", "$if2(%length%,' 0:00') | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%"));
+					break;
 				case 6:
-					fields.push(new Array(sort_pattern_albumartist, sort_pattern_queue, "null", sort_pattern_tracknumber, sort_pattern_title, sort_pattern_date, sort_pattern_artist, sort_pattern_albumartist, sort_pattern_album, sort_pattern_genre, "%mood% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", sort_pattern_rating, sort_pattern_playcount, sort_pattern_bitrate, sort_pattern_codec, "%samplerate% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", "$if2(%length%,' 0:00') | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%"));
+					fields.push(new Array("1000", "500", "0", "500", "3700", "0", "2600", "0", "0", "0", "0", "1000", "0", "0", "0", "0", "700"));
 					break;
 				};
 				// convert array to csv string
@@ -396,31 +409,32 @@ oHeaderBar = function() {
 				// save CSV string into window Properties
 				switch (i) {
 				case 0:
-					window.SetProperty("SYSTEM.HeaderBar.label", tmp);
+					config_col = tmp;
 					break;
 				case 1:
-					window.SetProperty("SYSTEM.HeaderBar.tf", tmp);
+					config_col = config_col + "##" + tmp;
 					break;
 				case 2:
-					window.SetProperty("SYSTEM.HeaderBar.tf2", tmp);
+					config_col = config_col + "##" + tmp;
 					break;
 				case 3:
-					window.SetProperty("SYSTEM.HeaderBar.percent", tmp);
+					config_col = config_col + "##" + tmp;
 					break;
 				case 4:
-					window.SetProperty("SYSTEM.HeaderBar.ref", tmp);
+					config_col = config_col + "##" + tmp;
 					break;
 				case 5:
-					window.SetProperty("SYSTEM.HeaderBar.align", tmp);
+					config_col = config_col + "##" + tmp;
 					break;
 				case 6:
-					window.SetProperty("SYSTEM.HeaderBar.sort", tmp);
+					layout.columnWidth[0] = tmp;
+					utils.WriteTextFile(config_dir + "layout_columnWidth", tmp);
 					break;
 				};
 			};
 			// create column Objects
+			utils.WriteTextFile(config_dir + "columns", config_col);
 			this.totalColumns = fields[0].length;
-			window.SetProperty("SYSTEM.HeaderBar.TotalColumns", this.totalColumns);
 			for (var k = 0; k < this.totalColumns; k++) {
 				this.columns.push(new oColumn(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k]));
 				if (this.columns[k].percent > 0) {
@@ -436,32 +450,46 @@ oHeaderBar = function() {
 		else {
 			var fields = [];
 			var tmp;
-			// LOAD columns from Properties
+			config_col = config_col.split("##");
 			for (var i = 0; i < 7; i++) {
 				switch (i) {
 				case 0:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.label", "?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?");
+					tmp = config_col[0];
 					break;
 				case 1:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.tf", "?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?");
+					tmp = config_col[1];
 					break;
 				case 2:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.tf2", "?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?");
+					tmp = config_col[2];
 					break;
 				case 3:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.percent", "0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0");
+					tmp = config_col[3];
 					break;
 				case 4:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.ref", "?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?");
+					tmp = config_col[4];
 					break;
 				case 5:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.align", "0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0");
+					tmp = config_col[5];
 					break;
 				case 6:
-					tmp = window.GetProperty("SYSTEM.HeaderBar.sort", "?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?^^?");
+					tmp = layout.columnWidth[layout.index];
+					if (!tmp) {
+						tmp = "1000^^500^^0^^500^^3700^^0^^2600^^0^^0^^0^^0^^1000^^0^^0^^0^^0^^700";
+						for (var j = 17; j < this.totalColumns; j++){
+							tmp = tmp + "^^0";
+						}
+						var tmp2 = tmp;
+						for (j = 0; j < layout.ids.length - 1; j++){
+							tmp2 = tmp2 + "##" + tmp;
+							layout.columnWidth[j] = tmp;
+						}
+						layout.columnWidth[layout.ids.length - 1] = tmp;
+						utils.WriteTextFile(config_dir + "layout_columnWidth", tmp2);
+					}
 					break;
 				};
 				fields.push(tmp.split("^^"));
+				if(i == 0) this.totalColumns =  fields[0].length;
 			};
 			for (var k = 0; k < this.totalColumns; k++) {
 				this.columns.push(new oColumn(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k]));
@@ -490,7 +518,7 @@ oHeaderBar = function() {
 					break;
 				case "up":
 					if (this.buttonClicked && state == ButtonStates.hover) {
-						this.contextMenu(ww, 0, 0);//this.contextMenu(ww - cScrollBar.width, cHeaderBar.height, 0);
+						this.contextMenu(ww, 0, 0);
 						this.button.state = ButtonStates.normal;
 					};
 					this.buttonClicked = false;
@@ -553,8 +581,7 @@ oHeaderBar = function() {
 					if (this.borderDragged) {
 						for (var i = 0; i < this.borders.length; i++) {
 							if (this.borders[i].drag) {
-								// save updated left & right columns 'percent' properties
-								tmp = window.GetProperty("SYSTEM.HeaderBar.percent", "0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0^^0");
+								tmp = layout.columnWidth[layout.index];
 								percents = tmp.split("^^");
 								percents[Math.round(this.borders[i].leftId)] = this.columns[this.borders[i].leftId].percent.toString();
 								percents[Math.round(this.borders[i].rightId)] = this.columns[this.borders[i].rightId].percent.toString();
@@ -566,7 +593,8 @@ oHeaderBar = function() {
 										tmp = tmp + "^^";
 									};
 								};
-								window.SetProperty("SYSTEM.HeaderBar.percent", tmp);
+								layout.columnWidth[layout.index] = tmp;
+								save_config("columnWidth");
 								// update border object status
 								this.borders[i].on_mouse(event, x, y);
 								this.repaint();
@@ -595,8 +623,7 @@ oHeaderBar = function() {
 								else {
 									plman.SortByFormatV2(plman.ActivePlaylist, this.columns[this.columnDraggedId].tf, this.sortedColumnDirection);
 								};
-								window.NotifyOthers("Sorting format null", true);
-								update_playlist(properties.collapseGroupsByDefault);
+								update_playlist(layout.collapseGroupsByDefault);
 							}
 							else {
 								this.columns[this.columnDraggedId].drag = false;
@@ -656,8 +683,8 @@ oHeaderBar = function() {
 								if (toDoLeft && toDoRight) { // ok, we can resize the left and the right columns
 									this.columns[this.borders[i].leftId].w += d;
 									this.columns[this.borders[i].rightId].w -= d;
-									var addedPercent = Math.abs(this.columns[this.borders[i].leftId].percent) + Math.abs(this.columns[this.borders[i].rightId].percent);
-									this.columns[this.borders[i].leftId].percent = Math.abs(this.columns[this.borders[i].leftId].w / this.w * 100000);
+									var addedPercent = Math.round(Math.abs(this.columns[this.borders[i].leftId].percent) + Math.abs(this.columns[this.borders[i].rightId].percent));
+									this.columns[this.borders[i].leftId].percent = Math.round(Math.abs(this.columns[this.borders[i].leftId].w / this.w * 10000));
 									this.columns[this.borders[i].rightId].percent = addedPercent - this.columns[this.borders[i].leftId].percent;
 									this.borders[i].sourceX = x;
 									full_repaint();
@@ -688,7 +715,7 @@ oHeaderBar = function() {
 								};
 							};
 						};
-						this.saveColumns();
+						this.saveColumnsWidth();
 						full_repaint();
 					};
 					break;
@@ -715,8 +742,7 @@ oHeaderBar = function() {
 			percents = [];
 
 		// check if active playlist is filtered in group patterns
-		//var pl_name = plman.GetPlaylistName(plman.ActivePlaylist);
-		var found = false;
+		/*var found = false;
 		var default_pattern_index = -1;
 		var playlist_pattern_index = -1;
 		if (properties.enablePlaylistFilter) {
@@ -732,48 +758,66 @@ oHeaderBar = function() {
 							default_pattern_index = m;
 							playlist_pattern_index = (playlist_pattern_index < 0 ? m : playlist_pattern_index);
 						};
-						if (arr_pl[n] == p.list.name) {
+						if (arr_pl[n] == layout.playlistName) {
 							found = true;
 							playlist_pattern_index = m;
 						};
 					};
 				};
 			};
-		};
+		};*/
 
 		// main Menu entries
 		_menu.AppendMenuItem(MF_STRING, 11, "转到当前播放 (F2)"); 	        
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 12, "foobox 设置");
-		_groups.AppendTo(_menu, MF_STRING, "分组选项");
-		_groups.AppendMenuItem(MF_STRING, 18, "启用分组");
-		_groups.CheckMenuItem(18, properties.showgroupheaders);
-		if (properties.showgroupheaders) {
-			_groups.AppendMenuItem(MF_STRING, 17, "电台列表禁止分组");
-			_groups.CheckMenuItem(17, properties.NetDisableGroup);
-			_groups.AppendMenuItem(MF_STRING, 19, "启用播放列表过滤");
-			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);
-			_groups.AppendMenuSeparator();
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Shift+Tab)");	
-		};
-		_groups.AppendMenuSeparator();
-		_groups.AppendMenuItem(MF_STRING, 13, "编辑分组...");
 		_menu.AppendMenuSeparator();
-		if (properties.showgroupheaders) {
-			_patterns.AppendTo(_menu, MF_STRING, "更改分组依据");
+		var _thislayout = "默认布局: ";
+		if (layout.index != 0) _thislayout = "此布局: ";
+		if(layout.uid == "默认布局") {
+			_menu.AppendMenuItem(MF_STRING, 15, "为此播放列表创建新布局");
+			//_menu.AppendMenuSeparator();
+		}
+		_menu.AppendMenuItem(MF_STRING, 18, _thislayout + "启用分组");
+		_menu.CheckMenuItem(18, layout.showgroupheaders);
+		if (layout.showgroupheaders) {
+			_patterns.AppendTo(_menu, MF_STRING, _thislayout + "分组依据");
 			var groupByMenuIdx = 20;
 			var totalGroupBy = p.list.groupby.length;
 			for (var i = 0; i < totalGroupBy; i++) {
-				_patterns.AppendMenuItem(((!found && default_pattern_index < 0) ? MF_STRING : MF_GRAYED | MF_DISABLED), groupByMenuIdx + i, p.list.groupby[i].label);
+				_patterns.AppendMenuItem(/*((!found && default_pattern_index < 0) ? */MF_STRING/* : MF_GRAYED | MF_DISABLED)*/, groupByMenuIdx + i, p.list.groupby[i].label);
 			};
-			if (!found && default_pattern_index < 0) {
-				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, cGroup.pattern_idx + groupByMenuIdx);
+			//if (!found && default_pattern_index < 0) {
+				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, layout.pattern_idx + groupByMenuIdx);
+			//}
+			//else {
+			//	_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, playlist_pattern_index + groupByMenuIdx);
+			//};
+		};
+		// Columns submenu entries
+		_columns.AppendTo(_menu, MF_STRING, _thislayout + "列");
+		_columns.AppendMenuItem(MF_STRING, 99, "显示附加行信息");
+		_columns.CheckMenuItem(99, layout.enableExtraLine ? 1 : 0);
+		_columns.AppendMenuSeparator();
+		var columnMenuIdx = 100;
+		for (var i = 0; i < this.columns.length; i++) {
+			if (i == column_index) {
+				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, "[" + this.columns[i].label + "]");
 			}
 			else {
-				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, playlist_pattern_index + groupByMenuIdx);
+				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, this.columns[i].label);
 			};
+			_columns.CheckMenuItem(columnMenuIdx + i, this.columns[i].w > 0 ? 1 : 0);
 		};
+		_menu.AppendMenuSeparator();
+
+		if (layout.showgroupheaders) {
+			_groups.AppendTo(_menu, MF_STRING, "折叠与展开分组");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Shift+Tab)");	
+		};
+		//_groups.AppendMenuSeparator();
+		//_groups.AppendMenuItem(MF_STRING, 13, "编辑分组...");
 		_sorting.AppendTo(_menu, MF_STRING, "排序");
 		_sorting.AppendMenuItem(MF_STRING, 205, "专辑艺术家");
 		_sorting.AppendMenuItem(MF_STRING, 219, "艺术家");
@@ -790,22 +834,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 216, "编码类型");
 		_sorting.AppendMenuItem(MF_STRING, 217, "随机");
 		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
-		_columns.AppendTo(_menu, MF_STRING, "列");
-		_columns.AppendMenuItem(MF_STRING, 99, "显示附加行信息");
-		_columns.CheckMenuItem(99, cList.enableExtraLine ? 1 : 0);
-		_columns.AppendMenuSeparator();
-		var columnMenuIdx = 100;
-		for (var i = 0; i < this.columns.length; i++) {
-			if (i == column_index) {
-				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, "[" + this.columns[i].label + "]");
-			}
-			else {
-				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, this.columns[i].label);
-			};
-			_columns.CheckMenuItem(columnMenuIdx + i, this.columns[i].w > 0 ? 1 : 0);
-		};
-		// Columns submenu entries
-	
+
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 16, "刷新封面 (F5)");
 		_menu.AppendMenuItem(MF_STRING, 14, "面板属性");
@@ -819,43 +848,45 @@ oHeaderBar = function() {
 		case (idx == 12):
 			show_setting(3, column_index);
 			break;
-		case (idx == 13):
-			show_setting(2, cGroup.pattern_idx);
-			break;
 		case (idx == 14):
 			window.ShowProperties();
+			break;
+		case (idx == 15):
+			layout.uid = layout.playlistName;
+			layout.ids.push(layout.uid);
+			layout.config.push(layout.config[layout.index]);
+			layout.columnWidth.push(layout.columnWidth[layout.index]);
+			layout.index = layout.ids.length - 1;
+			save_config("ids");
+			this.saveColumnsWidth();
+			save_config("config");
+			reinit_config();
+			if(p.settings.pages.length > 4){
+				var arr = [];
+				fin = layout.ids.length;
+				for (var i = 0; i < fin; i++) {
+					arr.push(layout.ids[i]);
+				};
+				p.settings.pages[4].elements[0].reSet(arr);
+				p.settings.pages[4].elements[0].showSelected(fin - 1);
+			}
 			break;
 		case (idx == 16):
 			refresh_cover();
 			break;
-		case (idx == 17):
-			properties.NetDisableGroup = !properties.NetDisableGroup;
-			window.SetProperty("SYSTEM.NetPlaylist Disable Group", properties.NetDisableGroup);
-			nethide_groupheader(properties.NetDisableGroup);
-			break;
 		case (idx == 18):
 			showhide_groupheader();
 			break;
-		case (idx == 19):
-			properties.enablePlaylistFilter = !properties.enablePlaylistFilter;
-			window.SetProperty("SYSTEM.Enable Playlist Filter", properties.enablePlaylistFilter);
-			// refresh playlist
+		case (idx >= 20 && idx < 50):
+			layout.pattern_idx = idx - groupByMenuIdx;
+			layout.config[layout.index][0] = layout.pattern_idx.toString();
+			layout.gopts[0] = layout.pattern_idx.toString();
+			save_config("config");
+			plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[layout.pattern_idx].sortOrder, 1);
 			p.list.updateHandleList(plman.ActivePlaylist, false);
 			p.list.setItems(true);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-			break;
-		case (idx >= 20 && idx < 50):
-			cGroup.pattern_idx = idx - groupByMenuIdx;
-			window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-			window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			// if a Playlist Filter is defined for the Active Playlist (current), DO NOT try to change current pattern!
-			if (!found && default_pattern_index < 0) { // no filter found, we can apply selected pattern and sort the playlist
-				plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[cGroup.pattern_idx].sortOrder, 1);
-				p.list.updateHandleList(plman.ActivePlaylist, false);
-				p.list.setItems(true);
-				p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-				full_repaint();
-			};
+			full_repaint();
 			break;
 		case (idx == 80):
 			resize_panels();
@@ -870,8 +901,11 @@ oHeaderBar = function() {
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 99):
-			cList.enableExtraLine = !cList.enableExtraLine;
-			window.SetProperty("SYSTEM.Enable Extra Line", cList.enableExtraLine);
+			if(layout.enableExtraLine) layout.enableExtraLine = 0;
+			else layout.enableExtraLine = 1;
+			layout.config[layout.index][7] = layout.enableExtraLine.toString();
+			layout.gopts[7] = layout.enableExtraLine.toString();
+			save_config("config");
 			resize_panels();
 			p.list.updateHandleList(plman.ActivePlaylist, false);
 			p.list.setItems(true);
@@ -880,7 +914,7 @@ oHeaderBar = function() {
 		case (idx >= 100 && idx <= 200):
 			// all size changes are in percent / ww
 			if (this.columns[idx - 100].percent == 0) {
-				var newColumnSize = 8000;
+				var newColumnSize = 800;
 				this.columns[idx - 100].percent = newColumnSize;
 				var totalColsToResizeDown = 0;
 				var last_idx = 0;
@@ -899,9 +933,9 @@ oHeaderBar = function() {
 							this.columns[k].percent = Math.abs(this.columns[k].percent) - reste;
 						};
 					};
-					this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 100000);
+					this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 10000);
 				};
-				this.saveColumns();
+				this.saveColumnsWidth();
 			}
 			else {
 				// check if it's not the last column visible, otherwise, we coundn't hide it!
@@ -931,108 +965,61 @@ oHeaderBar = function() {
 								this.columns[k].percent = Math.abs(this.columns[k].percent) + reste;
 							};
 						};
-						this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 100000);
+						this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 10000);
 					};
-					this.saveColumns();
+					this.saveColumnsWidth();
 				};
 			};
 			this.initColumns();
 
 			// set minimum rows / cover column size
-			if (this.columns[0].w > 0) {
-				cover.column = true;
-				cGroup.count_minimum = Math.ceil((this.columns[0].w) / cTrack.height);
-				if (cGroup.count_minimum < cGroup.default_count_minimum) cGroup.count_minimum = cGroup.default_count_minimum;
-
-				cover.previous_max_size = this.columns[0].w;
-				g_image_cache = new image_cache;
-				//CollectGarbage();
-			}
-			else {
-				cover.column = false;
-				cGroup.count_minimum = cGroup.default_count_minimum;
-			};
-			update_playlist(properties.collapseGroupsByDefault);
+			get_grprow_minimum(this.columns[0].w, true);
+			update_playlist(layout.collapseGroupsByDefault);
 			break;
 		case (idx == 205):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_albumartist, 1);
-			if(!properties.showgroupheaders){
-				cGroup.pattern_idx = 2;
-				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			}
             break;
 		case (idx == 219):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_artist, 1);
-			if(!properties.showgroupheaders){
-				cGroup.pattern_idx = 3;
-				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			}
             break;
 		case (idx == 206):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_album, 1);
-			if(!properties.showgroupheaders){
-				cGroup.pattern_idx = 0;
-				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			}
             break;
 		case (idx == 207):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_tracknumber, 1);
-			window.NotifyOthers("Sorting format null", true);
+			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_tracknumber);
             break;
 		case (idx == 208):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_title, 1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 209):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_path, 1);
-			if(!properties.showgroupheaders){
-				cGroup.pattern_idx = 5;
-				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			}
             break;
 		case (idx == 210):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_date, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 211):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_genre, 1);
-			if(!properties.showgroupheaders){
-				cGroup.pattern_idx = 4;
-				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
-			}
             break;
 		case (idx == 212):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_rating, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 213):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_bitrate, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 214):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_modified, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 215):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_playcount, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 216):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_codec, 1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 217):
 			plman.SortByFormat(plman.ActivePlaylist,"",false);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 218):
 			fb.RunMainMenuCommand("编辑/排序/颠倒");
-			window.NotifyOthers("Sorting format null", true);
             break;
 		};
 		this.columnRightClicked = -1;

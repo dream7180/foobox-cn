@@ -4,8 +4,8 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 > **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。
 
 1. 下载和安装 foobar2000 汉化版：
+* [智享阁Yeyo 汉化版 2.x](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)，下载 32 位的，或
 * [Asion 汉化版 1.6.16 版](https://www.cnblogs.com/asionwu)，注意不要使用 Plus 版，它只集成至 foobox 7.8。
-* [智享阁Yeyo 汉化版 2.x](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)。
 
 2. 下载最新的 Release 包，解压后：
 * 复制 themes 文件夹到已有的 foobar2000 中文汉化版目录下;
