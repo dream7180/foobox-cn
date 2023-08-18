@@ -1,7 +1,9 @@
 # foobox
-foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简洁而美观实用的特点，善于管理曲目数量大的媒体库 ，对音乐各种封面提供丰富的支持。  
-## 【安装】
-> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。
+foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简洁而美观实用的特点，善于管理曲目数量大的媒体库 ，对音乐各种封面提供丰富的支持。 
+## 【整合安装包】
+* 感谢网友 NLJS.SITE 制作的整合安装包: [123云盘下载地址](https://www.123pan.com/s/XlD9-Zbnx)
+## 【手动安装】
+> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。【
 
 1. 下载和安装 foobar2000 汉化版：
 * [智享阁Yeyo 汉化版 2.x](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)，下载 32 位的，或
