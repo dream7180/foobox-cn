@@ -428,12 +428,13 @@ function get_images() {
 	img_stop.ReleaseGraphics(gb);
 
 	var point_arr = new Array(_x8, _x6, _x20, _x14, _x8, _x22);
+	var _x221 = Math.floor(_x22) + 1;
 	img_next = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_next.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawPolygon(c_normal,2,point_arr);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(Math.floor(_x22)+1, _x7, Math.floor(_x22)+1, _x21, 2, c_normal);
+	gb.DrawLine(_x221, _x7, _x221, _x21, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, hotdia, hotdia, c_shadow_h);
 	gb.FillEllipse(0, imgh2, hotdia, hotdia, c_shadow);
@@ -446,7 +447,7 @@ function get_images() {
 	gb.SetSmoothingMode(2);
 	gb.DrawPolygon(c_normal,2,point_arr);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x6, _x22, _x22, _x22, 2, c_normal);
+	gb.DrawLine(_x6, _x221, _x221, _x221, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, hotdia, hotdia, c_shadow_h);
 	gb.FillEllipse(0, imgh2, hotdia, hotdia, c_shadow);
