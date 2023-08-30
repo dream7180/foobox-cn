@@ -1922,6 +1922,7 @@ oPage = function(id, objectName, label, nbrows) {
 	};
 
 	this.delButtonLayoutCheck = function(event, x, y) {
+		if(layout.config.length < 2) return;
 		var state = p.settings.delbuttonLayout.checkstate(event, x, y);
 		switch (event) {
 		case "up":
@@ -1957,6 +1958,7 @@ oPage = function(id, objectName, label, nbrows) {
 	}
 	
 	this.delButtonLayoutsCheck = function(event, x, y) {
+		if(layout.config.length < 2) return;
 		var state = p.settings.delbuttonLayouts.checkstate(event, x, y);
 		switch (event) {
 		case "up":

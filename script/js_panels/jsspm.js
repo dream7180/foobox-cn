@@ -1110,8 +1110,7 @@ oBrowser = function(name) {
 			fb.RunMainMenuCommand("编辑/移除重复项");
 			break;
 		case (idx == 12):
-			if(Number(fb.Version.substr(0, 1)) > 1) fb.RunMainMenuCommand("编辑/移除失效项目");
-			else fb.RunMainMenuCommand("编辑/移除无效项");
+			fb.RunMainMenuCommand("编辑/移除无效项");
 			break;
 		case (idx == 15):
 			window.ShowProperties();
