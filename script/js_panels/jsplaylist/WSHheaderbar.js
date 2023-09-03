@@ -216,9 +216,6 @@ oHeaderBar = function() {
 					};
 					gr.GdiDrawText(this.columns[j].label, g_font_b, g_color_normal_txt, cx + (this.borderWidth * 2), cy + 1, cw - (this.borderWidth * 4) - 1, this.h, this.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 				}
-				//else if (j == this.columnDraggedId && this.columnDragged == 2) {
-					//gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 60), 0, 1.0);
-				//};
 			};
 
 			if (this.borders[i].drag) {
@@ -260,9 +257,6 @@ oHeaderBar = function() {
 					};
 					gr.GdiDrawText(this.columns[j].label, g_font_b, g_color_normal_txt, cx + (this.borderWidth * 2), cy + 1, cw - (this.borderWidth * 4) - 1, this.h, this.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 				}
-				//else if (j == this.columnDraggedId && this.columnDragged == 2) {
-					//gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 70), 0, 1.0);
-				//};
 				break;
 			};
 		};
@@ -742,32 +736,6 @@ oHeaderBar = function() {
 		var tmp = "",
 			percents = [];
 
-		// check if active playlist is filtered in group patterns
-		/*var found = false;
-		var default_pattern_index = -1;
-		var playlist_pattern_index = -1;
-		if (properties.enablePlaylistFilter) {
-			// get Filtered groupBy pattern
-			for (var m = 0; m < p.list.groupby.length; m++) {
-				if (default_pattern_index > -1 && found) {
-					break;
-				}
-				else if (p.list.groupby[m].playlistFilter.length > 0) {
-					var arr_pl = p.list.groupby[m].playlistFilter.split(";");
-					for (var n = 0; n < arr_pl.length; n++) {
-						if (default_pattern_index < 0 && arr_pl[n] == "*") {
-							default_pattern_index = m;
-							playlist_pattern_index = (playlist_pattern_index < 0 ? m : playlist_pattern_index);
-						};
-						if (arr_pl[n] == layout.playlistName) {
-							found = true;
-							playlist_pattern_index = m;
-						};
-					};
-				};
-			};
-		};*/
-
 		// main Menu entries
 		_menu.AppendMenuItem(MF_STRING, 11, "转到当前播放 (F2)"); 	        
 		_menu.AppendMenuSeparator();
@@ -786,14 +754,9 @@ oHeaderBar = function() {
 			var groupByMenuIdx = 20;
 			var totalGroupBy = p.list.groupby.length;
 			for (var i = 0; i < totalGroupBy; i++) {
-				_patterns.AppendMenuItem(/*((!found && default_pattern_index < 0) ? */MF_STRING/* : MF_GRAYED | MF_DISABLED)*/, groupByMenuIdx + i, p.list.groupby[i].label);
+				_patterns.AppendMenuItem(MF_STRING, groupByMenuIdx + i, p.list.groupby[i].label);
 			};
-			//if (!found && default_pattern_index < 0) {
-				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, layout.pattern_idx + groupByMenuIdx);
-			//}
-			//else {
-			//	_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, playlist_pattern_index + groupByMenuIdx);
-			//};
+			_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, layout.pattern_idx + groupByMenuIdx);
 		};
 		// Columns submenu entries
 		_columns.AppendTo(_menu, MF_STRING, _thislayout + "列");
@@ -817,8 +780,6 @@ oHeaderBar = function() {
 			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
 			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Shift+Tab)");	
 		};
-		//_groups.AppendMenuSeparator();
-		//_groups.AppendMenuItem(MF_STRING, 13, "编辑分组...");
 		_sorting.AppendTo(_menu, MF_STRING, "排序");
 		_sorting.AppendMenuItem(MF_STRING, 205, "专辑艺术家");
 		_sorting.AppendMenuItem(MF_STRING, 219, "艺术家");
@@ -831,7 +792,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 212, "等级");
 		_sorting.AppendMenuItem(MF_STRING, 213, "比特率");
 		_sorting.AppendMenuItem(MF_STRING, 214, "修改时间");
-		/*if(foo_playcount) */_sorting.AppendMenuItem(MF_STRING, 215, "播放次数");
+		_sorting.AppendMenuItem(MF_STRING, 215, "播放次数");
 		_sorting.AppendMenuItem(MF_STRING, 216, "编码类型");
 		_sorting.AppendMenuItem(MF_STRING, 217, "随机");
 		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
