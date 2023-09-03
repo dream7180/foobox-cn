@@ -420,7 +420,7 @@ function get_images() {
 	gb = img_stop.GetGraphics();
 	time_length = gb.CalcTextWidth("00:00:00", g_font);
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(_x7, _x7, _x14, _x14, 2, c_normal);
+	gb.DrawRect(_x7, _x7, Math.floor(_x14)+1, Math.floor(_x14)+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, hotdia, hotdia, c_shadow_h);
 	gb.FillEllipse(0, imgh2, hotdia, hotdia, c_shadow);
