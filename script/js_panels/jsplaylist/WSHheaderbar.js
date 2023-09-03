@@ -716,6 +716,7 @@ oHeaderBar = function() {
 							};
 						};
 						this.saveColumnsWidth();
+						this.saveColumns();
 						full_repaint();
 					};
 					break;
