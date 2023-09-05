@@ -15,7 +15,7 @@ var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.13";
+var g_script_version = "7.14";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -2751,14 +2751,25 @@ function get_layout_cache(plname){
 }
 
 function assign_gopts(){
-	layout.pattern_idx = Number(layout.gopts[0]);
-	layout.showCover = Number(layout.gopts[1]);
-	layout.autocollapse = Number(layout.gopts[2]);
-	layout.collapsedHeight = Number(layout.gopts[3]);
-	layout.expandedHeight = Number(layout.gopts[4]);
-	layout.collapseGroupsByDefault = Number(layout.gopts[5]);
-	layout.showgroupheaders = Number(layout.gopts[6]);
-	layout.enableExtraLine = Number(layout.gopts[7]);
+	if(!layout.gopts) {
+		layout.pattern_idx = 0;
+		layout.showCover = 1;
+		layout.autocollapse = 0;
+		layout.collapsedHeight = 1;
+		layout.expandedHeight = 1;
+		layout.collapseGroupsByDefault = 0;
+		layout.showgroupheaders = 1;
+		layout.enableExtraLine = 0;
+	} else {
+		layout.pattern_idx = Number(layout.gopts[0]);
+		layout.showCover = Number(layout.gopts[1]);
+		layout.autocollapse = Number(layout.gopts[2]);
+		layout.collapsedHeight = Number(layout.gopts[3]);
+		layout.expandedHeight = Number(layout.gopts[4]);
+		layout.collapseGroupsByDefault = Number(layout.gopts[5]);
+		layout.showgroupheaders = Number(layout.gopts[6]);
+		layout.enableExtraLine = Number(layout.gopts[7]);
+	}
 }
 
 function save_config(arrname){

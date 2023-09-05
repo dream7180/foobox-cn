@@ -1928,10 +1928,9 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				var idx = p.settings.pages[4].elements[0].selectedId;
-				layout.config.splice(idx, 1);
 				layout.ids.splice(idx, 1);
 				layout.config.splice(idx, 1);
-				layout.columnWidth.splice(i, 1);
+				layout.columnWidth.splice(idx, 1);
 				save_config("ids");
 				save_config("config");
 				save_config("columnWidth");

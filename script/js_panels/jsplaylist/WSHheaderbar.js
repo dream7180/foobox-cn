@@ -283,7 +283,8 @@ oHeaderBar = function() {
 			for (var i = 0; i < this.columns.length; i++) {
 				switch (j) {
 				case 0:
-					tmp = tmp + this.columns[i].label;
+					if(this.columns[i].label == "#") tmp = tmp + "#@";
+					else tmp = tmp + this.columns[i].label;
 					break;
 				case 1:
 					tmp = tmp + this.columns[i].tf;
@@ -486,6 +487,7 @@ oHeaderBar = function() {
 				if(i == 0) this.totalColumns =  fields[0].length;
 			};
 			for (var k = 0; k < this.totalColumns; k++) {
+				if(fields[0][k] == "#@") fields[0][k] = "#";
 				this.columns.push(new oColumn(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k]));
 				if (this.columns[k].percent > 0) {
 					if (previousColumnToDrawId >= 0) {
@@ -823,7 +825,7 @@ oHeaderBar = function() {
 			this.saveColumnsWidth();
 			save_config("config");
 			reinit_config();
-			if(p.settings.pages.length > 4){
+			if(setting_init && p.settings.page_loaded[4]){
 				var arr = [];
 				fin = layout.ids.length;
 				for (var i = 0; i < fin; i++) {
