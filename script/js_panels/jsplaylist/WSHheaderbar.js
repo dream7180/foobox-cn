@@ -846,6 +846,7 @@ oHeaderBar = function() {
 			layout.config[layout.index][0] = layout.pattern_idx.toString();
 			layout.gopts[0] = layout.pattern_idx.toString();
 			save_config("config");
+			get_covercahe_config();
 			plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[layout.pattern_idx].sortOrder, 1);
 			p.list.updateHandleList(plman.ActivePlaylist, false);
 			p.list.setItems(true);

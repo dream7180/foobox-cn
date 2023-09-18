@@ -51,22 +51,22 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 		switch (layout.pattern_idx) {
 			case 0:
 			case 1:
-				tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+				tf_crc = albcov_lt ? fb.TitleFormat("$crc32('alb'%album%)") : fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
 				break;
 			case 2:
-				tf_crc = fb.TitleFormat("$crc32('artists'%album artist%)");
+				tf_crc = fb.TitleFormat("$crc32('art'%album artist%)");
 				break;
 			case 3:
-				tf_crc = fb.TitleFormat("$crc32('artists'%artist%)");
+				tf_crc = fb.TitleFormat("$crc32('art'%artist%)");
 				break;
 			case 4:
-				tf_crc = fb.TitleFormat("$crc32('genres'%genre%)");
+				tf_crc = fb.TitleFormat("$crc32('gen'%genre%)");
 				break;
 			case 5:
 				tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
 				break;
 			default:
-				tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+				tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
 		};
 		this.cachekey = process_cachekey(tf_crc.EvalWithMetadb(handle));
 	}
