@@ -509,7 +509,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					//
 					if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 						if (p.list.groups[this.group_index].cover_img == null) {
-							p.list.groups[this.group_index].cover_img = images.nocover;
+							p.list.groups[this.group_index].cover_img = (this.tracktype == 3) ? images.stream : images.nocover;
 						};
 						if (p.list.groups[this.group_index].cover_img) {
 							if (cover.keepaspectratio) {
@@ -715,7 +715,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						//
 						if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 							if (p.list.groups[this.group_index].cover_img == null) {
-								p.list.groups[this.group_index].cover_img = images.nocover;
+								p.list.groups[this.group_index].cover_img = (this.tracktype == 3) ? images.stream : images.nocover;
 							};
 							if (p.list.groups[this.group_index].cover_img) {
 								if (cover.keepaspectratio) {
@@ -1037,8 +1037,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						p.list.SHIFT_start_id = null;
 					};
 					if (!utils.IsKeyPressed(VK_SHIFT)) {
-						g_track_type = TrackType(fb.GetFocusItem().RawPath.substring(0, 4));
-						if(g_track_type < 2) g_track_type = -1;
+						if(this.tracktype < 2) g_track_type = -1;
+						else g_track_type = this.tracktype;
 						p.list.contextMenu(x, y, this.track_index, this.row_index);
 					};
 				}
@@ -1058,7 +1058,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							plman.ClearPlaylistSelection(p.list.playlist);
 							plman.SetPlaylistSelectionSingle(p.list.playlist, this.track_index, true);
 						};
-						g_track_type = TrackType(fb.GetFocusItem().RawPath.substring(0, 4));
+						g_track_type = this.tracktype;//TrackType(fb.GetFocusItem().RawPath.substring(0, 4));
 						p.list.contextMenu(x, y, this.track_index, this.row_index);
 					};
 				};
