@@ -91,6 +91,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			else {
 				albcov_lt = false;
 			}
+			get_covercahe_config();
 			window.NotifyOthers("alb_ignoring_art", albcov_lt);
 			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
 			p.settings.pages[parentId].elements[id].repaint();

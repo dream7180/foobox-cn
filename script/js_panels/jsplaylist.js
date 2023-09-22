@@ -326,7 +326,7 @@ const load_image_from_cache = async (metadb, crc, albumIndex) =>
 				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
 				clearInterval(cover.repaint_timer);
 				cover.repaint_timer = null;
-			}, 8);
+			}, 5);
 		};
 	};
 }
@@ -341,7 +341,7 @@ const get_album_art_async = async (metadb, albumIndex) =>
 				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
 				clearInterval(cover.repaint_timer);
 				cover.repaint_timer = null;
-			}, 10);
+			}, 8);
 		};
 	};
 
@@ -2761,12 +2761,15 @@ function get_next_nonempty(idx){
 	return 0;
 }
 
-function get_covercahe_config(idx){
+function get_covercahe_config(){
 	switch (layout.pattern_idx) {
 		case 0:
-		case 1:
 			albumart_id = AlbumArtId.front;
 			cache_subdir = "album\\";
+			break;
+		case 1:
+			albumart_id = AlbumArtId.front;
+			cache_subdir = albcov_lt ? "album\\" : "artist_album\\";
 			break;
 		case 2:
 		case 3:

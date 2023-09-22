@@ -625,10 +625,10 @@ function get_images() {
 	gb.DrawLine(zdpi, zdpi-1,zdpi, floor_x62+1, 2, c_normal);
 	gb.DrawLine(_x4, zdpi, _x4, floor_x62+1, 2, c_normal);
 	gb.DrawLine(zdpi, floor_x62, _x13, floor_x62, 2, c_normal);
-	gb.DrawLine(_x13, zdpi, _x13, _x3, 2, c_normal);
+	gb.DrawLine(_x13, zdpi, _x13, floor_x62 - _x8 - 0.5, 2, c_normal);
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(_x8, _x3, floor_x6*1.6, floor_x6*1.6, 2, c_normal);
-	gb.FillEllipse(11*zdpi-0.5, _x6-0.5, _x4, _x4, c_normal);
+	gb.DrawEllipse(_x9, floor_x62 - _x8 - 0.5, _x8, _x8, 2, c_normal);
+	gb.FillEllipse(11*zdpi, floor_x62 - _x6 - 0.5, _x4, _x4, c_normal);
 	gb.SetSmoothingMode(0);
 	img_cover.ReleaseGraphics(gb);
 	
