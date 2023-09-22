@@ -518,19 +518,10 @@ function ImageLoader(maxCacheLength, w, h) {
 			return;
 		} else pathitem.cacheHit = false;
 
-		/*if (sync) {
-			var img;
-			if (pathitem.artId == -1) img = gdi.Image(pathitem.path);
-			else if (pathitem.embed) img = utils.GetAlbumArtEmbedded(pathitem.metadb.RawPath, pathitem.artId);
-			else img = utils.GetAlbumArtV2(pathitem.metadb, pathitem.artId, false);
-			imgitem = new ImageItem(img);
-			whendone && whendone(imgitem);
-		} else {*/
-			var cookie = null;
-			if (pathitem.artId == -1) cookie = gdi.LoadImageAsync(window_id, pathitem.path);
-			else utils.GetAlbumArtAsync(window_id, pathitem.metadb, pathitem.artId, false, pathitem.embed);
-			imgLoadingQueue.push(new QueueItem(cookie, pathitem, whendone));
-		//}
+		var cookie = null;
+		if (pathitem.artId == -1) cookie = gdi.LoadImageAsync(window_id, pathitem.path);
+		else utils.GetAlbumArtAsync(window_id, pathitem.metadb, pathitem.artId, false, pathitem.embed);
+		imgLoadingQueue.push(new QueueItem(cookie, pathitem, whendone));
 	}
 
 	this.OnGetAlbumArtDone = function(metadb, art_id, image, image_path) {
@@ -2329,8 +2320,8 @@ function on_mouse_wheel(delta) {
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(!fromhook && currentMetadb && currentMetadb.Compare(handles[0])) {
-		MainController.Refresh(true, handles[0]);
+	if(currentMetadb && currentMetadb.Compare(handles[0])) {
+		if(!fromhook) MainController.Refresh(true, handles[0]);
 		OnMetadbChanged();
 	}
 }
