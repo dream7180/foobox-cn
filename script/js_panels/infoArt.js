@@ -583,7 +583,7 @@ function ImageLoader(maxCacheLength, w, h) {
 
 //----------------------------------------------------------
 
-function PathChecker(supportedTypes, maxFileSize, singleImageMode, cycleInWildCard, maxCacheCapacity) {
+function PathChecker(supportedTypes, singleImageMode, cycleInWildCard, maxCacheCapacity) {
 	this.AsyncChecking = false;
 	this.OnQueueFinished = null;
 	var albumArtCheckQueue = [];
@@ -643,11 +643,6 @@ function PathChecker(supportedTypes, maxFileSize, singleImageMode, cycleInWildCa
 				ext = p.slice(p.lastIndexOf('.') + 1).toLowerCase();
 				for (var l = 0; l < supportedTypes.length; l++) {
 					if (ext == supportedTypes[l]) {
-						if (maxFileSize > 0) {
-							var size = utils.FileTest(p, "s");
-							if (size > maxFileSize) // When size over 4G, "typeof(size)" will be unknown.
-							break;
-						}
 						resultArr.push(new PathItem(p, -1, null, false, pathitem.index));
 						break;
 					}
@@ -739,7 +734,7 @@ function PathProcessor(prop) {
 	var pathArray = [];
 	var reg1 = /^\<(.*)\>$/; // Use to get field from "<field>".
 	var _this = this;
-	this.pathChecker = new PathChecker(prop.SupportedTypes, prop.MaxFileSize, prop.SingleImageMode, prop.CycleInWildCard, prop.PathsCacheCapacity);
+	this.pathChecker = new PathChecker(prop.SupportedTypes, prop.SingleImageMode, prop.CycleInWildCard, prop.PathsCacheCapacity);
 
 	function ParsePathSting(psgroup, metadb) {
 		var pathGroups = [],
@@ -1823,11 +1818,11 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	this.ViewWithExternalViewer = function() {
-		if (currentPathItem) ShellExecute('"' +  currentPathItem.path + '"', "", "", "open", 1);
+		if (currentPathItem) ShellExecute('"' + currentPathItem.path + '"', "", "", "open", 1);
 	}
 
 	this.OpenContainingFolder = function() {
-		if (currentPathItem) ShellExecute("explorer", '/select,\"' +  currentPathItem.path + '"', "", "open", 1);
+		if (currentPathItem) ShellExecute("explorer", '/select,\"' + currentPathItem.path + '"', "", "open", 1);
 	}
 
 	function ShellExecute(arg1, arg2, arg3, arg4, arg5) {
@@ -2158,32 +2153,27 @@ var Properties = new function() {
 			SupportedTypes: ['jpg', 'png'],
 			SingleImageMode: this.Controller.Cycle.SingleImageMode,
 			CycleInWildCard: window.GetProperty("Cycle.CycleInWildCard", true),
-			MaxFileSize: window.GetProperty("Image.Genre.MaxFileSize (byte)", 2621440),
-			AtMostLoadImagesNumber: window.GetProperty("Image.AtMostLoadImagesNumber", 10),
+			AtMostLoadImagesNumber: window.GetProperty("Image.AtMostLoadImagesNumber", 50),
 			KeepAspectRatio: window.GetProperty("Image.Stretch.KeepAspectRatio", true),
 			Stretch: window.GetProperty("Image.Stretch.Stretch", true),
 			Fill: window.GetProperty("Image.Stretch.Fill", false),
 			InterpolationMode: window.GetProperty("Image.Stretch.InterpolationMode", 2),
-			ImagesCacheCapacity: window.GetProperty("Image.CacheCapacity.Images", 10),
-			PathsCacheCapacity: window.GetProperty("Image.CacheCapacity.Paths", 30)
+			ImagesCacheCapacity: window.GetProperty("Image.CacheCapacity.Images", 50),
+			PathsCacheCapacity: window.GetProperty("Image.CacheCapacity.Paths", 60)
 		}
 
 		this.Image.GenrePathFormat = this.Image.GenrePathFormat.replace(/%foobar_path%/ig, fb.FoobarPath.slice(0, -1)); // Process %foobar_path% field.
 		this.Image.PathFormatGroup = [this.Image.BuildinPathFormat, this.Image.GenrePathFormat];
 
-		if (typeof(this.Image.MaxFileSize) != "number") this.Image.MaxFileSize = 2621440;
-		else if (this.Image.MaxFileSize < 0) this.Image.MaxFileSize = 0;
-		window.SetProperty("Image.Genre.MaxFileSize (byte)", this.Image.MaxFileSize);
-
-		if (typeof(this.Image.AtMostLoadImagesNumber) != "number") this.Image.AtMostLoadImagesNumber = 10;
+		if (typeof(this.Image.AtMostLoadImagesNumber) != "number") this.Image.AtMostLoadImagesNumber = 50;
 		else if (this.Image.AtMostLoadImagesNumber < 0) this.Image.AtMostLoadImagesNumber = 0;
 		window.SetProperty("Image.AtMostLoadImagesNumber", this.Image.AtMostLoadImagesNumber);
 
-		if (typeof(this.Image.ImagesCacheCapacity) != "number") this.Image.ImagesCacheCapacity = 10;
+		if (typeof(this.Image.ImagesCacheCapacity) != "number") this.Image.ImagesCacheCapacity = 50;
 		else if (this.Image.ImagesCacheCapacity < 0) this.Image.ImagesCacheCapacity = 0;
 		window.SetProperty("Image.CacheCapacity.Images", this.Image.ImagesCacheCapacity);
 
-		if (typeof(this.Image.PathsCacheCapacity) != "number") this.Image.PathsCacheCapacity = 10;
+		if (typeof(this.Image.PathsCacheCapacity) != "number") this.Image.PathsCacheCapacity = 60;
 		else if (this.Image.PathsCacheCapacity < 0) this.Image.PathsCacheCapacity = 0;
 		window.SetProperty("Image.CacheCapacity.Paths", this.Image.PathsCacheCapacity);
 }();
