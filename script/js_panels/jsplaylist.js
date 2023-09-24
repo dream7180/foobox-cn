@@ -301,7 +301,7 @@ function set_scroll_delta() {
 					cList.scroll_step = Math.round(cList.scroll_delta / cList.scroll_div);
 					cList.scroll_delta -= cList.scroll_step;
 					if (cList.scroll_delta <= 1) {
-						window.ClearTimeout(cList.scroll_timer);
+						window.ClearInterval(cList.scroll_timer);
 						cList.scroll_timer = false;
 						cList.scroll_delta = 0;
 					};
@@ -1287,7 +1287,8 @@ function on_item_focus_change(playlist, from, to) {
 	if (!g_avoid_on_item_focus_change) {
 		g_metadb = (fb.IsPlaying || fb.IsPaused) ? fb.GetNowPlaying() : plman.PlaylistItemCount(plman.ActivePlaylist) > 0 ? fb.GetFocusItem() : false;
 		if (g_metadb) {
-			on_metadb_changed();
+			p.list.setItems(false);
+			full_repaint();
 		};
 		if (playlist == p.list.playlist) {
 			p.list.focusedTrackId = to;
@@ -1319,8 +1320,14 @@ function on_item_focus_change(playlist, from, to) {
 	};
 };
 
-function on_metadb_changed() {
+function on_metadb_changed(handles, fromhook) {
 	p.list.setItems(false);
+	if(!fromhook && p.headerBar.columns[0].w >0) {
+		var fin = p.list.groups.length;
+    	for(var i = 0; i < fin; i++) {
+			p.list.groups[i].load_requested = 0;
+		}
+	}
 	full_repaint();
 };
 
