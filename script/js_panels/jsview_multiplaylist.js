@@ -406,7 +406,7 @@ function get_imgs() {
 	gb = playing_list.GetGraphics();
 	gb.SetSmoothingMode(0);
 	gb.DrawLine(_x2, 4*zdpi, _x2, 14*zdpi, 1, g_color_highlight);
-	gb.DrawLine(5*zdpi, 6*zdpi, 5*zdpi, 14*zdpi, 1, g_color_highlight);
+	gb.DrawLine(5*zdpi, 7*zdpi, 5*zdpi, 14*zdpi, 1, g_color_highlight);
 	gb.DrawLine(8*zdpi, 10*zdpi, 8*zdpi, 14*zdpi, 1, g_color_highlight);
 	playing_list.ReleaseGraphics(gb);
 }
