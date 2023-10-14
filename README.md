@@ -27,6 +27,7 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 
 ## 【额外的视频面板整合】
 从 foobox 7.16 版开始支持整合 foo-youtube 以及 foo-mpv 视频面板到主界面。标准的 release 包没有视频面板组件和主题文件，如需要该功能可下载视频面板整合包 ([github](https://github.com/dream7180/foobox-cn/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-cn/releases/tag/video))，解压后按上面类似的方法安装。完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。
+
 <span style="display:block;text-align:left">![](info/dui.png)</span>
 
 [**查看 foobox 帮助**](https://dream7180.gitee.io/2023/foobox-release/)
