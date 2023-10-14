@@ -51,7 +51,7 @@ olist = function() {
 		repaint_main1 = repaint_main2;
 	}
 	this.draw = function(gr) {
-		gr.FillSolidRect(0, 0, ww, margin_top - 2, g_color_topbar);
+		gr.FillSolidRect(0, 0, ww, margin_top, g_color_topbar);
 		gr.FillSolidRect(0, margin_top, ww, 1, g_color_line_div);
 		var _dr_len = this.list_dr.length;
 		if (_dr_len == 0) return;
@@ -310,14 +310,21 @@ function on_paint(gr) {
 function get_colors() {
 	bgcolor = window.GetColourDUI(ColorTypeDUI.background);
 	fontcolor = window.GetColourDUI(ColorTypeDUI.text);
+	var light_mode = isDarkMode(fontcolor);
+	if(light_mode){
+		g_color_topbar = RGBA(0,0,0,15);
+		g_color_line_div = RGBA(0, 0, 0, 95);
+		
+	} else {
+		g_color_topbar = RGB(32, 32, 32);
+		g_color_line_div = RGBA(255, 255, 255, 71);
+	}
 	fontcolor2 = RGB(100, 100, 100);
 	g_color_line = RGBA(0, 0, 0, 20);
-	g_color_line_div = RGBA(0, 0, 0, 45);
 	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
 	g_scroll_color = fontcolor & 0x95ffffff;
 	g_btn_color1 = fontcolor & 0x35ffffff;
 	g_btn_color2 = RGBA(0, 0, 0, 90)
-	g_color_topbar = fontcolor & 0x09ffffff;
 	g_color_playing_txt = RGB(255, 255, 255);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
@@ -330,7 +337,7 @@ function get_font() {
 	g_fstyle = g_font.Style;
 	zdpi = g_fsize / 12;
 	g_font2 = GdiFont(g_fname, g_fsize, 1);
-	margin_top = Math.ceil(26 * zdpi) + 2;
+	margin_top = Math.ceil(21 * zdpi);
 }
 
 function load_pl(timer) {

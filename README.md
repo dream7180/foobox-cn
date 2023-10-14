@@ -11,7 +11,8 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 
 2. 下载最新的 Release 包，解压后：
 * 复制 themes 文件夹到已有的 foobar2000 中文汉化版目录下;
-* 复制 profile 里的文件夹到 foobar2000 用户配置目录下。
+* 复制 profile 里的文件夹到 foobar2000 用户配置目录下;
+* 简介面板 (作者 Wil-B) 需要 [fontawesome-webfont.ttf](https://ghproxy.com/https://github.com/beakerbrowser/beakerbrowser.com/raw/master/fonts/fontawesome-webfont.ttf) 字体，请复制到 C:\Windows\Fonts 目录下. 简介面板的完整功能需要连接外网，请自行解决 (如不想用也可以选择无简介面板的布局).
 
 > **Note** 便携版，profile 位于 foobar2000 根目录下。目录结构如下:
 
@@ -23,6 +24,10 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 > 目录结构如下 (2.x版为例):
 
 <span style="display:block;text-align:left">![](info/nonportable.png)</span>
+
+## 【额外的视频面板整合】
+从 foobox 7.16 版开始支持整合 foo-youtube 以及 foo-mpv 视频面板到主界面。标准的 release 包没有视频面板组件和主题文件，如需要该功能可下载视频面板整合包 ([github](https://github.com/dream7180/foobox-cn/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-cn/releases/tag/video))，解压后按上面类似的方法安装。完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。
+<span style="display:block;text-align:left">![](info/dui.png)</span>
 
 [**查看 foobox 帮助**](https://dream7180.gitee.io/2023/foobox-release/)
 

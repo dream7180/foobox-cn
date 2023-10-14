@@ -1300,7 +1300,6 @@ function Display(x, y, w, h, prop) {
 			var faddingStep2 = 0;
 			var opacity = 255;
 			var opacity2 = 0;
-			var fmt = StrFmt(1, 1, 0, 0); //prop.MacTypeSupport ? 1|4|100 : StrFmt(1, 2, 100, 0);
 			var imgCache = {
 				img: null,
 				text: ""
@@ -1319,10 +1318,6 @@ function Display(x, y, w, h, prop) {
 				return x >= this.x && y >= this.y && x <= this.x + this.w && y <= this.y + this.h;
 			}
 
-			function StrFmt(alignH, alignV, trim, flag) {
-				return (alignH << 28) | (alignV << 24) | (trim << 20) | (StringTrimmingEllipsisWord = 4 << 20) | flag;
-			}
-
 			this.Draw = function(g) {
 				if (opacity2 <= 0) return;
 
@@ -1334,7 +1329,7 @@ function Display(x, y, w, h, prop) {
 					imgCache.img = gdi.CreateImage(this.w, this.h);
 					var g2 = imgCache.img.GetGraphics();
 					g2.SetTextRenderingHint(4);
-					g2.DrawString(this.caption, g_font, RGBA(255, 255, 255, 255), 0, 0, this.w, this.h, fmt); // This is foreground text.
+					g2.DrawString(this.caption, g_font, RGBA(255, 255, 255, 255), 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
 					g2.SetTextRenderingHint(0);
 					//}
 					imgCache.img.ReleaseGraphics(g2);
@@ -2208,9 +2203,9 @@ function on_paint(gr) {
 			rbutton[i - 1].Paint(gr, i);
 		}
 		if (is_mood) btn_mood.Paint(gr);
-		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh + 1*zdpi, ww, 30*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh + 1*zdpi, ww, 30*zdpi, cc_txt);
 		var txt_line2 = (txt_info !="" && show_info) ? txt_info : txt_profile;
-		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, line2_y, ww, 25*zdpi, DT_CENTER | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, line2_y, ww, 25*zdpi, cc_txt);
 	}
 }
 

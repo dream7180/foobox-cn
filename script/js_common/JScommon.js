@@ -26,35 +26,7 @@ IDC_APPSTARTING = 32650;
 IDC_HAND = 32649;
 IDC_HELP = 32651;
 // }}
-// {{
-// Used in gr.DrawString()
-function StringFormat() {
-	var h_align = 0,
-	v_align = 0,
-	trimming = 0,
-	flags = 0;
-	switch (arguments.length) {
-		case 3:
-		trimming = arguments[2];
-		case 2:
-		v_align = arguments[1];
-		case 1:
-		h_align = arguments[0];
-		break;
-		default:
-		return 0;
-	};
-	return ((h_align << 28) | (v_align << 24) | (trimming << 20) | flags);
-};
-StringAlignment = {
-	Near: 0,
-	Centre: 1,
-	Far: 2
-};
-var lc_stringformat = StringFormat(StringAlignment.Near, StringAlignment.Centre);
-var cc_stringformat = StringFormat(StringAlignment.Centre, StringAlignment.Centre);
 
-//}}
 // {{
 function num(strg, nb) {
 	var i;

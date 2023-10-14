@@ -378,7 +378,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						else {
 							tf2 = "";
 						};
-						gr.GdiDrawText(tf2, g_font_2, blendColors(this.text_colour, g_color_normal_bg, 0.45), cx, tf2_y, cw, tf2_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+						gr.GdiDrawText(tf2, g_font_2, _playing_idx ? g_color_playing_txt : p.list.lcolor_40, cx, tf2_y, cw, tf2_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 					};
 					//}; catch (e) {};
 				};
@@ -419,42 +419,21 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var line_width = this.w - cover.w + cScrollBar.width;
 			if (this.empty_row_index == 0) {
 				this.queue_idx = plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1;
-				this.normalTextColor = false;
 				if (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex) {
 					// playing track bg
-					if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
-						if (p.list.focusedTrackId == this.track_index) {
-							gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
-						}
-						else {
-							gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
-						};
-					}
-					else {
-						// if row is focused, draw focused colors & style ELSE draw with normal colors
-						if (p.list.focusedTrackId == this.track_index) {
-							this.text_colour = blendColors(g_color_highlight, g_color_normal_bg, 0.1);
-							// frame on focused item
-							gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
-						}
-						else {
-							gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
-						};
-					};
+					gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
 					this.text_colour = g_color_playing_txt;
 				}
 				else {
 					// no playing track bg
 					if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
 						if (p.list.focusedTrackId == this.track_index) {
-							//**
 							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg);
 						}
 						else {
-							//**
 							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg & 0x85ffffff);
 						};
-						this.text_colour = p.list.text_colour_selected;
+						this.text_colour = g_color_selected_txt;
 					}
 					else {
 						// if row is focused, draw focused colors & style ELSE draw with normal colors
@@ -462,7 +441,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							// frame on focused item
 							gr.DrawRect(tcolumn_x, this.y + 1, line_width, this.h - 2, 1.0, g_color_selected_bg);
 						};
-						this.normalTextColor = true;
 						this.text_colour = g_color_normal_txt;
 					};
 				};
@@ -619,15 +597,14 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var line_width = this.w + cScrollBar.width;
 			if(this.heightInRow == 1){
 				gr.FillSolidRect(this.x, (this.y - groupDelta), line_width, 1, g_color_normal_bg);
-				this.l1_color = blendColors(g_color_normal_txt, g_color_highlight, 0.85);
-				this.l2_color = blendColors(g_color_normal_bg, this.l1_color, 0.75);
+				this.l1_color = p.list.lcolor_85;
+				this.l2_color = p.list.lcolor_75;
 			}else{
 				gr.FillSolidRect(this.x, (this.y - groupDelta) + 1, line_width, this.h - 1, g_group_header_bg);
 				gr.FillSolidRect(this.x, (this.y + this.h - groupDelta), line_width, 1, g_color_line);
-				this.l1_color = blendColors(g_color_normal_txt, g_color_highlight, 0.25);
-				this.l2_color = blendColors(g_color_normal_bg, this.l1_color, 0.75);
+				this.l1_color = g_color_normal_txt;
+				this.l2_color = p.list.lcolor_30;
 			}
-			var line_color = p.list.line_color;
 			// Draw Header content
 			// ===================
 			var line_x = this.x + cover.w + g_z2;
@@ -673,8 +650,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				}
 				var lg3_right_field = (this.group_index + 1) + " / " + p.list.groups.length;
 				var lg3_right_field_w = gr.CalcTextWidth(lg3_right_field, g_font) + cList.borderWidth * 2;
-				gr.GdiDrawText(lg3_left_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8 - lg3_right_field_w, cTrack.height, lcs_txt);
-				gr.GdiDrawText(lg3_right_field, g_font, blendColors(g_color_normal_txt, g_color_normal_bg, 0.35), line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z10 + 01, cTrack.height, rcs_txt);
+				gr.GdiDrawText(lg3_left_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8 - lg3_right_field_w, cTrack.height, lcs_txt);
+				gr.GdiDrawText(lg3_right_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z10 + 01, cTrack.height, rcs_txt);
 				break;
 			};
 
@@ -1227,9 +1204,10 @@ oList = function(object_name, playlist) {
 
 	// items variables used in Item object (optimization)
 	this.setItemColors = function() {
-		this.text_colour_playing = blendColors(g_color_highlight, g_color_normal_bg, 0.1);
-		this.text_colour_selected = blendColors(g_color_selected_txt, g_color_normal_bg, 0.1);
-		this.line_color = blendColors(g_color_normal_txt, g_color_normal_bg, 0.45);
+		this.lcolor_40 = blendColors(g_color_normal_txt, g_color_normal_bg, 0.4);
+		this.lcolor_85 = blendColors(g_color_normal_txt, g_color_highlight, 0.85);
+		this.lcolor_75 = blendColors(g_color_normal_bg, this.lcolor_85, 0.75);
+		this.lcolor_30 = blendColors(g_color_normal_txt, g_color_normal_bg, 0.3);
 	};
 	this.setItemColors();
 

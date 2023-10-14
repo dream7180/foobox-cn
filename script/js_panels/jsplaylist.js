@@ -14,9 +14,10 @@ var track_edit_app = window.GetProperty("foobox.track.editor", "");
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", true);
+var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.15";
+var g_script_version = "7.16";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -622,7 +623,7 @@ function on_size() {
 	resize_panels();
 
 	// Set the empty rows count in playlist setup for cover column size!
-	get_grprow_minimum(p.headerBar.columns[0].w, false);
+	get_grprow_minimum(p.headerBar.columns[0].w, false, true);
 
 	if (g_init_window) {
 		update_playlist(layout.collapseGroupsByDefault);
@@ -1962,7 +1963,7 @@ function on_colours_changed() {
 	get_colors();
 	get_images_color();
 	p.headerBar.setButtons();
-	if (p.list) {
+	if(p.list) {
 		if (p.list.totalRows > p.list.totalRowVisible) {
 			p.scrollbar.setButtons();
 			p.scrollbar.setCursorButton();
@@ -1995,6 +1996,10 @@ function on_notify_data(name, info) {
 				if(Math.abs(info[0]-r)<25 && Math.abs(info[0]-g)<25 && Math.abs(info[0]-b)<25) g_color_star_h = g_color_normal_txt;
 			}
 			get_images_color();
+			if(p.list){
+				p.list.lcolor_85 = blendColors(g_color_normal_txt, g_color_highlight, 0.85);
+				p.list.lcolor_75 = blendColors(g_color_normal_bg, p.list.lcolor_85, 0.75);
+			}
 			full_repaint();
 		}
 		break;
@@ -2748,7 +2753,7 @@ function reinit_config(){
 	}
 }
 
-function get_grprow_minimum(column_w, reimgcache){
+function get_grprow_minimum(column_w, reimgcache, norecord){
 	if (column_w > 0) {
 		cGroup.count_minimum = Math.ceil(column_w / cTrack.height);
 		if (cGroup.count_minimum < cGroup.default_count_minimum) cGroup.count_minimum = cGroup.default_count_minimum;
@@ -2756,7 +2761,7 @@ function get_grprow_minimum(column_w, reimgcache){
 	} else {
 		cGroup.count_minimum = cGroup.default_count_minimum;
 	}
-	cover.previous_max_size = column_w;
+	if(!norecord) cover.previous_max_size = column_w;
 }
 
 function get_next_nonempty(idx){

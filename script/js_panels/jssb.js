@@ -2218,15 +2218,16 @@ function on_init() {
 	get_colors();
 	g_switchbar = new oSwitchbar();
 	get_metrics();
-	if(!fb.IsLibraryEnabled()) ppt.locklibpl = false;
-	window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
-	if (ppt.locklibpl) {
-		g_active_playlist = 0;
-		if (plman.GetPlaylistName(0) != "媒体库") {
+	if(ppt.locklibpl) {
+		if(!fb.IsLibraryEnabled()) {
 			ppt.locklibpl = false;
-			g_active_playlist = plman.ActivePlaylist;
 			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
-			window.SetProperty("_PROPERTY: Lock to Library playlist", ppt.locklibpl);
+		} else {
+			g_active_playlist = 0;
+			if (plman.GetPlaylistName(0) != "媒体库") {
+				g_active_playlist = plman.ActivePlaylist;
+				window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
+			}
 		}
 	} else g_active_playlist = plman.ActivePlaylist;
 
