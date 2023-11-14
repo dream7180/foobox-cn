@@ -3,7 +3,7 @@ foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简
 ## 【整合安装包】
 <!-- * 感谢[南陇居士](https://www.nljs.site/)制作的整合安装包: [https://www.nljs.site/foobar2000.html](https://www.nljs.site/foobar2000.html) -->
 到最新 Releases (发行版) 页面下载安装包，已整合最新的 foobar2000 汉化版及 foobox 主题配置。
-> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。
+> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。\
 >安装版基于 foobar2000 [智享阁Yeyo 汉化版 2.x](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)
 <!--
 ## 【用主题包手动安装】
