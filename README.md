@@ -1,11 +1,25 @@
 # foobox
-foobox 是一个 foobar2000 默认用户界面 (DUI) 的皮肤配置，具有简洁而美观实用的特点，善于管理曲目数量大的媒体库 ，对音乐各种封面提供丰富的支持。 
-## 【整合安装包】
-<!-- * 感谢[南陇居士](https://www.nljs.site/)制作的整合安装包: [https://www.nljs.site/foobar2000.html](https://www.nljs.site/foobar2000.html) -->
-到最新 Releases (发行版) 页面下载安装包，已整合最新的 foobar2000 汉化版及 foobox 主题配置。
-> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。\
->安装版基于 foobar2000 [智享阁Yeyo 汉化版 2.x](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)
-<!--
+foobox 是一个 [foobar2000](https://www.foobar2000.org) 默认用户界面 (DUI) 的皮肤配置，具有简洁而美观实用的特点，善于管理曲目数量大的媒体库 ，对音乐各种封面提供丰富的支持。 
+## 【制作和使用】
+foobox 中文版的制作基于 [foobar2000 汉化版](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)，使用以下组件:  
+* ttsping 的歌词组件 [ESLyric](https://github.com/ESLyric/release);  
+* 基于 [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) 的 [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378);  
+* [foo_enhanced_spectrum_analyzer] (https://hydrogenaud.io/index.php/topic,116014.0.html).
+
+并修改使用以下优秀的代码部件:  
+* 播放列表管理器，播放列表，封面浏览原作者 br3tt，汉化 always_beta;  
+* 封面面板原作者 Jensen;  
+* 搜索框原作者 [Asion](https://www.cnblogs.com/asionwu);  
+* [简介面板](https://github.com/Wil-B/Biography)作者 Wil-B;
+* 网络电台列表维护 [范明明](https://github.com/fanmingming);
+
+**到最新 Releases (发行版) 页面下载安装包，已整合最新的 foobar2000 汉化版及 foobox 主题配置。**
+> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本
+
+<!-- * 感谢[南陇居士](https://www.nljs.site/)制作的整合安装包: [https://www.nljs.site/foobar2000.html](https://www.nljs.site/foobar2000.html)
+> **Note** 。\
+>安装版基于 foobar2000 [智享阁Yeyo 汉化版 2.x]
+
 ## 【用主题包手动安装】
 > **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本。
 
