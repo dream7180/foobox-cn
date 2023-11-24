@@ -377,10 +377,11 @@ function g_onSearch() {
 			5: "%date% HAS ",
 			6: "%comment% HAS "
 		};
+		var s3 = "\"" + s1 + "\"";
 		if (scopecases[ppts.scope]) {
-			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[ppts.scope] + s1, "", 0);
+			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[ppts.scope] + s3, "", 0);
 		} else {
-			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[1]+s1 + " OR " + scopecases[2]+s1 + " OR " + scopecases[3]+s1 + " OR " + scopecases[4]+s1 + " OR " + scopecases[5]+s1, "", 0);
+			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[1]+s3 + " OR " + scopecases[2]+s3 + " OR " + scopecases[3]+s3 + " OR " + scopecases[4]+s3 + " OR " + scopecases[5]+s3, "", 0);
 		};
 
 		// 转换自动列表为普通列表

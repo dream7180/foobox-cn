@@ -1914,7 +1914,7 @@ oBrowser = function(name) {
 			case 899:
 				var pl_n = plman.PlaylistCount;
 				var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(fb.GetFocusItem());
-				plman.CreateAutoPlaylist(pl_n, string_n, ppt.tf_autopl + " IS " + string_n);
+				plman.CreateAutoPlaylist(pl_n, string_n, ppt.tf_autopl + " IS \"" + string_n + "\"");
 				break;
 			case 1010:
 				reset_this_cache(albumIndex, crc);
