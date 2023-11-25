@@ -498,7 +498,7 @@ function Show_Menu_Searchbox(x, y) {
 		g_searchbox.historyreset();
 		break;
 	case (idx == 30):
-		LoadRadio("网络电台", "https://ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u");
+		LoadRadio("网络电台", "https://mirror.ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u");
 		break;
 	}
 }
