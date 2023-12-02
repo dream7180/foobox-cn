@@ -13,9 +13,10 @@ foobox 中文版的制作基于 [foobar2000 汉化版](https://www.esnpc.com/foo
 * [简介面板](https://github.com/Wil-B/Biography)作者 Wil-B;
 * 网络电台列表维护 [范明明](https://github.com/fanmingming);
 
-**到最新 Releases (发行版) 页面下载安装包，已整合最新的 foobar2000 汉化版及 foobox 主题配置。**
-> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本
+**到最新 Releases (发行版) 页面下载安装包，已整合最新的 foobar2000 汉化版及 foobox 主题配置。**  
+> **Note** 由于所依赖的组件 JSplitter 目前只有 32 位，故暂不支持 foobar2000 x64 版本  
 
+额外的视频面板可选安装，它基于 [foo-youtube](https://fy.3dyd.com/download/) 和 [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) 组件。  
 <!-- * 感谢[南陇居士](https://www.nljs.site/)制作的整合安装包: [https://www.nljs.site/foobar2000.html](https://www.nljs.site/foobar2000.html)
 > **Note** 。\
 >安装版基于 foobar2000 [智享阁Yeyo 汉化版 2.x]
@@ -46,6 +47,8 @@ foobox 中文版的制作基于 [foobar2000 汉化版](https://www.esnpc.com/foo
 ## 【额外的视频面板整合】
 从 foobox 7.16 版开始支持整合 foo-youtube 以及 foo-mpv 视频面板到主界面。标准的 release 包没有视频面板组件和主题文件，如需要该功能可下载视频面板整合包 ([github](https://github.com/dream7180/foobox-cn/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-cn/releases/tag/video))，解压后按上面类似的方法安装。完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。
 -->
+完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。  
+
 <span style="display:block;text-align:left">![](info/dui.png)</span>
 
 [**查看 foobox 帮助**](https://dream7180.gitee.io/2023/foobox-release/)
