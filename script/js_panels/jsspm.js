@@ -81,7 +81,7 @@ ppt = {
 	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
 	scrollSmoothness: 3.0,
 	refreshRate: 20,
-	showFilter: window.GetProperty("_DISPLAY: Show Filter", false),
+	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
 	lockReservedPlaylist: window.GetProperty("_PROPERTY: Lock Reserved Playlist", false),
 	SearchBarHeight: 28,
 	headerBarHeight: 28,
@@ -89,7 +89,8 @@ ppt = {
 	//drawUpAndDownScrollbar: window.GetProperty("_PROPERTY: Draw Up and Down Scrollbar Buttons", false),
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	winver: null,
-	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
+	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true),
+	radiolist: window.GetProperty("Radio Playlist URL", "https://raw.fgit.cf/fanmingming/live/main/radio/m3u/index.m3u")
 };
 
 var PlaylistExcludedIdx = Array();
@@ -271,31 +272,26 @@ oBrowser = function(name) {
 	this.new_bt = null;
 
 	this.images = {
-		newplaylist_off: null,
-		newplaylist_ov: null,
-		newplaylist_dn: null
+		topbar_btn: null,
+		topbar_btn_ov: null
 	};
 
 	this.getImages = function() {
 		var gb;
-		var bt_w = 65*(zdpi+1), x7 = 7*zdpi, x9 = 9*zdpi, bt_h = ppt.rowHeight;
+		var bt_h = z(24);
 		
-		this.images.newplaylist_off = gdi.CreateImage(bt_w, bt_h);
-		gb = this.images.newplaylist_off.GetGraphics();
-		gb.FillSolidRect(10+x7, bt_h / 2 - 1, x9, 1, g_color_normal_txt);
-		gb.FillSolidRect(10+x7 + 4*zdpi, bt_h / 2 - 5*zdpi, 1, x9, g_color_normal_txt);
-		this.images.newplaylist_off.ReleaseGraphics(gb);
+		this.images.topbar_btn = gdi.CreateImage(bt_h, bt_h);
+		gb = this.images.topbar_btn.GetGraphics();
+		this.images.topbar_btn.ReleaseGraphics(gb);
+		
+		this.images.topbar_btn_ov = gdi.CreateImage(bt_h, bt_h);
+		gb = this.images.topbar_btn_ov.GetGraphics();
+		gb.SetSmoothingMode(2);
+		gb.FillRoundRect(zdpi, zdpi, z(22)-1, z(22)-1, z(3), z(3), g_color_bt_overlay);
+		this.images.topbar_btn_ov.ReleaseGraphics(gb);
 
-		this.images.newplaylist_ov = gdi.CreateImage(bt_w, bt_h);
-		gb = this.images.newplaylist_ov.GetGraphics();
-		gb.SetSmoothingMode(0);
-		gb.FillSolidRect(0, 0, 4, bt_h, g_color_highlight);
-		gb.FillSolidRect(10+x7, bt_h / 2 - 1, x9, 1, g_color_normal_txt);
-		gb.FillSolidRect(10+x7 + 4*zdpi, bt_h / 2 - 5*zdpi, 1, x9, g_color_normal_txt);
-		this.images.newplaylist_ov.ReleaseGraphics(gb);
-
-		this.new_bt = new button(this.images.newplaylist_off, this.images.newplaylist_ov, this.images.newplaylist_ov);
-		this.new_menu = new button(g_searchbox.images.source_switch, g_searchbox.images.source_switch_ov, g_searchbox.images.source_switch_ov);
+		this.new_bt = new button(this.images.topbar_btn, this.images.topbar_btn_ov, this.images.topbar_btn_ov);
+		this.new_menu = new button(this.images.topbar_btn, this.images.topbar_btn_ov, this.images.topbar_btn_ov);
 	};
 	this.getImages();
 	
@@ -455,7 +451,7 @@ oBrowser = function(name) {
 					ay = Math.floor(this.y + (i * ah) - scroll_);
 					this.rows[i].x = ax;
 					this.rows[i].y = ay;
-					if (ay > ppt.headerBarHeight && ay < this.y + this.h) {
+					if (ay > this.y - ppt.headerBarHeight - ah && ay < this.y + this.h) {
 						// row bg
 						var track_color_txt = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 						if(ppt.showGrid) gr.DrawLine(ax, ay + ah, aw, ay + ah, 1, g_color_line);
@@ -531,21 +527,22 @@ oBrowser = function(name) {
 					};
 				};
 			}
+			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight+1, g_color_normal_bg);
 			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
-			gr.FillSolidRect(0, ppt.headerBarHeight-2, ww, ppt.rowHeight+2, g_color_normal_bg);
 			if(ppt.showFilter){
 				var boxText = this.rows.length.toString();
 				var tw = gr.CalcTextWidth(boxText, g_font_track);
 				gr.GdiDrawText(boxText, g_font_track, g_color_normal_txt, this.w - tw, 0, tw, ppt.headerBarHeight + ppt.SearchBarHeight - 1, rc_txt);
 			}
-			if(ppt.showGrid)gr.DrawLine(0, ppt.headerBarHeight + ppt.rowHeight, ww, ppt.headerBarHeight + ppt.rowHeight, 1, g_color_line);
 			gr.DrawLine(0, ppt.SearchBarHeight, ww, ppt.SearchBarHeight, 1, g_color_line_div);
-			this.new_bt.draw(gr, 0, ppt.headerBarHeight + 1, 255);
-			var bt_y = ppt.headerBarHeight + (ppt.rowHeight - images.add_menu.Height)/2;
-			this.new_menu.draw(gr, Math.round(ww - images.add_menu.Width - cScrollBar.width - 2*zdpi), Math.round(bt_y - 2*zdpi), 255);
-			gr.DrawImage(images.add_menu, Math.round(ww - images.add_menu.Width - cScrollBar.width + zdpi), Math.round(bt_y), images.add_menu.Width, images.add_menu.Height, 0, 0, images.add_menu.Width, images.add_menu.Height, 0, 255);
-			var new_bt_txt_x = this.marginLR + Math.floor(27*zdpi) + this.paddingLeft + 4;
-			gr.GdiDrawText("新建播放列表", g_font, g_color_normal_txt, new_bt_txt_x, ppt.headerBarHeight + 1, ww - new_bt_txt_x - 10, ppt.rowHeight - 2, lc_txt);
+			var bt_y = (ppt.SearchBarHeight - brw.images.topbar_btn.Height)/2;
+			this.new_menu.draw(gr, Math.round(ww - 2*brw.images.topbar_btn.Width), Math.round(bt_y - zdpi), 255);
+			this.new_bt.draw(gr, Math.round(ww - brw.images.topbar_btn.Width),  Math.round(bt_y - zdpi), 255);
+			gr.DrawImage(images.add_menu, Math.round(ww - 1.5*brw.images.topbar_btn.Width - images.add_menu.Height/2), Math.round((ppt.SearchBarHeight - images.add_menu.Height)/2-2), images.add_menu.Width, images.add_menu.Height, 0, 0, images.add_menu.Width, images.add_menu.Height, 0, 255);
+			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), 0, 1, ppt.SearchBarHeight/2, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), ppt.SearchBarHeight/2, 1, ppt.SearchBarHeight/2, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+			gr.FillSolidRect(Math.round(ww - brw.images.topbar_btn.Width), 0, 1, ppt.SearchBarHeight - 2, g_color_normal_bg);
+			gr.DrawImage(images.newplaylist_img, Math.round(ww - 0.5*brw.images.topbar_btn.Width - images.newplaylist_img.Height/2), Math.round((ppt.SearchBarHeight - images.newplaylist_img.Height)/2-2), images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 0, images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 255);
 			// draw scrollbar
 			//if (cScrollBar.enabled) {
 			brw.scrollbar && brw.scrollbar.draw(gr);
@@ -659,7 +656,7 @@ oBrowser = function(name) {
 				};
 				
 				if (this.buttonClicked && this.new_menu.checkstate("up", x, y) == ButtonStates.hover) {
-					this.context_menu(Math.round(ww - images.add_menu.Width - cScrollBar.width - 2*zdpi), ppt.headerBarHeight + (ppt.rowHeight + images.add_menu.Height)/2 + 2*zdpi, null, true);
+					this.context_menu(Math.round(ww - 2*brw.images.topbar_btn.Width), ppt.SearchBarHeight - 3*zdpi, null, true);
 					this.new_menu.state = ButtonStates.normal;
 					this.new_menu.repaint();
 				}
@@ -902,11 +899,10 @@ oBrowser = function(name) {
 	}, ppt.refreshRate);
 
 	this.context_menu = function(x, y, id, setting_mode) {
-		var MF_SEPARATOR = 0x00000800;
-		var MF_STRING = 0x00000000;
 		var _menu = window.CreatePopupMenu();
 		var _newplaylist = window.CreatePopupMenu();
 		var _autoplaylist = window.CreatePopupMenu();
+		var _options = window.CreatePopupMenu();
 		var PLRecManager = plman.PlaylistRecycler;
 		var _restorepl = window.CreatePopupMenu();
 		var idx;
@@ -915,27 +911,87 @@ oBrowser = function(name) {
 		var add_mode = (id == null || id < 0);
 		var total = plman.PlaylistCount;
 		
+		if(setting_mode){
+			_menu.AppendMenuItem(MF_STRING, 21, "列表中搜索");
+			_menu.AppendMenuItem(MF_STRING, 22, "媒体库搜索");
+			_menu.CheckMenuRadioItem(21, 22, ppts.source + 20);
+			_menu.AppendMenuSeparator();
+	
+			var SearchHistoryMenu = window.CreatePopupMenu();
+			var SearchOptionMenu = window.CreatePopupMenu();
+
+			for (var i = g_searchbox.historylist.length - 1; i >= 0; i--) {
+				SearchHistoryMenu.AppendMenuItem(MF_STRING, i + 51, g_searchbox.historylist[i][0].replace("&", "&&"));
+			}
+			if (g_searchbox.historylist.length == 0) {
+				SearchHistoryMenu.AppendMenuItem(MF_GRAYED, 40, "无记录");
+			} else {
+				SearchHistoryMenu.AppendMenuSeparator();
+				SearchHistoryMenu.AppendMenuItem(MF_STRING, ppts.historymaxitems + 60, "清除记录");
+			}
+
+			SearchHistoryMenu.AppendTo(_menu, MF_STRING, "搜索记录");
+
+			if (ppts.source == 1) {
+				_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
+				_menu.CheckMenuItem(1, ppts.autosearch ? 1 : 0);
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 8, "搜索:文件名");
+				SearchOptionMenu.AppendMenuSeparator();
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 9, "搜索:注释");
+				SearchOptionMenu.CheckMenuRadioItem(2, 9, ppts.scope + 2);
+
+			} else if (ppts.source == 2) {
+				var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
+				var quickSearchMenu = window.CreatePopupMenu();
+				quickSearchMenu.AppendMenuItem(MF_STRING, 36, "相同艺术家");
+				quickSearchMenu.AppendMenuItem(MF_STRING, 37, "相同专辑");
+				quickSearchMenu.AppendMenuItem(MF_STRING, 38, "相同流派");
+				quickSearchMenu.AppendMenuItem(MF_STRING, 39, "相同日期");
+				quickSearchMenu.AppendTo(_menu, MF_STRING, "快速搜索...");
+				_menu.AppendMenuItem(MF_STRING, 27, "保留之前的搜索列表");
+				_menu.CheckMenuItem(27, ppts.multiple ? 1 : 0);
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 8, "搜索:文件名");
+				SearchOptionMenu.AppendMenuSeparator();
+				SearchOptionMenu.AppendMenuItem(MF_STRING, 9, "搜索:注释");
+				SearchOptionMenu.CheckMenuRadioItem(2, 9, ppts.scope + 2);
+			}
+			SearchOptionMenu.AppendTo(_menu, MF_STRING, "搜索范围");
+			_menu.AppendMenuSeparator();
+		}
+		
 		if (!add_mode) {
-			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 8, "移除");
-			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 3, "重命名");
-			_menu.AppendMenuItem(MF_STRING, 5, "复制");
+			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 10, "移除");
+			_menu.AppendMenuSeparator();
+			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 11, "重命名");
+			_menu.AppendMenuItem(MF_STRING, 12, "复制");
 			if (plman.IsAutoPlaylist(id)) {
-				_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-				_menu.AppendMenuItem(MF_STRING, 6, "智能列表属性...");
-				_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 7, "转换为普通列表");
+				_menu.AppendMenuSeparator();
+				_menu.AppendMenuItem(MF_STRING, 13, "智能列表属性...");
+				_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 14, "转换为普通列表");
 			};
-			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
+			_menu.AppendMenuSeparator();
 		}
 
 		if (!add_mode) {
 			var pl_idx = this.rows[id].idx;
-			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "插入...");
+			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "插入播放列表...");
 		}
 		else {
 			id = this.rowsCount;
 			var pl_idx = total;
-			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "添加...");
+			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "添加播放列表...");
 		};
 		_newplaylist.AppendMenuItem(MF_STRING, 100, "新建播放列表");
 		_newplaylist.AppendMenuItem(MF_STRING, 101, "新建智能列表");
@@ -945,21 +1001,22 @@ oBrowser = function(name) {
 		_autoplaylist.AppendMenuItem(MF_STRING, 205, "历史记录 (一个星期内播放过的音轨)");
 		_autoplaylist.AppendMenuItem(MF_STRING, 206, "最常播放的音轨");
 		_autoplaylist.AppendMenuItem(MF_STRING, 210, "最近添加的音轨");
-		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
+		_autoplaylist.AppendMenuSeparator();
 		_autoplaylist.AppendMenuItem(MF_STRING, 250, "喜爱的音轨");
-		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
+		_autoplaylist.AppendMenuSeparator();
 		_autoplaylist.AppendMenuItem(MF_STRING, 225, "音轨评级为 5");
 		_autoplaylist.AppendMenuItem(MF_STRING, 224, "音轨评级为 4");
 		_autoplaylist.AppendMenuItem(MF_STRING, 223, "音轨评级为 3");
 		_autoplaylist.AppendMenuItem(MF_STRING, 222, "音轨评级为 2");
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
-		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "载入播放列表");
-		_menu.AppendMenuItem(MF_STRING, 13, "保存所有播放列表");
+		_newplaylist.AppendMenuItem(MF_STRING, 30, "网络电台列表");
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 15, "载入播放列表");
+		_menu.AppendMenuItem(MF_STRING, 16, "保存所有播放列表");
 		if (!add_mode) {
-			_menu.AppendMenuItem(MF_STRING, 4, "保存播放列表");
-			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
+			_menu.AppendMenuItem(MF_STRING, 17, "保存播放列表");
+			_menu.AppendMenuSeparator();
 			_restorepl.AppendTo(_menu, PLRecManager.Count >= 1 ? MF_STRING : MF_GRAYED | MF_DISABLED, "列表记录");
 			if (PLRecManager.Count >= 1) {
 				for (var irm = 0; irm < PLRecManager.Count; irm++) {
@@ -969,26 +1026,70 @@ oBrowser = function(name) {
 				_restorepl.AppendMenuItem(MF_STRING, 2000, "清除列表记录");
 			}
 			if (!plman.IsAutoPlaylist(id)) {
-				_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 10, "清空列表");
-				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 11, "移除重复项");
-				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 12, "移除无效项");
+				_menu.AppendMenuSeparator();
+				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 18, "清空列表");
+				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 19, "移除重复项");
+				_menu.AppendMenuItem((plman.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 20, "移除无效项");
 			}
 		};
 		if(setting_mode){
 			_menu.AppendMenuSeparator();
-			_menu.AppendMenuItem(MF_STRING, 16, "删除播放列表需确认");
-			_menu.CheckMenuItem(16, ppt.confirmRemove);
-			_menu.AppendMenuSeparator();
-			_menu.AppendMenuItem(MF_STRING, 9, "显示过滤栏");
-			_menu.CheckMenuItem(9, ppt.showFilter);
-			_menu.AppendMenuItem(MF_STRING, 14, "显示网格线");
-			_menu.CheckMenuItem(14, ppt.showGrid);
-			_menu.AppendMenuItem(MF_STRING, 15, "面板属性");
+			_options.AppendTo(_menu, MF_STRING, "面板选项");
+			_options.AppendMenuItem(MF_STRING, 23, "删除播放列表需确认");
+			_options.CheckMenuItem(23, ppt.confirmRemove);
+			_options.AppendMenuSeparator();
+			_options.AppendMenuItem(MF_STRING, 24, "显示过滤栏");
+			_options.CheckMenuItem(24, ppt.showFilter);
+			_options.AppendMenuItem(MF_STRING, 25, "显示网格线");
+			_options.CheckMenuItem(25, ppt.showGrid);
+			_options.AppendMenuItem(MF_STRING, 26, "面板属性");
 		}
 		idx = _menu.TrackPopupMenu(x, y);
 
 		switch (true) {
+		case (idx == 1):
+			ppts.autosearch = !ppts.autosearch;
+			g_searchbox.inputbox.autovalidation = ppts.autosearch;
+			window.SetProperty("Search Box: Auto-validation", ppts.autosearch);
+			break;
+		case (idx >= 2 && idx <= 9):
+			ppts.scope = idx - 2;
+			window.SetProperty("Search Box: Scope", ppts.scope);
+			break;
+		case (idx == 27):
+			ppts.multiple = !ppts.multiple;
+			window.SetProperty("Search Box: Keep Playlist", ppts.multiple);
+			break;
+		case (idx >= 21 && idx <= 22):
+			window.SetProperty("Search Source", ppts.source = idx - 20);
+			g_searchbox.inputbox.autovalidation = (ppts.source > 1) ? false : ppts.autosearch;
+			g_searchbox.inputbox.empty_text = (ppts.source == 1) ? "搜索当前列表" : "搜索媒体库";
+			g_searchbox.repaint();
+			break;
+		case (idx == 36):
+			quickSearch(now_playing_track, "artist");
+			break;
+		case (idx == 37):
+			quickSearch(now_playing_track, "album");
+			break;
+		case (idx == 38):
+			quickSearch(now_playing_track, "genre");
+			break;
+		case (idx == 39):
+			quickSearch(now_playing_track, "date");
+			break;
+		case (idx >= 51 && idx <= ppts.historymaxitems + 51):
+			g_searchbox.inputbox.text = g_searchbox.historylist[idx - 51][0];
+			g_searchbox.on_char();
+			g_searchbox.repaint();
+			break;
+		case (idx == ppts.historymaxitems + 60):
+			g_searchbox.historyreset();
+			break;
+		case (idx == 30):
+			LoadRadio("网络电台", ppt.radiolist);
+			break;
+			
 		case (idx == 100):
 			plman.CreatePlaylist(total, "");
 			plman.MovePlaylist(total, pl_idx);
@@ -1042,13 +1143,13 @@ oBrowser = function(name) {
 			this.inputbox.select = true;
 			this.repaint();
 			break;
-		case (idx == 2):
+		case (idx == 15):
 			fb.RunMainMenuCommand("文件/载入播放列表...");
 			break;
-		case (idx == 13):
+		case (idx == 16):
 			fb.RunMainMenuCommand("文件/保存所有播放列表...");
 			break;
-		case (idx == 3):
+		case (idx == 11):
 			// set rename it
 			var rh = ppt.rowHeight - 10;
 			var tw = this.w - rh - 10;
@@ -1071,22 +1172,22 @@ oBrowser = function(name) {
 			this.inputbox.select = true;
 			this.repaint();
 			break;
-		case (idx == 4):
+		case (idx == 17):
 			fb.RunMainMenuCommand("文件/保存播放列表...");
 			break;
-		case (idx == 5):
+		case (idx == 12):
 			plman.DuplicatePlaylist(pl_idx, plman.GetPlaylistName(pl_idx) + " (复件)");
 			plman.ActivePlaylist = pl_idx + 1;
 			break;
-		case (idx == 6):
+		case (idx == 13):
 			plman.ShowAutoPlaylistUI(pl_idx);
 			break;
-		case (idx == 7):
+		case (idx == 14):
 			plman.DuplicatePlaylist(pl_idx, plman.GetPlaylistName(pl_idx));
 			plman.RemovePlaylist(pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
-		case (idx == 8):
+		case (idx == 10):
 			if (brw.rowsCount > 0) {
 				if(ppt.confirmRemove){
 					DeletePlaylist(pl_idx);
@@ -1096,30 +1197,30 @@ oBrowser = function(name) {
 				}
 			}
 			break;
-		case (idx == 9):
+		case (idx == 24):
 			ppt.showFilter = !ppt.showFilter;
 			window.SetProperty("_DISPLAY: Show Filter", ppt.showFilter);
 			ppt.headerBarHeight = ppt.SearchBarHeight + (ppt.showFilter ? ppt.rowHeight : 0);
-			brw.setSize(0, ppt.rowHeight +  ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.rowHeight - ppt.headerBarHeight);
+			brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 			brw.repaint();
 			break;
-		case (idx == 10):
+		case (idx == 18):
 			fb.RunMainMenuCommand("编辑/清除");
 			break;
-		case (idx == 11):
+		case (idx == 19):
 			fb.RunMainMenuCommand("编辑/移除重复项");
 			break;
-		case (idx == 12):
+		case (idx == 20):
 			fb.RunMainMenuCommand("编辑/移除无效项");
 			break;
-		case (idx == 15):
+		case (idx == 26):
 			window.ShowProperties();
 			break;
-		case (idx == 16):
+		case (idx == 23):
 			ppt.confirmRemove = !ppt.confirmRemove;
 			window.SetProperty("_PROPERTY: Confirm Before Removing", ppt.confirmRemove);
 			break;
-		case (idx == 14):
+		case (idx == 25):
 			ppt.showGrid = !ppt.showGrid;
 			window.SetProperty("_PROPERTY: Show Grid", ppt.showGrid);
 			brw.repaint();
@@ -1246,9 +1347,10 @@ function on_size() {
 	window.MinWidth = 1;
 	window.MinHeight = 1;
 	cFilterBox.w = Math.floor(ww * 0.6);
-	cSearchBox.w = ww - 30 * zdpi - cSearchBox.x;
+	cSearchBox.w = ww - brw.images.topbar_btn.Width * 2 - cSearchBox.x;
 	// set Size of browser
-	brw.setSize(0, ppt.rowHeight +  ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.rowHeight - ppt.headerBarHeight);
+	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
+	brw.repaint();
 };
 
 function on_paint(gr) {
@@ -1478,22 +1580,28 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 function get_images() {
 	var gb;
 	var imgw = Math.floor(27*zdpi), imgh = Math.floor(25*zdpi);
-	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
-			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
-	var add_h = Math.ceil(4*zdpi);
-	images.add_menu = gdi.CreateImage(Math.ceil(_x14), add_h*3+3);
+	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x5 = 5*zdpi, _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
+			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
+	
+	images.newplaylist_img = gdi.CreateImage(_x10, _x10);
+		gb = images.newplaylist_img.GetGraphics();
+		gb.FillSolidRect(1, Math.floor(_x10/2), Math.floor(_x10), 1, g_color_normal_txt);
+		gb.FillSolidRect(Math.floor(_x10/2), 1, 1, Math.floor(_x10), g_color_normal_txt);
+	images.newplaylist_img.ReleaseGraphics(gb);
+		
+	images.add_menu = gdi.CreateImage(Math.round(_x14), Math.round(_x14));
 		gb = this.images.add_menu.GetGraphics();
+		var point_arr = new Array(3*zdpi,Math.floor(_x5),_x11,Math.floor(_x5),_x7,_x10);
+		gb.SetSmoothingMode(2);
+		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(Math.ceil(2*zdpi), x2+1, Math.ceil(_x12), x2+1, 1, g_color_normal_txt);
-		gb.DrawLine(Math.ceil(2*zdpi), x2+add_h+1, Math.ceil(_x12), x2+add_h+1, 1, g_color_normal_txt);
-		gb.DrawLine(Math.ceil(2*zdpi), x2+add_h*2+1, Math.ceil(_x12), x2+add_h*2+1, 1, g_color_normal_txt);	
 	images.add_menu.ReleaseGraphics(gb);
 		
 	images.icon_normal_pl = gdi.CreateImage(imgw, imgh);
 	gb = images.icon_normal_pl.GetGraphics();
 	
 	gb.DrawLine(_x8, _x8, _x19, _x8, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3, _x17, _x8+x3, 1, g_color_normal_txt);
+	gb.DrawLine(_x8, _x8+x3, 17*zdpi, _x8+x3, 1, g_color_normal_txt);
 	gb.DrawLine(_x8, _x8+x3*2, _x19, _x8+x3*2, 1, g_color_normal_txt);
 	gb.DrawLine(_x8, _x8+x3*3, _x18, _x8+x3*3, 1, g_color_normal_txt);
 	images.icon_normal_pl.ReleaseGraphics(gb);
@@ -1521,8 +1629,8 @@ function get_images() {
 	images.history_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.history_icon.GetGraphics();
 	gb.DrawRect(Math.round(_x7), Math.round(_x7), Math.round(_x12), Math.round(_x10), 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(_x10), Math.ceil(5*zdpi), Math.round(_x10), Math.floor(_x9), 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(5*zdpi),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x10), Math.ceil(_x5), Math.round(_x10), Math.floor(_x9), 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(_x5),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_normal_txt);
 	gb.DrawLine(Math.round(_x7), Math.ceil(_x11), Math.round(_x7)+Math.round(_x12), Math.ceil(_x11), 1, g_color_normal_txt);
 	images.history_icon.ReleaseGraphics(gb);
 	
@@ -1560,7 +1668,7 @@ function get_images() {
 	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_normal_txt);
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_normal_txt);
-	gb.DrawEllipse(_x7, 5*zdpi, _x10, _x10, 1, g_color_normal_txt);
+	gb.DrawEllipse(_x7, _x5, _x10, _x10, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.radios_icon.ReleaseGraphics(gb);
 	
@@ -1597,8 +1705,8 @@ function get_images() {
 	images.history_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.history_icon_hl.GetGraphics();
 	gb.DrawRect(Math.round(_x7), Math.round(_x7), Math.round(_x12), Math.round(_x10), 1, g_color_playing_txt);
-	gb.DrawLine(Math.round(_x10), Math.ceil(5*zdpi), Math.round(_x10), Math.floor(_x9), 1, g_color_playing_txt);
-	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(5*zdpi),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_playing_txt);
+	gb.DrawLine(Math.round(_x10), Math.ceil(_x5), Math.round(_x10), Math.floor(_x9), 1, g_color_playing_txt);
+	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(_x5),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_playing_txt);
 	gb.DrawLine(Math.round(_x7), Math.ceil(_x11), Math.round(_x7)+Math.round(_x12), Math.ceil(_x11), 1, g_color_playing_txt);
 	images.history_icon_hl.ReleaseGraphics(gb);
 
@@ -1635,7 +1743,7 @@ function get_images() {
 	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_playing_txt);
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_playing_txt);
-	gb.DrawEllipse(_x7, 5*zdpi, _x10, _x10, 1, g_color_playing_txt);
+	gb.DrawEllipse(_x7, _x5, _x10, _x10, 1, g_color_playing_txt);
 	gb.SetSmoothingMode(0);
 	images.radios_icon_hl.ReleaseGraphics(gb);
 	
@@ -1955,28 +2063,7 @@ function on_playlist_items_added(playlist_idx) {
 function on_playlist_items_removed(playlist_idx, new_count) {
 	brw.repaint();
 };
-/*
-function on_playlist_items_reordered(playlist_idx) {
 
-};
-
-
-function on_item_focus_change(playlist, from, to) {
-
-};
-
-function on_metadb_changed() {
-
-};
-
-function on_item_selection_change() {
-
-};
-
-function on_playlist_items_selection_change() {
-
-};
-*/
 function on_focus(is_focused) {
 	g_focus = is_focused;
 	g_searchbox.on_focus(g_focus);
@@ -2125,7 +2212,7 @@ function on_notify_data(name, info) {
 		get_metrics();
 		brw.scrollbar.updateScrollbar();
 		brw.scrollbar.setSize();
-		brw.setSize(0, ppt.rowHeight +  ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.rowHeight - ppt.headerBarHeight);
+		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 		brw.repaint();
 		break;
 	case "ScrollStep":

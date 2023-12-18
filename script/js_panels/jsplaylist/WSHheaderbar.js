@@ -88,28 +88,35 @@ oHeaderBar = function() {
 		var color_txt = g_color_normal_txt;
 		var color_bg = g_color_normal_bg;
 		var btn_h = cHeaderBar.height;
+		var add_h = Math.round(3*zdpi);
+		var y_ini = Math.round((btn_h-add_h*2)/2);
+		var x_ini =  cScrollBar.width / 4;
 
 		this.slide_open_normal = gdi.CreateImage(cScrollBar.width, btn_h);
 		var gb = this.slide_open_normal.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
-		var x_ini =  cScrollBar.width / 4;
-		pointArr = Array(x_ini, btn_h/3, x_ini + g_z2, btn_h/2, x_ini, btn_h*2/3, x_ini + g_z6, btn_h/2);
-		gb.FillPolygon(color_txt&0xaaffffff, 1, pointArr);
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt&0xaaffffff);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt&0xaaffffff);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt&0xaaffffff);	
 		this.slide_open_normal.ReleaseGraphics(gb);
 
 		this.slide_open_hover = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_hover.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,30));
 		gb.SetSmoothingMode(2);
-		gb.FillPolygon(color_txt, 1, pointArr);
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt);	
 		this.slide_open_hover.ReleaseGraphics(gb);
 
 		this.slide_open_down = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_down.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,50));
 		gb.SetSmoothingMode(2);
-		gb.FillPolygon(color_txt, 1, pointArr);
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt);	
 		this.slide_open_down.ReleaseGraphics(gb);
 		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "");
 	};
@@ -514,7 +521,7 @@ oHeaderBar = function() {
 					break;
 				case "up":
 					if (this.buttonClicked && state == ButtonStates.hover) {
-						this.contextMenu(ww, 0, 0);
+						this.contextMenu(ww, cHeaderBar.height, 0, true);
 						this.button.state = ButtonStates.normal;
 					};
 					this.buttonClicked = false;
@@ -724,7 +731,7 @@ oHeaderBar = function() {
 		};
 	};
 
-	this.contextMenu = function(x, y, column_index) {
+	this.contextMenu = function(x, y, column_index, btnclk) {
 		var idx;
 		var _menu = window.CreatePopupMenu();
 		var _this = window.CreatePopupMenu();
@@ -803,7 +810,7 @@ oHeaderBar = function() {
 		_menu.AppendMenuItem(MF_STRING, 16, "刷新封面 (F5)");
 		_menu.AppendMenuItem(MF_STRING, 14, "面板属性");
 		
-		idx = _menu.TrackPopupMenu(x, y);
+		idx = _menu.TrackPopupMenu(x, y, btnclk ? 0x0008 : 0);
 		switch (true) {
 		case (idx == 11):
 			p.list.showNowPlaying();

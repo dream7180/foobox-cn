@@ -58,12 +58,6 @@ searchbox = function() {
 		gb = this.images.source_switch.GetGraphics();
 		this.images.source_switch.ReleaseGraphics(gb);
 		
-		this.images.source_switch_ov = gdi.CreateImage(Math.ceil(20 * zdpi), x18);
-		gb = this.images.source_switch_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillRoundRect(zdpi, zdpi, z(18), z(16), x2, x2, g_color_bt_overlay);
-		this.images.source_switch_ov.ReleaseGraphics(gb);
-		
 		this.images.source_pl = gdi.CreateImage(x14, x14);
 		gb = this.images.source_pl.GetGraphics();
 		gb.SetSmoothingMode(2);
@@ -94,17 +88,7 @@ searchbox = function() {
 		gb.DrawLine(x11, x4, x11, x11, 1, g_color_normal_txt);
 		gb.SetSmoothingMode(0);
 		this.images.source_lib.ReleaseGraphics(gb);
-		this.menu_btn = new button(this.images.source_switch, this.images.source_switch_ov, this.images.source_switch_ov, "");
-		this.src_btn = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, "");
-		
-		this.images.ico_menu = gdi.CreateImage(x14, x14);
-		gb = this.images.ico_menu.GetGraphics();
-		var point_arr = new Array(3*zdpi,Math.floor(5*zdpi),11*zdpi,Math.floor(5*zdpi),7*zdpi,10*zdpi);
-		gb.SetSmoothingMode(2);
-		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
-		gb.SetSmoothingMode(0);
-		this.images.ico_menu.ReleaseGraphics(gb);
-		
+		this.src_btn = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, "");	
 	}
 	this.getImages();
 
@@ -113,7 +97,7 @@ searchbox = function() {
 		this.y = y;
 		this.w = w;
 		this.h = h;
-		this.inputbox.setSize(this.w - 45 * zdpi, this.h - 4);
+		this.inputbox.setSize(this.w - 40 * zdpi, this.h - 4);
 	};
 
 	this.on_init = function() {
@@ -128,7 +112,6 @@ searchbox = function() {
 
 	this.draw = function(gr) {
 		// 绘制搜索框背景
-		this.menu_btn.draw(gr, Math.round(ww - this.images.ico_menu.Width - cScrollBar.width - 2*zdpi), Math.round(this.y + 2 * zdpi), 255);
 		this.src_btn.draw(gr, this.x + 4 - 2*zdpi, Math.round(this.y + zdpi), 255);
 		this.inputbox.draw(gr, this.x + this.images.source_pl.Width + 10, this.y + 2, 0, 0);
 		if(ppts.source == 1){
@@ -136,9 +119,8 @@ searchbox = function() {
 		}else{
 			var src_img = this.images.source_lib;
 		}
-		if ((this.inputbox.text.length > 0 || ppts.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, this.x + this.inputbox.w + 22 * zdpi, this.y + 3 * zdpi, 255);
+		if ((this.inputbox.text.length > 0 || ppts.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, Math.round(this.x + this.inputbox.w + 22 * zdpi), Math.round(this.y + zdpi), 255);
 		gr.DrawImage(src_img, this.x + 5, Math.round(this.y + 3 * zdpi), src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
-		gr.DrawImage(this.images.ico_menu, Math.round(ww - this.images.ico_menu.Width - cScrollBar.width + zdpi), Math.round(this.y + 3 * zdpi + 1), this.images.ico_menu.Width, this.images.ico_menu.Height, 0, 0, this.images.ico_menu.Width, this.images.ico_menu.Height, 0, 255);
 	}
 
 	this.historylist = Array();
@@ -198,21 +180,10 @@ searchbox = function() {
 	this.on_mouse = function(event, x, y, delta) {
 		switch (event) {
 		case "lbtn_down":
-			//this.src_switch.checkstate("down", x, y);
-			if (this.menu_btn.checkstate("down", x, y) == ButtonStates.down) {
-				this.buttonClicked = true;
-				this.menu_btn.state = ButtonStates.hover;
-			};
 			this.inputbox.check("down", x, y);
 			if (this.inputbox.text.length > 0 || ppts.showreset) this.reset_bt.checkstate("down", x, y);
 			break;
 		case "lbtn_up":
-			if (this.buttonClicked && this.menu_btn.checkstate("up", x, y) == ButtonStates.hover) {
-				Show_Menu_Searchbox(Math.round(ww - this.images.ico_menu.Width - cScrollBar.width - 2*zdpi),  Math.round(cSearchBox.y + cSearchBox.h - 2*zdpi));
-				this.menu_btn.state = ButtonStates.normal;
-				this.menu_btn.repaint();
-			}
-			this.buttonClicked = false;
 			if (this.src_btn.checkstate("up", x, y) == ButtonStates.hover) {
 				ppts.source = 3 - ppts.source;
 				if (ppts.source > 2 || ppts.source < 1) ppts.source = 1;
@@ -240,8 +211,7 @@ searchbox = function() {
 			break;
 		case "move":
 			this.inputbox.check("move", x, y);
-			this.menu_btn.checkstate("move", x, y);
-			if (!this.inputbox.hover && (this.inputbox.text.length > 0 || ppts.showreset)) this.reset_bt.checkstate("move", x, y);
+			if (this.inputbox.text.length > 0 || ppts.showreset) this.reset_bt.checkstate("move", x, y);
 			break;
 		case "leave":
 			this.inputbox.check("leave", 0, 0);
@@ -375,13 +345,14 @@ function g_onSearch() {
 			3: "%title% HAS ",
 			4: "%genre% HAS ",
 			5: "%date% HAS ",
-			6: "%comment% HAS "
+			6: "%filename% HAS ",
+			7: "%comment% HAS "
 		};
 		var s3 = "\"" + s1 + "\"";
 		if (scopecases[ppts.scope]) {
 			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[ppts.scope] + s3, "", 0);
 		} else {
-			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[1]+s3 + " OR " + scopecases[2]+s3 + " OR " + scopecases[3]+s3 + " OR " + scopecases[4]+s3 + " OR " + scopecases[5]+s3, "", 0);
+			plman.CreateAutoPlaylist(plIndex, "搜索 | " + s1, scopecases[1]+s3 + " OR " + scopecases[2]+s3 + " OR " + scopecases[3]+s3 + " OR " + scopecases[4]+s3 + " OR " + scopecases[5]+s3 + " OR " + scopecases[6]+s3, "", 0);
 		};
 
 		// 转换自动列表为普通列表
@@ -391,121 +362,10 @@ function g_onSearch() {
 	}
 }
 
-//=================================================// 搜索框菜单
-
-function Show_Menu_Searchbox(x, y) {
-	var idx;
-
-	var _menu = window.CreatePopupMenu();
-	
-	_menu.AppendMenuItem(MF_STRING, 21, "列表中搜索");
-	_menu.AppendMenuItem(MF_STRING, 22, "媒体库搜索");
-	_menu.CheckMenuRadioItem(21, 22, ppts.source + 20);
-	_menu.AppendMenuSeparator();
-	_menu.AppendMenuItem(MF_STRING, 30, "载入网络电台");
-	_menu.AppendMenuSeparator();
-	
-	var SearchHistoryMenu = window.CreatePopupMenu();
-
-	for (var i = g_searchbox.historylist.length - 1; i >= 0; i--) {
-		SearchHistoryMenu.AppendMenuItem(MF_STRING, i + 51, g_searchbox.historylist[i][0].replace("&", "&&"));
-	}
-	if (g_searchbox.historylist.length == 0) {
-		SearchHistoryMenu.AppendMenuItem(MF_GRAYED, 40, "无记录");
-	} else {
-		SearchHistoryMenu.AppendMenuSeparator();
-		SearchHistoryMenu.AppendMenuItem(MF_STRING, ppts.historymaxitems + 60, "清除记录");
-	}
-
-	SearchHistoryMenu.AppendTo(_menu, MF_STRING, "搜索记录");
-
-	if (ppts.source == 1) {
-		_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
-		_menu.CheckMenuItem(1, ppts.autosearch ? 1 : 0);
-		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
-		_menu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
-		_menu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
-		_menu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
-		_menu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
-		_menu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
-		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 8, "搜索:注释");
-		_menu.CheckMenuRadioItem(2, 8, ppts.scope + 2);
-
-	} else if (ppts.source == 2) {
-		var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
-		var quickSearchMenu = window.CreatePopupMenu();
-		quickSearchMenu.AppendMenuItem(MF_STRING, 36, "相同艺术家");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 37, "相同专辑");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 38, "相同流派");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 39, "相同日期");
-		quickSearchMenu.AppendTo(_menu, MF_STRING, "快速搜索...");
-		_menu.AppendMenuItem(MF_STRING, 9, "保留之前的搜索列表");
-		_menu.CheckMenuItem(9, ppts.multiple ? 1 : 0);
-		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
-		_menu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
-		_menu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
-		_menu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
-		_menu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
-		_menu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
-		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 8, "搜索:注释");
-		_menu.CheckMenuRadioItem(2, 8, ppts.scope + 2);
-	}
-
-	idx = _menu.TrackPopupMenu(x, y);
-	switch (true) {
-	case (idx == 1):
-		ppts.autosearch = !ppts.autosearch;
-		g_searchbox.inputbox.autovalidation = ppts.autosearch;
-		window.SetProperty("Search Box: Auto-validation", ppts.autosearch);
-		break;
-	case (idx >= 2 && idx <= 8):
-		ppts.scope = idx - 2;
-		window.SetProperty("Search Box: Scope", ppts.scope);
-		break;
-	case (idx == 9):
-		ppts.multiple = !ppts.multiple;
-		window.SetProperty("Search Box: Keep Playlist", ppts.multiple);
-		break;
-
-	case (idx >= 21 && idx <= 22):
-		window.SetProperty("Search Source", ppts.source = idx - 20);
-		g_searchbox.inputbox.autovalidation = (ppts.source > 1) ? false : ppts.autosearch;
-		g_searchbox.inputbox.empty_text = (ppts.source == 1) ? "搜索当前列表" : "搜索媒体库";;
-		g_searchbox.repaint();
-		break;
-	case (idx == 36):
-		quickSearch(now_playing_track, "artist");
-		break;
-	case (idx == 37):
-		quickSearch(now_playing_track, "album");
-		break;
-	case (idx == 38):
-		quickSearch(now_playing_track, "genre");
-		break;
-	case (idx == 39):
-		quickSearch(now_playing_track, "date");
-		break;
-	case (idx >= 51 && idx <= ppts.historymaxitems + 51):
-		g_searchbox.inputbox.text = g_searchbox.historylist[idx - 51][0];
-		g_searchbox.on_char();
-		g_searchbox.repaint();
-		break;
-	case (idx == ppts.historymaxitems + 60):
-		g_searchbox.historyreset();
-		break;
-	case (idx == 30):
-		LoadRadio("网络电台", "https://mirror.ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u");
-		break;
-	}
-}
-
 //=================================================// 快速搜索
 
 function quickSearch(metadb, search_function) {
+	if(!metadb) return;
 	var playlist_index = -1;
 	for (i = 0; i < plman.PlaylistCount; i++) {
 		if (plman.GetPlaylistName(i) == "搜索结果") {

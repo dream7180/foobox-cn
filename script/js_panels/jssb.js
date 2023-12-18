@@ -35,7 +35,7 @@ ppt = {
 	// 1 = album, 2 = artist, 3 = genre
 	albumMode: window.GetProperty("_PROPERTY: Album Mode", 1), //0-with art, 1-without art
 	artistMode: window.GetProperty("_PROPERTY: Artist Mode", 0), //0-albumartist, 1-artist
-	genre_dir: window.GetProperty("_PROPERTY: Genre or Directory", 0), //0-genre, 1-dir
+	genre_dir: window.GetProperty("_PROPERTY: Genre or Directory", 1), //0-genre, 1-dir
 	albumArtId: 0,
 	// 0 = front
 	panelMode: window.GetProperty("_PROPERTY: Display Mode", 1),

@@ -17,7 +17,7 @@ var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", true);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.17";
+var g_script_version = "7.18";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -432,7 +432,9 @@ image_cache = function() {
 			img = FormatCover(image, pw, ph, false);
 			if (!img) img = null;
 		};
-		this._cachelist[p.list.groups[albumIndex].cachekey] = img;
+		try{
+			this._cachelist[p.list.groups[albumIndex].cachekey] = img;
+		} catch(e){}
 		return img;
 	};
 };
