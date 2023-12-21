@@ -338,8 +338,8 @@ oSwitchbar = function() {
 		switch (event) {
 		case "move":
 			if(this.ishover){
-				if(x < 70*zdpi) this.hover_tab = 1;
-				else if (x > 140*zdpi) this.hover_tab = 3;
+				if(x < z(39)) this.hover_tab = 1;
+				else if (x > z(78)) this.hover_tab = 3;
 				else this.hover_tab = 2;
 			}
 			else this.hover_tab = 0;
@@ -370,23 +370,20 @@ oSwitchbar = function() {
 	};
 	
 	this.draw = function(gr){
-		var sw_img_y = Math.ceil((ppt.headerBarHeight - images.album.Height)/2);
-		gr.DrawImage(images.album, Math.round(10*zdpi), sw_img_y, images.album.Width, images.album.Height, 0, 0, images.album.Width, images.album.Height,0,255);
-		gr.DrawImage(images.artist, Math.round(75*zdpi), sw_img_y, images.artist.Width, images.artist.Height, 0, 0, images.artist.Width, images.artist.Height,0,255);
-		gr.DrawImage(images.genre, Math.round(145*zdpi), sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
-		gr.GdiDrawText("专 辑", g_font, g_color_normal_txt, 30*zdpi, sw_img_y, 35*zdpi, images.album.Height, lc_txt);
-		gr.GdiDrawText("艺术家", g_font, g_color_normal_txt, 95*zdpi, sw_img_y, 40*zdpi, images.album.Height, lc_txt);
-		gr.GdiDrawText(ppt.genre_dir?"文件夹":"流 派", g_font, g_color_normal_txt, 165*zdpi, sw_img_y, 40*zdpi, images.album.Height, lc_txt);
+		var _linex = z(39);
 		var bys = Math.round((ppt.headerBarHeight - 2) / 2);
 		gr.FillGradRect(this.x + this.w -1, 0, 1, bys, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
 		gr.FillGradRect(this.x + this.w -1, bys, 1, bys, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
 		gr.FillSolidRect(this.x + this.w, 0, 1, ppt.headerBarHeight - 2, g_color_normal_bg);
-		if(this.hover_tab == 1) gr.FillSolidRect(this.x, ppt.headerBarHeight - 4, 63*zdpi, 4, g_color_selected_bg);
-		else if(this.hover_tab > 1) gr.FillSolidRect((this.hover_tab-1)*70*zdpi, ppt.headerBarHeight - 4, 68*zdpi, 4, g_color_selected_bg);
-		if(ppt.tagMode==1)
-			gr.FillSolidRect(this.x, ppt.headerBarHeight - 4, 63*zdpi, 4, g_color_highlight);
-		else
-			gr.FillSolidRect((ppt.tagMode-1)*70*zdpi, ppt.headerBarHeight - 4, 68*zdpi, 4, g_color_highlight);
+		gr.FillSolidRect((ppt.tagMode - 1) * _linex, 0, _linex, ppt.headerBarHeight, g_color_normal_bg);
+		gr.FillSolidRect((ppt.tagMode - 1) * _linex - 1, 0, _linex + 2, 2, g_color_highlight);
+		gr.FillSolidRect((ppt.tagMode - 1) * _linex, ppt.headerBarHeight, _linex, 1, g_color_normal_bg);
+		gr.FillSolidRect((ppt.tagMode - 1) * _linex - 1, 0, 1, ppt.headerBarHeight, g_color_line);
+		gr.FillSolidRect(ppt.tagMode * _linex, 0, 1, ppt.headerBarHeight, g_color_line);
+		var sw_img_y = Math.ceil((ppt.headerBarHeight - images.album.Height)/2);
+		gr.DrawImage(images.album, z(11), sw_img_y, images.album.Width, images.album.Height, 0, 0, images.album.Width, images.album.Height,0,255);
+		gr.DrawImage(images.artist, z(50), sw_img_y, images.artist.Width, images.artist.Height, 0, 0, images.artist.Width, images.artist.Height,0,255);
+		gr.DrawImage(images.genre, z(90) - 1, sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
 	}
 }
 
@@ -1659,7 +1656,7 @@ oBrowser = function(name) {
 			var source_width = gr.CalcTextWidth(source_name, g_font_b);
 			gr.FillSolidRect(0, 0, ww, brw.y + 1, g_color_normal_bg);
 			gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + cScrollBar.width/*(cScrollBar.enabled ? cScrollBar.width : 0)*/, 1, g_color_line);
-			var tx = cFilterBox.x + cFilterBox.w + Math.round(22 * zdpi) + 10;
+			var tx = cFilterBox.x + cFilterBox.w + z(22) + 10;
 			var tw = (this.w - tx - cSwitchBtn.w - 2 + cScrollBar.width/*(cScrollBar.enabled ? cScrollBar.width : 0)*/)*2/3;
 			var source_w = Math.min(tw, source_width);
 			gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
@@ -2520,11 +2517,11 @@ function get_metrics() {
 	cScrollBar.minCursorHeight = 25*zdpi;
 	cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 	ppt.headerBarHeight = Math.ceil(26 * zdpi) + 2;
-	g_switchbar.x = z(5);
+	g_switchbar.x = 0;
 	g_switchbar.y = z(5);
-	g_switchbar.w = z(205);
+	g_switchbar.w = z(117);
 	g_switchbar.h = ppt.headerBarHeight;
-	cFilterBox.x = g_switchbar.x * 2 + g_switchbar.w;
+	cFilterBox.x = g_switchbar.x + g_switchbar.w + z(11);
 	cFilterBox.w = 120*zdpi;
 	cFilterBox.h = 20*zdpi;
 	cFilterBox.y = Math.ceil((ppt.headerBarHeight - cFilterBox.h)/2);
