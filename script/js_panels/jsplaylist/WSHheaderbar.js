@@ -78,6 +78,7 @@ oHeaderBar = function() {
 		this.sortedColumnDirection = 1;
 	};
 	this.resetSortIndicators();
+	this.buttonClicked = false;
 
 	this.borderHover = false;
 	this.clickX = 0;
@@ -85,8 +86,7 @@ oHeaderBar = function() {
 	this.icoFont = GdiFont("Tahoma", g_fsize - 2, 1);
 
 	this.setButtons = function() {
-		var color_txt = g_color_normal_txt;
-		var color_bg = g_color_normal_bg;
+		var menu_ico = g_color_normal_txt&0x88ffffff;
 		var btn_h = cHeaderBar.height;
 		var add_h = Math.round(3*zdpi);
 		var y_ini = Math.round((btn_h-add_h*2)/2);
@@ -96,27 +96,27 @@ oHeaderBar = function() {
 		var gb = this.slide_open_normal.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt&0xaaffffff);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt&0xaaffffff);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt&0xaaffffff);	
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, menu_ico);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, menu_ico);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, menu_ico);	
 		this.slide_open_normal.ReleaseGraphics(gb);
 
 		this.slide_open_hover = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_hover.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,30));
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt);	
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, g_color_normal_txt);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, g_color_normal_txt);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, g_color_normal_txt);	
 		this.slide_open_hover.ReleaseGraphics(gb);
 
 		this.slide_open_down = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_down.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,50));
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, color_txt);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, color_txt);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, color_txt);	
+		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, g_color_normal_txt);
+		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, g_color_normal_txt);
+		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, g_color_normal_txt);	
 		this.slide_open_down.ReleaseGraphics(gb);
 		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "");
 	};
@@ -522,12 +522,16 @@ oHeaderBar = function() {
 				case "up":
 					if (this.buttonClicked && state == ButtonStates.hover) {
 						this.contextMenu(ww, cHeaderBar.height, 0, true);
-						this.button.state = ButtonStates.normal;
 					};
-					this.buttonClicked = false;
 					break;
-				case "leave":
-					this.button.state = ButtonStates.normal;
+					
+				case "leave_menu":
+					var _state = this.button.state;
+					if(this.buttonClicked && state == ButtonStates.hover) {
+						this.buttonClicked = false;
+						
+					} else this.button.state = ButtonStates.normal;
+					if(this.button.state != _state) this.button.repaint();
 					break;
 				};
 				return state;
@@ -723,9 +727,6 @@ oHeaderBar = function() {
 						full_repaint();
 					};
 					break;
-				//case "leave":
-					//full_repaint();
-					//break;
 				};
 			};
 		};

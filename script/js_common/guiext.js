@@ -14,11 +14,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 		this.X = x;
 		this.Y = y;
 		this.sub_w = Math.round((w - 9)/10);
-		if(ImgDiv) {
-			this.Width = this.sub_w * 10 + 9;
-		} else {
-			this.Width = w;
-		}
+		this.Width = w;
 		this.Height = h;
 	}
 

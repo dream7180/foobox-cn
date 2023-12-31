@@ -17,12 +17,11 @@ var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", true);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.18";
+var g_script_version = "7.19";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
-var g_leave = false;
 var g_focus = true;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -988,8 +987,6 @@ function on_mouse_move(x, y) {
 
 	if (x == mouse_x && y == mouse_y) return true;
 
-	if (x >= 0 && x < ww && y >= 0 && y < wh) g_leave = false;
-
 	// check settings
 	if (cSettings.visible) {
 
@@ -1180,10 +1177,10 @@ function on_mouse_mbtn_up(x, y, mask) {
 };
 
 function on_mouse_leave() {
-	g_leave = true;
 	if (p.scrollbar && p.list.totalRows > 0 && (p.list.totalRows > p.list.totalRowVisible)) {
 		p.scrollbar.check("leave", 0, 0);
 	};
+	p.headerBar.buttonCheck("leave_menu", 0, 0);
 };
 
 // Callbacks

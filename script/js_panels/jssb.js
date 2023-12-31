@@ -796,7 +796,8 @@ oGroup = function(index, start, handle, groupkey) {
 		this.cachekey = process_cachekey(ppt.tf_crc.EvalWithMetadb(handle));
 		if (ppt.tagMode == 3 && ppt.genre_dir == 1) {
 			this.groupkey = fb.TitleFormat("$directory(%path%,1)").EvalWithMetadb(handle);
-			if(this.groupkey.length < 6 && this.groupkey.indexOf("CD") == 0){
+			var _gkey = this.groupkey.toUpperCase();
+			if(this.groupkey.length < 6 && _gkey.indexOf("CD") == 0){
 				this.groupkey = fb.TitleFormat("$directory(%path%,2)").EvalWithMetadb(handle) + " | " + this.groupkey;
 			}
 		}

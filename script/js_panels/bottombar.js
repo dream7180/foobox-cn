@@ -418,7 +418,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 }
 
 function init_obj() {
-	vol_len = z(70);
+	vol_len = Math.round((z(70) - 9)/10) * 10 + 9;
 	seek_h = z(20);
 	win_y = wh - z(58);
 	let btn_space = z(12) + 3;
