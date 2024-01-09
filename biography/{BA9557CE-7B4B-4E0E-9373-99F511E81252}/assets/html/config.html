@@ -1,0 +1,2110 @@
+﻿<!DOCTYPE html>
+	<html>
+	<head>
+
+	<meta http-equiv="x-ua-compatible" content="IE=8"/>
+	<link rel="stylesheet" type="text/css" href="styles10.css">
+	<style type="text/css">
+
+	body, html {height:100%; margin:0;}
+
+	.tablink {background-color:#e5e5e5; overflow:hidden; font:1em Microsoft Yahei UI;}
+	.tablink a {margin:0; background-color:#555; color:white; text-align:center; float:left; border:none; border-bottom:1px solid #d0d0d0; border-top:0.31em solid #329932; outline:none; cursor:pointer; padding:0.31em 2px; width:13.67%;}
+	.tablink a:hover {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tablink a:focus {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tablink a:focus a:hover {padding:0.31em 2px; border-top:0.31em solid #329932; background-color:#777;}
+	.tabcontent {display:none; padding:1px;}
+
+	.tablink2 {background-color:#e5e5e5; overflow:hidden; font:1em Microsoft Yahei UI;}
+	.tablink2 a {margin:0; background-color:#A9A9A9; color:white; text-align:center; float:left; border:none; outline:none; cursor:pointer; padding:0.31em 2px; min-width:13.67%;}
+	.tablink2 a:hover {padding:0.31em 2px; border:none; background-color:#777;}
+	.tablink2 a:focus {padding:0.31em 2px; border:none; background-color:#777;}
+	.tablink2 a:focus a:hover {padding:0.31em 2px; border:none; background-color:#777;}
+	.tabcontent2 {display:none; padding:1px;}
+
+	input[type="checkbox"] {vertical-align:middle; position:relative; width:17px; height:15px; border:0; padding:2px 1px; margin:5px 0;}
+	input[type="checkbox"]:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="checkbox"]:hover:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="checkbox"]:hover {border:1px solid #000000; padding:1px 0;}
+	input[readonly] {background-color:#E1E1E1;}
+	.checkbox_label {padding:0; margin:0; vertical-align:middle; margin-left:0.31em;}
+	.checkbox_enable {padding:0; margin:0; vertical-align:middle; margin-left:0.5em; margin-right:17%; font:bold 1em Microsoft Yahei UI; color:#0066CC; }
+
+	input[type="radio"] {vertical-align:middle; position:relative; width:17px; height:15px; border:0; padding:2px 1px; margin:5px 0;}
+	input[type="radio"]:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="radio"]:hover:focus {border:1px solid #0078D7; padding:1px 0;}
+	input[type="radio"]:hover {border:1px solid #000000; padding:1px 0;}
+
+	.alignLH {width:40%; padding:1.25em 0 0; float:left;}
+	.alignRH {padding:1.25em 0 0; float:left;}
+	.alignLeftH {width:21%; padding:1.25em 0 0; float:left;}
+	.alignRightH {padding:1.25em 0 0; float:left;}	
+	.div_text2 {padding:1.01em 0 0;}
+	.div_text3 {padding:1.25em 0 0;}
+	.div_text6 {padding:1.25em 0 0.5em;}
+	.div_text7 {padding:1.25em 0 0.7em;}
+	.div_text8 {padding:1.25em 0 0.31em;}
+	.div_text9 {padding:1.57em 0 0;}
+	.div_text10 {padding:0 0 0.7em;}
+	.div_text11 {padding:1.57em 0 0.31em;}
+	.div_text12 {padding:1.25em 0 0.91em;}
+	.div_text13 {padding:0.725em 0 0;}
+	.div_text14 {padding:0.58em 0 0;}
+	.alignLH, .alignRH, .alignLeftH, .alignRightH, .div_text1, .div_text2, .div_text3, .div_text6, .div_text7, .div_text8, .div_text9, .div_text10, .div_text11, .div_text12, .div_text13, .div_text14 {
+		font:bold 1em Microsoft Yahei UI; color:#0066CC; word-wrap:break-word; white-space:pre-wrap;
+	}
+	
+	.info2 {padding:0.7em 0 0.31em;}
+	.info3 {margin:0 2% 0 0;}
+	.info4 {padding:0.7em 0 0;}
+	.info5 {padding:0.85em 0 0.31em;}
+	.info6 {padding:0.7em 0;}
+	.info7 {padding:0; text-align: right;}
+	.info8 {padding-top:1.57em;}
+	.info9 {padding-top:0.7em; padding-bottom:3.77em;}
+	.info10 {padding-top:0.7em; padding-bottom:0.94em;}
+	.info11 {padding-top:0.63em;}
+	.info12 {padding:0.31em 0 0;}
+	.info14 {padding-top:3em;}
+	
+	.info1, .info2, .info3, .info4, .info5, .info6, .info7, .info8, .info9, .info10, .info11, .info12, .info14 {
+		word-wrap:break-word; white-space:pre-wrap;
+	}
+	
+	.alignLeft {width:4%; margin-top:0.7em; float:left;}
+	.alignLeft1 {width:18%; margin-top:0.7em; float:left;}
+	.alignLeft2 {width:19%; margin-top:0.7em; float:left;}
+	.alignLeft3 {width:4%; margin-top:0.58em; float:left;}
+	.alignLeft4 {width:19%; margin-top:0.58em; float:left;}
+	.alignRight1 {margin-top:0.7em; float:left;}
+	.alignRight2 {margin-top:0.58em; float:left;}
+	.alignLeft, .alignLeft1, .alignLeft2, .alignLeft3, .alignLeft4, .alignRight1, .alignRight2 {
+		font:bold 1em Microsoft Yahei UI; word-wrap:break-word; white-space:pre-wrap;
+	}
+
+	.cacheInfo {position:absolute; width:25%; height:67%; left:33%; top:14.4%; padding-left:0.5em;}
+	.pad {height:1.57em;}
+	.padMedium {height:10em;}
+	.top {display:block; margin-top:1.57em;}
+
+	.input_cnt1 {margin-top:0.58em; margin-bottom:0.58em;}
+	.input_cnt2 {margin:0; padding:0;}
+	.input_cnt3 {padding-top:0.7em;}
+	.input_cnt4 {padding-top:0.31em;}
+	.input_cnt5 {padding-top:1em;}
+	.input_cnt6 {padding-top:0.25em;}
+	.input_cnt7 {padding-top:0.5em;}
+	.input2 {width:2em; text-align:center;}
+	.input3 {width:3em;}
+	
+	.input15 {width:15%;}
+	.input17 {width:17%;}
+	.input18 {display:inline-block; vertical-align:middle; width:18%; margin-left:2%; margin-right:0;}
+	.input21 {display:inline-block; vertical-align:middle; width:22%; margin-right:0;}
+	.input54 {width:54%}
+	.input70 {width:70%;}
+
+	.input50 {width:5em;}
+	.input60 {float:right; width:60%;}
+	.input65 {display:inline-block; vertical-align:middle; width:65%; margin-left:2%;}
+	
+	.input76 {width:76%;}
+	.input85 {width:88%;}
+	.input82 {float:right; width:82%;}
+	.input50, .input60, .input76, .input82, .input85 {
+		vertical-align:middle;
+	}
+
+	.input66 {width:66%}
+	.input98 {width:98%;}
+	.input66, input98 {
+		display:block;
+	}
+
+	.input35 {width:35%; margin-bottom:0.31em;}
+	.input40 {width:40%; margin-left:5%;}
+	.input73 {width:77%; margin-bottom:0.46em;}
+	.input96 {width:96%;}
+	.input35, .input40, .input73, .input96 {
+		display:inline-block; vertical-align:middle;
+	}
+	.input99 {display:inline-block; vertical-align:middle; width:98%; border:none !important; background:none}
+
+	.inp_label1 {display:block; margin:0.31em 0;}
+	.inp_label2 {padding-left:0.46em;}
+	.inp_label3 {padding-right:0.31em; margin:0.31em 0;}
+	.inp_label4 {display:inline-block; width:21%;}
+	.inp_label5 {vertical-align:middle; padding-left:0.46em;}
+	.inp_label6 {display:block; margin:0 0 0.31em 0;}
+	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;}
+	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right;}
+	#btn_cnt_left {text-align:left;}
+	#btn_cnt_center {text-align:center;}
+	#mainMargin {margin: 0 2%}
+
+	table {width: 100%; text-align:center; border-collapse:collapse; border:1px solid Gainsboro; empty-cells:show;}
+	th {border:0;}
+	td {border:0;}
+	tr {border:0;}
+	.table75 {width:75%;}
+
+	.dropbtn {white-space:nowrap; width:100px; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
+	.dropbtn:after {font-family: FontAwesome; content: "\f107"; padding-left:0.5em; padding-right:0.19em;}
+	.dropdown {margin-top: 10px; position:static; display:inline-block;}
+	.dropdown-content {display:none; position:absolute; background-color:#f9f9f9; min-width:10em; white-space:nowrap; box-shadow:0 8px 1.01em 0 rgba(0,0,0,0.2); z-index:1;}
+ 	.dropdown-content a {padding:0.13em 5px; color:black; text-decoration:none; display:block;}
+	.dropdown-content a:hover {background-color:#f1f1f1;}
+	.dropdown .dropdown-content {display:none;}
+	.dropdown:hover .dropbtn {background-color:#4CAF50;}
+
+	.column4 {width:4%;}
+	.column5 {width:5%;}
+	.column14 {width:14%;}
+	.column16 {width:16%;}
+	.column19 {width:19%;}
+	.column21 {width:21%;}
+	.column25 {width:25%;}
+	.column30 {width:30%;}
+	.column31 {width:31%;}
+	.column33 {width:33%;}
+	.column40 {width:40%;}
+	.column43 {width:43%;}
+	.column45 {width:45%;}
+	.column46 {width:46%;}
+	.column50 {width:50%;}
+	.column55 {width:55%;}
+	.column60 {width:60%;}
+
+	.column4, .column5, .column14, .column16, .column19, .column21, .column25, .column30, .column31, .column33, .column40, .column43, .column45, .column46, .column50, .column55, .column60 {
+		margin:0; padding:0; float:left;
+	}
+
+	.columnf1 {margin:0; padding:0; float:left; width:50%;}
+	.columnf2 {margin:0.6em 0 0; padding:0; float:left; width:20%;}
+	.columnf3 {margin:0.44em 0 0; padding:0; float:left; width:20%;}
+
+	.row:after {content:""; display:table; clear:both;}
+
+	ul {margin-top:0; margin-bottom:0;}
+						
+	</style>
+	</head>
+	<body>
+		<div style="background-color:#e5e5e5; clear:both;">
+		<div id="tablink2" class="tablink2">
+			<a onclick="openTab('PanelCfg', this, 'green')" id="PanelCfg">面板设置</a>
+			<a onclick="openTab('ServerCfg', this, '#004BD2')" id="ServerCfg">服务器设置（所有面板）</a>
+		</div>
+		
+		
+		<div id="tablink" class="tablink">
+			<a onclick="openPage('behaviour', this, 'green')" id="behaviourCfg">行为</a>
+			<a onclick="openPage('display', this, 'green')" id="displayCfg">显示</a>
+			<a onclick="openPage('headings', this, 'green')" id="headingsCfg">标题</a>
+			<a onclick="openPage('image', this, 'green')" id="imageCfg">图像</a>
+			<a onclick="openPage('textreader', this, 'green')" id="textreaderCfg">文本阅读器 & 歌词</a>
+			<a onclick="openPage('custom', this, 'green')" id="customCfg">自定义</a>
+			<a onclick="openPage('advanced', this, 'green')" id="advancedCfg">高级</a>
+			
+			<a onclick="openPage('title_format', this, '#004BD2')" id="title_formatCfg">标题格式</a>
+			<a onclick="openPage('download', this, '#004BD2')" id="downloadCfg">下载</a>
+			<a onclick="openPage('photo', this, '#004BD2')" id="photoCfg">照片</a>
+			<a onclick="openPage('cover', this, '#004BD2')" id="coverCfg">封面</a>
+			<a onclick="openPage('tagger', this, '#004BD2')" id="taggerCfg">标签</a>
+			<a onclick="openPage('misc', this, '#004BD2')" id="miscCfg">杂项</a>
+		</div>
+		</div>
+<div id="mainMargin">
+
+		<div style="clear:both;"></div>
+		<div id="btn_cnt_right" class="btn_cnt"> 
+			<button id="btn_ok">确定</button>
+			<button class="button_apply" id="btn_apply">应用</button>
+			<button id="btn_cancel">取消</button>
+		</div>
+		<div id="btn_cnt_left" class="btn_cnt">
+			<button id="btn_reset">重置所有面板设置</button>
+			<button id="btn_resetPage">重置页面</button>
+		</div>
+
+		<div id="behaviour" class="tabcontent">
+		<div class="row">
+			<div class="column50">
+				<div class="div_text6">布局</div>
+				<div id="layout"></div>
+				<div class="div_text6">查找按钮</div>
+				<div id="look_up"></div>
+				<div class="div_text1" style="padding:1.25em 0 0.15em;">后备文本：标题|无标题</div>
+				<div id="fall_back"></div>	
+				<div class="div_text12">滚动</div>
+				<span class="info3">滚动条：</span>
+				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarShow_dropdown" class="dropbtn" href="#" onclick="toggle('sbarShow');"></a>
+				<span id="sbarShow" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarType_dropdown" class="dropbtn" href="#" onclick="toggle('sbarType');"></a>
+				<span id="sbarType" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" id="sbar_col_dropdown" class="dropdown"><a id="sbarCol_dropdown" class="dropbtn" href="#" onclick="toggle('sbarCol');"></a>
+				<span id="sbarCol" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.31em;" id="sbar_icon_dropdown" class="dropdown"><a id="sbarIcon_dropdown" class="dropbtn" href="#" onclick="toggle('sbarIcon');"></a>
+				<span id="sbarIcon" class="dropdown-content"></span>
+				</span>
+				<div id="scrolling"></div>
+
+			</div>
+
+			<div class="column50">
+				<div class="div_text6">叠加</div>
+				<span class="dropdown" style="width:auto;"><a id="overlay_dropdown" class="dropbtn" href="#" onclick="toggle('overlayType');"></a>
+				<span id="overlayType" class="dropdown-content"></span>
+				</span>
+				<div id="overlayMetrics"></div>
+				<div style= "margin-right:10%;" class="info2">平面和圆形支持自定义颜色。
+
+作为歌词的替代方案，尝试菜单 > 布局 > 完全叠加：平面样式，
+<input class="input99" value="强度 61 和 RGB(0,0,0) 的自定义叠加颜色。歌词使用："/>
+<input class="input99" value="粗体白色字体，自定义高亮颜色 RGB(255,240,132)，阴影级别 2。"/></div>
+				<div class="div_text7">额外菜单项</div>
+				<table id="menu" class="table75">
+					<colgroup>
+					<col span="6" style="width:16%">
+					</colgroup>
+				</table>
+				<div style="padding:1.25em 0;"><a id="setWinSize" style="text-decoration:none;" href="#" onclick="setWindowSize();return false;">单击以重置窗口大小</a></div>
+			</div>
+		</div>
+		</div>
+
+		<div id="display" class="tabcontent">
+		<div class="row">
+			<div class="column33">
+				<div class="div_text3">指标</div>
+				<div class="info6"><b>主边距（像素）</b></div>
+				<table id="imageMarginTable" class="table" style="width:1%; border:none"></table>
+				<table id="textMarginTable" class="table" style="margin-top:1.01em; width:1%; border:none"></table>
+				<div id="metrics"style="padding:1.01em 0 0;"></div>
+				<div id="metrics2"></div>
+				<div class="div_text6">文本</div>
+				<div id="textStyle"></div>
+			</div>				
+						
+			<div class="column33">
+				<div class="div_text6">主题</div>
+				<span class="dropdown"><a id="theme_dropdown" class="dropbtn" href="#" onclick="toggle('themeBg');"></a>
+				<span id="themeBg" class="dropdown-content"></span>
+				</span>
+				<div id="themeStyle" style="padding-top:0.5em;"></div>
+				<div class="div_text6">高亮</div>
+				<div id="highlight"></div>
+				<div class="info12" style="padding-right:10%"><i>启用自定义颜色时禁用高亮设置。启用深色线条时，禁用横线高亮选项。</i></div>
+				<div class="div_text6">线条风格</div>
+				<div id="lines"></div>
+				<div class="div_text6" style="color:red;">图像和幻灯片尺寸</div>
+				<div class="info3" style="padding-right:10%">按 Ctrl 键并拖动线条以调整图像：文本比例或幻灯片大小（面板需要焦点，例如单击它）。</div>
+			</div>
+					
+			<div class="column33">
+			<div class="div_text3">专辑等级</div>
+			<div class="row">
+				<div class="column50">
+					<div class="info2"><b>显示</b></div>
+					<div id="rating1"></div>
+				</div>
+				<div class="column50">
+					<div class="info2"><b>位置</b></div>
+					<div id="rating2"></div>
+				</div>
+			</div>
+				<span class="dropdown" style="margin-top:1em;" ><a id="rating_dropdown" class="dropbtn" href="#" onclick="toggle('ratingTextPos');"></a>
+				<span id="ratingTextPos" class="dropdown-content"></span>
+				</span>
+				<div class="info2" id="ratingTextName"><b>文本名称</b></div>
+				<div id="rating3"></div>
+				<div class="div_text6">摘要项目</div>
+				<div id="summary"></div>
+				<span style="margin:1em 0 0.7em 0;" class="dropdown"><a id="summaryStyle_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('summaryFont');"></a>
+				<span id="summaryFont" class="dropdown-content"></span>
+				</span>
+				<div class="info3"><i>*区域设置控制 last.fm 和维基百科。Allmusic 区域设置是日期不可或缺的一部分。</i></div>
+			</div>
+		</div>
+		</div>
+
+		<div id="headings" class="tabcontent">
+		<div class="row">
+			<div style="padding-right:6%; "class="column60">
+				<span class="alignLeftH">主要</span>
+				<span class="alignRightH">标题格式</span>
+				<div style="clear:both;"></div>
+				<div id="heading_title_format"></div>
+				<span class="alignLeftH">音轨</span>
+				<span class="alignRightH">标题格式</span>
+				<div style="clear:both;"></div>
+				<div id="sub_titleformat"></div>
+				<div id="title_formatPreview"></div>
+				<div class="div_text2">来源</div>
+				<div class="info10">使用网站名称（歌词未知）</div>
+
+				<span style="margin:1.4em 0 0.7em;" class="dropdown"><a id="heading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('mainShow');"></a>
+				<span id="mainShow" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="headFontStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('mainFont');"></a>
+				<span id="mainFont" class="dropdown-content"></span>
+				</span>
+				<div style="clear:both;"></div>
+		
+				<span style="margin:0 0 0.7em;" class="dropdown"><a id="trackHeading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('trackShow');"></a>
+				<span id="trackShow" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="trackStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('trackFont');"></a>
+				<span id="trackFont" class="dropdown-content"></span>
+				</span>
+				<div style="clear:both;"></div>
+
+				<span style="margin:0 0 0.7em;" class="dropdown"><a id="sourceHeading_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('sourceShow');"></a>
+				<span id="sourceShow" class="dropdown-content"></span>
+				</span>
+				<span style="margin:0 0 0.7em 0.39em;" class="dropdown"><a id="sourceStyle_dropdown" class="dropbtn" style="display:inline-block; min-width:9em;" href="#" onclick="toggle('sourceFont');"></a>
+				<span id="sourceFont" class="dropdown-content"></span>
+				</span>
+				<div style="clear:both;"></div>
+
+				<span style="margin:1.4em 0 0.7em 0;" class="dropdown"><a id="wikiStyle_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('wikiFont');"></a>
+				<span id="wikiFont" class="dropdown-content"></span>
+				</span>
+				<div style="clear:both;"></div>
+	
+			</div>
+			<div class="row">
+			<div class="div_text3">主要</div>
+				<div class="column50">
+					<div class="info2"><b>版式</b></div>
+					<div id="headingStyle"></div>
+				</div>
+				<div class="column50">
+					<div class="info2"><b>按钮样式</b></div>
+					<div id="btn"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="column50">
+					<div class="info2"><b>横线</b></div>
+					<div id="line"></div>
+					<div class="info2"><b>国旗标志</b></div>
+					<div id="flag"></div>
+					<div id="flagInfo" class="info2"><i>标志显示需要将标题版式设置为左侧</i></div>
+				</div>
+				<div class="column50">
+					<div class="info2"><b>填充 +/-</b></div>
+					<div id="headingPadding"></div>
+				</div>	
+			</div>
+		</div>
+		</div>
+			
+		<div id="image" class="tabcontent">
+		<div class="row">
+			<div class="column31">
+				<div class="div_text6">主图像</div>
+				<div id="mainImage"></div>
+					<div class="div_text9">过滤</div>
+					<div class="info2"><i>适用于 Last.fm 照片下载文件夹</i></div>
+					<div class="info5"><b>类型</b></div>
+					<div id="input_cntf1"></div>
+					<div class="info5"><b>大小</b></div>
+					<div id="input_cntf2"></div>
+			</div>
+			<div class="column25">
+			<div class="div_text6">幻灯片</div>
+				<div id="filmStripShow"></div>
+				<span class="dropdown" style="width:auto;"><a id="film_dropdown" class="dropbtn" href="#" onclick="toggle('filmStripAlign');"></a>
+				<span id="filmStripAlign" class="dropdown-content"></span>
+				</span>
+				<div id="gap"></div>
+				<div class="div_text11"><b>导航 & 计数</b></div>
+				<span class="dropdown"><a id="seeker_dropdown" class="dropbtn" href="#" onclick="toggle('seeker');"></a>
+				<span id="seeker" class="dropdown-content"></span>
+				</span>
+				<div id="seekerStyle"></div>
+				<div id="seekerDots"></div>
+				<div id="seekerNA" class="info12" style="padding-right:10%;"></div>
+			</div>
+
+
+			<div class="column43" style="margin-top:1.4em;">
+				<table id="imageFormat" class="table75">
+					<colgroup>
+						<col span="6" style="width:13%">
+					</colgroup>
+					<tr>
+						<th colspan="2" style="color:#008000;">图像+文本</th>
+						<th colspan="2" style="color:#008000;">仅图像</th>
+						<th colspan="2" style="color:#008000;">幻灯片</th>
+						<th></th>
+					</tr>
+				</table>
+				<div class="div_text11">倒影</div>
+				<span class="dropdown" style="width:auto;"><a id="reflection_dropdown" class="dropbtn" href="#" onclick="toggle('reflPos');"></a>
+				<span id="reflPos" class="dropdown-content"></span>
+				</span>
+				<div id="reflectionMetrics"></div>
+				<div class="div_text9">默认图像</div>
+				<div class="info2">默认图像通常在 fb2k 参数选项>显示中设置。它们也可以在面板属性 ("Stub...") 中设置，首先检查该属性。如果两者都未设置，则使用简介样式的默认图像。</div>
+		</div>
+		</div>
+		</div>
+
+		<div id="textreader" class="tabcontent">
+				<span id="cusText1" style="padding-top:1.25em; width:23%; float:left;"></span>
+				<span class="info4" style="padding-top:1.57em; float:left;">显示文本、歌词、项目属性和正在播放的信息。每个视图显示检索到的第一个结果。</span>
+				<div style="clear:both;"></div>
+				<div class="div_text13">艺术家视图</div>
+				<span class="alignLeft3">使用</span>
+				<span class="alignLeft4">名称</span>
+				<span class="alignRight2">完整路径或标签*</span>
+				<span class="alignRight2" style="float:right;">歌词来源</span>
+				<div style="clear:both;"></div>
+				<div id="cusText2"></div>
+				<div class="div_text14">专辑视图</div>
+				<span class="alignLeft3">使用</span>
+				<span class="alignLeft4">名称</span>
+				<span class="alignRight2">完整路径或标签*</span>
+				<span class="alignRight2" style="float:right;">歌词来源</span>
+				<div style="clear:both;"></div>
+				<div id="cusText3"></div>
+				<div class="row">
+					<span style="float:left;"><i>*如果存在反斜杠，则作为路径评估，否则作为标签。<br>文件名和扩展名支持通配符。</i></span>
+					<span style="float:right;" class="dropdown"><a id="shadowFontStyle_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('shadowLevel');"></a>
+					<span id="shadowLevel" class="dropdown-content"></span>
+					</span>
+					<span style="float:right;" class="dropdown"><a id="lyricsFontStyle_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('lyricsFont');"></a>
+					<span id="lyricsFont" class="dropdown-content"></span>
+					</span>
+					<span style="float:right; display:inline-block; width:auto; padding-top:0.5em" id="largerHighlighted"></span>
+				</div>
+				<div style="clear:both;"></div>
+				<div id="cusTextPreview"></div>
+				<div class="row" style="margin-top:0.7em; padding-top:0.31em; background-color:#E8E8E8; border-bottom: 1px solid #D8D8D8;">
+				<div class="column5"style="padding-top:0.31em;">歌词：</div>
+				<div class="column25">
+					<div id="downloadLyrics"></div>
+				</div>
+				<div class="column14">
+					<div id="syncedScroll"></div>
+				</div>
+				<div class="column14">
+					<div id="unsyncedScroll"></div>
+				</div>
+				<div class="column21">
+					<div id="lyricsFadeHeight"></div>
+				</div>
+				<div class="column4">
+					<div id="lyricsScrollTimeAvg"></div>
+					<div id="lyricsScrollTimeMax"></div>
+				</div>
+				<div class="column16">
+					<span style="float:left; margin:0;" class="dropdown"><a id="lyricsScrollMethod_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('lyricsScrollMethod');"></a>
+					<span id="lyricsScrollMethod" class="dropdown-content"></span>
+					</span>
+				</div>
+				</div>
+				<div class="row"style="padding-top:0.31em; background-color:#E8E8E8; border-bottom: 1px solid #D8D8D8;">
+				<div class="column30"style="padding-top:0.31em;">项目属性：</div>
+				<div class="column14">
+					<div id="rowStripes"></div>
+				</div>
+				<div class="column14">
+					<div id="lineDividers"></div>
+				</div>
+				<div class="column40">
+					<div id="fieldWidth"></div>
+				</div>
+				</div>
+				<div class="row"style="padding-top:0.31em; background-color:#E8E8E8;">
+				<div class="column30"style="padding-top:0.31em;">正在播放：</div>
+				<div class="column14">
+					<div id="npVCenter"></div>
+				</div>
+				<div class="column14">
+					<div id="npHCenter"></div>
+				</div>
+				</div>
+			<div style="display:inline-block; padding-top:0.7em; width:50%"><a id="setSize" href="#" onclick="showLyricsHelp();return false;">帮助</a></div>
+			<div id="lyrics_help" style="display: none;">
+			<div class="div_text2"><b>常规</b></div>
+			<div class="info4"><ul><li>左上角启用后，可以使用</li><li>勾选 “歌词来源” 以确定哪些来源需要歌词处理</li><li>图像和其它来源都可用，因此可以用更有趣的方式查看文本、歌词和项目属性</li></ul></div>
+<div class="div_text2"><b>歌词</b></div>
+<div class="info4">-  自动滚动现有和新下载的歌词
+-  默认设置是，如果未找到歌词，回退到显示简介或评论
+-  支持歌词偏移 + 使用鼠标滚轮即时调整（不保存）</div>
+<div class="info8"><b><i>下载集成</i></b></div>
+<div class="info4">简介不下载歌词，但可以与歌词组件同步，如下所示。</div>
+<div class="info4"><ul><li>上面勾选 “同步...” 选项</li><li>确保在布局中添加了歌词秀3 或 <a href="https://github.com/ESLyric/release" target=\"_blank\">ESLyric</a> 面板（可以隐藏），并启用了歌词保存功能</li><li>确保歌词面板中的保存设置与上面的加载设置相匹配</li></ul></div>
+<div class="info4">如果使用 ESLyric，推荐设置：歌词保存位置>配置文件目录，保存文件名：[%artist% - ]%title%（默认）。如果歌词保存位置不一致，请修改上面歌词来源。</div>
+<div class="info4">如果使用歌词秀 3，请安装 veksha 的 <a href="https://www.reddit.com/r/foobar2000/comments/o7ua73/lyric_show_panel_3_lyrics_from_genius_musixmatch" target=\"_blank\">multi-source</a> 组件。禁用歌词秀 3 默认来源，因为它们大多不再起作用。启用 NEW DB: Minilyrics, NEW DB: QQ Music & NEW DB: Netease。虽然 openlyrics 获取的歌词可以显示，但该插件不适合下载集成。</div>
+<div class="info8"><b><i>淡入淡出高度</i></b></div>
+<div class="info4">如果淡入淡出效果太接近顶部/底部，则增加，例如尝试 0.5。</div>
+<div class="info8"><b><i>标签中的歌词</i></b></div>
+<div class="info4">如果歌词显示为 "."，则需要编辑 LargeFieldsConfig.txt：</div>
+<div class="info4"><ul><li>增加 defaultMetaMax 大小限制</li><li>对于 %lyrics% 或 %unsynced lyrics% 标签，请注释掉或删除 "fieldSpam" 下的那些特定条目</li></ul></div>
+<div class="info8"><b><i>滚动</i></b></div>
+<div class="info4">滚动时间是指滚动一行所需的毫秒数。建议的范围是 400-1500。如果文本来源合并，则无法自动滚动歌词</div>
+<div class="div_text3"><b>项目属性</b></div>
+<div class="info4">可以通过粘贴到以下路径之一中来显示项目属性。两者都显示相同的信息，但使用不同的分组。</div>
+<div class="input_cnt3"><input class="input99" value="%storage_folder%\item_properties.json"/></div>
+<div class="input_cnt2"><input class="input99" value="%storage_folder%\item_properties_alternative_grouping.json"/></div>
+<div class="info4"><ul><li>item_properties 将元数据分割成不同组</li><li>item_properties_alternative_grouping 显示单个组中的元数据</li><li>两者都显示其它组，如 youtube、播放统计信息、位置、常规和播放增益</li><li>可以在文本编辑器中进行编辑，以添加、删除或重新排序组和属性</li><li>如果名称中存在 item_properties，则可以使用其他文件</li></ul></div>
+<div class="div_text3"><b>正在播放</b></div>
+<div class="info4">现在播放信息可以通过粘贴在下面的路径中显示。</div>
+<div class="input_cnt3"><input class="input99" value="%storage_folder%\nowplaying.txt"/></div>
+<div class="info4"><ul><li>为了便于编辑，正在播放来源使用保存的文件</li><li>如果名称中存在 nowplaying，则可以使用其他文件</li><li>如果合并了文本来源，则对齐方式不适用</li></ul></div>
+<div class="div_text3"><b>查找（下拉菜单）</b></div>
+<div class="info4"><ul><li>可选择是否启用</li><li>文本阅读器需要加载艺术家（艺术家视图）或专辑（专辑视图）的信息。根据需要使用 %BIO_ARTIST%, %BIO_ALBUMARTIST% 或 %BIO_ALBUM%</li><li>歌词、项目属性和正在播放信息，显示为当前音轨的</li></ul>
+</div>
+</div>
+		</div>
+
+		<div id="custom" class="tabcontent">
+		<div class="row">
+			<div class="div_text6">颜色和字体</div>
+			<div class="info1">
+默认情况下使用用户界面或主题设置。如果需要，启用和配置自定义项目。
+Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重置缩放]。</div>
+			<div class="column50">
+				<div class="info4"><b>字体</b></div>
+				<div class="info2" style="margin-left:8.5%">名称，大小，字形(0-4)</div>
+				<div id="fonts"></div>
+				<div class="info6"><b>颜色 (R,G,B)：</b></div>
+				<div id="colours1"></div>
+				<div class="info3">
+
+将使用选定的颜色和字体。
+字体样式代码：0 常规、1 粗体、2 斜体、3 粗斜体、4 下划线
+		</div>
+			</div>
+			<div class="column50">
+				<p style="font:1.05em Microsoft Yahei UI;" "><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool#ColorPicker_tool" target=\"_blank\">颜色选择器</a></p>
+				<div class="info3">
+颜色：灵活输入，例如 255,0,0 或 0-255-0 或 rgba(255,0,0,64)
+透明度： 0-255 或 0-1 范围内
+透明：背景不适用；可以使用透明填充
+				</div>
+				<div class="info6"><b>颜色 (R,G,B 或 R,G,B,A)：</b></div>
+				<div id="colours2"></div>
+			</div>
+		</div>
+		</div>
+		
+		
+		<div id="advanced" class="tabcontent">
+		<div class="row">
+			<div class="column50">
+				<div class="div_text6">滚动</div>
+				<div class="info2"><b>行为</b></div>
+				<div id="cusScroll"></div>
+				<div class="info2"><b>滚动条</b></div>
+				<div id="scrollbar"></div>
+				<div class="info2" style="padding-right:15%"><i>*在 “面板设置>行为>滚动>箭头” 下选择自定义滚动条图标（如果设置了 Windows 滚动条，则不适用）。确保字体支持图标。</i></div>
+			</div>
+					
+			<div class="column50">
+				<div class="div_text6"class>杂项</div>
+				<div class="info2"><b>主题模糊</b></div>
+				<div id="themeBlur"></div>
+				<div class="info2"><b>图像：平滑过渡级别</b></div>
+				<div id="smoothTransLevel"></div>
+				<div class="info2"><b>播放列表交互（跟随所选项目）</b></div>
+				<div id="loadDelay"></div>
+				<div class="div_text7">服务器名称</div>
+				<div id="serverName"></div>
+<div class="info4">此选项允许按面板设置服务器。具有相同服务器名称的面板使用相同的服务器。<i> 更改服务器名称后，必须单击 “确定” 按钮。</i></div>
+		</div>
+
+		</div>
+		</div>
+
+
+		<div id="title_format" class="tabcontent">
+			<div class="div_text3">标题格式</div>
+			<div id="titleformat"></div>
+			<div id="titleformatPreview"></div>
+			<div class="info8">
+这些变量用于搜索，并应在保存文件夹路径和标题中使用，以确保功能正确。
+
+包含非标准格式的艺术家姓名和歌曲标题的高级电台解析器位于 foo_spider_monkey_panel\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}。它是用户可配置的（在文本编辑器中打开）。
+</div>
+			<div style="clear:both;"></div>
+			<div class="div_text11">古典音乐扩展</div>
+			<div class="info4">将 Allmusic 和维基百科评价的自动下载扩展到作品。Last.fm 不适用。在下方启用并设置标签。要显示，每个面板，请使用来源>文本子菜单。
+如果愿意，可以通过更改上面的 %BIO_ALBUMARTIST% 来使用作曲家，因此 $meta(composer,0) 是第一项。</div>
+			<div id="classicalMode"></div>
+			<div id="classicalModeTitleformat"></div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="download" class="tabcontent">
+			<div class="top"></div>
+			<div class="row">
+			<div class="column33">
+			<div class="div_text1">自动下载</div>
+			</div>
+			<div class="column25">
+			<div id="cacheLocation" class="div_text1">缓存位置</div>
+			<a id="hide_folders" href="#" onclick="showSaveFolders();return false;">隐藏文件夹</a>
+			</div>
+			<div class="column40">
+			<span class="dropdown" style="float:right; margin-top:0;"><a id="btn_dropdown" class="dropbtn" href="#" onclick="toggle('language');">Last.fm + 维基百科语言：英语</a>
+			<span id="language" class="dropdown-content"></span>
+			</span>
+			<span id="fallback" style="float:right;"></span>
+			</div>
+			</div>
+			<div style="clear:both;"></div>
+			<span style="margin-top:0;" class="alignLeft1">AllMusic</span>
+			<span id="savefolder0" style="margin-top:0;" class="alignRight1">保存文件夹</span>
+			<div style="clear:both;"></div>
+			<div id="allmusic"></div>
+			<span class="alignLeft1">Last.fm</span>
+			<span id="savefolder1" class="alignRight1">保存文件夹</span>
+			<div style="clear:both;"></div>
+			<div id="lastfm"></div>
+			<span class="alignLeft1">维基百科</span>
+			<span id="savefolder2" class="alignRight1">保存文件夹</span>
+			<div style="clear:both;"></div>
+			<div id="wikipedia"></div>
+			<div id="savefolder3" class="info7">文件名是自动生成的</div>
+			<div style="clear:both;"></div>
+			<div id="supplCache0" class="div_text10">补充缓存</div>
+			<div id="supplemental"></div>
+			<div id="supplCache1" class="info4">查找项目（如相似艺术家和热门专辑）可以单独保存。查找和替换应用于上面的保存文件夹。预览显示 Last.fm 传记的结果。</div>
+			<div style="clear:both;"></div>
+			<div id="savePreview" class="div_text3">预览</div>
+			<div id="prev"></div>
+			<div style="clear:both;"></div>
+			<div class="cacheInfo">
+			<div id="cache0"></div>
+			<div id="cache1"></div>
+			<a id="save_folders" style="display:block; padding-top:1em;" href="#" onclick="showSaveFolders();return false;">配置自定义缓存</a>
+			<div id="defaultOption" style="margin-top:2%;" class="info4">默认缓存是自动管理的：</div>
+			<span class="dropdown" style="float:left; margin-top:0.31em;"><a id="cache_dropdown" style="padding-top:0; padding-bottom:0;" class="dropbtn" href="#" onclick="toggle('cacheTime');"></a>
+			<span id="cacheTime" class="dropdown-content"></span>
+			</span>
+			</div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="photo" class="tabcontent">
+			<div class="div_text7">初始下载数量 (1-20)</div>
+			<div id="photo_num"></div>
+			<div class="div_text8">自动添加新图像</div>
+			<div id="input_cnt" class="input_cnt3">
+				<input id="photo_checkbox" name="photo_checkbox" type="checkbox" />
+				<label id="label_for_checkbox">对每位艺术家图像固定数量的禁用</label>
+			</div>
+			<div class="div_text7">每位艺术家限制</div>
+			<div id="photo_limit"></div>
+			<div class="info10">限制是为与自动添加新的使用而设计的。如果设置了，新的图像会取代旧的。多余的部分被转移到照片回收器。0 = 无限制。</div>
+			<div id="photoLimit" class="info9">如果项目的缓存时间不超过28天，则自动添加新图像不执行。</div>
+						<div class="div_text7">自定义加载文件夹</div>
+			<div id="artCusImgFolder"></div>
+			<div class="info4">艺术家照片的替代加载文件夹（仅加载：此处不保存任何图像）。在菜单>来源>照片启用。如果启用，则首先检查自定义文件夹。如果未找到图像，则选中 Last.fm 照片下载文件夹。</div>
+			<div id="pad" class="pad"></div>
+			<div style="padding:1.25em 0;"><a id="setSize" href="#" onclick="showPhotoSyntax();return false;">在其它专辑封面查看器和播放列表中显示下载的艺术家照片</a></div>
+			<div id="photo_help" style="display: none;">
+<div class="info12"><i>适用于大多数用途的简单字符串</i>
+</div>
+<div class="input_cnt3"><input class="input99" value="...*你的文件路径*...\art_img\$cut(%artist%,1)\%artist%\*"/></div>
+<div class="info12">	
+<i>更复杂的字符串，可与前端为点的艺术家一起使用，例如：.38 Special。简介总是用下划线替换前面的点，以防止 foobar2000 卡住</i>
+</div>
+<div class="input_cnt3"><input class="input99" value="...*你的文件路径*...\art_img\$replace($cut(%artist%,1),.,_)\$if($stricmp($cut(%artist%,1),.),_$substr(%artist%,2,$len(%artist%)),%artist%)\*"/></div>
+<div class="info12"><b>
+将字符串填入：文件>参数选项>显示>专辑封面>艺术家 模版中</b>
+</div>
+<div class="info12"><b><i>
+根据需要改变*你的文件路径*；模版假设简介保存在默认位置</i></b>
+要获取...*你的文件路径*...，请使用 来源>打开文件位置>图像。从 Windows 资源管理器地址栏中复制所需的部分。
+</div>
+				</div>
+			<div id="pad" class="pad"></div>
+			<div id="btn_cnt_center" class="btn_cnt">
+			<button id="btn_empty">清空照片回收器</button>
+			<button id="btn_open">打开照片回收器</button>
+			</div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="cover" class="tabcontent">
+			<div class="div_text3">封面：音乐文件</div>
+			<div class="info4">音乐文件的封面通常通过 fb2k（参数选项>显示）或从保存的位置获得。</div>
+			<div id="cov"></div>
+			<div style="clear:both;"></div>
+			<div class="div_text3">封面：循环文件夹</div>
+			<div id="covCycleFolder"></div>
+			<div class="info4">允许在专辑视图中循环浏览图像的文件夹。默认加载艺术家照片。在菜单>来源>封面选择。</div>
+			<div class="div_text3">封面：自定义路径</div>
+			<div id="covCustom"></div>
+			<div class="info4">大多数用户不需要此功能，因为封面是由 fb2k（参数选项>显示）或从保存位置自动加载的。如果需要，请启用。使用完整路径减去扩展名。</div>
+			<div class="div_text3">预览</div>
+			<div id="covPreview"></div>
+			<div id="pad" class="pad"></div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="tagger" class="tabcontent">
+		<div class="row">
+			<div class="column46">
+			<span class="alignLH">AllMusic 标签</span>
+			<span class="alignRH">标签名称</span>
+			<div style="clear:both;"></div>
+			<div id="tagAllmusic"></div>
+			<span class="alignLH">Last.fm 标签</span>
+			<span class="alignRH">标签名称</span>
+			<div style="clear:both;"></div>
+			<div id="tagLastfm"></div>
+			<div id="similarArtists"></div>
+			<span class="alignLH">维基百科标签</span>
+			<span class="alignRH">标签名称</span>
+			<div style="clear:both;"></div>
+			<div id="tagWikipedia"></div>
+			</div>
+			<div class="column46" style="margin-left:6%">
+			<div class="div_text6"><b>Last.fm 流派</b></div>
+			<div id="whitelist"></div>
+<div id="whitelistInfo" class="info3">
+
+要添加到白名单中，请在下面输入逗号 (,) 分隔的流派：
+</div>				
+			<div id="lfmGenreTag"></div>
+			<div class="div_text3">通知标签</div>
+			<div id="notifyTags"></div>
+			<div class="div_text3">在写入文件标签之前显示确认弹出窗口</div>
+			<div id="taggerConfirm"></div>
+			<div style="display:inline-block; padding-top:1.25em; padding-bottom:0.7em; width:18%"><a id="setSize" href="#" onclick="showTaggerHelp();return false;">标签帮助</a></div>
+			<div id="tagger_help" style="display: none;">
+			<div class="info4"><b>常规</b></div>
+			<div class="info4">所有标签写入都来自保存的来源（即仅写入已保存的简介和评论中的现有信息）。这是为了遵守某些网站的限制。如果简介已经使用了一段时间，并且项目被缓存了足够长的时间，则标签器应该工作得最好。标签是多值的，等级除外。
+<div class="info4"><i>Last.fm 流派</i></div>白名单可用于删除任何非标准流派标签。如果使用白名单，翻译也可用。其它流派来源不需要这些。白名单会自动下载并更新。</div>
+<div class="info4"><i>播放统计信息</i></div>标签播放统计信息需要使用简介 v1.2.0 或更高版本创建或更新的文件。Last.fm 播放次数（音乐记录），听众和组合分数 (1-100) 被写成多值标签。
+
+<div class="info4">分数将艺术家和专辑的长期受欢迎程度排在1-100的范围内，使用音乐记录和听众。Last.fm 上得分最高的艺术家或专辑被设定为100分。</div>
+<div class="info4">获取标签，例如：</div>
+<div class="input_cnt2"><input class="input99" value="$meta(Artist Statistics Last.fm,1[playcount])"/></div>
+<div class="input_cnt2"><input class="input99" value="$meta(Artist Statistics Last.fm,3[listeners])"/></div>
+<div class="input_cnt2"><input class="input99" value="$meta(Artist Statistics Last.fm,5[score])"/></div>
+<div class="info4">对于专辑统计信息，请将艺术家更改为专辑。</div>
+
+<div class="info4">如果用于查询，排序或算术标题格式功能，则从播放次数和听众中删除标点符号，例如：</div>
+<div class="input_cnt2"><input class="input99" value="$replace($meta(Artist Statistics Last.fm,1[playcount]),',',,.,, ,)"/></div>
+<br>
+			<div class="info4"><b>通知标签</b></div>
+			<div class="info4">如果选中，则当前音轨的已启用标签将通知其它蜘蛛猴面板 (Spider Monkey Panels)。这包括电台的艺术家数据。在音轨变化和收到新的或更新的数据时，会发出通知。
+
+当前音轨是正在播放音轨或选定音轨，具体取决于面板显示模式。使用默认标签名称而不是任何自定义名称，因此第三方脚本知道会接收什么。
+
+此外，当前音轨更改时，第三方脚本可以使用 window.NotifyOthers('bio_syncTags', focus)，其中 focus 为 false（首选正在播放项）或 true（跟随所选音轨）。这会覆盖简介(biography)标签设置，以便简介(biography)始终通知标签，通知标签包括一组核心标签，并且通知标签包括正确的选择模式。
+
+在接收面板中使用 on_notify_data(name, info) 来处理通知，其中：
+name is 'biographyTags'
+info is an object:
+	{
+		artist: 'ARTIST NAME',
+		album: 'ALBUM NAME',
+		handle: handle of current track,
+		selectionMode: 简介选择模式 - 字符串是 '首选正在播放项' 或 '跟随所选音轨（播放列表）'
+		tags: {
+			{name: value}, {name: value}...
+		}
+	}
+
+第三方脚本可以通过使用 window.NotifyOthers('bio_followSelectedTrack', boolean) 来设置简介选择模式*，其中 boolean 是 true [跟随所选音轨（播放列表）] 或 false [首选正在播放项]。*如果有启用的歌词或正在播放来源，则不适用，因为面板必须处于首选正在播放模式。
+
+</div>
+</div>
+		</div>			
+			
+			
+		</div>
+		</div>
+		<div style="clear:both;"></div>
+
+		<div id="misc" class="tabcontent">
+				<div class="div_text3">网站显示名称</div>
+				<div id="siteNames"></div>
+				<div class="div_text1" style="padding:1.25em 0 0.15em;">杂项</div>
+				<div id="miscellaneous"></div>
+				<div id="miscl"></div>
+				<div id="fuzzyLevel"></div>
+			<div class="info8">
+部分匹配设置适用于 AllMusic 和 维基百科。Last.fm 匹配由网站提供。</div>
+			<div class="info5">
+如果专辑版本信息在它自己的标签中，则不需要专辑名称自动清理。如果启用，在网络搜索之前，将根据需要从专辑名称中删除关键字，例如："Deluxe Version", "[2011 - Remaster]", "Expanded Edition" 等等。如果在专辑名称中使用此类短语，可以改善搜索结果。</div>
+			<div id="pad" class="pad"></div>
+		</div>	
+</div>
+<div id="div" style="height:0; width:0;outline:none; border:none; padding:none; margin:none; box-sizing:content-box;"></div>
+		<script>
+			var em, i = 0, is_closed_manually = false, j = 0, height, left, top, window_h, window_w;
+			var panelTabs = ["behaviourCfg", "displayCfg", "headingsCfg", "imageCfg", "textreaderCfg", "customCfg", "advancedCfg"];
+			var serverTabs = ["title_formatCfg", "downloadCfg", "photoCfg", "coverCfg", "taggerCfg", "miscCfg"];
+			function getValue(id) {
+				var div = document.getElementById(id);
+				div.style.height = '1em';
+				return (em = Math.max(div.offsetHeight, 13.6));
+			}
+			getValue('div');
+
+			function setWindowSize() {
+				window_w = cur.def_w * em || screen.width * 0.67;
+				window_h = cur.def_h * em || screen.height * 0.85;
+				window_w = Math.min(window_w, screen.width * 0.67);
+				window_h = Math.min(window_h, screen.height * 0.85);
+				left = (screen.width - window_w) / 2;
+				top = (screen.height - window_h) / 2;
+				window.resizeTo(window_w, window_h);
+				window.moveTo(left, top);
+				height = document.documentElement.clientHeight || document.body.clientHeight;	
+			}
+
+			function openTab(tabName,elmnt,color) {
+				cur.tab = tabName;
+				var cur_id = document.getElementById(cur.tab);
+				if (cur.tab == 'PanelCfg') {
+					cur_id.style.borderLeft = "0.31em solid #329932";
+					cur_id.style.borderRight = "0.31em solid #329932";
+					var gray_id = document.getElementById("ServerCfg");
+					gray_id.style.borderLeft = "none";
+					gray_id.style.borderRight = "none";
+				} else if (cur.tab == 'ServerCfg') {
+					cur_id.style.borderLeft = "0.31em solid #326edb";
+					cur_id.style.borderRight = "0.31em solid #326edb";
+					var gray_id = document.getElementById("PanelCfg");
+					gray_id.style.borderLeft = "none";
+					gray_id.style.borderRight = "none";
+					
+				}
+				var tabcontent2, tablinks2;
+				tabcontent2 = document.querySelectorAll(".tabcontent2");
+				tablinks2 = document.getElementsByTagName("a");
+				for (i = 0; i < tablinks2.length; i++) {
+					tablinks2[i].style.backgroundColor = "";
+				}
+				document.getElementById(tabName).style.display = "block";
+				elmnt.style.backgroundColor = color;
+				
+				if (tabName == 'PanelCfg') {
+					for (i = 0; i < panelTabs.length; i++) {
+						var id = document.getElementById(panelTabs[i]);
+						id.style.display = "block";
+						id.style.width = "13.67%";
+					}
+					for (i = 0; i < serverTabs.length; i++) {
+						document.getElementById(serverTabs[i]).style.display = "none";
+					}
+					tabcontent2 = document.querySelectorAll(".tabcontent2");
+					for (i = 0; i < tabcontent2.length; i++) {
+						tabcontent2[i].style.display = "none";
+					}				
+				} else {
+					for (i = 0; i < serverTabs.length; i++) {
+						var id = document.getElementById(serverTabs[i]);
+						id.style.display = "block";
+						id.style.width = "16%";
+					}
+					for (i = 0; i < panelTabs.length; i++) {
+						document.getElementById(panelTabs[i]).style.display = "none";
+					}
+					tabcontent = document.querySelectorAll(".tabcontent");
+					for (i = 0; i < tabcontent.length; i++) {
+						tabcontent[i].style.display = "none";
+					}
+				}
+
+				window.btn_reset.innerHTML = cur.tab == 'PanelCfg' ? '重置所有面板设置' : '重置所有服务器设置';
+				var target = cur.tab == 'PanelCfg' ? cur.panelPage : cur.serverPage;
+				document.getElementById(target + 'Cfg').click();
+
+			}
+
+			function openPage(pageName,elmnt,color) {
+				cur.page = pageName;
+				if (cur.tab == 'PanelCfg') cur.panelPage = cur.page;
+				else cur.serverPage = cur.page;
+				var tabcontent, tablinks;
+				tabcontent = document.querySelectorAll(".tabcontent");
+				for (i = 0; i < tabcontent.length; i++) {
+					tabcontent[i].style.display = "none";
+				}
+				tablinks = document.getElementsByTagName("a");
+				for (i = 0; i < tablinks.length; i++) {
+					if (tablinks[i].parentNode.id == 'tablink') {
+						tablinks[i].style.backgroundColor = "";
+						tablinks[i].style.borderColor = cur.tab == 'PanelCfg' ? "#329932" : "#326edb";
+					}
+				}
+				document.getElementById(pageName).style.display = "block";
+				elmnt.style.backgroundColor = color;
+				document.getElementById(pageName).style.height = height - window.tablink.offsetHeight * 2 - window.btn_cnt_right.offsetHeight;
+				document.getElementById(pageName).style.overflow = "auto";
+				document.getElementById("btn_ok").focus();
+			}
+
+			document.getElementsByTagName("BODY")[0].onresize = function() {				
+				height = document.documentElement.clientHeight || document.body.clientHeight;
+				document.getElementById(cur.page).style.height = height - window.tablink.offsetHeight * 2 - window.btn_cnt_right.offsetHeight;
+				window_w = (document.documentElement.clientWidth || document.body.clientWidth) + widthOffset;
+				window_h = height + heightOffset;
+				cur.w = Math.round(window_w / em);
+				cur.h = Math.round(window_h / em);
+				checkWindowDefaultSize();
+				set_btn_apply_state();
+			}
+			
+			function checkWindowDefaultSize() {
+				var def_w = cur.def_w * em || screen.width * 0.67;
+				var def_h = cur.def_h * em || screen.height * 0.85;
+				def_w = Math.min(def_w, screen.width * 0.67);
+				def_h = Math.min(def_h, screen.height * 0.85);
+				window.setWinSize.disabled = window_w == def_w && window_h == def_h;
+			}
+
+			function close_window() {
+				is_closed_manually = true;
+				window.open('', '_self', '');
+				window.close();
+			}
+
+			function getPreview(id, value) {
+				if (cur.page == "title_format" || cur.page == "download" || cur.page == "cover" || cur.page == "textreader" && id.slice(-1) < 8) {
+					var sFind = null;
+					var sReplace = null;
+					if (id == 'dld_container11') {
+						sFind = value;
+						sReplace = document.getElementById('dld_container12').value;
+					}
+					if (id == 'dld_container12') {
+						sFind = document.getElementById('dld_container11').value;
+						sReplace = value;
+					}
+					var tf = /tf_/.test(id);
+					var excludeStream = id == 'cov_container0';
+					var tfAll = '';
+					for (i = 0; i < input.title_format.name.length; i++) {
+						tfAll += document.getElementById('tf_container' + i).value;
+						if (i < 4) tfAll += '~#~'
+					}
+					var ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
+					if (tf) ev = ev.slice(0, -1);
+					if (cur.page == "title_format" && document.getElementById("tf_preview") && id != "tf_preview") document.getElementById("tf_preview").value = ev;
+					if (cur.page == "download" && document.getElementById("dld_preview") && id != "dld_preview") document.getElementById("dld_preview").value = ev;
+					if (cur.page == "cover" && document.getElementById("cov_preview") && id != "cov_preview") document.getElementById("cov_preview").value = ev;
+					if (cur.page == "textreader" && document.getElementById("cusText_Preview") && id != "cusText_Preview") document.getElementById("cusText_Preview").value = ev;
+				}
+
+				if (cur.page == "headings") {
+					var t_id = id.slice(-1);
+					var artistType = t_id < 2;
+					var trackType = t_id > 1;
+					var ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
+					if (document.getElementById("tf_heading_preview") && id != "tf_heading_preview") document.getElementById("tf_heading_preview").value = ev;
+				}
+			}
+
+			function set_btn_apply_state() {
+				getValues();
+				document.getElementById("btn_apply").disabled = JSON.stringify(ppt) != parsed_args[0] || JSON.stringify(cfg) != parsed_args[1] ? false : true;
+
+				var el = document.activeElement;
+				var id = el.id;
+				if (/scrollbar_container6/.test(id)) {
+					window.scrollbar_container5.style.fontFamily = window.scrollbar_container6.value;
+				}
+				
+				var previewable = /tf_|dld_|cov_|cusText_/.test(id);
+				if (previewable) {
+					getPreview(id, el.value);
+				}
+
+				var needCustomCol = /colour_container/.test(id);
+				if (needCustomCol) setCustomColours('value');
+				
+			}
+
+			function assign(c, t) {
+				c = c.replace(/[^0-9.,-]/g, '').replace(/-/g, ',').split(',');
+				var cc = ''; if (c.length != 3 && c.length != 4) return [255, 255, 255];
+				for (i = 0; i < c.length; i++) {
+					c[i] = parseFloat(c[i]);
+					if (i < 3) c[i] = clamp(Math.round(c[i]), 0, 255);
+					else if (i == 3) {
+						if (c[i] <= 1) c[i] = Math.round(255 * c[i]);
+						else c[i] = clamp(Math.round(c[i]), 0, 255);
+					}
+				}
+				switch (t) {
+					case 0: cc = [c[0], c[1], c[2]]; break;
+					case 1: switch (c.length) {
+						case 3: cc = [c[0], c[1], c[2]]; break;
+						case 4: cc = RGBAtoRGB([c[0], c[1], c[2], c[3]], [255, 255, 255, 255]); break;
+					} break;}
+				return cc;
+			}
+			
+			function clamp(num, min, max) {
+				num = num <= max ? num : max; num = num >= min ? num : min; return num;
+			}
+
+			function getSelCol(c) {
+				var cc = [], v = 1;
+				for (i = 0; i < c.length; i++) {
+					v = c[i] / 255;
+					cc.push(v <= 0.03928 ? v /= 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4));
+				}
+				var L = 0.2126 * cc[0] + 0.7152 * cc[1] + 0.0722 * cc[2]; if (L > 0.31) return 'black'; else return 'white';
+			}
+
+			function RGBAtoRGB(c, bg) {
+				var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, a = c[3] / 255, bgr = bg[0] / 255, bgg = bg[1] / 255, bgb = bg[2] / 255; var nR = ((1 - a) * bgr) + (a * r), nG = ((1 - a) * bgg) + (a * g), nB = ((1 - a) * bgb) + (a * b); nR = clamp(Math.round(nR * 255), 0, 255); nG = clamp(Math.round(nG * 255), 0, 255); nB = clamp(Math.round(nB * 255), 0, 255); return [nR, nG, nB];
+			}
+
+			var callback;
+			var cbox_h = 15;
+			var cbox_w = 17;
+			var cfg = {};
+			var cur = {};
+			var ix = {filter: -1, view: -1}
+			var lang_ix = 0;
+			var parsed_args;
+			var tf_callback;
+			var ppt = {};
+			var scale = 1;
+			var sizes = [];
+			var isTransparent = false;
+
+			try {
+				parsed_args = window.external.dialogArguments.toArray();
+			}
+			catch(e) {}
+
+			if (parsed_args) {
+				cur = JSON.parse(parsed_args[2]);
+				if (!/PanelCfg|ServerCfg/.test(cur.tab)) cur.tab = 'PanelCfg'; // guard against bad user edits of ppt
+				if (cur.tab == 'PanelCfg') {
+					if (!/behaviour|display|headings|image|custom|textreader|advanced/.test(cur.panelPage)) cur.panelPage = 'display'
+				}
+				else {
+					if (!/title_format|download|photo|cover|tagger|misc/.test(cur.serverPage)) cur.serverPage = 'download'
+				}
+				document.title = '简介 ' + cur.version;
+				ppt = JSON.parse(parsed_args[0]);
+				cfg = JSON.parse(parsed_args[1]);
+				if (ppt.multiServer_internal.value) {
+					var servName = ppt.serverName_internal.value;
+					servName = servName.charAt(0).toUpperCase() + servName.slice(1).toLowerCase() + ' ';
+					var newName = ServerCfg.innerHTML.replace(' （所有面板）',  '')
+					ServerCfg.innerHTML = servName + newName;
+				}
+				cbox_h = Math.round(Math.max(em, 13));
+				cbox_w = cbox_h + 2;
+				var cbox = "width:" + cbox_w + "px; height:" + cbox_h + "px;"
+				window_w = cur.w * em || screen.width * 0.67;
+				window_h = cur.h * em || screen.height * 0.85;
+				if (cur.w == cur.def_w) window_w = Math.min(window_w, screen.width * 0.67);
+				if (cur.h == cur.def_h) window_h = Math.min(window_h, screen.height * 0.85);
+				left = (screen.width - window_w) / 2;
+				top = (screen.height - window_h) / 2;		
+				window.resizeTo(window_w, window_h);
+				window.moveTo(left, top);
+				height = document.documentElement.clientHeight || document.body.clientHeight;
+				var heightOffset = window_h - height;
+				var widthOffset = window_w - (document.documentElement.clientWidth || document.body.clientWidth);
+				checkWindowDefaultSize();
+				document.getElementById(cur.tab).click();
+
+				var btnLabels = ['无', '文本', '图标', '背景', '红色 Last.fm'];
+				var cacheLabels = ['永久缓存项目（推荐）', '缓存项目1个月', '缓存项目2周', '缓存项目1周', '缓存项目1天', '时间自上次访问以来'];
+				var clickLabels = ['单击面板', '双击面板'];
+				var colourLabels = ['文本', '高亮', '按钮', '标题', '等级图标', '摘要', '叠加', '自由式边框', '背景', '横线', '透明填充', '选定幻灯片'];
+				var covLabels = ['自动下载 [Last.fm 最佳质量]', '保存文件夹', '保存文件名', '检查自定义路径', '自定义路径 1', '自定义路径 2', '自定义路径 3'];
+				var cusScrollLabels = ['行数 (0 = 页面)', '最大平滑持续时间（毫秒）', '最大触摸持续时间（毫秒）', '触摸灵敏度 0-10'];
+				var cusTextLabels = ['文本、歌词和项目属性：支持标签或完整路径。每个视图显示检索到的第一个结果。', '预览', '同步最新下载', '滚动同步歌词', '滚动非同步歌词'];
+				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
+				var dropShadowLevelLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+				var fallbackLabels = ['简介', '评论'];
+				var filmStripLabels = ['齐平', '对齐图像', '应用图像边距','对齐文本', '应用文本边距', ]
+				var filterLabels = ['KB 最大尺寸', 'KB 最小尺寸', 'PX 最小分辨率', '最少数量（最高优先级）'];
+				var flaglabels = ['艺术家视图', '专辑视图'];
+				var fontLabels = ['主要', '标题'];
+				var fuzzyLabels = ['专辑评论', '音轨评论', '作品评论'];
+				var headingLabels = ['隐藏', '显示'];
+				var headingFontLabels = ['常规', '粗体', '斜体', '粗斜体', '半粗体', '半粗斜体'];
+				var headingFormatlabels = ['居左', '居右', '居中', '显示标题', '显示按钮', '全宽'];
+				var headingPaddingLabels = ['标题', '横线底部', '按钮'];
+				var highlightLabels = ['按钮', '标题', '横线', '图像边框', '叠加边框', '等级图标', '副标题', '摘要', '文本'];
+				var langLabels = ['英语', '德语', '西班牙语', '法语', '意大利语', '日语', '波兰语', '葡萄牙语', '俄语', '瑞典语', '土耳其语', '\u7b80\u4f53\u4e2d\u6587'];
+				var layoutLabels = ['双击切换', '艺术家和专辑视图布局相同'];
+				var lookupLabels = ['隐藏', '左上角', '首选标题', '自动循环时间（秒；最小 30）'];
+				var lineLabels = ['无', '底部', '居中'];
+				var lyricsScrollMethodLabels = ['滚动时间平均值（毫秒）', '最大滚动时间（毫秒）'];
+				var mainImgLabels = ['悬停时放大', '平滑过渡', '自动循环时间（秒）'];
+				var metricsLabels = ['图像和文本之间的间距', '行填充'];
+				var miscLabels = ['专辑名称自动清理', '专辑评论高品质', '显示控制台消息', '搜索：包括部分匹配项。匹配级别 (%)：', '自动更新间隔（天：最小 28）', '相似艺术家：菜单上的个数（0-10）', '群星'];
+				var overlayLabels = ['渐变', '平面', '带边框平面', '圆形', '带边框圆形', '强度 % [Shift + 滚轮]', '渐变级别 %', '边框宽度（像素）'];
+				var ratingLabels = ['AllMusic', 'Last.fm', '首选标题', '首选文本', 'AllMusic', 'Last.fm'];
+				var ratingTextPosLabels = ['自动', '嵌入', '自成一行'];
+				var reflPosLabels = ['自动位置', '上', '右', '下', '左', '强度 % [主图像上 Shift + 滚轮]', '尺寸 %', '渐变级别 %'];
+				var sbarColLabels = ['灰色', '混合'];
+				var sbarIconLabels = ['箭头', '三角', '自定义'];
+				var sbarShowLabels = ['隐藏', '自动', '显示'];
+				var sbarTypeLabels = ['默认', '风格', 'Windows 浅色模式', 'Windows 深色模式'];
+				var scrollbarLabels = ['滑块宽度', '滑道宽度（0 = 自动）', '箭头宽度', '箭头填充 (+/-)', '滑块最小高度', '自定义图标*', '自定义图标字体名称', '自定义图标偏移 (%)', '首选全高滚动条'];
+				var scrollLabels = ['尺寸跟随系统', '紧凑圆角', '平滑滚动', '触摸控制'];
+				var seekerLabels = ['计数', '导航条', '长条', '圆点'];
+				var siteNameLabels = ['AllMusic', 'Last.fm', '维基百科'];
+				var summaryLabels = ['流派', '发行日期', '区域*', '现在热门 (Last.fm)', '最新发布（维基百科）', '其它'];
+				var tagLabel = ['专辑流派', '专辑喜爱', '专辑等级', '专辑主题', '艺术家流派', '专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '当前音轨'];
+				var textStyleLabels = ['顶部对齐', '展开列表', '如果显示多个项目，自动优化'];
+				var tfLabels = ['简介', '评论', '标题', '歌词', '标题'];
+				var tfServLabels = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%', '作品标签'];
+				var themeLabels = !ppt['themed_internal'].value ? ['用户界面', '深色', '混合', '浅色', '随机', '始终基于封面', '交换颜色'] : ['N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set', 'N/A: central set'];
+				var themeBlurLabels = ['自动填充', '级别 (%)', '不透明度 (%)', '%', '加载延迟（毫秒）', '加载项目：立即加载（忽略延迟）'];
+				var whitelistLabels = ['写入所有 Last.fm 标签', '应用过滤器以使用此<a href="microsoft-edge:https://musicbrainz.org/genres" target=\"_blank\">白名单</a>删除非标准流派',];
+
+				var imgTable1 = ['artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'];
+				var imgTable2 = [['artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', '', 'Reflection'], ['artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', '', 'Border'], ['artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly', '', 'Shadow']];
+				var menuTable = ['menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'];
+
+				isTransparent = parsed_args[3];
+				callback = parsed_args[4];
+				tf_callback = parsed_args[5];
+
+				var input = {
+					behaviour: {
+						name: ['cycTimeItem', 'bioFallbackText', 'revFallbackText', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
+						type: ['float', 'text', 'text', 'float', 'float', 'float']
+					},
+					display: {
+						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'amRatingName', 'lfmRatingName'],
+						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'text', 'text']
+						
+					},
+					headings: {
+						name: ['bioHeading', 'revHeading', 'trkHeading', 'lyricHeading', 'trackSubHeading', 'hdPad', 'hdLinePad', 'hdBtnPad'],
+						type: ['text', 'text', 'text', 'text', 'text', 'int', 'int', 'int']
+					},
+					image: {
+						name: ['cycTimePic', 'imgFilterMaxSz', 'imgFilterMinSz', 'imgFilterMinPx', 'imgFilterMinNo', 'thumbNailGap', 'reflStrength', 'reflSize', 'reflGradient'],
+						type : ['int', 'int', 'int', 'int', 'int', 'int', 'float', 'float', 'float']
+					},
+					textreader: {
+						name: ['nmTxtReader0', 'pthTxtReader0', 'nmTxtReader1', 'pthTxtReader1', 'nmTxtReader2', 'pthTxtReader2', 'nmTxtReader3', 'pthTxtReader3', 'nmTxtReader4', 'pthTxtReader4', 'nmTxtReader5', 'pthTxtReader5', 'nmTxtReader6', 'pthTxtReader6', 'nmTxtReader7', 'pthTxtReader7', 'lyricsFadeHeight', 'lyricsScrollTimeAvg', 'lyricsScrollTimeMax', 'fieldWidth'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'float', 'float', 'float']
+					},
+					custom: {
+						name: ['custFont', 'custHeadFont', 'text', 'text_h', 'headingBtn', 'headingText', 'stars', 'summary', 'rectOv', 'rectOvBor', 'bg', 'line', 'bgTrans', 'frame'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
+					},
+					advanced: {
+						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'arrowSymbol', 'butCustIconFont', 'sbarButPad', 'blurTemp', 'blurAlpha', 'transLevel', 'focusLoadRate', 'serverName'],
+						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'text', 'text', 'float', 'float', 'float', 'float', 'float', 'text']
+					},
+					title_format: {
+						name: ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'],
+						type : ['text', 'text', 'text', 'text', 'text']
+					},
+					download: {
+						name: ['foAmRev', 'foAmBio', 'foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'supFind', 'supReplace'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
+					},
+					photo: {
+						name: ['photoNum', 'photoLimit', 'foCycPhoto'],
+						type : ['int', 'int', 'text']
+					},
+					cover: {
+						name: ['foImgCov', 'fnImgCov', 'foCycCov', 'cusCov0', 'cusCov1', 'cusCov2'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text']
+					},
+					tagger: {
+						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagName8', 'tagName9', 'tagName10', 'tagEnabled13', 'tagName11', 'tagName12', 'customGenres', 'translate'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text', 'text', 'text']
+					},
+					misc: {
+						name: ['amDisplayName', 'lfmDisplayName', 'wikiDisplayName', 'exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
+						type : ['text', 'text', 'text', 'int', 'int', 'text', 'int', 'int', 'int']
+					},
+					all: {}
+				}
+				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.textreader.name, input.custom.name, input.advanced.name, input.title_format.name, input.download.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
+				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.download.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
+				var box = {
+					behaviour: ['dblClickToggle', 'sameStyle', 'sbarWinMetrics', 'sbarGripRounded', 'smooth', 'touchControl'],
+					display: ['topAlign', 'expandLists', 'autoOptimiseText', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightImgBor', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightSummary', 'highlightText', 'colLineDark', 'amRating', 'lfmRating', 'summaryGenre', 'summaryDate', 'summaryLocale', 'summaryPopNow', 'summaryLatest', 'summaryOther'],
+					headings: ['hdShowTitle', 'hdBtnShow', 'fullWidthHeading', 'hdShowBtnBg', 'hdShowRedLfm', 'bioFlagShow', 'revFlagShow'],
+					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
+					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', 'lyricsTxtReader3', 'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', 'lyricsTxtReader7', 'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
+					custom: ['custFontUse', 'custHeadFontUse', 'textUse', 'text_hUse', 'headingBtnUse', 'headingTextUse', 'starsUse', 'summaryUse', 'rectOvUse', 'rectOvBorUse', 'bgUse', 'lineUse', 'bgTransUse', 'frameUse'],
+					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate'],
+					title_format: ['classicalModeEnable'],
+					download: ['languageFallback', 'wikipediaEnGenres', 'dlAmRev', 'dlAmBio', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio', 'supCache'],
+					photo: ['photoAutoAdd'],
+					cover: ['dlLfmCov', 'cusCov'],
+					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'tagEnabled8', 'tagEnabled9', 'tagEnabled10', 'tagEnabled11', 'tagEnabled12', 'notifyTags', 'taggerConfirm'],
+					misc: ['albStrip', 'imgRevHQ', 'showConsoleMessages', 'partialMatchEnabled']
+				}
+				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.textreader, box.custom, box.advanced, box.title_format, box.download, box.photo, box.cover, box.tagger, box.misc);
+				var radio = {
+					behaviour: ['lookUp', 'menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'],
+					display: ['star'],
+					headings: ['hdPos', 'hdShowBtnLabel', 'hdLine'],
+					image: ['imgSeekerDots', 'artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'],
+					textreader: [],
+					custom: [],
+					advanced: [],
+					title_format: [],
+					download: ['autoCache'],
+					photo: [],
+					cover: [],
+					tagger: ['useWhitelist'],
+					misc: []
+				}
+				radio.all = radio.behaviour.concat(radio.display, radio.headings, radio.image, radio.download, radio.tagger);
+				lang_ix = parsed_args[6];
+
+				function getTableData(id) {
+					var cells = [];
+					var headings = [];
+					var columnCount = 0;
+					switch (id) {
+						case 'imageFormat':
+							headers = [];
+							cells.push(headers);
+							var subHeaders = ['照片', '封面', '照片', '封面', '照片', '封面', ''];
+							cells.push(subHeaders);
+							var radioLabels = ['常规', '自动填充', '圆形'];
+							var cboxLabels = ['倒影', '边框', '阴影'];
+							var items = [];
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < imgTable1.length; i++) {
+									var n = imgTable1[i]; 
+									var id = imgTable1[i] + j; 
+									items[j].push('<input id="'+id+'" name="'+n+'" style="'+cbox+'" type="radio" />');
+									if (i == 5) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left">'+radioLabels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < imgTable2[j].length; i++) {
+									var id = imgTable2[j][i]; 
+									items[j].push(i < 4 ? '<input id="'+id+'" name="image_checkbox" style="'+cbox+'" type="checkbox" />' : '');
+									if (i == 5) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left">'+cboxLabels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							columnCount = 7;
+						break;
+
+						case 'menu':
+							headers = ['粘贴', '播放列表', '标签', '缺少数据', '停用', ''];
+							cells.push(headers);
+							var labels = ['隐藏', '需要 Shift 键', '显示'];
+							var items = [];
+							for (j = 0; j < 3; j++) {
+								items[j] = [];
+								for (i = 0; i < menuTable.length; i++) {
+									
+									var n = menuTable[i];
+									var id = n + j; 
+									items[j].push('<input id="'+id+'" name="'+n+'" style="'+cbox+'" type="radio" />');
+									if (i == 4) {
+										items[j].push('<div style="padding-left:0.46em; text-align:left; white-space:nowrap">'+labels[j]+'</div>');
+										cells.push(items[j]);
+									}
+								}
+							}
+							columnCount = 6;
+							break;
+
+						case 'imageMarginTable':
+							var input0 = '<label for="image_metrics0" >上</label><input id="image_metrics0" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input1 = '<input id="image_metrics1" name="display_input" style="padding:0; margin-left:0.31em;" class="input2" />'
+							var input2 = '<input id="image_metrics2" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input3 = '<input id="image_metrics3" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" /><label for="image_metrics3" >下</label>'
+								headers = [];
+								cells = [
+									headers,
+									['', '', input0, '', ''],
+									['左', input1, '<b> 图像 </b>', input2, '右'],
+									['', '', input3, '', '']
+								];
+							columnCount = 5;
+							break;
+
+						case 'textMarginTable':
+							var input0 = '<label for="text_metrics'+i+'" >上</label><input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input1 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-left:0.31em;" class="input2" />'
+							var input2 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" />'
+							var input3 = '<input id="text_metrics'+i+'" name="display_input" style="padding:0; margin-right:0.31em;" class="input2" /><label for="text_metrics'+i+'" >下</label>'
+								headers = [];
+								cells = [
+									headers,
+									['', '', input0, '', ''],
+									['左', input1, '<b> 文本 </b>', input2, ' 右'],
+									['', '', input3, '', '']
+								];
+							columnCount = 5;
+							break;
+					}
+					return [cells, headers.length, columnCount]
+				}
+
+				function generateTable(tb) {
+					var items = getTableData(tb);
+					var cells = items[0];
+					var headerCount = items[1];
+					var table = document.getElementById(tb);
+					// Get the count of columns.
+					var columnCount = items[2];
+					var noInternalBorder = tb == 'imageMarginTable' || tb == 'textMarginTable';
+
+					// Add the header row.
+					var row;
+					if (headerCount) {
+						row = table.insertRow(-1);
+						for (i = 0; i < headerCount; i++) {
+							var headerCell = document.createElement("TH");
+							headerCell.innerHTML = cells[0][i]; 
+							headerCell.style.color = "green";
+							row.appendChild(headerCell);
+						}
+					}
+			 
+					// Add the data rows.
+					for (var i = 1; i < cells.length; i++) {
+						row = table.insertRow(-1);
+						for (j = 0; j < columnCount; j++) {
+							var cell = row.insertCell(-1);
+							cell.innerHTML = cells[i][j];
+							if (tb == 'imageFormat') {if (i % 2 == 0) cell.style.background = '#E8E8E8';}
+							else if (tb == 'menu') {if(i % 2 == 1) cell.style.background = '#E8E8E8';}
+							if (tb == 'imageFormat' && i == 5) cell.style.borderTop = "1px solid green";
+							if (j == 3) {
+								if (tb == 'imageMarginTable' && i == 3) cell.style.color = "green";
+							}
+							if (j == 2 && (tb == 'textMarginTable' || tb == 'imageMarginTable') && i == 2) cell.style.color = "green";
+						}
+					}
+				}
+
+				function setCacheTime(n) {
+				if (n > 4) return;
+				var r = !n || window.confirm('警告：过期项目将在下次简介初始化后删除。\n\n这将发生在 foobar2000 重新启动或更改某些需要重新加载简介面板或服务器设置时。');
+					if (r == true) {
+						window.cache_dropdown.innerHTML = cacheLabels[n];
+						cfg['autoCacheTime_internal'].value = n;
+						window.cacheTime.style.display = 'none';
+					}
+				}
+
+				function setDropShadowLevel(n) {
+					window.shadowFontStyle_dropdown.innerHTML = '歌词和正在播放的阴影级别：' + dropShadowLevelLabels[n];
+					ppt['dropShadowLevel_internal'].value = n;
+					window.shadowLevel.style.display = 'none';
+				}
+
+				function setFilmAlignment(n) {
+					window.film_dropdown.innerHTML = filmStripLabels[n];
+					ppt['filmStripMargin_internal'].value = n;
+					window.filmStripAlign.style.display = 'none';
+				}
+
+				function setHeadingShow(n, type) {
+					var prop = ['heading', 'trackHeading', 'sourceHeading'][type];
+					window[prop + '_dropdown'].innerHTML = '<b>' + ['主要', '音轨', '来源'][type] + ': </b>' + (type == 0 ? headingLabels[n] : sbarShowLabels[n]);
+					ppt[prop + '_internal'].value = n;
+					switch (type) {
+						case 0: window.mainShow.style.display = 'none'; break;
+						case 1: window.trackShow.style.display = 'none'; break;
+						case 2: window.sourceShow.style.display = 'none'; break;
+					}
+				}
+				
+				function setHeadingFont(n, type) {
+					var prop = ['headFontStyle', 'trackStyle', 'sourceStyle', 'wikiStyle', 'lyricsFontStyle', 'summaryStyle'][type];
+					window[prop + '_dropdown'].innerHTML = (type == 3 ? '维基百科章节标题：' : type == 4 ? '歌词 & 正在播放字体样式：' : type == 5 ? '摘要字体样式：' : '') + headingFontLabels[n];
+					ppt[prop + '_internal'].value = n;
+					setHeadingFontStyle(n, type);
+					switch (type) {
+						case 0: window.mainFont.style.display = 'none'; break;
+						case 1: window.trackFont.style.display = 'none'; break;
+						case 2: window.sourceFont.style.display = 'none'; break;
+						case 3: window.wikiFont.style.display = 'none'; break;
+						case 4: window.lyricsFont.style.display = 'none'; break;
+						case 5: window.summaryFont.style.display = 'none'; break;
+					}
+				}
+
+				function setHeadingFontStyle(n, type) {
+					var prop = ['headFontStyle', 'trackStyle', 'sourceStyle', 'wikiStyle', 'lyricsFontStyle', 'summaryStyle'][type];
+					window[prop + '_dropdown'].style.fontWeight = n == 1 || n == 3 ? 'bold' : 'normal';
+					window[prop + '_dropdown'].style.fontFamily = n == 4 || n == 5 ? 'Segoe UI Semibold' : 'caption';
+					window[prop + '_dropdown'].style.fontStyle = n == 2 || n == 3 || n == 5 ? 'italic' : 'normal';
+				}
+			
+				function setLyricsScrollMethod(n) {
+					window.lyricsScrollMethod_dropdown.innerHTML = lyricsScrollMethodLabels[n];
+					ppt['lyricsScrollMaxMethod_internal'].value = n;
+					window.lyricsScrollMethod.style.display = 'none';
+				}
+
+				function setOverlayType(n) {
+					window.overlay_dropdown.innerHTML = overlayLabels[n];
+					ppt['typeOverlay_internal'].value = n;
+					window.overlayType.style.display = 'none';
+				}
+
+				function ratingTextPosn(n) {
+					window.rating_dropdown.innerHTML = '文本位置：' + ratingTextPosLabels[n];
+					ppt['ratingTextPos_internal'].value = n;
+					window.ratingTextPos.style.display = 'none';
+				}
+
+				function setReflectionType(n) {
+					window.reflection_dropdown.innerHTML = reflPosLabels[n];
+					ppt['imgReflType_internal'].value = n;
+					window.reflPos.style.display = 'none';
+				}
+
+				function setSbarShow(n) {
+					window.sbarShow_dropdown.innerHTML = sbarShowLabels[n];
+					ppt['sbarShow_internal'].value = n;
+					window.sbarShow.style.display = 'none';
+				}
+
+				function setsbarType(n) {
+					window.sbarType_dropdown.innerHTML = sbarTypeLabels[n];
+					ppt['sbarType_internal'].value = n;
+					sbar_col_dropdown.style.display = n < 2 ? "inline-block" : "none";
+					sbar_icon_dropdown.style.display = n < 2 ? "inline-block" : "none";
+					window.sbarType.style.display = 'none';
+				}
+
+				function setSbarCol(n) {
+					window.sbarCol_dropdown.innerHTML = sbarColLabels[n];
+					ppt['sbarCol_internal'].value = n;
+					window.sbarCol.style.display = 'none';
+				}
+
+				function setSbarIcon(n) {
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[n];
+					ppt['sbarButType_internal'].value = n;
+					window.sbarIcon.style.display = 'none';
+				}
+
+				function setSeekerShow(n) {
+					window.seeker_dropdown.innerHTML = sbarShowLabels[n];
+					ppt['imgSeekerShow_internal'].value = n;
+					window.seeker.style.display = 'none';
+				}
+
+				function setTheme(n) {
+					window.theme_dropdown.innerHTML = themeLabels[n];
+					ppt['theme_internal'].value = n;
+					window.themeBg.style.display = 'none';
+				}
+
+				function setBehaviour() {
+					for (i = 0; i < 2; i++) {window.layout.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="layout_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="layout_checkbox'+i+'" class="checkbox_label">'+layoutLabels[i]+'</label></div>');}
+					window.sbarShow_dropdown.innerHTML = sbarShowLabels[ppt['sbarShow_internal'].value];
+					for (i = 0; i < 3; i++) {window.sbarShow.insertAdjacentHTML('beforeend', '<a onclick="setSbarShow(' + i + ');">'+sbarShowLabels[i]+'</a>');}
+					window.sbarType_dropdown.innerHTML = sbarTypeLabels[ppt['sbarType_internal'].value];
+					for (i = 0; i < 4; i++) {window.sbarType.insertAdjacentHTML('beforeend', '<a onclick="setsbarType(' + i + ');">'+sbarTypeLabels[i]+'</a>');}
+					window.sbarCol_dropdown.innerHTML = sbarColLabels[ppt['sbarCol_internal'].value];
+					for (i = 0; i < 2; i++) {window.sbarCol.insertAdjacentHTML('beforeend', '<a onclick="setSbarCol(' + i + ');">'+sbarColLabels[i]+'</a>');}
+					sbar_col_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[ppt['sbarButType_internal'].value];
+					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
+					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
+					for (i = 0; i < 4; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
+					for (i = 0; i < 2; i++) {window.fall_back.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="fallback_container'+i+'" name="behaviour_input" class="input54" /><label for="fallback_container'+i+'" class="inp_label2">'+fallbackLabels[i]+'</label></div>');}
+
+					window.overlay_dropdown.innerHTML = overlayLabels[ppt['typeOverlay_internal'].value];
+					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}
+					for (i = 5; i < 8; i++) {window.overlayMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="overlayMetrics_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input3" /><label for="overlayMetrics_container'+i+'" class="inp_label2">'+overlayLabels[i]+'</label></div>');}
+					generateTable('menu');
+					for (i = 0; i < 3; i++) {window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lookUp'+i+'" name="lookUp" style="'+cbox+'" type="radio" /><label for="lookUp'+i+'" id="lookUpState'+i+'" class="checkbox_label">'+lookupLabels[i]+'</label></div>');}
+					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookupLabels[i]+'</label></div>');
+				}
+
+				function setDisplay() {
+					generateTable('imageMarginTable');
+					generateTable('textMarginTable');
+					i = 4; window.metrics.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[0]+'</b></label></div>');
+					i = 5; window.metrics2.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[1]+'</b></label></div>');
+					for (i = 0; i < 3; i++) {window.textStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="textStyle_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="textStyle_checkbox'+i+'" class="checkbox_label">'+textStyleLabels[i]+'</label></div>');}
+
+					window.theme_dropdown.innerHTML = themeLabels[ppt['theme_internal'].value];
+					for (i = 0; i < 5; i++) {window.themeBg.insertAdjacentHTML('beforeend', '<a onclick="setTheme(' + i + ');">'+themeLabels[i]+'</a>');}
+					for (i = 5; i < 7; i++) {window.themeStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="theme_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="theme_checkbox'+i+'" class="checkbox_label">'+themeLabels[i]+'</label></div>');}
+					for (i = 0; i < 9; i++) {window.highlight.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="highlight_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="highlight_checkbox'+i+'" class="checkbox_label">'+highlightLabels[i]+'</label></div>');}
+					window.lines.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lines_checkbox" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="lines_checkbox" class="checkbox_label">深色</label></div>');
+					for (i = 0; i < 2; i++) {window.rating1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="rating_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="rating_checkbox'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+					for (i = 2; i < 4; i++) {window.rating2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="star'+i+'" name="star" style="'+cbox+'" type="radio" /><label for="star'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+
+					window.rating_dropdown.innerHTML = '文本位置：' + ratingTextPosLabels[ppt['ratingTextPos_internal'].value];
+					for (i = 0; i < 3; i++) {window.ratingTextPos.insertAdjacentHTML('beforeend', '<a onclick="ratingTextPosn(' + i + ');">'+ratingTextPosLabels[i]+'</a>');}
+					for (i = 4; i < 6; i++) {window.rating3.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="ratingName_container'+i+'" name="display_input" style="padding:0; margin:0;" class="input70" /><label for="ratingName_container'+i+'" class="inp_label2">'+ratingLabels[i]+'</label></div>');}
+
+					for (i = 0; i < 6; i++) {window.summary.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="summary_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="summary_checkbox'+i+'" class="checkbox_label">'+summaryLabels[i]+'</label></div>');}
+					window.summaryStyle_dropdown.innerHTML = '摘要字体样式：' + headingFontLabels[ppt['summaryStyle_internal'].value];
+					setHeadingFontStyle(ppt['summaryStyle_internal'].value, 5);
+					for (i = 0; i < 6; i++) {window.summaryFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 5 + ');">'+headingFontLabels[i]+'</a>');}
+				}
+
+				function setHeading() {
+					for (i = 0; i < 4; i++) {window.heading_title_format.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_heading_container'+i+'" class="inp_label4">'+tfLabels[i]+'</label><input id="tf_heading_container'+i+'" name="headings_input" class="input73" /></div>');}
+					i = 4; window.sub_titleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_heading_container'+i+'" class="inp_label4">'+tfLabels[i]+'</label><input id="tf_heading_container'+i+'" name="headings_input" class="input73" /></div>');
+					i = 5; window.title_formatPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="tf_heading_container'+i+'""><label for="tf_heading_preview" class="inp_label4">预览</label><input id="tf_heading_preview" name="previewTf" class="input73" readonly/></div>')
+
+					for (i = 0; i < 3; i++) {window.headingStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdPos'+i+'" name="hdPos" style="'+cbox+'" type="radio" /><label for="hdPos'+i+'" class="checkbox_label">'+headingFormatlabels[i]+'</label></div>');}
+					for (i = 3; i < 6; i++) {window.headingStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="headingFormat_checkbox'+i+'" name="headings_checkbox" style="'+cbox+'" type="checkbox" /><label for="headingFormat_checkbox'+i+'" class="checkbox_label">'+headingFormatlabels[i]+'</label></div>');}
+					for (i = 0; i < 3; i++) {window.btn.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdShowBtnLabel'+i+'" name="hdShowBtnLabel" style="'+cbox+'" type="radio" /><label for="hdShowBtnLabel'+i+'" class="checkbox_label">'+btnLabels[i]+'</label></div>');}
+					for (i = 3; i < 5; i++) {window.btn.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="btn_checkbox'+i+'" name="headings_checkbox" style="'+cbox+'" type="checkbox" /><label for="btn_checkbox'+i+'" class="checkbox_label">'+btnLabels[i]+'</label></div>');}
+					for (i = 0; i < 3; i++) {window.line.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="hdLine'+i+'" name="hdLine" style="'+cbox+'" type="radio" /><label for="hdLine'+i+'" class="checkbox_label">'+lineLabels[i]+'</label></div>');}
+					for (i = 0; i < 2; i++) {window.flag.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="flag_checkbox'+i+'" name="headings_checkbox" style="'+cbox+'" type="checkbox" /><label for="flag_checkbox'+i+'" class="checkbox_label">'+flaglabels[i]+'</label></div>');}
+					for (i = 0; i < 3; i++) {window.headingPadding.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="headingPadding_container'+i+'" name="headings_input" style="padding:0; margin:0;" class="input15" /><label for="headingPadding_container'+i+'" class="inp_label2">'+headingPaddingLabels[i]+'</label></div>');}
+
+					window.heading_dropdown.innerHTML = '<b>主要：</b>' + headingLabels[ppt['heading_internal'].value];
+					for (i = 0; i < 2; i++) {window.mainShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 0 + ');">'+headingLabels[i]+'</a>');}
+					window.trackHeading_dropdown.innerHTML = '<b>音轨：</b>' + sbarShowLabels[ppt['trackHeading_internal'].value];
+					for (i = 0; i < 3; i++) {window.trackShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 1 + ');">'+sbarShowLabels[i]+'</a>');}
+					window.sourceHeading_dropdown.innerHTML = '<b>来源：</b>' + sbarShowLabels[ppt['sourceHeading_internal'].value];
+					for (i = 0; i < 3; i++) {window.sourceShow.insertAdjacentHTML('beforeend', '<a onclick="setHeadingShow(' + i + ',' + 2 + ');">'+sbarShowLabels[i]+'</a>');}
+
+					window.headFontStyle_dropdown.innerHTML = headingFontLabels[ppt['headFontStyle_internal'].value];
+					setHeadingFontStyle(ppt['headFontStyle_internal'].value, 0);
+					for (i = 0; i < 6; i++) {window.mainFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 0 + ');">'+headingFontLabels[i]+'</a>');}
+					window.trackStyle_dropdown.innerHTML = headingFontLabels[ppt['trackStyle_internal'].value];
+					setHeadingFontStyle(ppt['trackStyle_internal'].value, 1);
+					for (i = 0; i < 6; i++) {window.trackFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 1 + ');">'+headingFontLabels[i]+'</a>');}
+					window.sourceStyle_dropdown.innerHTML = headingFontLabels[ppt['sourceStyle_internal'].value];
+					setHeadingFontStyle(ppt['sourceStyle_internal'].value, 2);
+					for (i = 0; i < 6; i++) {window.sourceFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 2 + ');">'+headingFontLabels[i]+'</a>');}
+					window.wikiStyle_dropdown.innerHTML = '维基百科章节标题：' + headingFontLabels[ppt['wikiStyle_internal'].value];
+					setHeadingFontStyle(ppt['wikiStyle_internal'].value, 3);			
+					for (i = 0; i < 6; i++) {window.wikiFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 3 + ');">'+headingFontLabels[i]+'</a>');}
+				}
+
+				function setImage() {
+					for (i = 0; i < 2; i++) {window.mainImage.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="mainImg_checkbox'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="mainImg_checkbox'+i+'" class="checkbox_label">'+mainImgLabels[i]+'</label></div>');}
+					i = 2; window.mainImage.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="cycleTime_container'+i+'" name="image_input" style="padding:0; margin:0;" class="input2" /><label for="cycleTime_container'+i+'" class="inp_label2">'+mainImgLabels[i]+'</label></div>');
+					
+					window.seeker_dropdown.innerHTML = sbarShowLabels[ppt['imgSeekerShow_internal'].value];
+					if (!ppt['imgSeekerDisabled_internal'].value) for (i = 0; i < 3; i++) {window.seeker.insertAdjacentHTML('beforeend', '<a onclick="setSeekerShow(' + i + ');">'+sbarShowLabels[i]+'</a>');}
+					else {
+						window.seeker_dropdown.style.background = '#EBEBE4';
+						window.seeker_dropdown.style.color = '#C6C6C6';
+					}
+
+					for (i = 0; i < 2; i++) {window.seekerStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="imgSeekerStyle'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="imgSeekerStyle'+i+'" class="checkbox_label">'+seekerLabels[i]+'</label></div>');}
+					for (i = 2; i < 4; i++) {window.seekerDots.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="imgSeekerDots'+i+'" name="imgSeekerDots" style="'+cbox+'" type="radio" /><label for="imgSeekerDots'+i+'" class="checkbox_label">'+seekerLabels[i]+'</label></div>');}
+					i = 0; window.filmStripShow.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="filmStrip_checkbox'+i+'" name="image_checkbox" style="'+cbox+'" type="checkbox" /><label for="filmStrip_checkbox'+i+'" class="checkbox_label">仅当 > 1 个缩略图时显示</label></div>');
+					
+					window.film_dropdown.innerHTML = filmStripLabels[ppt['filmStripMargin_internal'].value];
+					if (!ppt['filmStripOverlay_internal'].value || ppt['text_only_internal'].value) for (i = 0; i < 5; i++) {window.filmStripAlign.insertAdjacentHTML('beforeend', '<a onclick="setFilmAlignment(' + i + ');">'+filmStripLabels[i]+'</a>');}
+					else {
+						window.film_dropdown.style.background = '#EBEBE4';
+						window.film_dropdown.style.color = '#C6C6C6';
+					}
+					i = 0; window.gap.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="gap_container'+i+'" name="image_input" class="input2" /><label for="gap_container'+i+'" class="inp_label2">缩略图间距</label></div>');
+					var cboxMargin = "width:" + cbox_w + "px; height:" + cbox_h + "px; margin-right:5px;"
+					window.input_cntf1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="f_checkbox1" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="f_checkbox1" class="checkbox_label">仅 Last.fm 照片</label></div>');
+					for (i = 0; i < 3; i++) {window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');}
+					i = 3; window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'; visibility:hidden;" name="image_checkbox_hidden" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');
+					generateTable('imageFormat');
+					
+					window.reflection_dropdown.innerHTML = reflPosLabels[ppt['imgReflType_internal'].value];
+					for (i = 0; i < 5; i++) {window.reflPos.insertAdjacentHTML('beforeend', '<a onclick="setReflectionType(' + i + ');">'+reflPosLabels[i]+'</a>');}
+					for (i = 5; i < 8; i++) {window.reflectionMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="reflectionMetrics_container'+i+'" name="image_input" class="input2" /><label for="reflectionMetrics_container'+i+'" class="inp_label2">'+reflPosLabels[i]+'</label></div>');}
+				}
+				var bg = [];
+				var fg = [];
+				function setCustomColours(value) {
+					var items = ['text', 'text_h', 'headingBtn', 'headingText', 'stars', 'summary', 'rectOv', 'rectOvBor', 'bg', 'line', 'bgTrans', 'frame'];
+					for (var i = 0; i < items.length; i++) {
+						bg[i] = assign(ppt[items[i] + '_internal'][value], i < 8 ? 0 : 1);
+						fg[i] = getSelCol(bg[i]);
+						bg[i] = "rgb("+bg[i][0]+","+bg[i][1]+","+bg[i][2]+")";
+						var el = document.getElementById('colour_container'+i);
+						el.style.background = bg[i];
+						el.style.color = fg[i];
+					}
+				}
+				
+				function setTextreader() {
+					i = 0; window.cusText1.insertAdjacentHTML('beforeend', '<span class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_enable">启用</label></span>');
+					var cboxMargin = "width:" + cbox_w + "px; height:" + cbox_h + "px; margin-left:5em;"
+					for (i = 0; i < 4; i++) {window.cusText2.insertAdjacentHTML('beforeend', '<div class="input_cnt1" ><input name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><input name="textreader_input" class="input18" /><input id="tf_cusText_container'+i+'" name="textreader_input" class="input65" /><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cboxMargin+'" type="checkbox" /></div>')}
+					for (i = 4; i < 8; i++) {window.cusText3.insertAdjacentHTML('beforeend', '<div class="input_cnt1" ><input name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><input name="textreader_input" class="input18" /><input id="tf_cusText_container'+i+'" name="textreader_input" class="input65" /><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cboxMargin+'" type="checkbox" /></div>')}
+
+					window.lyricsFontStyle_dropdown.innerHTML = '歌词 & 正在播放字体样式：' + headingFontLabels[ppt['lyricsFontStyle_internal'].value];
+					window.shadowFontStyle_dropdown.innerHTML = '歌词和正在播放的阴影级别：' + dropShadowLevelLabels[ppt['dropShadowLevel_internal'].value];
+					setHeadingFontStyle(ppt['lyricsFontStyle_internal'].value, 4);			
+					for (i = 0; i < 6; i++) {window.lyricsFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 4 + ');">'+headingFontLabels[i]+'</a>');}
+					for (i = 0; i < 11; i++) {window.shadowLevel.insertAdjacentHTML('beforeend', '<a onclick="setDropShadowLevel(' + i + ');">'+dropShadowLevelLabels[i]+'</a>');}
+					i = 0; window.largerHighlighted.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="larger_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="larger_checkbox'+i+'" class="checkbox_label">更大的同步歌词行</label></div>');
+					i = 1; window.cusTextPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="input_cnt2"><label for="cusText_Preview" class="inp_label6"></label><input id="cusText_Preview" name="previewTf" class="input98" readonly/></div>');
+					i = 2; window.downloadLyrics.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">'+cusTextLabels[i]+'</label></div>');
+					i = 3; window.syncedScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">'+cusTextLabels[i]+'</label></div>');
+					i = 4; window.unsyncedScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">'+cusTextLabels[i]+'</label></div>');
+					i = 5; window.lyricsFadeHeight.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lyricsFadeHeight_container'+i+'" name="textreader_input" class="input2" /><label for="lyricsFadeHeight_container'+i+'" class="inp_label2">淡入淡出高度（0=自动）</label></div>');
+					i = 6; window.lyricsScrollTimeAvg.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lyricsScrollTimeAvg_container'+i+'" name="textreader_input" class="input98" /></div>');
+					i = 7; window.lyricsScrollTimeMax.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lyricsScrollTimeMax_container'+i+'" name="textreader_input" class="input98" /></div>');
+					window.lyricsScrollMethod_dropdown.innerHTML = lyricsScrollMethodLabels[ppt['lyricsScrollMaxMethod_internal'].value];
+					for (i = 0; i < 2; i++) {window.lyricsScrollMethod.insertAdjacentHTML('beforeend', '<a onclick="setLyricsScrollMethod(' + i + ',' + 0 + ');">'+lyricsScrollMethodLabels[i]+'</a>');}
+					i = 8; window.rowStripes.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">条纹背景</label></div>');
+					i = 9; window.lineDividers.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">线条</label></div>');
+					i = 10; window.fieldWidth.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="nameWidth_container'+i+'" name="textreader_input" class="input2" /><label for="nameWidth_container'+i+'" class="inp_label2">名称列：宽度 % （0=自动）</label></div>');
+					i = 11; window.npVCenter.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">垂直居中</label></div>');
+					i = 12; window.npHCenter.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">水平居中</label></div>');
+				}
+
+				function setCustom() {
+					for (i = 0; i < 2; i++) {window.fonts.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="font_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="font_container'+i+'" name="custom_input" class="input40" /><label for="font_container'+i+'" class="inp_label2">'+fontLabels[i]+'</label></div>');}
+					for (i = 0; i < 8; i++) {window.colours1.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="colour_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="colour_container'+i+'" name="custom_input" class="input40" /><label for="colour_container'+i+'" class="inp_label2">'+colourLabels[i]+'</label></div>');}
+					for (i = 8; i < 12; i++) {window.colours2.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="colour_checkbox'+i+'" name="custom_checkbox" style="'+cbox+'" type="checkbox" /><input id="colour_container'+i+'" name="custom_input" class="input40" /><label for="colour_container'+i+'" class="inp_label2">'+colourLabels[i]+'</label></div>');}
+				}
+
+				function setAdvanced() {
+					for (i = 0; i < 4; i++) {window.cusScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scroll_container'+i+'" name="advanced_input" class="input35" /><label for="scroll_container'+i+'" class="inp_label2">'+cusScrollLabels[i]+'</label></div>');}
+					for (i = 0; i < 5; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
+					var fFamily = ppt['butCustIconFont_internal'].value;
+					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" style="font-family:'+fFamily+'" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');
+					for (i = 6; i < 8; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
+					i = 8; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
+					i = 0; window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="themeBlur_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="themeBlur_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
+					for (i = 1; i < 3; i++) {window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="themeBlur_container'+i+'" name="advanced_input" class="input35" /><label for="themeBlur_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');}
+					i = 3; window.smoothTransLevel.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="smoothing_container'+i+'" name="advanced_input" class="input3" /><label for="smoothing_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
+					i = 4; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="loadDelay_container'+i+'" name="advanced_input" class="input3" /><label for="loadDelay_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
+					i = 5; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="loadDelay_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="loadDelay_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
+					window.serverName.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="serverName_container'+i+'" name="advanced_input" class="input35" /></div>');
+				}
+
+				function setServer() {
+					var labelInnerHtml = window.btn_dropdown.innerHTML;
+					window.btn_dropdown.innerHTML = labelInnerHtml.replace(/Last\.fm \+ 维基百科语言：英语/g, 'Last.fm & 维基百科语言：' + langLabels[lang_ix]);
+					for (i = 0; i < 4; i++) {
+						window.titleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tf_container'+i+'" class="inp_label1">'+tfServLabels[i]+'</label><input id="tf_container'+i+'" name="title_format_input" class="input98" /></div>');
+					}
+					i = 0; window.classicalMode.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="t_checkbox'+i+'" name="tf_checkbox" type="checkbox" /><label for="t_checkbox'+i+'" class="checkbox_label">启用</label></div>');
+					i = 4; window.classicalModeTitleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt6"><label for="tf_container'+i+'" class="inp_label1">'+tfServLabels[i]+'</label><input id="tf_container'+i+'" name="title_format_input" class="input98" /></div>');
+
+					i = 0; window.cache0.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
+					i = 1; window.cache1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
+					window.cache_dropdown.innerHTML = cacheLabels[cfg['autoCacheTime_internal'].value];
+
+					for (i = 0; i < 6; i++) {window.cacheTime.insertAdjacentHTML('beforeend', '<a id="cacheProp'+i+'" onclick="setCacheTime(' + i + ');">'+cacheLabels[i]+'</a>');}
+					window.cacheProp5.style.borderTop = "1px solid Gainsboro";
+					window.fallback.insertAdjacentHTML('beforeend', '<div class="input_cnt3" style="padding:0;"><input id="lang_checkbox0" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox0" style="padding-right:0.75em;" class="checkbox_label">回退到英语服务器&nbsp</label><input id="lang_checkbox1" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox1" class="checkbox_label">维基百科流派：英语</label></div>');
+					for (i = 2; i < 4; i++) {
+						window.allmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+					}
+					for (i = 4; i < 9; i++) {
+						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+					}
+					window.dnld_checkbox8.parentNode.style.display = 'none'; // similar artists: now auto
+					for (i = 9; i < 11; i++) {
+						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+					}
+
+					window.supplemental.insertAdjacentHTML('beforeend', '<div class="row"><div class="column19"><input id="dnld_checkbox11" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox11" class="checkbox_label">'+dlLabels[i]+'</label></div><div class="column40"><label for="dld_container11" class="inp_label3">查找内容：</label><input id="dld_container11" name="download_input" class="input76" /></div><div class="column40"><label for="dld_container12" class="inp_label3">替换为：</label><input id="dld_container12" name="download_input" class="input76" /></div></div>');
+
+					window.photo_num.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container0" name="photo_input" class="input98" /></div>');
+					window.photo_limit.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container1" name="photo_input" class="input98" /></div>');
+					window.artCusImgFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container2" name="photo_input" class="input98" /></div>')
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox0" name="cover_checkbox" type="checkbox" /><label for="input_checkbox0" class="checkbox_label">'+covLabels[0]+'</label></div>')
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cov_container0" class="inp_label3">'+covLabels[1]+'</label><input id="cov_container0" name="cover_input" class="input82" /></div>')
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><label for="tf_cov_container" class="inp_label3">'+covLabels[2]+'</label><input id="tf_cov_container" name="cover_input" class="input82" /></div>')
+					window.covCycleFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container2" name="cover_input" class="input82" /></div>')
+					window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox1" name="cover_checkbox" type="checkbox" /><label for="input_checkbox1" class="checkbox_label">'+covLabels[3]+'</label></div>')
+					for (i = 3; i < 6; i++) {
+						window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container'+i+'" name="cover_input" class="input82" /><label for="custom_container'+i+'" class="inp_label3">'+covLabels[i + 1]+'</label></div>');
+					}
+					for (i = 0; i < 5; i++) {
+						window.tagAllmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
+					}
+					for (i = 5; i < 11; i++) {
+						window.tagLastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
+					}
+					for (i = 11; i < 13; i++) {
+						window.tagWikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
+					}
+					i = 13; window.similarArtists.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tag_checkbox'+i+'" class="inp_label3">相似艺术家数量 1-6</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
+					i = 14; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
+					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /></div>');
+					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
+					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
+					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">转化：</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
+					for (i = 0; i < 3; i++) {
+						window.siteNames.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="siteNames_container'+i+'" name="misc_input" style="padding:0;" class="input21" /><label for="siteNames_container'+i+'" class="inp_label2">'+siteNameLabels[i]+'</label></div>');
+					}
+					for (i = 0; i < 4; i++) {
+						window.miscl.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="misc_checkbox'+i+'" name="misc_checkbox" type="checkbox" /><label for="misc_checkbox'+i+'" class="checkbox_label">'+miscLabels[i]+'</label></div>');
+					}
+					for (i = 4; i < 7; i++) {
+						window.miscellaneous.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="misc_container'+i+'" name="misc_input" class="input21" /><label for="misc_container'+i+'" class="inp_label2">'+miscLabels[i]+'</label></div>');
+					}
+					for (i = 0; i < 3; i++) {
+						window.fuzzyLevel.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="fuzzyLevel_container'+i+'" name="misc_input" style="padding:0; margin-left:5%;" class="input3" /><label for="fuzzyLevel_container'+i+'" class="inp_label2">'+fuzzyLabels[i]+'</label></div>');
+					}
+					window.titleformatPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="input_cnt3"><label for="tf_preview" class="inp_label1">预览</label><input id="tf_preview" name="previewTf" class="input98" readonly/></div>');
+					for (i = 0; i < 12; i++) {
+						window.language.insertAdjacentHTML('beforeend', '<a onclick="setLanguage(' + i + ')" >'+langLabels[i]+'</a>');
+					}
+					window.lang_checkbox0.parentNode.disabled = !lang_ix ? true : false;
+					window.prev.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="preview_cnt"><input id="dld_preview" name="preview" readonly class="input82"/><label for="dld_container1000" class="inp_label3">当前项目：</label></div>');
+					window.covPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="custom3"><input id="cov_preview" name="preview" class="input82" readonly/><label for="preview_container" class="inp_label3">当前项目：</label></div>');
+				}
+
+				document.getElementById("btn_empty").disabled = !parsed_args[7];
+				document.getElementById("btn_open").disabled = !parsed_args[7];
+				setBehaviour();
+				setDisplay();
+				setHeading();
+				setImage();
+				setTextreader();
+				setCustom();
+				setAdvanced();
+				setServer();
+				setCustomColours('value');
+				setCheckboxes('all', 'value');
+				setRadioBtns('all', 'value');
+				setInputs('all', 'value');
+				setCheckboxStates();
+				document.getElementById("btn_apply").disabled = true;
+			}
+
+			function setInputs(page, value) {
+				var nm = page.toString()+'_input', inputs = document.querySelectorAll(page == 'all' ? "[name$='_input']" : "[name="+nm+"]");
+				for (i = 0; i < inputs.length; i++) {
+					inputs[i].value = (ppt[input[page].name[i] + '_internal'] || cfg[input[page].name[i] + '_internal'])[value];
+				}
+			}
+
+			function setCheckboxStates() {
+				window.artReflDual.disabled = window.artShadowDual.checked;
+				window.artShadowDual.disabled = window.artReflDual.checked;
+				window.artReflImgOnly.disabled = window.artShadowImgOnly.checked;
+				window.artShadowImgOnly.disabled = window.artReflImgOnly.checked;
+				window.btn_checkbox3.parentNode.disabled = window.btn_checkbox4.checked;
+				window.colour_checkbox8.disabled = isTransparent;
+				window.covReflDual.disabled = window.covShadowDual.checked;
+				window.covShadowDual.disabled = window.covReflDual.checked;
+				window.covReflImgOnly.disabled = window.covShadowImgOnly.checked;
+				window.filterCheckbox3.parentNode.disabled = !window.filterCheckbox0.checked && !window.filterCheckbox1.checked && !window.filterCheckbox2.checked
+				window.fuzzyLevel.disabled = !misc_checkbox3.checked;
+				window.headFontStyle_dropdown.style.display = window.font_checkbox1.checked && window.font_container1.value.length ? "none" : "inline-block";
+				window.flag_checkbox0.parentNode.disabled = ppt['hdPos_internal'].value != 0;
+				window.flag_checkbox1.parentNode.disabled = ppt['hdPos_internal'].value != 0;
+				window.flagInfo.innerHTML = ppt['hdPos_internal'].value == 0 ? "国家或地区代码在维基百科简介下载期间保存" : "标志显示需要将标题版式设置为居左";
+				window.highlight_checkbox0.parentNode.disabled = window.colour_checkbox2.checked;
+				window.highlight_checkbox1.parentNode.disabled = window.colour_checkbox3.checked;
+				window.highlight_checkbox2.parentNode.disabled = window.colour_checkbox9.checked || window.lines_checkbox.checked;
+				window.highlight_checkbox4.parentNode.disabled = window.colour_checkbox7.checked;
+				window.highlight_checkbox5.parentNode.disabled = window.colour_checkbox4.checked;
+				window.highlight_checkbox7.parentNode.disabled = window.colour_checkbox5.checked;
+				window.highlight_checkbox8.parentNode.disabled = window.colour_checkbox0.checked;
+				var disabled1 = !ppt['imgSeekerShow_internal'].value || ppt['imgSeekerDisabled_internal'].value;
+				var disabled2 = disabled1 || !window.imgSeekerStyle1.checked;
+				window.imgSeekerStyle0.parentNode.disabled = disabled1;
+				window.imgSeekerStyle1.parentNode.disabled = disabled1;
+				window.imgSeekerDots2.parentNode.disabled = disabled2;
+				window.imgSeekerDots3.parentNode.disabled = disabled2;
+				window.seekerNA.innerHTML = ppt['imgSeekerDisabled_internal'].value ? (ppt['filmStripOverlay_internal'].value ? "<i>灰色项目不可用，图像区域有幻灯片叠加</i>" : "<i>具有当前叠加指标的导航 & 计数不可用</i>") : "";
+				window.scroll_checkbox1.parentNode.disabled = ppt['sbarType_internal'].value == 2;
+				window.lyricsScrollTimeMax.style.display = ppt['lyricsScrollMaxMethod_internal'].value == 0 ? "none" : "block";
+				window.lyricsScrollTimeAvg.style.display = ppt['lyricsScrollMaxMethod_internal'].value == 1 ? "none" : "block";
+				document.getElementById('ratingTextName').style.display = ppt['star_internal'].value ? "block" : "none";
+				window.rating3.style.display = ppt['star_internal'].value ? "block" : "none";
+				window.theme_checkbox5.parentNode.disabled = ppt['theme_internal'].value == 0;
+				window.theme_checkbox6.parentNode.disabled = ppt['theme_internal'].value == 1 || ppt['theme_internal'].value == 4;
+				if (ppt['themed_internal'].value) window.themeStyle.style.display = "none";
+				window.whitelistInfo.style.display = window.useWhitelist1.checked ? "block" : "none";
+				window.lfmGenreTag.style.display = window.useWhitelist1.checked ? "block" : "none";
+
+				var dnld = document.querySelectorAll("[id^='dld_container'], [id=savePreview], [id=preview_cnt], [id=supplCache0], [id=supplCache1], [id=supplemental], [id^='savefolder']");
+				for (i = 0; i < dnld.length; i++) {
+					dnld[i].style.display = cur.displaySaveFolders ? "block" : "none";
+				}
+
+				var showStorageTimeOption = true;
+				window.defaultOption.style.display = !cur.displaySaveFolders && window.autoCache1.checked && showStorageTimeOption ? "block" : "none";
+				window.cache_dropdown.style.display = !cur.displaySaveFolders && window.autoCache1.checked && showStorageTimeOption ? "inline-block" : "none";
+				window.cache_dropdown.style.width = !cur.displaySaveFolders && window.autoCache1.checked && showStorageTimeOption ? "auto" : 0;
+				window.photoLimit.style.display = window.autoCache1.checked && showStorageTimeOption && cfg['autoCacheTime_internal']. value > 3 ? "block" : "none";
+				window.cacheLocation.style.display = !cur.displaySaveFolders ? "block" : "none";
+				window.cache0.style.display = !cur.displaySaveFolders ? "block" : "none";
+				window.cache1.style.display = !cur.displaySaveFolders ? "block" : "none";
+				window.save_folders.style.display = cur.displaySaveFolders || showStorageTimeOption && window.autoCache1.checked ? "none" : "block";
+				if (!showStorageTimeOption) window.save_folders.disabled = window.autoCache1.checked;
+				window.hide_folders.style.display = !cur.displaySaveFolders ? "none" : "block";
+			
+				var showsupplCacheOption = false;
+				if (!showsupplCacheOption) {
+					window.supplCache0.style.display = "none";
+					window.supplCache1.style.display = "none";
+					window.supplemental.style.display = "none";
+				}
+			}
+
+			function setLanguage(n) {
+				window.btn_dropdown.innerHTML = 'Last.fm + 维基百科语言：' + langLabels[n];
+				cfg['language_internal'].value = ['EN', 'DE', 'ES', 'FR', 'IT', 'JA', 'PL', 'PT', 'RU', 'SV', 'TR', 'ZH'][n];
+				window.lang_checkbox0.parentNode.disabled = !n ? true : false;
+			}
+
+			function setCheckboxes(page, value) {
+				var nm = page.toString()+'_checkbox', boxes = document.querySelectorAll(page == 'all' ? "[name$='_checkbox']" : "[name="+nm+"]");
+				for (i = 0; i < boxes.length; i++) {
+					boxes[i].checked = (ppt[box[page][i] + '_internal'] || cfg[box[page][i] + '_internal'])[value];
+				}
+			}
+
+			setInterval(inputChanged, 500);
+			function inputChanged() {
+				set_btn_apply_state();
+			}
+
+			function setRadioBtns(page, value) {
+				var radios = radio[page];
+				for (i = 0; i < radios.length; i++) {
+					var radioBtns = document.getElementsByName(radios[i]);
+					for (j = 0; j < radioBtns.length; j++) {
+						if (j == (ppt[radios[i] + '_internal'] || cfg[radios[i] + '_internal'])[value]) {
+							radioBtns[j].checked = true;
+							radioBtns[j].value = j;	
+						}
+					}
+				}
+			}
+
+			function getValues() {
+				var inputs = document.querySelectorAll("[name$='_input']");
+				for (i = 0; i < inputs.length; i++) {
+					(ppt[input.all.name[i] + '_internal'] || cfg[input.all.name[i] + '_internal']).value = input.all.type[i] == 'text' ? inputs[i].value : input.all.type[i] == 'int' ? parseInt(inputs[i].value) : parseFloat(inputs[i].value);
+				}
+
+				var boxes = document.querySelectorAll("[name$='_checkbox']");
+				for (i = 0; i < boxes.length; i++) {
+					(ppt[box.all[i] + '_internal'] || cfg[box.all[i] + '_internal']).value = boxes[i].checked;
+				}
+
+				for (i = 0; i < radio.all.length; i++) {
+					var radioBtns = document.getElementsByName(radio.all[i]);
+					for (j = 0; j < radioBtns.length; j++) {
+						if (radioBtns[j].checked) {
+							(ppt[radio.all[i] + '_internal'] || cfg[radio.all[i] + '_internal']).value = j;
+							break;
+						}
+					}
+				}
+			}
+
+			function sendCallback(new_ppt, new_cfg, type, new_cur) {
+				if (!callback) return;
+				try {
+					callback(new_ppt, new_cfg, type, new_cur);
+				} catch (e) {
+				}
+			}
+
+			window.btn_ok.onclick = function () {
+				getValues();
+				var new_ppt = JSON.stringify(ppt);
+				var new_cfg = JSON.stringify(cfg);
+				var new_cur = JSON.stringify(cur);
+				if (new_ppt == parsed_args[0]) new_ppt = '';
+				if (new_cfg == parsed_args[1]) new_cfg = '';
+				if (new_cur == parsed_args[2]) new_cur = '';
+				if (new_ppt || new_cfg || new_cur) {
+					sendCallback(new_ppt, new_cfg, '' , new_cur);
+				}
+				close_window();
+			}
+
+			window.btn_apply.onclick = function () {
+				getValues();
+				var new_ppt = JSON.stringify(ppt);
+				var new_cfg = JSON.stringify(cfg);
+				if (new_ppt == parsed_args[0]) new_ppt = ''; else parsed_args[0] = new_ppt;
+				if (new_cfg == parsed_args[1]) new_cfg = ''; else parsed_args[1] = new_cfg;
+				if (new_ppt || new_cfg) {
+					sendCallback(new_ppt, new_cfg);
+				}
+			}
+
+			window.btn_resetPage.onclick = function () {
+				setCheckboxes(cur.page, 'default_value');
+				setInputs(cur.page, 'default_value');
+				setRadioBtns(cur.page, 'default_value');
+				if (cur.page == 'behaviour') {
+					setOverlayType(ppt['typeOverlay_internal'].default_value);
+					setSbarShow(ppt['sbarShow_internal'].default_value);
+					setsbarType(ppt['sbarType_internal'].default_value);
+					setSbarCol(ppt['sbarCol_internal'].default_value);
+					setSbarIcon(ppt['sbarButType_internal'].default_value);
+				}
+				if (cur.page == 'display') {
+					setTheme(ppt['theme_internal'].default_value);
+				}
+				if (cur.page == 'headings') {
+					setHeadingShow(ppt['heading_internal'].default_value, 0);
+					setHeadingShow(ppt['trackHeading_internal'].default_value, 1);
+					setHeadingShow(ppt['sourceHeading_internal'].default_value, 2);
+					setHeadingFont(ppt['headFontStyle_internal'].default_value, 0);
+					setHeadingFont(ppt['trackStyle_internal'].default_value, 1);
+					setHeadingFont(ppt['sourceStyle_internal'].default_value, 2);
+				}
+				if (cur.page == 'image') {
+					setFilmAlignment(ppt['filmStripMargin_internal'].default_value);
+					setReflectionType(ppt['imgReflType_internal'].default_value);
+					setSeekerShow(ppt['imgSeekerShow_internal'].default_value);
+				}
+				if (cur.page == 'custom') setCustomColours('default_value');
+				if (cur.page == 'textreader') {
+					setHeadingFont(ppt['lyricsFontStyle_internal'].default_value, 3);
+				}
+				set_btn_apply_state();
+			}
+
+			window.btn_reset.onclick = function () {
+				var msg = cur.tab == 'PanelCfg' ? '将面板设置重置为默认值\n继续？' : '将服务器设置重置为默认值\n\n原始 ('+  cfg.cfgBaseName +'.cfg ) 将备份\n\n继续？';
+				var r = window.confirm(msg);
+				if (r == true) {
+					var new_cur = JSON.stringify(cur);
+					if (new_cur == parsed_args[2]) new_cur = '';
+					close_window();
+					sendCallback('', '', 'reset' + cur.tab, new_cur);
+				}
+			}
+
+			window.btn_empty.onclick = function () {
+				sendCallback('', '', "empty");
+			}
+
+			window.btn_open.onclick = function () {
+				sendCallback('', '', "open");
+			}
+			
+			function showLyricsHelp() {
+				var divToggleLyrics = document.getElementById('lyrics_help');
+					if (divToggleLyrics.style.display === 'none') {
+						divToggleLyrics.style.display = 'block';
+						divToggleLyrics.scrollIntoView();
+					} else {
+						divToggleLyrics.style.display = 'none';
+					}
+			}
+
+			function showPhotoSyntax() {
+				var divTogglePho = document.getElementById('photo_help');
+					if (divTogglePho.style.display === 'none') {
+						divTogglePho.style.display = 'block';
+					} else {
+						divTogglePho.style.display = 'none';
+					}
+			}
+			
+			function showSaveFolders() {
+				cur.displaySaveFolders = !cur.displaySaveFolders;
+			}
+			
+			function showTaggerHelp() {
+				var divToggleTag = document.getElementById('tagger_help');
+					if (divToggleTag.style.display === 'none') {
+						divToggleTag.style.display = 'block';
+					} else {
+						divToggleTag.style.display = 'none';
+					}
+			}
+			
+			function toggle(item) {
+				if (window[item].style.display != 'block') window[item].style.display = 'block'
+				else window[item].style.display = 'none';
+			}
+
+			var h = [
+				['btn_dropdown', 'language'],
+				['cache_dropdown', 'cacheTime'],
+				['film_dropdown', 'filmStripAlign'],
+				['heading_dropdown', 'mainShow'],
+				['headFontStyle_dropdown', 'mainFont'],
+				['lyricsFontStyle_dropdown', 'lyricsFont'],
+				['lyricsScrollMethod_dropdown', 'lyricsScrollMethod'],
+				['trackHeading_dropdown', 'trackShow'],
+				['trackStyle_dropdown', 'trackFont'],
+				['sourceHeading_dropdown', 'sourceShow'],
+				['sourceStyle_dropdown', 'sourceFont'],
+				['wikiStyle_dropdown', 'wikiFont'],
+				['summaryStyle_dropdown', 'summaryFont'],
+				['overlay_dropdown', 'overlayType'],
+				['rating_dropdown', 'ratingTextPos'],
+				['reflection_dropdown', 'reflPos'],
+				['sbarShow_dropdown', 'sbarShow'],
+				['sbarType_dropdown', 'sbarType'],
+				['sbarCol_dropdown', 'sbarCol'],
+				['sbarIcon_dropdown', 'sbarIcon'],
+				['seeker_dropdown', 'seeker'],
+				['shadowFontStyle_dropdown', 'shadowLevel'],
+				['theme_dropdown', 'themeBg']
+			];
+			
+			function hide() {
+				var id = document.activeElement.id;
+				for (i = 0; i < h.length; i++) {
+					if (id != h[i][0]) window[h[i][1]].style.display = 'none';
+				}
+			}
+
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.btn_ok.onclick) {
+					window.btn_ok.onclick();
+				}
+			}
+			
+			document.onkeyup = function () {
+				set_btn_apply_state();
+			}
+
+			document.onclick = function () {
+				set_btn_apply_state();
+				setCheckboxStates();
+				hide();
+			}
+
+			window.btn_cancel.onclick = function () {
+				var new_cur = JSON.stringify(cur);
+				if (new_cur != parsed_args[2]) sendCallback('', '', '', new_cur);
+				close_window();
+			}
+
+			window.onunload = function () {
+				if (!is_closed_manually) {
+					var new_cur = JSON.stringify(cur);
+					if (new_cur != parsed_args[2]) sendCallback('', '', '', new_cur);
+				}
+			}
+
+			window.document.body.focus();
+			document.getElementById("btn_ok").focus();
+		</script>
+	</body>
+	</html>

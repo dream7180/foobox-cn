@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+	<html>
+	<head>
+	<meta http-equiv="x-ua-compatible" content="IE=8"/>
+	 <link rel="stylesheet" type="text/css" href="styles10.css">
+	<style type="text/css">
+	html, body {padding:0; margin:0;}
+	.container {font:caption; padding:0.63em 1.57em; word-wrap:break-word; white-space:pre-wrap;}
+	#div_text {padding-top:1.25em; padding-bottom:1.25em; 
+		background:#ffffff; /* Old browsers */
+		background:-moz-linear-gradient(top,  #ffffff 0%, #f0f0f0 100%); /* FF3.6-15 */
+		background:-webkit-linear-gradient(top,  #ffffff 0%,#f0f0f0 100%); /* Chrome10-25,Safari5.1-6 */
+		background:linear-gradient(to bottom,  #ffffff 0%,#f0f0f0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f0f0f0',GradientType=0 ); /* IE6-9 */
+	}
+	#input_container {padding:0.63em 1.25em 1.57em; border-width:1px 0; overflow:visible;}
+	#input_container input {width:98%; display:block}
+	#input_container label {display:block; margin-bottom:3px; margin-top:15px;}
+	#btn_cnt {padding:0.4em 1.25em; position:absolute;bottom:0; right:0; left:0; text-align:right;}
+	</style>
+	</head>
+	<body>
+		<div id="div_text" class="container"></div>
+		<div id="input_container"></div>
+		<div id="btn_cnt"> 
+			<button id="btn_ok">OK</button>
+			<button class="button_apply" id="btn_apply">Apply</button>
+			<button id="btn_cancel">Cancel</button>
+		</div>					
+		<script>
+			function close_window() {
+				window.open('', '_self', '');
+				window.close();
+			}
+
+			var parsed_args;
+			var callback;
+			try {
+				parsed_args = window.external.dialogArguments.toArray();
+			}
+			catch(e) {
+			}
+			if (parsed_args) {
+				document.title = parsed_args[0];
+				window.div_text.innerText = parsed_args[1];
+				var labelInnerHtml = window.btn_cancel.innerHTML;
+				window.btn_cancel.innerHTML = labelInnerHtml.replace(/Cancel/g, parsed_args[2]);
+				callback = parsed_args[3];
+				
+				var input = parsed_args[4];
+				var def = parsed_args[5];
+				window.input_container.insertAdjacentHTML('beforeend', '<div><label for="in">'+input+'</label><input id="in" name="input" value="'+def+'"></input></div>');
+			}
+
+			var window_w = 558;
+			var window_h = 425;
+			window_h = 17 + window.div_text.offsetHeight + window.input_container.offsetHeight + window.btn_cnt.offsetHeight;
+			if (window_w < window_h + 50) {
+				window_w += 50;
+				window.resizeTo(window_w, window_h);
+				window_h = 17 + window.div_text.offsetHeight + window.input_container.offsetHeight + window.btn_cnt.offsetHeight;
+			}
+
+			var left = (screen.width - window_w) / 2;
+			var top = (screen.height - window_h) / 2;
+			window.resizeTo(window_w, window_h);
+			window.moveTo(left, top);
+			
+			window.btn_ok.onclick = function () {
+				callback && callback("ok", document.getElementsByName('input')[0].value);
+				close_window();
+			}
+
+			window.btn_apply.onclick = function () {
+				callback && callback("ok", document.getElementsByName('input')[0].value);
+			}
+
+			document.onkeydown = function () {
+				if (window.event.keyCode == 13 && window.btn_ok.onclick) {
+					window.btn_ok.onclick();
+				}
+			};
+			window.btn_cancel.onclick = function () {
+				callback && callback("cancel", false);
+				close_window();
+			}
+
+			window.document.body.focus();
+			window.btn_ok.focus();
+		</script>
+	</body>
+	</html>
