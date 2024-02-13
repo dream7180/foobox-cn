@@ -10,14 +10,15 @@ var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var config_dir = fb.ProfilePath + "foobox\\config\\";
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
-var track_edit_app = window.GetProperty("foobox.track.editor", "");
+var track_edit_app = "";
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", true);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
+var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.20";
+var g_script_version = "7.21";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -528,6 +529,8 @@ function on_init() {
 	get_playlist_layout_id();
 	layout.playlistName = plman.GetPlaylistName(plman.ActivePlaylist);
 	get_layout(layout.playlistName);
+	
+	get_misccfg();
 
 	if (!layout.showgroupheaders) {
 		cGroup.collapsed_height = 0;
@@ -2071,6 +2074,7 @@ function get_colors() {
 function get_images_color() {
 	var color_ico_bg = blendColors(g_color_normal_bg, g_color_normal_txt, 0.065);
 	var color_ico = blendColors(g_color_normal_bg, g_color_normal_txt, 0.13);
+	let mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0);
 
 	images.nocover = gdi.CreateImage(300, 300);
 	gb = images.nocover.GetGraphics();
@@ -2123,19 +2127,12 @@ function get_images_color() {
 	
 	var imgw = Math.floor(16*zdpi);
 	imgh = Math.floor(18*zdpi);
-	var _x15 = 15*zdpi, _x12 = 12*zdpi;
-	var points_arr = Array(g_z2,g_z2,g_z2,_x15,g_z7,11*zdpi,_x12,_x15,_x12,g_z2);
-	var points_arr_2 = Array(g_z2,g_z2+imgh,g_z2,_x15+imgh,g_z7,11*zdpi+imgh,_x12,_x15+imgh,_x12,g_z2+imgh);
-	var points_arr_3 = Array(g_z2,g_z2+imgh*2,g_z2,_x15+imgh*2,g_z7,11*zdpi+imgh*2,_x12,_x15+imgh*2,_x12,g_z2+imgh*2);
-	var points_arr_4 = Array(g_z2,g_z2+imgh*3,g_z2,_x15+imgh*3,g_z7,11*zdpi+imgh*3,_x12,_x15+imgh*3,_x12,g_z2+imgh*3);
-	images.mood_ico = gdi.CreateImage(imgw, imgh*4);
+	images.mood_ico = gdi.CreateImage(imgw, imgh*2);
 	gb = images.mood_ico.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_star_h, 2, points_arr);
-	gb.DrawPolygon(g_color_star, 2, points_arr_2);
-	gb.DrawPolygon(g_color_star, 2, points_arr_3);
-	gb.DrawPolygon(g_color_playing_txt, 2, points_arr_4);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("♥", mood_font, g_color_star, 0, 0, imgw, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, g_color_star_h, 0, imgh, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	images.mood_ico.ReleaseGraphics(gb);
 	
 	images.beam = draw_beam_image();
@@ -2173,7 +2170,7 @@ function get_images_color() {
 }
 
 function get_images_static() {
-	var gb;
+	var gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0), color_playing_alpha = g_color_playing_txt & 0x2dffffff;
 	var imgh = Math.floor(14*zdpi);
 	images.playing_ico = gdi.CreateImage(Math.floor(16*zdpi), imgh*2);
 	gb = images.playing_ico.GetGraphics();
@@ -2192,6 +2189,23 @@ function get_images_static() {
 	gb.FillPolygon(g_color_playing_txt, 0, star_arr);
 	gb.SetSmoothingMode(0);
 	images.star_h_playing.ReleaseGraphics(gb);
+	
+	images.star_playing = gdi.CreateImage(imgh, imgh);
+	gb = images.star_playing.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillPolygon(color_playing_alpha, 0, star_arr);
+	gb.SetSmoothingMode(0);
+	images.star_playing.ReleaseGraphics(gb);
+	
+	let imgw = Math.floor(16*zdpi);
+	imgh = Math.floor(18*zdpi);
+	images.mood_ico_playing = gdi.CreateImage(imgw, imgh*2);
+	gb = images.mood_ico_playing.GetGraphics();
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("♥", mood_font, color_playing_alpha, 0, 0, imgw, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, g_color_playing_txt, 0, imgh, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
+	images.mood_ico_playing.ReleaseGraphics(gb);
 }
 
 function draw_beam_image() {
@@ -2653,6 +2667,26 @@ function get_playlist_layout_id(){
 	//for (var i = 0; i < layout.ids.length; i++){
 	//	layout.config.push(null);
 	//}
+}
+
+function get_misccfg(){
+	var misccfg = "";
+	try{
+		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
+	}catch(e){}
+	if(!misccfg){
+		radiom3u = "https://jsdelivr.b-cdn.net/gh/fanmingming/live@main/radio/m3u/index.m3u;https://jsdelivr.b-cdn.net/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+		save_misccfg();
+	}else{
+		misccfg = misccfg.split("##");
+		track_edit_app = misccfg[0];
+		if(misccfg.length > 1) radiom3u = misccfg[1];
+	}
+	window.NotifyOthers("Radio_list", radiom3u);
+}
+
+function save_misccfg(){
+	utils.WriteTextFile(config_dir + "misc", track_edit_app + "##" + radiom3u);
 }
 
 function get_layout(plname){

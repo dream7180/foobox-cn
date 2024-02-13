@@ -523,8 +523,8 @@ function get_images() {
 	gb.DrawLine(_x10, z(5)+1, _x10, z(18), 2, c_normal);
 	gb.DrawLine(zdpi, z(8), zdpi, z(15)+1, 2, c_normal);
 	gb.DrawLine(zdpi, z(15), _x4+1, z(15), 2, c_normal);
-	gb.DrawLine(Math.floor(_x14), _x9+1, Math.floor(_x14), _x13+1, 2, c_normal);
-	gb.DrawLine(Math.floor(_x17+1), _x7+1, Math.floor(_x17+1), _x15+1, 2, c_normal);
+	gb.DrawLine(_x10+2+z(2), _x9+1, _x10+2+z(2), _x13+1, 2, c_normal);
+	gb.DrawLine(_x10+4+z(2)*2, _x7+1, _x10+4+z(2)*2, _x15+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.DrawLine(_x4, z(8)+1, _x10, z(5)+1, 2, c_normal);
 	gb.DrawLine(_x4, z(15)-1, _x10, z(18)-1, 2, c_normal);

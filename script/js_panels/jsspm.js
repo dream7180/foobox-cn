@@ -79,7 +79,7 @@ ppt = {
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	winver: null,
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true),
-	radiolist: window.GetProperty("Radio Playlist URL", "https://raw.fgit.cf/fanmingming/live/main/radio/m3u/index.m3u")
+	radiolist: []
 };
 
 var PlaylistExcludedIdx = Array();
@@ -894,6 +894,7 @@ oBrowser = function(name) {
 		var _options = window.CreatePopupMenu();
 		var PLRecManager = plman.PlaylistRecycler;
 		var _restorepl = window.CreatePopupMenu();
+		if(ppt.radiolist.length > 1) var _radiolist = window.CreatePopupMenu();
 		var idx;
 		var total_area, visible_area;
 		var bout, z;
@@ -999,7 +1000,13 @@ oBrowser = function(name) {
 		_autoplaylist.AppendMenuItem(MF_STRING, 222, "音轨评级为 2");
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
-		_newplaylist.AppendMenuItem(MF_STRING, 30, "网络电台列表");
+		if(ppt.radiolist.length > 1){
+			_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
+			for(var urlcount = 0; urlcount < ppt.radiolist.length; urlcount++){
+				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, ppt.radiolist[urlcount]);
+			}
+		} else
+			_newplaylist.AppendMenuItem(MF_STRING, 30, "网络电台列表");
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 15, "载入播放列表");
 		_menu.AppendMenuItem(MF_STRING, 16, "保存所有播放列表");
@@ -1076,9 +1083,11 @@ oBrowser = function(name) {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("网络电台", ppt.radiolist);
+			LoadRadio("网络电台", ppt.radiolist[0]);
 			break;
-			
+		case (idx >= 300 && idx < 300 + ppt.radiolist.length):
+			LoadRadio("网络电台", ppt.radiolist[idx - 300]);
+			break;
 		case (idx == 100):
 			plman.CreatePlaylist(total, "");
 			plman.MovePlaylist(total, pl_idx);
@@ -1559,7 +1568,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 }
 
 function get_images() {
-	var gb;
+	var gb, mood_font = GdiFont("Segoe UI", Math.round(g_font.Size*1.5), 0);
 	var imgw = Math.floor(27*zdpi), imgh = Math.floor(25*zdpi);
 	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x5 = 5*zdpi, _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
 			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
@@ -1653,12 +1662,11 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	images.radios_icon.ReleaseGraphics(gb);
 	
-	var point_arr = new Array(_x8,_x8,Math.round(_x18),_x8,Math.round(_x18),_x19,(_x8+Math.round(_x18))/2,_x15,_x8,_x19);
 	images.mood_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.mood_icon.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_normal_txt,1,point_arr);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("♡", mood_font, g_color_normal_txt, 0, 0, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	images.mood_icon.ReleaseGraphics(gb);
 
 	if (dark_mode) return;
@@ -1730,9 +1738,9 @@ function get_images() {
 	
 	images.mood_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.mood_icon_hl.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_playing_txt,1,point_arr);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("♡", mood_font, g_color_playing_txt, 0, 0, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	images.mood_icon_hl.ReleaseGraphics(gb);
 };
 
@@ -2196,6 +2204,9 @@ function on_notify_data(name, info) {
 	case "ScrollStep":
 		ppt.rowScrollStep = info;
 		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
+		break;
+	case "Radio_list":
+		ppt.radiolist = info.split(";");
 		break;
 	}
 };

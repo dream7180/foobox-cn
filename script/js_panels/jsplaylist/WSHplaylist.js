@@ -252,7 +252,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					};
 					columns.mood = true;
 					// column width
-					var imgh = images.mood_ico.Height/4;
+					var imgh = images.mood_ico.Height/2;
 					var imgw = images.mood_ico.Width;
 					columns.mood_w = imgw + 3;
 					// for minimum width for this column
@@ -269,8 +269,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						columns.mood_x = cx + cw - columns.mood_w + 6;
 						break;
 					};
-					var m_color = (this.mood != 0 ? _playing_idx*imgh*3 : dark_mode*imgh + imgh);
-					gr.DrawImage(images.mood_ico, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2 + 1), imgw, imgh, 0, m_color, imgw, imgh, 0, 255);
+					if (_playing_idx) {
+						gr.DrawImage(images.mood_ico_playing, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2 + 1), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
+					} else {
+						gr.DrawImage(images.mood_ico, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2 + 1), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
+					}
 					break;
 				case "等级":
 					cw = p.headerBar.columns[j].w - g_z6;
@@ -301,15 +304,18 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						columns.rating_x = cx + 3 + cw - 6 - one_star_w * total_stars_drawable;
 						break;
 					};
-					for (var i = 0; i < total_stars_drawable; i++) {
-						gr.DrawImage(images.star, columns.rating_x - 3 + i * imgh, Math.round(this.y + cTrack.height / 2 - imgh/2), imgh, imgh, 0, 0, imgh, imgh, 0, 255);
-					}
 					var active_star_num = Math.round(this.rating > total_stars_drawable ? total_stars_drawable : this.rating);
 					if (_playing_idx) {
+						for (var i = 0; i < total_stars_drawable; i++) {
+							gr.DrawImage(images.star_playing, columns.rating_x - 3 + i * imgh, Math.round(this.y + cTrack.height / 2 - imgh/2), imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+						}
 						for (var i = 0; i < active_star_num; i++) {
 							gr.DrawImage(images.star_h_playing, columns.rating_x - 3 + i * imgh, Math.round(this.y + cTrack.height / 2 - imgh/2), imgh, imgh, 0, 0, imgh, imgh, 0, 255);
 						}
 					} else {
+						for (var i = 0; i < total_stars_drawable; i++) {
+							gr.DrawImage(images.star, columns.rating_x - 3 + i * imgh, Math.round(this.y + cTrack.height / 2 - imgh/2), imgh, imgh, 0, 0, imgh, imgh, 0, 255);
+						}
 						for (var i = 0; i < active_star_num; i++) {
 							gr.DrawImage(images.star_h, columns.rating_x - 3 + i * imgh, Math.round(this.y + cTrack.height / 2 - imgh/2), imgh, imgh, 0, 0, imgh, imgh, 0, 255);
 						}

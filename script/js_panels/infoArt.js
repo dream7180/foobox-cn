@@ -123,11 +123,7 @@ function get_var() {
 	imgh = imgw;
 	mood_h = Math.floor(20*zdpi);
 	infobar_h = show_infobar ? Math.floor(80*zdpi) : 0;
-	pointArr = {
-		p1: Array(9*zdpi, zdpi, 6.4*zdpi, 5.6*zdpi, zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi),
-		p2: Array(2*zdpi,zdpi,2*zdpi,16*zdpi,8*zdpi,12*zdpi,14*zdpi,16*zdpi,14*zdpi,zdpi),
-		p3: Array(2*zdpi,zdpi+mood_h,2*zdpi,16*zdpi+mood_h,8*zdpi,12*zdpi+mood_h,14*zdpi,16*zdpi+mood_h,14*zdpi,zdpi+mood_h)
-	}
+	pointArr = Array(9*zdpi, zdpi, 6.4*zdpi, 5.6*zdpi, zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi);
 }
 
 var ww = 0, wh = 0;
@@ -152,27 +148,27 @@ function get_font() {
 }
 
 function get_imgs() {
-	var gb;
+	let gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.8), 0), mood_color = RGB(255, 0, 0);
 	img_rating_on = gdi.CreateImage(imgw, imgh);
 	gb = img_rating_on.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(c_rating_h, 0, pointArr.p1);
+	gb.FillPolygon(c_rating_h, 0, pointArr);
 	gb.SetSmoothingMode(0);
 	img_rating_on.ReleaseGraphics(gb);
 
 	img_rating_off = gdi.CreateImage(imgw, imgh);
 	gb = img_rating_off.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(icocolor, 0, pointArr.p1);
+	gb.FillPolygon(icocolor, 0, pointArr);
 	gb.SetSmoothingMode(0);
 	img_rating_off.ReleaseGraphics(gb);
 
 	mood_img = gdi.CreateImage(imgw, mood_h*2);
 	gb = mood_img.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(c_rating_h, 2, pointArr.p2);
-	gb.DrawPolygon(icocolor, 2, pointArr.p3);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("♥", mood_font,mood_color, 0, -2*zdpi, imgw, mood_h, cc_stringformat);
+	gb.DrawString("♥", mood_font, icocolor, 0, mood_h-2*zdpi, imgw, mood_h, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	mood_img.ReleaseGraphics(gb);
 }
 

@@ -18,6 +18,7 @@
 	"乡村": "Country",
 	"其他": "Other",
 	"其它": "Other",
+	"电音": "EDM",
 	"迪斯科": "Disco",
 	"民谣": "Folk",
 	"金属": "Metal",

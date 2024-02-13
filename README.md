@@ -1,7 +1,7 @@
 # foobox
 foobox 是一个 [foobar2000](https://www.foobar2000.org) 默认用户界面 (DUI) 的皮肤配置，具有简洁而美观实用的特点，善于管理曲目数量大的媒体库 ，对音乐各种封面提供丰富的支持。 
 ## 【制作和使用】
-foobox 中文版的制作基于 [foobar2000 汉化版](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)，使用以下第三方组件:  
+foobox 中文版的制作基于 foobar2000 汉化版 by [Asion](https://www.cnblogs.com/asionwu) 或[智享阁](https://www.esnpc.com/foobar2000-20-simplified-chinese-version/)，使用以下第三方组件:  
 * ttsping 的歌词组件 [ESLyric](https://github.com/ESLyric/release);  
 * 基于 [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) 的 [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378);  
 * [foo_enhanced_spectrum_analyzer](https://hydrogenaud.io/index.php/topic,116014.0.html).
