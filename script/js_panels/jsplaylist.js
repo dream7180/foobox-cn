@@ -18,7 +18,7 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.21";
+var g_script_version = "7.22";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -334,18 +334,19 @@ const load_image_from_cache = async (metadb, crc, albumIndex) =>
 
 const get_album_art_async = async (metadb, albumIndex) =>
 {
-	let result = await utils.GetAlbumArtAsyncV2(0, metadb, albumart_id, false);
-	p.list.groups[albumIndex].cover_img = g_image_cache.getit(metadb, result.image, albumIndex);
-	if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
-		if (!cover.repaint_timer) {
-			cover.repaint_timer = setInterval(() => {
-				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
-				clearInterval(cover.repaint_timer);
-				cover.repaint_timer = null;
-			}, 8);
-		};
-	};
-
+	try{
+		let result = await utils.GetAlbumArtAsyncV2(0, metadb, albumart_id, false);
+		p.list.groups[albumIndex].cover_img = g_image_cache.getit(metadb, result.image, albumIndex);
+		if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
+			if (!cover.repaint_timer) {
+				cover.repaint_timer = setInterval(() => {
+					if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
+					clearInterval(cover.repaint_timer);
+					cover.repaint_timer = null;
+				}, 8);
+			};
+		}
+	} catch(e) {}
 }
 
 image_cache = function() {
@@ -2675,7 +2676,7 @@ function get_misccfg(){
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
 	if(!misccfg){
-		radiom3u = "https://jsdelivr.b-cdn.net/gh/fanmingming/live@main/radio/m3u/index.m3u;https://jsdelivr.b-cdn.net/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+		radiom3u = "https://cdn.jsdelivr.us/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.us/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");

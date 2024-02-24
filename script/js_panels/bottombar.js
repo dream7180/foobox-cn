@@ -14,7 +14,7 @@ var track_len = 0, PlaybackTimeText, PlaybackLengthText;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn;
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
-var lib_tooltip = lib_albumlist ? "专辑列表" : "分面";
+var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var LIST = window.GetPanel('list'),
 	BRW = window.GetPanel('brw'),
 	BIO = window.GetPanel('bio'),
@@ -861,7 +861,7 @@ function on_mouse_lbtn_up(x, y) {
 	if (MuteBtn.MouseUp()) fb.VolumeMute();
 	if (LibBtn.MouseUp()) {
 		if(lib_albumlist) fb.RunMainMenuCommand("媒体库/专辑列表");
-		else fb.RunMainMenuCommand("媒体库/分面");
+		else fb.RunMainMenuCommand("媒体库/分面查看器");
 	}
 	g_switchbar.on_mouse("lbtn_up", x, y);
 	PBOBtn.MouseUp();
@@ -986,7 +986,7 @@ function on_notify_data(name, info) {
 		if(Number(fb.Version.substr(0, 1)) > 1){
 			lib_albumlist = info;
 			window.SetProperty("Library.button: Show.Albumlist", lib_albumlist);
-			lib_tooltip = lib_albumlist ? "专辑列表" : "分面";
+			lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 			window.Repaint();
 		}
 		break;
