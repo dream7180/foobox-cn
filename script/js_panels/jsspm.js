@@ -1334,7 +1334,6 @@ on_init();
 // START
 
 function on_size() {
-	window.DlgCode = DLGC_WANTALLKEYS;
 	ww = window.Width;
 	wh = window.Height;
 	if (!ww || !wh) {
@@ -2075,19 +2074,6 @@ function match(input, str) {
 		if (input.indexOf(str[j]) < 0) return false;
 	};
 	return true;
-};
-
-function check_playlist(name) {
-	var pl_name = "",
-		pl_idx = -1;
-	for (var i = 0; i < plman.PlaylistCount; i++) {
-		pl_name = plman.GetPlaylistName(i);
-		if (pl_name == name) {
-			pl_idx = i;
-			break;
-		};
-	};
-	return pl_idx;
 };
 
 function process_string(str) {

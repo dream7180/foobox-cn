@@ -7,7 +7,7 @@ var txt_format = DT_LEFT | DT_VCENTER | DT_NOPREFIX | DT_CALCRECT | DT_END_ELLIP
 txt_format_c = DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_CALCRECT | DT_END_ELLIPSIS,
 txt_format_r = DT_RIGHT | DT_VCENTER | DT_NOPREFIX | DT_CALCRECT | DT_END_ELLIPSIS;
 var title_type = window.GetProperty("List: Group type", 1);
-if (title_type<1 || title_type>5) {
+if (title_type<1 || title_type>6) {
 	title_type = 1;
 	window.SetProperty("List: Group type", 1);
 }
@@ -16,12 +16,13 @@ var cursor_max = 110;
 var show_active_pl = window.GetProperty("List: Show active playlist", false);
 var playing_ico;
 var tf_string = [];
-tf_string[0] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%");
-tf_string[1] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album%,单曲)");
-tf_string[2] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album artist%,未知艺术家)");
-tf_string[3] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%artist%,未知艺术家)");
-tf_string[4] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%genre%,未知流派)");
-tf_string[5] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^%directory%");
+tf_string[0] = "$if2(%tracknumber%,)^^%title%^^%length%";
+tf_string[1] = "$if2(%album%,单曲)";
+tf_string[2] = "$if2(%album artist%,未知艺术家)";
+tf_string[3] = "$if2(%artist%,未知艺术家)";
+tf_string[4] = "$if2(%genre%,未知流派)";
+tf_string[5] = "%directoryname%";
+tf_string[6] = "";
 var m_x = 0, m_y = 0, ww = 0, wh = 0, scroll = 0, scroll_ = 0, scroll__ = 0, scroll___ = 0, time_dl = 0;
 var time222 = (new Date()).getTime();
 var time_s = fb.CreateProfiler();
@@ -41,16 +42,40 @@ olist = function() {
 	this.list = {};
 	this.SHIFT_start_id = null;
 	this.nowplaying = null;
+	this.title = "";
 	this.get_list = function() {
 		this.activeindex = -1;
 		scroll = 0;
 		var k = 0, temp = "";
-		var total = this.list.Count, metadb;
+		var total = this.list.Count, metadb, subject_start, subject_end;
+		if (!show_active_pl){
+			if(title_type == 6){
+				var path_start = fb.GetLibraryRelativePath(this.list[0]).split("\\");
+				var path_end = fb.GetLibraryRelativePath(this.list[total - 1]).split("\\");
+				if(path_start.length == 1) {
+					if(path_start[0] != "") subject_start = "媒体库根目录";
+					else subject_start = "非媒体库目录";
+				} else {
+					subject_start = path_start[0];
+				}
+				if(path_end.length == 1) {
+					if(path_end[0] != "") subject_end = "媒体库根目录";
+					else subject_end = "非媒体库目录";
+				} else {
+					subject_end = path_end[0];
+				}
+			} else {
+				subject_start = fb.TitleFormat(tf_string[title_type]).EvalWithMetadb(this.list[0]);
+				subject_end = fb.TitleFormat(tf_string[title_type]).EvalWithMetadb(this.list[total - 1]);
+			}
+			if(subject_start.toUpperCase() != subject_end.toUpperCase()) this.title = "所有项目";
+			else this.title = subject_start;
+		} else this.title = "当前列表：" + plman.GetPlaylistName(pidx);
 		while (k < total) {
 			metadb = this.list[k];
 			this.id = k;
-			if (show_active_pl) temp = tf_string[0].EvalWithMetadb(metadb).split("^^");
-			else temp = tf_string[title_type].EvalWithMetadb(metadb).split("^^");
+			if (show_active_pl) temp = fb.TitleFormat(tf_string[0]).EvalWithMetadb(metadb).split("^^");
+			else temp = fb.TitleFormat(tf_string[0] + "^^" + tf_string[title_type]).EvalWithMetadb(metadb).split("^^");
 			this.list_dr.push({
 				metadb: metadb,
 				index: k + 1,
@@ -71,19 +96,11 @@ olist = function() {
 		this.end_ = Math.ceil((scroll_ + list_h) / row_height);
 		this.end_ = (this.list_dr.length < this.end_) ? this.list_dr.length: this.end_;
 		gcursor.vis = (this.list_dr.length * row_height > wh - row_height);
-		var _title = "";
-		var string_n = 3;
 		var len_w = gr.CalcTextWidth("00:00:00", g_font);
 		var len_w_rx = 10 + len_w + (gcursor.vis * gcursor.bar_w);
 		var _x30 = 30 * zdpi;
-		if (show_active_pl) _title = "当前列表：" + plman.GetPlaylistName(pidx);
-		else {
-			try {
-				if (this.list_dr[0].string[string_n].toUpperCase() != this.list_dr[_dr_len - 1].string[string_n].toUpperCase()) _title = "所有项目";
-				else _title = this.list_dr[this.start_].string[string_n];
-			} catch(e) {}
-		}
-		gr.GdiDrawText(_title + " (" + _dr_len + ")", g_font2, fontcolor, 20, 0, ww - btn_w - 40, margin_top - 2, txt_format);
+		
+		gr.GdiDrawText(this.title + " (" + _dr_len + ")", g_font2, fontcolor, 20, 0, ww - btn_w - 40, margin_top - 2, txt_format);
 		for (var i = this.start_; i < this.end_; i++) {
 			y_ = margin_top + row_height * i - scroll_;
 			var y2_ = i * row_height + margin_top - scroll_;
@@ -91,7 +108,8 @@ olist = function() {
 				if (i == this.focus_id) gr.FillSolidRect(0, y2_, ww, row_height, g_color_selected_bg);
 				else gr.FillSolidRect(0, y2_, ww, row_height, g_color_selected_bg & 0x85ffffff)
 			} else if (i == this.focus_id) gr.DrawRect(1, y2_, ww - 2, row_height, 2, g_color_selected_bg);
-			var tracknum = show_active_pl ? this.list_dr[i].index : this.list_dr[i].string[0];
+			var tracknum = this.list_dr[i].index;
+			if(!show_active_pl && title_type == 1) tracknum = this.list_dr[i].string[0];
 			if (fb.IsPlaying && plman.PlayingPlaylist == pidx) {
 				var _playing = plman.GetPlayingItemLocation();
 				if (i == _playing.PlaylistItemIndex) {

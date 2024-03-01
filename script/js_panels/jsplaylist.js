@@ -18,7 +18,7 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.22";
+var g_script_version = "7.23";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -36,7 +36,6 @@ var repaint_cover1 = true,
 	repaint_cover2 = false;
 var window_visible = false;
 var g_mouse_wheel_timer = false;
-var fso = new ActiveXObject("Scripting.FileSystemObject");
 //
 var setting_init = false;
 // drag'n drop from windows system
@@ -522,7 +521,10 @@ function get_metrics() {
 system_init();
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
-	if (!fso.FolderExists(fb.ProfilePath + "foobox\\config")) fso.CreateFolder(fb.ProfilePath + "foobox\\config");
+	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\config")) {
+		var fso = new ActiveXObject("Scripting.FileSystemObject");
+		fso.CreateFolder(fb.ProfilePath + "foobox\\config");
+	}
 	// clear queue and queue playlist
 	plman.FlushPlaybackQueue();
 	ClearQueuePlaylist();
@@ -2639,7 +2641,7 @@ function process_cachekey(str) {
 
 function check_cache(albumIndex) {
 	var crc = p.list.groups[albumIndex].cachekey;
-	if (fso.FileExists(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg")) {
+	if (utils.FileExists(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg")) {
 		return true;
 	}
 	return false;

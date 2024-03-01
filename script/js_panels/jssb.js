@@ -32,10 +32,10 @@ ppt = {
 	// 0 = Library, 1 = Playlist
 	locklibpl: window.GetProperty("_PROPERTY: Lock to Library playlist", true),
 	tagMode: window.GetProperty("_PROPERTY: Tag Mode", 1),
-	// 1 = album, 2 = artist, 3 = genre
+	// 1 = album, 2 = artist, 3= dir, 4 = genre
 	albumMode: window.GetProperty("_PROPERTY: Album Mode", 1), //0-with art, 1-without art
 	artistMode: window.GetProperty("_PROPERTY: Artist Mode", 0), //0-albumartist, 1-artist
-	genre_dir: window.GetProperty("_PROPERTY: Genre or Directory", 1), //0-genre, 1-dir
+	dirMode: window.GetProperty("_PROPERTY: Folder or Library directory", 0), //0-Folder, 1-Library directory
 	albumArtId: 0,
 	// 0 = front
 	panelMode: window.GetProperty("_PROPERTY: Display Mode", 1),
@@ -186,10 +186,10 @@ image_cache = function() {
 					// load img default method
 					if (!timers.coverLoad) {
 						timers.coverLoad = setInterval(() => {
-							if (ppt.albumArtId == 5) { // genre
+							if (ppt.albumArtId == 5) { // genre or dir
 								try {
 									var arr = brw.groups[albumIndex].groupkey.split(" ^^ ");
-									if(ppt.genre_dir){
+									if(ppt.tagMode == 3){
 										var dc_arr = dir_cover_name.split(";");
 										var folder_path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
 										var _path;
@@ -338,9 +338,13 @@ oSwitchbar = function() {
 		switch (event) {
 		case "move":
 			if(this.ishover){
-				if(x < z(39)) this.hover_tab = 1;
-				else if (x > z(78)) this.hover_tab = 3;
-				else this.hover_tab = 2;
+				if(x < z(78)){
+					if(x < z(39)) this.hover_tab = 1;
+					else this.hover_tab = 2;
+				} else {
+					if (x > z(117)) this.hover_tab = 4;
+					else this.hover_tab = 3;
+				}
 			}
 			else this.hover_tab = 0;
 			break;
@@ -383,7 +387,8 @@ oSwitchbar = function() {
 		var sw_img_y = Math.ceil((ppt.headerBarHeight - images.album.Height)/2);
 		gr.DrawImage(images.album, z(11), sw_img_y, images.album.Width, images.album.Height, 0, 0, images.album.Width, images.album.Height,0,255);
 		gr.DrawImage(images.artist, z(50), sw_img_y, images.artist.Width, images.artist.Height, 0, 0, images.artist.Width, images.artist.Height,0,255);
-		gr.DrawImage(images.genre, z(90) - 1, sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
+		gr.DrawImage(images.folder, z(90) - 1, sw_img_y, images.folder.Width, images.folder.Height, 0, 0, images.folder.Width, images.folder.Height,0,255);
+		gr.DrawImage(images.genre, z(130) - 1, sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
 	}
 }
 
@@ -394,8 +399,7 @@ oPlaylist = function(idx, rowId) {
 	this.y = -1;
 };
 
-oPlaylistManager = function(name) {
-	this.name = name;
+oPlaylistManager = function() {
 	this.playlists = [];
 	this.state = 0; // 0 = hidden, 1 = visible
 	// metrics
@@ -794,11 +798,12 @@ oGroup = function(index, start, handle, groupkey) {
 	this.groupkey = groupkey;
 	if (handle) {
 		this.cachekey = process_cachekey(ppt.tf_crc.EvalWithMetadb(handle));
-		if (ppt.tagMode == 3 && ppt.genre_dir == 1) {
-			this.groupkey = fb.TitleFormat("$directory(%path%,1)").EvalWithMetadb(handle);
+		if (ppt.tagMode == 3 && ppt.dirMode == 0) {
+			var pathdir = groupkey.split("\\");
+			this.groupkey = pathdir[pathdir.length - 1];
 			var _gkey = this.groupkey.toUpperCase();
-			if(this.groupkey.length < 6 && _gkey.indexOf("CD") == 0){
-				this.groupkey = fb.TitleFormat("$directory(%path%,2)").EvalWithMetadb(handle) + " | " + this.groupkey;
+			if(this.groupkey.length < 6 && _gkey.indexOf("CD") == 0 && pathdir.length > 2){
+				this.groupkey = pathdir[pathdir.length - 2] + " | " + this.groupkey;
 			}
 		}
 		this.tracktype = TrackType(handle.RawPath.substring(0, 4));
@@ -817,8 +822,7 @@ oGroup = function(index, start, handle, groupkey) {
 	};
 };
 
-oBrowser = function(name) {
-	this.name = name;
+oBrowser = function() {
 	this.groups = [];
 	this.rows = [];
 	this.scrollbar = new oScrollbar();
@@ -1073,7 +1077,7 @@ oBrowser = function(name) {
 		var previous = "";
 		var g = 0,
 			t = 0;
-		var arr = [];
+		var arr = ["?", "?"];
 		var tr = [];
 		var pl = plman.GetPlaylistItems(-1);
 		var total = this.list.Count;
@@ -1081,14 +1085,28 @@ oBrowser = function(name) {
 		var tr_all = [];
 		var pl_all = plman.GetPlaylistItems(-1);
 		var e = [];
+		var libpaths = null;
 
 		this.groups.splice(0, this.groups.length);
 
 		var str_filter = process_string(filter_text);
+		
+		if(ppt.tagMode == 3 && ppt.dirMode == 1)
+			libpaths = this.list.GetLibraryRelativePaths();
 
 		for (var i = 0; i < total; i++) {
 			handle = this.list[i];
-			arr = ppt.tf_groupkey.EvalWithMetadb(handle).split(" ## ");
+			if(ppt.tagMode == 3 && ppt.dirMode == 1){
+				var libpath = libpaths[i].split("\\");
+				if(libpath.length == 1) {
+					if(libpath[0] != "") arr[0] = "根目录";
+					else arr[0] = "非媒体库目录";
+				}
+				else arr[0] = libpath[0];
+				arr[1] = fb.TitleFormat("%title%").EvalWithMetadb(handle);
+			} else {
+				arr = ppt.tf_groupkey.EvalWithMetadb(handle).split(" ## ");
+			}
 			current = arr[0].toUpperCase();
 			if (str_filter.length > 0) {
 				var comp_str = (arr.length > 1 ? arr[0] + " " + arr[1] : arr[0]);
@@ -1326,14 +1344,18 @@ oBrowser = function(name) {
 			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至专辑艺术家");
 			break;
 			case 3:
-			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "切换至文件夹");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至流派");
+			if (ppt.dirMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "切换至媒体库一级目录");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "切换至文件夹");
+			break;
+			default:
+			this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "流派");
 			break;
 		}
 	}
 	this.init_swbtn();
 	
 	this.reset_swbtn = function(){
+		if(ppt.tagMode == 4) return;
 		this.switch_btn.Tooltip.Deactivate();
 		switch(ppt.tagMode){
 			case 1:
@@ -1356,12 +1378,12 @@ oBrowser = function(name) {
 			}
 			break;
 			case 3:
-			if (ppt.genre_dir ==0) {
+			if (ppt.dirMode ==0) {
 				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
-				this.switch_btn.Tooltip.Text = "切换至文件夹";
+				this.switch_btn.Tooltip.Text = "切换至媒体库一级目录";
 			}else{
 				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
-				this.switch_btn.Tooltip.Text = "切换至流派";
+				this.switch_btn.Tooltip.Text = "切换至文件夹";
 			}
 			break;
 		}
@@ -1381,6 +1403,7 @@ oBrowser = function(name) {
 			all_w = 0,
 			all_h = 0;
 		var coverImg = null;
+		var arr = ["?", "?"];
 
 		this.getlimits();
 
@@ -1400,7 +1423,7 @@ oBrowser = function(name) {
 					// parse stored tags
 					if (!(ppt.showAllItem && i == 0)) {// && total > 1)) {
 						if (this.groups[i].groupkey.length > 0) {
-							var arr = this.groups[i].groupkey.split(" ^^ ");
+							arr = this.groups[i].groupkey.split(" ^^ ");
 						};
 					};
 					// get cover
@@ -1642,11 +1665,23 @@ oBrowser = function(name) {
 			};
 
 			// draw top header bar 
-			var item_txt = new Array("", "张专辑", "位专辑艺术家", "位艺术家", "个流派", "个文件夹");
+			var item_txt = ["张专辑", "位专辑艺术家", "位艺术家", "个文件夹", "个目录", "个流派"];
 			var nb_groups = ((ppt.showAllItem && total > 0) ? total - 1 : total);
-			var _idx1 = (ppt.tagMode == 2 && ppt.artistMode);
-			var _idx2 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 2 : 1) : 0);
-			var boxText = nb_groups + " " +  item_txt[ppt.tagMode+_idx1+_idx2] + "  ";
+			var boxText;
+			switch (ppt.tagMode){
+			case 1:
+				boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1] + "  ";
+				break;
+			case 2:
+				boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1 + ppt.artistMode] + "  ";
+				break;
+			case 3:
+				boxText = nb_groups + " " +  item_txt[ppt.tagMode + ppt.dirMode] + "  ";
+				break;
+			default:
+				boxText = nb_groups + " " +  item_txt[ppt.tagMode + 1] + "  ";
+				break;
+			}
 			try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)}
 			catch (e) {boxText_len = 0;}
 			if (ppt.sourceMode == 0) {
@@ -1667,7 +1702,7 @@ oBrowser = function(name) {
 				gr.GdiDrawText(boxText, g_font_b, g_color_normal_txt, tx + tw, 0, tw/2, ppt.headerBarHeight, rc_txt);
 			}
 			catch (e) {};
-			this.switch_btn.draw(gr, cSwitchBtn.x, cSwitchBtn.y, 255);
+			if(ppt.tagMode < 4) this.switch_btn.draw(gr, cSwitchBtn.x, cSwitchBtn.y, 255);
 		};
 	};
 
@@ -1881,8 +1916,10 @@ oBrowser = function(name) {
 
 		_menu.AppendMenuItem(MF_STRING, 1, "设置...");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 899, "创建智能列表");
-		_menu.AppendMenuSeparator();
+		if(this.groups[albumIndex].tracktype == 0) {
+			_menu.AppendMenuItem(MF_STRING, 899, "创建智能列表");
+			_menu.AppendMenuSeparator();
+		}
 		Context.BuildMenu(_menu, 2, -1);
 		_menu.AppendMenuItem(MF_STRING, 1010, "重置所选图像的缓存");
 		_child01.AppendTo(_menu, MF_STRING, "选择添加到...");
@@ -1911,8 +1948,13 @@ oBrowser = function(name) {
 			switch (ret) {
 			case 899:
 				var pl_n = plman.PlaylistCount;
-				var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(fb.GetFocusItem());
-				plman.CreateAutoPlaylist(pl_n, string_n, ppt.tf_autopl + " IS \"" + string_n + "\"");
+				if(ppt.tagMode == 3 && ppt.dirMode == 1){
+					var string_n = fb.GetLibraryRelativePath(fb.GetFocusItem()).split("\\")[0];
+					if(string_n !== "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\"\\");
+				} else {
+					var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(fb.GetFocusItem());
+					plman.CreateAutoPlaylist(pl_n, string_n, ppt.tf_autopl + " IS \"" + string_n + "\"");
+				}
 				break;
 			case 1010:
 				reset_this_cache(albumIndex, crc);
@@ -1947,17 +1989,27 @@ oBrowser = function(name) {
 		_menu0.CheckMenuItem(52, ppt.locklibpl);
 		_menu0.AppendTo(_menu, MF_STRING, "来源");
 		_menu.AppendMenuSeparator();
-		
 		_menu1.AppendMenuItem(MF_STRING, 111, "专辑 | 专辑艺术家");
 		_menu1.AppendMenuItem(MF_STRING, 112, "专辑");
 		_menu1.AppendMenuItem(MF_STRING, 113, "专辑艺术家");
 		_menu1.AppendMenuItem(MF_STRING, 114, "艺术家");
-		_menu1.AppendMenuItem(MF_STRING, 115, "流派");
-		_menu1.AppendMenuItem(MF_STRING, 116, "文件夹");
-		var _idx1 = (ppt.tagMode == 1 && ppt.albumMode);
-		var _idx2 = (ppt.tagMode == 2 ? (ppt.artistMode ? 2 : 1)  : 0);
-		var _idx3 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 3 : 2)  : 0);
-		_menu1.CheckMenuRadioItem(111, 116, 110 + ppt.tagMode + _idx1 + _idx2 + _idx3);
+		_menu1.AppendMenuItem(MF_STRING, 115, "文件夹");
+		_menu1.AppendMenuItem(MF_STRING, 116, "媒体库一级目录");
+		_menu1.AppendMenuItem(MF_STRING, 117, "流派");
+		switch (ppt.tagMode){
+		case 1:
+			_menu1.CheckMenuRadioItem(111, 112, 110 + ppt.tagMode + ppt.albumMode);
+			break;
+		case 2:
+			_menu1.CheckMenuRadioItem(113, 114, 111 + ppt.tagMode + ppt.artistMode);
+			break;
+		case 3:
+			_menu1.CheckMenuRadioItem(115, 116, 112 + ppt.tagMode + ppt.dirMode);
+			break;
+		case 4:
+			_menu1.CheckMenuRadioItem(117, 117, 117);
+			break;
+		}
 		_menu1.AppendTo(_menu, MF_STRING, "视图");
 		_menu2.AppendMenuItem(MF_STRING, 901, "间距排列模式");
 		_menu2.AppendMenuItem(MF_STRING, 902, "网格排列无文字模式");
@@ -2014,9 +2066,17 @@ oBrowser = function(name) {
 			break;
 		case (idx >= 115 && idx <= 116):
 			ppt.tagMode = 3;
-			ppt.genre_dir = idx - 115;
+			ppt.dirMode = idx - 115;
 			window.SetProperty("_PROPERTY: Tag Mode", ppt.tagMode);
-			window.SetProperty("_PROPERTY: Genre or Directory", ppt.genre_dir);
+			window.SetProperty("_PROPERTY: Folder or Library directory", ppt.dirMode);
+			get_tagprop();
+			get_botGridHeight();
+			brw.reset_swbtn();
+			brw.populate();
+			break;
+		case (idx == 117):
+			ppt.tagMode = 4;
+			window.SetProperty("_PROPERTY: Tag Mode", ppt.tagMode);
 			get_tagprop();
 			get_botGridHeight();
 			brw.reset_swbtn();
@@ -2043,7 +2103,7 @@ oBrowser = function(name) {
 			brw.populate();
 			break;
 		case (idx == 912):
-			if (fso.FolderExists(CACHE_FOLDER)){
+			if (utils.IsDirectory(CACHE_FOLDER)){
 				try{
 					fso.DeleteFile(CACHE_FOLDER + "\\artist_album\\*");
 					fso.DeleteFile(CACHE_FOLDER + "\\album\\*");
@@ -2207,11 +2267,18 @@ var playing_title;
 
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
-	if (!fso.FolderExists(CACHE_FOLDER)) fso.CreateFolder(CACHE_FOLDER);
-	if (!fso.FolderExists(CACHE_FOLDER + "\\artist_album")) fso.CreateFolder(CACHE_FOLDER + "\\artist_album");
-	if (!fso.FolderExists(CACHE_FOLDER + "\\album")) fso.CreateFolder(CACHE_FOLDER + "\\album");
-	if (!fso.FolderExists(CACHE_FOLDER + "\\artist")) fso.CreateFolder(CACHE_FOLDER + "\\artist");
-	if (!fso.FolderExists(CACHE_FOLDER + "\\genre_dir")) fso.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+	if (!utils.IsDirectory(CACHE_FOLDER)) {
+		fso.CreateFolder(CACHE_FOLDER);
+		fso.CreateFolder(CACHE_FOLDER + "\\artist_album");
+		fso.CreateFolder(CACHE_FOLDER + "\\album");
+		fso.CreateFolder(CACHE_FOLDER + "\\artist");
+		fso.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+	} else {
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist_album")) fso.CreateFolder(CACHE_FOLDER + "\\artist_album");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\album")) fso.CreateFolder(CACHE_FOLDER + "\\album");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist")) fso.CreateFolder(CACHE_FOLDER + "\\artist");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\genre_dir")) fso.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+	}
 	get_font();
 	get_colors();
 	g_switchbar = new oSwitchbar();
@@ -2232,8 +2299,8 @@ function on_init() {
 	get_tagprop();
 	get_images();
 	get_images_loading();
-	brw = new oBrowser("brw");
-	pman = new oPlaylistManager("pman");
+	brw = new oBrowser();
+	pman = new oPlaylistManager();
 	g_filterbox = new oFilterBox();
 	g_filterbox.setSize(cFilterBox.w, cFilterBox.h);
 	g_filterbox.inputbox.visible = true;
@@ -2244,8 +2311,6 @@ on_init();
 // START
 
 function on_size() {
-	window.DlgCode = DLGC_WANTALLKEYS;
-
 	ww = window.Width;
 	wh = window.Height;
 
@@ -2325,7 +2390,7 @@ function on_mouse_lbtn_down(x, y) {
 
 	// inputBox
 	g_filterbox.on_mouse("lbtn_down", x, y);
-	brw.switch_btn.checkstate("down", x, y);
+	if(ppt.tagMode < 4) brw.switch_btn.checkstate("down", x, y);
 };
 
 function on_mouse_lbtn_up(x, y) {
@@ -2336,7 +2401,7 @@ function on_mouse_lbtn_up(x, y) {
 		pman.on_mouse("up", x, y);
 	} else {
 		brw.on_mouse("up", x, y);
-		if (brw.switch_btn.checkstate("up", x, y) == ButtonStates.hover) {
+		if (ppt.tagMode < 4 && brw.switch_btn.checkstate("up", x, y) == ButtonStates.hover) {
 			switch (ppt.tagMode){
 				case 1:
 					ppt.albumMode = !ppt.albumMode;
@@ -2348,8 +2413,8 @@ function on_mouse_lbtn_up(x, y) {
 					window.SetProperty("_PROPERTY: Artist Mode", ppt.artistMode);
 					break;
 				case 3:
-					ppt.genre_dir = !ppt.genre_dir;
-					window.SetProperty("_PROPERTY: Genre or Directory", ppt.genre_dir);
+					ppt.dirMode = !ppt.dirMode;
+					window.SetProperty("_PROPERTY: Folder or Library directory", ppt.dirMode);
 					break;
 			}
 			get_tagprop();
@@ -2439,7 +2504,7 @@ function on_mouse_move(x, y) {
 			};
 		} else {
 			brw.on_mouse("move", x, y);
-			brw.switch_btn.checkstate("move", x, y);
+			if(ppt.tagMode < 4) brw.switch_btn.checkstate("move", x, y);
 		};
 	};
 
@@ -2485,7 +2550,7 @@ function on_mouse_wheel(step) {
 
 function on_mouse_leave() {
 	g_filterbox.on_mouse("leave", 0, 0);
-	brw.switch_btn.checkstate("leave", 0, 0);
+	if(ppt.tagMode < 4) brw.switch_btn.checkstate("leave", 0, 0);
 	brw.on_mouse("leave", 0, 0);
 
 	if (pman.state == 1) {
@@ -2520,7 +2585,7 @@ function get_metrics() {
 	ppt.headerBarHeight = Math.ceil(26 * zdpi) + 2;
 	g_switchbar.x = 0;
 	g_switchbar.y = z(5);
-	g_switchbar.w = z(117);
+	g_switchbar.w = z(157);
 	g_switchbar.h = ppt.headerBarHeight;
 	cFilterBox.x = g_switchbar.x + g_switchbar.w + z(11);
 	cFilterBox.w = 120*zdpi;
@@ -2619,6 +2684,15 @@ function get_images() {
 	gb.DrawLine(Math.round(x5),2*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
 	gb.DrawLine(Math.round(x5),x5, Math.round(_x14),x5, 1, g_color_normal_txt);
 	images.genre.ReleaseGraphics(gb);
+	
+	images.folder = gdi.CreateImage(nw, nh);
+	gb = images.folder.GetGraphics();
+	gb.SetSmoothingMode(0);
+	var pointArr = Array(zdpi,zdpi, 6*zdpi,zdpi, 8*zdpi,3*zdpi, _x14,3*zdpi, _x14,_x14, zdpi,_x14);
+	gb.DrawPolygon(g_color_normal_txt, 1, pointArr);
+	gb.SetSmoothingMode(0);
+	gb.DrawLine(zdpi,z(6), _x14,z(6), 1, g_color_normal_txt);
+	images.folder.ReleaseGraphics(gb);
 }
 
 function get_images_loading() {
@@ -3095,7 +3169,7 @@ function on_notify_data(name, info) {
 	case "set_dir_name":
 		dir_cover_name = info;
 		window.SetProperty("foobox.cover.folder.name", dir_cover_name);
-		if(ppt.tagMode == 3 && ppt.genre_dir){
+		if(ppt.tagMode == 3){
 			g_image_cache = new image_cache;
 			brw.populate();
 		}
@@ -3133,7 +3207,7 @@ function path_img(path) {
 
 function check_cache(albumIndex) {
 	var crc = brw.groups[albumIndex].cachekey;
-	if (fso.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
+	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
 		return true;
 	}
 	return false;
@@ -3205,7 +3279,7 @@ function get_tagprop(){
 			ppt.tf_crc = fb.TitleFormat("$crc32('alb'%album%)");;
 		}
 		ppt.tf_autopl = "%album%";
-		window.NotifyOthers("lib_cover_type", ppt.tagMode);
+		window.NotifyOthers("lib_cover_type", ppt.tagMode);//1
 		break;
 	case 2:
 		ppt.albumArtId = 4;
@@ -3221,25 +3295,26 @@ function get_tagprop(){
 			ppt.tf_autopl = "%artist%";
 			ppt.tf_crc = fb.TitleFormat("$crc32('art'%artist%)");
 		}
-		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.artistMode);
+		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.artistMode);//2,3
 		break;
 	case 3:
 		ppt.albumArtId = 5;
 		ppt.cache_subdir = "\\genre_dir\\";
-		if(ppt.genre_dir == 0) {
-			ppt.TFsorting = "%genre% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
-			ppt.tf_groupkey = fb.TitleFormat("$if2(%genre%,未知流派) ## %title%");
-			ppt.tf_autopl = "%genre%";
-			ppt.tf_crc = fb.TitleFormat("$crc32('gen'%genre%)");
-		} else {
-			ppt.TFsorting = "$directory_path(%path%) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
-			ppt.tf_groupkey = fb.TitleFormat("$directory_path(%path%) ## %title%");
-			ppt.tf_autopl = "%directory%";
-			ppt.tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
-		}
-		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.genre_dir + 1);
+		ppt.TFsorting = "$directory_path(%path%) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
+		ppt.tf_groupkey = fb.TitleFormat("$directory_path(%path%) ## %title%");
+		ppt.tf_autopl = "$directory_path(%path%)";
+		ppt.tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
+		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.dirMode + 2);//5,6
 		break;
-
+	case 4:
+		ppt.albumArtId = 5;
+		ppt.cache_subdir = "\\genre_dir\\";
+		ppt.TFsorting = "%genre% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
+		ppt.tf_groupkey = fb.TitleFormat("$if2(%genre%,未知流派) ## %title%");
+		ppt.tf_autopl = "%genre%";
+		ppt.tf_crc = fb.TitleFormat("$crc32('gen'%genre%)");
+		window.NotifyOthers("lib_cover_type", ppt.tagMode);//4
+		break;
 	}
 }
 
@@ -3256,7 +3331,7 @@ function process_cachekey(str) {
 };
 
 function reset_this_cache(idx, crc){
-	if (fso.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
+	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
 		try {
 			fso.DeleteFile(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 		}

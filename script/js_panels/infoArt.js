@@ -2090,7 +2090,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.Init();
 }
 
-// ===================================================
+/*/ ===================================================
 var VBE;
 try {
 	VBE = new ActiveXObject("ScriptControl");
@@ -2098,7 +2098,7 @@ try {
 } catch (e) {
 	PopMessage("Can not create ActiveX object (ScriptControl), some functions are not available.\nPlease check your system authorities.", 1);
 }
-
+*/
 function PopMessage(text, type) {
 	fb.ShowPopupMessage(text, "Foobox Cover Panel", type);
 }

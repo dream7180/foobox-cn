@@ -2269,7 +2269,7 @@ oList = function(object_name, playlist) {
 		Context.BuildMenu(_menu, 3, -1);
 		
 		if(track_edit_app != ""){
-			if(fso.FileExists(track_edit_app) && (g_track_type < 2)){
+			if(utils.FileExists(track_edit_app) && (g_track_type < 2)){
 				_menu.AppendMenuSeparator();
 				var idx1 = track_edit_app.lastIndexOf(".");
 				var idx2 = track_edit_app.lastIndexOf("\\");

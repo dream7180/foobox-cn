@@ -2069,17 +2069,16 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				let shellObj = new ActiveXObject("Shell.Application");
-				let fso = new ActiveXObject("Scripting.FileSystemObject");
 				let Folder = shellObj.BrowseForFolder(window.ID, "选择编辑程序所在的文件夹", 0, 0x11);
 				if (Folder != null) {
 					let FolderItem = Folder.Items().Item().Path;
 					if(FolderItem.substr(FolderItem.length-1, 1) != "\\") FolderItem += "\\";
 					p.settings.pages[0].elements[8].inputbox.text = FolderItem;
 					p.settings.ext_app[0] = FolderItem;
-					if (fso.FileExists(FolderItem + "MusicTag.exe")) {
+					if (utils.FileExists(FolderItem + "MusicTag.exe")) {
 						p.settings.ext_app[1] = "MusicTag.exe";
 						p.settings.pages[0].elements[9].inputbox.text = "MusicTag.exe";
-					} else if(fso.FileExists(FolderItem + "Mp3tag.exe")){
+					} else if(utils.FileExists(FolderItem + "Mp3tag.exe")){
 						p.settings.ext_app[1] = "Mp3tag.exe";
 						p.settings.pages[0].elements[9].inputbox.text = "Mp3tag.exe";
 					} else if(p.settings.ext_app[1] == "MusicTag.exe" || p.settings.ext_app[1] == "Mp3tag.exe"){
