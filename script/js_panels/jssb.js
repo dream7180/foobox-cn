@@ -1916,9 +1916,11 @@ oBrowser = function() {
 
 		_menu.AppendMenuItem(MF_STRING, 1, "设置...");
 		_menu.AppendMenuSeparator();
-		if(this.groups[albumIndex].tracktype == 0) {
-			_menu.AppendMenuItem(MF_STRING, 899, "创建智能列表");
-			_menu.AppendMenuSeparator();
+		if(ppt.showAllItem && albumIndex != 0) {
+			if(this.groups[albumIndex].tracktype == 0){
+				_menu.AppendMenuItem(MF_STRING, 899, "创建智能列表");
+				_menu.AppendMenuSeparator();
+			}
 		}
 		Context.BuildMenu(_menu, 2, -1);
 		_menu.AppendMenuItem(MF_STRING, 1010, "重置所选图像的缓存");
@@ -1948,12 +1950,17 @@ oBrowser = function() {
 			switch (ret) {
 			case 899:
 				var pl_n = plman.PlaylistCount;
-				if(ppt.tagMode == 3 && ppt.dirMode == 1){
-					var string_n = fb.GetLibraryRelativePath(fb.GetFocusItem()).split("\\")[0];
-					if(string_n !== "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\"\\");
+				if(ppt.tagMode == 3){
+					if(ppt.dirMode == 1){
+						var string_n = fb.GetLibraryRelativePath(fb.GetFocusItem()).split("\\")[0];
+						if(string_n !== "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\"\\");
+					}else{
+						var string_n = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
+						plman.CreateAutoPlaylist(pl_n, this.groups[albumIndex].groupkey, "%path%" + " HAS \"" + string_n + "\"");
+					}
 				} else {
 					var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(fb.GetFocusItem());
-					plman.CreateAutoPlaylist(pl_n, string_n, ppt.tf_autopl + " IS \"" + string_n + "\"");
+					plman.CreateAutoPlaylist(pl_n, this.groups[albumIndex].groupkey, ppt.tf_autopl + " IS \"" + string_n + "\"");
 				}
 				break;
 			case 1010:
@@ -3302,7 +3309,7 @@ function get_tagprop(){
 		ppt.cache_subdir = "\\genre_dir\\";
 		ppt.TFsorting = "$directory_path(%path%) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 		ppt.tf_groupkey = fb.TitleFormat("$directory_path(%path%) ## %title%");
-		ppt.tf_autopl = "$directory_path(%path%)";
+		ppt.tf_autopl = "%directoryname%";
 		ppt.tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
 		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.dirMode + 2);//5,6
 		break;

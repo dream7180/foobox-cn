@@ -48,6 +48,10 @@ olist = function() {
 		scroll = 0;
 		var k = 0, temp = "";
 		var total = this.list.Count, metadb, subject_start, subject_end;
+		if(total == 0) {
+			repaint_main1 = repaint_main2;
+			return;
+		}
 		if (!show_active_pl){
 			if(title_type == 6){
 				var path_start = fb.GetLibraryRelativePath(this.list[0]).split("\\");
