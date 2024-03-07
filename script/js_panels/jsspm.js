@@ -2112,8 +2112,7 @@ function checkMediaLibrayPlaylist() {
 
 function check_scroll(scroll___) {
 	if (scroll___ < 0) scroll___ = 0;
-	var g1 = brw.h - (brw.totalRowsVis * ppt.rowHeight);
-	var end_limit = (brw.rowsCount * ppt.rowHeight) - (brw.totalRowsVis * ppt.rowHeight) - g1;
+	var end_limit = (brw.rowsCount * ppt.rowHeight) - brw.scrollbar.totalRowsVish;
 	if (scroll___ != 0 && scroll___ > end_limit) {
 		scroll___ = end_limit;
 	};

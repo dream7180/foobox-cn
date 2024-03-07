@@ -238,8 +238,8 @@ oScrollbar = function() {
 	this.updateScrollbar = function() {
 		var prev_cursorh = this.cursorh;
 		this.total = brw.rowsCount;
-		this.rowh = ppt.rowHeight;
-		this.totalh = this.total * this.rowh;
+		this.totalh = this.total * ppt.rowHeight;
+		this.totalRowsVish = brw.totalRowsVis * ppt.rowHeight;
 		// set scrollbar visibility
 		cScrollBar.visible = (this.totalh > brw.h);
 		// set cursor width/height
@@ -259,7 +259,7 @@ oScrollbar = function() {
 
 	this.setCursorY = function() {
 		// set cursor y pos
-		var ratio = scroll / (this.totalh - brw.h);
+		var ratio = scroll / (this.totalh - this.totalRowsVish);
 		this.cursory = this.areay + Math.round((this.areah - this.cursorh) * ratio);
 	};
 
@@ -284,7 +284,7 @@ oScrollbar = function() {
 		// calc ratio of the scroll cursor to calc the equivalent item for the full list (with gh)
 		var ratio = (this.cursory - this.areay) / (this.areah - this.cursorh);
 		// calc idx of the item (of the full list with gh) to display at top of the panel list (visible)
-		scroll = Math.round((this.totalh - brw.h) * ratio);
+		scroll = Math.round((this.totalh - this.totalRowsVish) * ratio);
 	};
 
 	this.cursorCheck = function(event, x, y) {

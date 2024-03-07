@@ -883,14 +883,13 @@ oBrowser = function() {
 		} else {
 			this.rowHeight = cover.max_w + 1;
 		};
-		this.totalRows = Math.ceil(this.h / this.rowHeight);
 		this.totalRowsVis = Math.floor(this.h / this.rowHeight);
+		this.h_half = Math.floor(this.totalRowsVis / 3) * this.rowHeight;
 		ppt.rowHeight = this.rowHeight;
 		//scaled loading img
 		var iw = ppt.rowHeight / 2;
 		images.loading_draw = images.img_loading.Resize(iw, iw, 2);
 
-		//
 		scroll = Math.round(scroll / this.rowHeight) * this.rowHeight;
 		scroll = check_scroll(scroll);
 		scroll_ = scroll;
@@ -983,8 +982,8 @@ oBrowser = function() {
 			if(ppt.sourceMode == 1) avoid_checkscroll =false;
 			if(!avoid_checkscroll){
 			var row = Math.floor(a / this.totalColumns);
-			if (this.h / 2 > this.rowHeight) {
-				var delta = Math.floor(this.h / 2);
+			if (this.h_half > this.rowHeight) {
+				var delta = this.h_half;
 			} else {
 				var delta = 0
 			};
@@ -1026,8 +1025,8 @@ oBrowser = function() {
 			var index = this.selectedIndex;
 			if (ppt.showAllItem && index == 0) index += 1;
 			var row = Math.floor(index / this.totalColumns);
-			if (this.h / 2 > this.rowHeight) {
-				var delta = Math.floor(this.h / 2);
+			if (this.h_half > this.rowHeight) {
+				var delta = this.h_half;
 			} else {
 				var delta = 0
 			};
@@ -1039,8 +1038,8 @@ oBrowser = function() {
 	this.showItemFromItemIndex = function(index, isplaying) {
 		if (ppt.showAllItem && index == 0) index += 1;
 		var row = Math.floor(index / this.totalColumns);
-		if (this.h / 2 > this.rowHeight) {
-			var delta = Math.floor(this.h / 2);
+		if (this.h_half > this.rowHeight) {
+			var delta = this.h_half;
 		} else {
 			var delta = 0
 		};
@@ -3115,9 +3114,7 @@ function process_string(str) {
 
 function check_scroll(scroll___) {
 	if (scroll___ < 0) scroll___ = 0;
-	var g1 = brw.h - (brw.totalRowsVis * ppt.rowHeight);
-
-	var end_limit = (brw.rowsCount * ppt.rowHeight) - (brw.totalRowsVis * ppt.rowHeight) - g1;
+	var end_limit = (brw.rowsCount * ppt.rowHeight) - brw.scrollbar.totalRowsVish;
 	if (scroll___ != 0 && scroll___ > end_limit) {
 		scroll___ = end_limit;
 	};

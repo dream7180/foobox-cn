@@ -18,7 +18,7 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.23";
+var g_script_version = "7.24";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
