@@ -1050,7 +1050,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		case "move":
 			if (this.ishover) {
 				InfoPane.index_pre = InfoPane.index;
-				if(this.empty_row_index != 0 || this.type != 0) {
+				InfoPane.rowindex = this.row_index;
+				if(this.empty_row_index != 0 || this.type != 0 || !p.list.ishover) {
 					InfoPane.index = -1;
 				}else {
 					InfoPane.index = this.row_index;
@@ -1822,8 +1823,13 @@ oList = function(object_name, playlist) {
 		};
 		this.setItems(false);
 		p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-
 		if (properties.smoothscrolling) set_scroll_delta();
+		
+		if(this.items[InfoPane.rowindex].empty_row_index != 0 || this.items[InfoPane.rowindex].type != 0) {
+			InfoPane.index = -1;
+		}else {
+			InfoPane.index = this.items[InfoPane.rowindex].row_index;
+		}
 		if(InfoPane.show || !p.list.drawRectSel) {
 			InfoPane.show = false;
 			full_repaint();
@@ -2393,6 +2399,7 @@ oInfoPane = function(){
 	this.show = false;
 	this.index = -1;
 	this.index_pre = -1;
+	this.rowindex = -1;
 	this.y = 0;
 	this.rowh = g_fsize*1.8;
 	this.h = 0;
