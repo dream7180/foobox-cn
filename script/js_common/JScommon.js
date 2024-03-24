@@ -193,10 +193,6 @@ function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, l
 	gr.DrawImage(img, x, y, out_radius, out_radius, 0, 0, out_radius, out_radius, angle, opacity);
 };
 
-function zoom(value, factor) {
-	return Math.ceil(value * factor);
-};
-
 function get_system_scrollbar_width() {
 	var tmp = utils.GetSystemMetrics(SM_CXVSCROLL);
 	return tmp;

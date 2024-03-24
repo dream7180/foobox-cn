@@ -33,7 +33,7 @@ searchbox = function() {
 	this.getImages = function() {
 		var gb;
 		var x2 = 2 * zdpi, x4 = 4 * zdpi, x5 = 5 * zdpi, x11 = 11 * zdpi, x12 = 12 * zdpi, 
-			x14 = Math.ceil(14 * zdpi), x17 = 17 * zdpi, x18 = Math.ceil(18 * zdpi);
+			x14 = z(14), x17 = 17 * zdpi, x18 = z(18);
 
 		this.images.resetIcon_off = gdi.CreateImage(x18, x18);
 		gb = this.images.resetIcon_off.GetGraphics();
@@ -54,7 +54,7 @@ searchbox = function() {
 
 		this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_ov);
 
-		this.images.source_switch = gdi.CreateImage(Math.ceil(20 * zdpi), x18);
+		this.images.source_switch = gdi.CreateImage(z(20), x18);
 		gb = this.images.source_switch.GetGraphics();
 		this.images.source_switch.ReleaseGraphics(gb);
 		
@@ -82,8 +82,8 @@ searchbox = function() {
 		gb = this.images.source_lib.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.DrawEllipse(0, x2, x11, x5, 1, g_color_normal_txt);
-		gb.DrawImage(img_arc, 0, 8*zdpi, x14, zoom(8,zdpi), 0, 0, x14, zoom(8,zdpi), 0, 255);
-		gb.DrawImage(img_arc, 0, x11, x14, zoom(8,zdpi), 0, 0, x14, zoom(8,zdpi), 0, 255);
+		gb.DrawImage(img_arc, 0, z(8), x14, z(8), 0, 0, x14, z(8), 0, 255);
+		gb.DrawImage(img_arc, 0, z(11), x14, z(8), 0, 0, x14, z(8), 0, 255);
 		gb.DrawLine(0, x4, 0, x11, 1, g_color_normal_txt);
 		gb.DrawLine(x11, x4, x11, x11, 1, g_color_normal_txt);
 		gb.SetSmoothingMode(0);

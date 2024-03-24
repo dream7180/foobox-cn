@@ -330,7 +330,7 @@ function get_font() {
 	g_fstyle = g_font.Style;
 	zdpi = g_fsize / 12;
 	g_font2 = GdiFont(g_fname, g_fsize, 1);
-	margin_top = Math.ceil(26 * zdpi) + 2;
+	margin_top = z(26) + 2;
 }
 
 function load_pl(timer) {
@@ -367,19 +367,19 @@ function SelectAtoB(start_id, end_id) {
 };
 
 function get_imgs() {
-	btn_w = Math.ceil(20 * zdpi);
-	btn_h = Math.ceil(18 * zdpi);
+	btn_w = z(20);
+	btn_h = z(18);
 	btn_sw_y = Math.floor((margin_top - btn_h) / 2);
 	var gb, _x2 = 2*zdpi, x2 = Math.floor(_x2), _x12 = 12*zdpi,
 		x5 = 5 * zdpi;
-	var add_h = Math.ceil(4*zdpi);
+	var add_h = z(4);
 	img_swbt = gdi.CreateImage(btn_w, btn_h*3);
 	gb = img_swbt.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(zdpi, zdpi + btn_h, z(18), z(16), _x2, _x2, fontcolor & 0x35ffffff);
 	gb.FillRoundRect(zdpi, zdpi + btn_h*2, z(18), z(16), _x2, _x2, fontcolor & 0x35ffffff);
 	img_swbt.ReleaseGraphics(gb);
-	img_plsw = gdi.CreateImage(Math.ceil(14*zdpi), add_h*3+3);
+	img_plsw = gdi.CreateImage(z(14), add_h*3+3);
 	gb = img_plsw.GetGraphics();
 	gb.SetSmoothingMode(0);
 	gb.DrawLine(Math.ceil(_x2), x2+1, Math.ceil(_x12), x2+1, 1, fontcolor);

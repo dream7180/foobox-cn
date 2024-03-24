@@ -256,7 +256,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					var imgw = images.mood_ico.Width;
 					columns.mood_w = imgw + 3;
 					// for minimum width for this column
-					p.headerBar.columns[j].minWidth = zoom(36, zdpi);
+					p.headerBar.columns[j].minWidth = z(36);
 					// column x
 					switch (p.headerBar.columns[j].align) {
 					case 0:
@@ -287,7 +287,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					// column width
 					columns.rating_w = imgh * 5;
 					// for minimum width for this column
-					p.headerBar.columns[j].minWidth = columns.rating_w + zoom(imgh/2, zdpi);
+					p.headerBar.columns[j].minWidth = columns.rating_w + z(imgh/2);
 					//
 					var one_star_w = Math.round(columns.rating_w / 5);
 					var total_stars_drawable = Math.floor((cw - 2) / one_star_w);
@@ -1048,6 +1048,19 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			};
 			break;
 		case "move":
+			if (this.ishover) {
+				InfoPane.index_pre = InfoPane.index;
+				if(this.empty_row_index != 0 || this.type != 0) {
+					InfoPane.index = -1;
+				}else {
+					InfoPane.index = this.row_index;
+					InfoPane.y = this.y;
+				}
+				if(InfoPane.show && (InfoPane.index_pre != InfoPane.index)) {
+					InfoPane.show = false;
+					full_repaint();
+				}
+			}
 			if (columns.rating && !columns.rating_drag) {
 				if (this.rating_hover) {
 					var one_star_w = Math.round(columns.rating_w / 5);
@@ -1065,10 +1078,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				else {
 					this.l_mood = 0;
 				};
-			};
-			// update tooltip text
-			if (this.tooltip && this.ishover) {
-				g_tooltip_txt = this.title;
 			};
 
 			// update on mouse move to draw rect selection zone
@@ -1815,8 +1824,10 @@ oList = function(object_name, playlist) {
 		p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 
 		if (properties.smoothscrolling) set_scroll_delta();
-
-		if (!p.list.drawRectSel) full_repaint();
+		if(InfoPane.show || !p.list.drawRectSel) {
+			InfoPane.show = false;
+			full_repaint();
+		}
 	};
 
 	this.setItems = function(forceFocus) {
@@ -2016,6 +2027,7 @@ oList = function(object_name, playlist) {
 				};
 			};
 		};
+		if(InfoPane.show && InfoPane.index > -1) InfoPane.draw(gr);
 	};
 
 	this.repaint = function() {
@@ -2376,3 +2388,70 @@ oList = function(object_name, playlist) {
 		return true;
 	};
 };
+
+oInfoPane = function(){
+	this.show = false;
+	this.index = -1;
+	this.index_pre = -1;
+	this.y = 0;
+	this.rowh = g_fsize*1.8;
+	this.h = 0;
+	this.c_border = RGBA(0, 0, 0, 120);
+	this.draw = function(gr){
+		var l=[];
+		l.push(fb.TitleFormat("%filename_ext%").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("$if2(%title%,)").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("$if2(%artist%,)").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("$if2(%album%,)").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%channels% | %bitrate% kbps | %samplerate% Hz").EvalWithMetadb(p.list.items[this.index].metadb));
+		l.push(fb.TitleFormat("%filesize_natural%").EvalWithMetadb(p.list.items[this.index].metadb));
+		var clw = gr.CalcTextWidth("所在文件夹: ", g_font);
+		var maxl = gr.CalcTextWidth(l[0], g_font);
+		for(var i = 1; i < 6; i++) {
+			var j = gr.CalcTextWidth(l[i], g_font);
+			if(j > maxl) maxl = j;
+		}
+		maxl = maxl + 3*g_z10 + clw;
+		this.h = this.rowh * 7 + g_z10 * 2;
+		var panew = Math.min(window.Width*0.8, maxl);
+		var x0 = Math.round((window.Width - panew)/2);
+		var sety = this.y + cTrack.height*0.8;
+		var upset = false;
+		if((sety + this.h) > window.Height){
+			upset = true;
+			sety = Math.round(sety - this.h - cTrack.height*0.6);
+		}
+		gr.SetSmoothingMode(2);
+		gr.DrawRoundRect(x0, sety, panew, this.h, g_z10, g_z10, 1, this.c_border);
+		gr.FillRoundRect(x0, sety, panew, this.h-0.5, g_z10, g_z10, g_color_infopanebg);
+		if(upset){
+			gr.DrawPolygon(this.c_border, 1, [x0, sety+this.h-g_z10, x0+g_z10,sety+this.h, x0,sety+this.h+g_z10/1.25]);
+			gr.FillPolygon(g_color_infopanebg, 1, [x0, sety+this.h-g_z10-1, x0+g_z10+1,sety+this.h-1,x0,sety+this.h+g_z10/1.25]);
+		}else{
+			gr.DrawPolygon(this.c_border, 1, [x0, sety+g_z10, x0+g_z10,sety, x0,sety-g_z10/1.25]);
+			gr.FillPolygon(g_color_infopanebg, 1, [x0, sety+g_z10+1, x0+g_z10+1,sety+1,x0,sety-g_z10/1.25]);
+		}
+		gr.SetSmoothingMode(0);
+		
+		x0 = x0 + g_z10;
+		var y0 = sety + g_z10;
+		var lx = x0+clw+g_z10;
+		var lw = panew-clw-g_z10*3;
+		gr.GdiDrawText("文件名: ", g_font,  p.list.lcolor_85, x0, y0, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("所在文件夹: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("大  小: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh*2, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("标  题: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh*3, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("艺术家: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh*4, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("专  辑: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh*5, clw, this.rowh, rcs_txt);
+		gr.GdiDrawText("音频信息: ", g_font,  p.list.lcolor_85, x0, y0+this.rowh*6, clw, this.rowh, rcs_txt);
+		
+		gr.GdiDrawText(l[0], g_font, g_color_normal_txt, lx, y0, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[1], g_font, g_color_normal_txt, lx, y0+this.rowh, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[6], g_font, g_color_normal_txt, lx, y0+this.rowh*2, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[2], g_font, g_color_normal_txt, lx, y0+this.rowh*3, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[3], g_font, g_color_normal_txt, lx, y0+this.rowh*4, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[4], g_font, g_color_normal_txt, lx, y0+this.rowh*5, lw, this.rowh, lcs_txt);
+		gr.GdiDrawText(l[5], g_font, g_color_normal_txt, lx, y0+this.rowh*6, lw, this.rowh, lcs_txt);
+	}
+}

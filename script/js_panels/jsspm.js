@@ -1529,7 +1529,7 @@ function get_metrics() {
 		cScrollBar.maxCursorHeight = 110*zdpi;
 	}
 	ppt.rowHeight = Math.round(ppt.defaultRowHeight * zdpi);
-	ppt.SearchBarHeight = Math.ceil(26 * zdpi) + 2;
+	ppt.SearchBarHeight = z(26) + 2;
 	ppt.headerBarHeight = ppt.SearchBarHeight + (ppt.showFilter ? ppt.rowHeight : 0);
 	cFilterBox.y = Math.round(ppt.SearchBarHeight + (ppt.rowHeight - cFilterBox.h)/2);
 	cSearchBox.h = 22 * zdpi;

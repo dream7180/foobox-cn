@@ -198,7 +198,7 @@ function settings_radioboxes_action(id, status, parentId) {
 			sys_scrollbar = false;
 			window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			cScrollBar.width = 12*zdpi;
+			cScrollBar.width = g_z12;
 			properties.cursor_max = 110*zdpi;
 			//if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
 			//else{
@@ -874,13 +874,12 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		gb.FillEllipse(12, 12, 24, 24, p.settings.color2);
 		this.checkbox_hover_on.ReleaseGraphics(gb);
 
-		var button_zoomSize = g_z16;
 		// button
 		if (this.status) {
-			this.button = new button(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button = new button(this.checkbox_normal_on.Resize(g_z16, g_z16, 2), this.checkbox_hover_on.Resize(g_z16, g_z16, 2), this.checkbox_hover_on.Resize(g_z16, g_z16, 2));
 		}
 		else {
-			this.button = new button(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button = new button(this.checkbox_normal_off.Resize(g_z16, g_z16, 2), this.checkbox_hover_off.Resize(g_z16, g_z16, 2), this.checkbox_hover_off.Resize(g_z16, g_z16, 2));
 		};
 	};
 	this.setButtons();
@@ -888,12 +887,11 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 	this.draw = function(gr) {
 		this.status = eval(this.linkedVariable);
 		if (this.status != this.prevStatus) {
-			var button_zoomSize = g_z16;
 			if (this.status) {
-				this.button.update(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
+				this.button.update(this.checkbox_normal_on.Resize(g_z16, g_z16, 2), this.checkbox_hover_on.Resize(g_z16, g_z16, 2), this.checkbox_hover_on.Resize(g_z16, g_z16, 2));
 			}
 			else {
-				this.button.update(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
+				this.button.update(this.checkbox_normal_off.Resize(g_z16, g_z16, 2), this.checkbox_hover_off.Resize(g_z16, g_z16, 2), this.checkbox_hover_off.Resize(g_z16, g_z16, 2));
 			};
 			this.prevStatus = this.status;
 		};
@@ -971,24 +969,22 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		gb.FillEllipse(12, 12, 24, 24, p.settings.color2);
 		this.radiobt_hover_on.ReleaseGraphics(gb);
 
-		var button_zoomSize = g_z16;
 		// button
 		if (this.status) {
-			this.button = new button(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button = new button(this.radiobt_normal_on.Resize(g_z16, g_z16, 2), this.radiobt_hover_on.Resize(g_z16, g_z16, 2), this.radiobt_hover_on.Resize(g_z16, g_z16, 2));
 		}
 		else {
-			this.button = new button(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button = new button(this.radiobt_normal_off.Resize(g_z16, g_z16, 2), this.radiobt_hover_off.Resize(g_z16, g_z16, 2), this.radiobt_hover_off.Resize(g_z16, g_z16, 2));
 		};
 	};
 	this.setButtons();
 
 	this.draw = function(gr) {
-		var button_zoomSize = g_z16;
 		if (this.status) {
-			this.button.update(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button.update(this.radiobt_normal_on.Resize(g_z16, g_z16, 2), this.radiobt_hover_on.Resize(g_z16, g_z16, 2), this.radiobt_hover_on.Resize(g_z16, g_z16, 2));
 		}
 		else {
-			this.button.update(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
+			this.button.update(this.radiobt_normal_off.Resize(g_z16, g_z16, 2), this.radiobt_hover_off.Resize(g_z16, g_z16, 2), this.radiobt_hover_off.Resize(g_z16, g_z16, 2));
 		};
 		this.ly = this.y - (p.settings.pages[this.parentPageId].offset * cSettings.rowHeight);
 		if (this.ly > cSettings.topBarHeight) {
@@ -1496,7 +1492,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "滚轮滚动步长（全局）", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
 			this.elements.push(new oTextBox(3, txtbox_x + 180*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
-			var spaceBetween_w = zoom(70, zdpi);
+			var spaceBetween_w = z(70);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
 
@@ -1514,9 +1510,9 @@ oPage = function(id, objectName, label, nbrows) {
 			for (var i = 0; i < fin; i++) {
 				arr.push(p.headerBar.columns[i].label);
 			};
-			var listBoxRowHeight = zoom(21, zdpi);
+			var listBoxRowHeight = z(21);
 			var listBoxRowNum = 6;
-			var listBoxWidth = zoom(120, zdpi);
+			var listBoxWidth = z(120);
 			var listBoxCurrentId = 0;
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "列", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 
@@ -1531,7 +1527,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.75), oTextBox_1, cHeaderBar.height, "排序 (输入 'null' ：不排序)", txtbox_value, "settings_textboxes_action", this.id));
 
 			// Create radio buttons
-			var spaceBetween_w = zoom(80, zdpi);
+			var spaceBetween_w = z(80);
 			this.elements.push(new oRadioButton(5, txtbox_x, cSettings.topBarHeight + rh * 15.75, "左", (p.headerBar.columns[listBoxCurrentId].align == 0), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(6, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 15.75, "居中", (p.headerBar.columns[listBoxCurrentId].align == 1), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(7, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 15.75, "右", (p.headerBar.columns[listBoxCurrentId].align == 2), "settings_radioboxes_action", this.id));
@@ -1545,9 +1541,9 @@ oPage = function(id, objectName, label, nbrows) {
 			for (var i = 0; i < fin; i++) {
 				arr.push(p.list.groupby[i].label);
 			};
-			var listBoxRowHeight = zoom(21, zdpi);
+			var listBoxRowHeight = z(21);
 			var listBoxRowNum = 6;
-			var listBoxWidth = zoom(175, zdpi);
+			var listBoxWidth = z(175);
 			var listBoxCurrentId = layout.pattern_idx;
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "分组模版", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 
@@ -1571,7 +1567,7 @@ oPage = function(id, objectName, label, nbrows) {
 			//foobox options
 			var rh = cSettings.rowHeight;
 			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(1, zoom(120, zdpi), cSettings.topBarHeight + rh * 2.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "封面信息面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "高亮色跟随封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
@@ -1579,7 +1575,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，含扩展名，以分号 ';' 来分隔 (封面在该文件夹内)", dir_cover_name, "settings_textboxes_action", this.id));			
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 12.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oRadioButton(8, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(9, zoom(120, zdpi), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(9, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "播放列表管理面板中添加网络电台的地址 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
 			break;
 		case 4:
@@ -1591,16 +1587,16 @@ oPage = function(id, objectName, label, nbrows) {
 				arr.push(layout.ids[i]);
 				if(layout.playlistName == arr[i]) layout.setting_idx = i;
 			};
-			var listBoxRowHeight = zoom(21, zdpi);
+			var listBoxRowHeight = z(21);
 			var listBoxRowNum = 6;
-			var listBoxWidth = zoom(175, zdpi);
+			var listBoxWidth = z(175);
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "播放列表布局", arr, layout.setting_idx, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 			this.elements.push(new oCheckBox(1, txtbox_x, cSettings.topBarHeight + rh * 7.75, "在分组标题中显示封面 (分组标题高度 ≥ 2，及不显示封面列时生效. 推荐值: 勾选)", "layout.config[layout.setting_idx][1] == '1' ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, txtbox_x, cSettings.topBarHeight + rh * 8.75, "自动折叠", "layout.config[layout.setting_idx][2] == '1' ? true : false", "settings_checkboxes_action", this.id));
 			/*if (layout.gopts[3] < 0 || layout.gopts[3] > 3) {
 				layout.gopts[3] = (layout.gopts[3] < 0 ? 0 : 3);
 			};*/
-			var spaceBetween_w = zoom(50, zdpi);
+			var spaceBetween_w = z(50);
 			var v = layout.config[layout.setting_idx][3];
 			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 10.75, "0", (v == "0"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 10.75, "1", (v == "1"), "settings_radioboxes_action", this.id));
@@ -1617,7 +1613,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(8, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 12.5, "1", (v == "1"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(9, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 12.5, "2", (v == "2"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 12.5, "3", (v == "3"), "settings_radioboxes_action", this.id));
-			spaceBetween_w = zoom(90, zdpi);
+			spaceBetween_w = z(90);
 			this.elements.push(new oRadioButton(11, txtbox_x, cSettings.topBarHeight + rh * 14.5, "折叠", (layout.config[layout.setting_idx][5] == "1"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(12, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 14.5, "展开", (layout.config[layout.setting_idx][5] == "0"), "settings_radioboxes_action", this.id));
 			break;
@@ -1663,7 +1659,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("浏览", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
 		case 1:
-			var listBoxWidth = zoom(120, zdpi);
+			var listBoxWidth = z(120);
 			gr.GdiDrawText("对齐方式", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 15 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			// new column button
 			var nx = 20 + listBoxWidth + g_z30;
@@ -1692,7 +1688,7 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 2:
-			var listBoxWidth = zoom(175, zdpi);
+			var listBoxWidth = z(175);
 			// new pattern button
 			var nx = 20 + listBoxWidth + g_z30;
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
@@ -1733,7 +1729,7 @@ oPage = function(id, objectName, label, nbrows) {
 			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 19.25);
 			break;
 		case 4:
-			var listBoxWidth = zoom(175, zdpi);
+			var listBoxWidth = z(175);
 			var dx = 20 + listBoxWidth + g_z30;
 			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
 			if (p.settings.pages[4].elements[0].selectedId != 0) {
@@ -2238,14 +2234,14 @@ oSettings = function() {
 	this.get_ext_app();
 
 	this.setButtons = function() {
-		var x28 = zoom(28, zdpi), x32 = zoom(32, zdpi);
+		var x28 = z(28), x32 = z(32);
 		var pic = gdi.CreateImage(500, 200);
 		gpic = pic.GetGraphics();
 		var button_zoomSize = 0,
 			button_zoomSizeW = 0,
 			button_zoomSizeH = 0,
 			rect_w = 0;
-		var lineWidth = zoom(1.5, zdpi);
+		var lineWidth = z(1.5);
 
 		rect_w = gpic.CalcTextWidth("删除", g_font_b) + g_z30;
 		this.btn_off = gdi.CreateImage(rect_w, x32);
@@ -2323,7 +2319,7 @@ oSettings = function() {
 		gb.SetSmoothingMode(0);
 		this.close_ov.ReleaseGraphics(gb);
 
-		button_zoomSize = Math.ceil(25 * zdpi);
+		button_zoomSize = z(25);
 		this.closebutton = new button(this.close_off.Resize(button_zoomSize, button_zoomSize, 2), this.close_ov.Resize(button_zoomSize, button_zoomSize, 2), this.close_ov.Resize(button_zoomSize, button_zoomSize, 2));
 		
 		this.tabButtons.splice(0, this.tabButtons.length);
@@ -2388,7 +2384,7 @@ oSettings = function() {
 	this.draw = function(gr) {
 		var padding = 10;
 		var tx = 20,
-			ty = cSettings.topBarHeight - zoom(1, zdpi),
+			ty = cSettings.topBarHeight - z(1),
 			tw = 0,
 			th = this.txtHeight + g_z10 + cHeaderBar.borderWidth,
 			tpad = 10 + cSettings.tabPaddingWidth,
@@ -2420,10 +2416,10 @@ oSettings = function() {
 			tx += tw + tpad * 2;
 		};
 		// active tab bg
-		gr.FillSolidRect(cx + zoom(1, zdpi), ty - g_z2, cw - zoom(1, zdpi), th + g_z4, g_color_normal_bg);
+		gr.FillSolidRect(cx + z(1), ty - g_z2, cw - z(1), th + g_z4, g_color_normal_bg);
 
 		// draw tab lineart
-		var lineStrength = 1;//zoom(1.0, zdpi);
+		var lineStrength = 1;
 		gr.FillSolidRect(0, ty + th, cx + lineStrength, lineStrength, this.color4);
 		gr.FillSolidRect(cx, ty - g_z3, lineStrength, th + g_z4, this.color4);
 		gr.FillSolidRect(cx, ty - g_z3, cw, lineStrength, this.color4);

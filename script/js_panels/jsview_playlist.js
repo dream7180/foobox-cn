@@ -343,7 +343,7 @@ function get_font() {
 	g_fstyle = g_font.Style;
 	zdpi = g_fsize / 12;
 	g_font2 = GdiFont(g_fname, g_fsize, 1);
-	margin_top = Math.ceil(26 * zdpi) + 2;
+	margin_top = z(26) + 2;
 }
 
 function check_pidx() {

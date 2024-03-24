@@ -2588,7 +2588,7 @@ function get_metrics() {
 	cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
 	cScrollBar.minCursorHeight = 25*zdpi;
 	cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
-	ppt.headerBarHeight = Math.ceil(26 * zdpi) + 2;
+	ppt.headerBarHeight = z(26) + 2;
 	g_switchbar.x = 0;
 	g_switchbar.y = z(5);
 	g_switchbar.w = z(157);
@@ -3340,7 +3340,7 @@ function reset_this_cache(idx, crc){
 			fso.DeleteFile(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 		}
 		catch (e) {
-			console.log("WSH Panel 错误: 图像缓存 [" + crc + "] 无法删除, 文件正在使用中,稍后重试或重载面板.");
+			console.log("错误: 图像缓存 [" + crc + "] 无法删除, 文件正在使用中,稍后重试或重载面板.");
 		};
 	};
 	brw.groups[idx].load_requested = 0;

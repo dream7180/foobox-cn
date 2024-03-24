@@ -41,7 +41,7 @@ oColumn = function() {
 	this.sortOrder = arguments[5];
 	this.percent = arguments[6];
 	this.DT_align = (this.align == 0 ? DT_LEFT : (this.align == 2 ? DT_RIGHT : DT_CENTER));
-	this.minWidth = zoom(32, zdpi);
+	this.minWidth = z(32);
 	this.drag = false;
 
 	this.isHover = function(x, y) {

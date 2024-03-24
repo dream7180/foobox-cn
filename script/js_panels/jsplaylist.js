@@ -18,9 +18,7 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.24";
-var g_middle_clicked = false;
-var g_middle_click_timer = false;
+var g_script_version = "7.25";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_focus = true;
@@ -71,7 +69,7 @@ var g_first_launch = true;
 //albumart
 var albumart_id, cache_subdir;
 
-var g_z2, g_z3, g_z4, g_z5, g_z6, g_z7, g_z8, g_z10, g_z16, g_z30;
+var g_z2, g_z3, g_z4, g_z5, g_z6, g_z7, g_z8, g_z10, g_z12, g_z16, g_z30;
 var ww = 0,
 	wh = 0;
 var mouse_x = 0,
@@ -467,7 +465,6 @@ function cover_repaint() {
 };
 
 function resize_panels() {
-
 	// list row height
 	if (layout.enableExtraLine) {
 		cRow.playlist_h = cRow.default_playlist_h + cRow.extra_line_h;
@@ -475,46 +472,44 @@ function resize_panels() {
 	else {
 		cRow.playlist_h = cRow.default_playlist_h;
 	};
-	cTrack.height = zoom(cRow.playlist_h, zdpi);
+	cTrack.height = z(cRow.playlist_h);
 	var list_h = wh - cHeaderBar.height - cHeaderBar.borderWidth;
 	// set Size of Header Bar
 	p.headerBar && p.headerBar.setSize(0, 0, ww, cHeaderBar.height);
 	p.headerBar.calculateColumns();
-
 	// set Size of List
 	p.list.setSize(0, (wh - list_h), ww, list_h);
 	if (!g_init_window) {
 		p.list.setItems(true);
 	};
-
 	// set Size of scrollbar
 	p.scrollbar.setSize(p.list.x + p.list.w - cScrollBar.width, p.list.y, cScrollBar.width, p.list.h);
 	p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-
 	// set Size of Settings
 	if (cSettings.visible) p.settings.setSize(0, 0, ww, wh);
 };
 
 function get_metrics() {
-	g_z2 = zoom(2, zdpi);
-	g_z3 = zoom(3, zdpi);
-	g_z4 = zoom(4, zdpi);
-	g_z5 = zoom(5, zdpi);
-	g_z6 = zoom(6, zdpi);
-	g_z7 = zoom(7, zdpi);
-	g_z8 = zoom(8, zdpi);
-	g_z10 = zoom(10, zdpi);
-	g_z16 = zoom(16, zdpi);
-	g_z30 = zoom(30, zdpi);
-	star_arr = new Array(1*zdpi, 5.5*zdpi, 4.05*zdpi, 8.8*zdpi, 3.5*zdpi, 13*zdpi, 7.5*zdpi, 11.15*zdpi, 11.5*zdpi, 13*zdpi, 11*zdpi, 8.8*zdpi, 14*zdpi, 5.5*zdpi, 9.65*zdpi, 4.75*zdpi, 7.5*zdpi, 1*zdpi, 5.25*zdpi, 4.75*zdpi);
+	g_z2 = z(2);
+	g_z3 = z(3);
+	g_z4 = z(4);
+	g_z5 = z(5);
+	g_z6 = z(6);
+	g_z7 = z(7);
+	g_z8 = z(8);
+	g_z10 = z(10);
+	g_z12 = z(12);
+	g_z16 = z(16);
+	g_z30 = z(30);
+	star_arr = new Array(zdpi, 5.5*zdpi, 4.05*zdpi, 8.8*zdpi, 3.5*zdpi, 13*zdpi, 7.5*zdpi, 11.15*zdpi, 11.5*zdpi, 13*zdpi, 11*zdpi, 8.8*zdpi, 14*zdpi, 5.5*zdpi, 9.65*zdpi, 4.75*zdpi, 7.5*zdpi, 1*zdpi, 5.25*zdpi, 4.75*zdpi);
 	properties.cursor_min = 25*zdpi;
 	properties.cursor_max = sys_scrollbar ? 125*zdpi : 110*zdpi;
-	cSettings.topBarHeight = zoom(50, zdpi);
-	cSettings.tabPaddingWidth = zoom(30/ 14, zdpi);
+	cSettings.topBarHeight = z(50);
+	cSettings.tabPaddingWidth = z(30/ 14);
 	cSettings.rowHeight = Math.round(cRow.settings_h * zdpi);
-	cHeaderBar.height = zoom(26, zdpi);
-	cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
-	cTrack.height = zoom(cRow.playlist_h, zdpi);
+	cHeaderBar.height = z(26);
+	cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : g_z12;
+	cTrack.height = z(cRow.playlist_h);
 }
 
 //=================================================// Init
@@ -622,8 +617,8 @@ on_init();
 
 function on_size() {
 	if (!window.Width || !window.Height) return;
-	window.MinWidth = zoom(360, zdpi);
-	window.MinHeight = zoom(200, zdpi);
+	window.MinWidth = z(360);
+	window.MinHeight = z(200);
 
 	ww = window.Width;
 	wh = window.Height;
@@ -691,14 +686,14 @@ function on_paint(gr) {
 				// if Search Playlist, draw image "No Result"
 				if (text_top.substr(0, 4) == "搜索 [") {
 					var search_text = text_top.substr(4, text_top.length - 5);
-					gr.GdiDrawText("搜索 \"" + search_text + "\" 无结果", g_font_blank,c_txtlight, 0, 0 - zoom(20, zdpi), ww, wh, cc_txt);
-					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + zoom(20, zdpi), ww, wh, cc_txt);
+					gr.GdiDrawText("搜索 \"" + search_text + "\" 无结果", g_font_blank,c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
+					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
 					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, 1, 0, 0, c_txtlight, 0.5);
 				}
 				else {
 					// if empty playlist, display text info
-					gr.GdiDrawText(text_top, g_font_blank, c_txtlight, 0, 0 - zoom(20, zdpi), ww, wh, cc_txt);
-					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + zoom(20, zdpi), ww, wh, cc_txt);
+					gr.GdiDrawText(text_top, g_font_blank, c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
+					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
 					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, 1, 0, 0, c_txtlight, 0.5);
 				};
 			};
@@ -1011,7 +1006,6 @@ function on_mouse_move(x, y) {
 			};
 		};
 		p.settings.on_mouse("move", x, y);
-
 	}
 	else {
 
@@ -1031,7 +1025,6 @@ function on_mouse_move(x, y) {
 					};
 				};
 			};
-
 		}
 		else {
 			// check list
@@ -1056,8 +1049,6 @@ function on_mouse_move(x, y) {
 };
 
 function on_mouse_wheel(delta) {
-
-	if (g_middle_clicked) return;
 		// check settings
 	if (cSettings.visible) {
 		p.settings.on_mouse("wheel", mouse_x, mouse_y, delta);
@@ -1154,32 +1145,10 @@ function on_mouse_wheel(delta) {
 	};
 };
 
-function on_mouse_mbtn_down(x, y, mask) {
-	g_middle_clicked = true;
-};
-
-function on_mouse_mbtn_dblclk(x, y, mask) {
-	on_mouse_mbtn_down(x, y, mask);
-};
-
 function on_mouse_mbtn_up(x, y, mask) {
-	if (g_middle_click_timer) {
-		window.ClearTimeout(g_middle_click_timer);
-		g_middle_click_timer = false;
-	};
-	g_middle_click_timer = window.SetTimeout(function() {
-		g_middle_clicked = false;
-		window.ClearTimeout(g_middle_click_timer);
-		g_middle_click_timer = false;
-	}, 250);
-	if (cSettings.visible) return;
-	var fin = p.list.items.length;
-	for (var i = 0; i < fin; i++) {
-		if (p.list.items[i].ishover) {
-			plman.SetPlaylistFocusItem(p.list.playlist, p.list.items[i].track_index);
-			plman.AddItemToPlaybackQueue(fb.GetFocusItem());
-		}
-	};
+	if (cSettings.visible || p.list.count == 0) return;
+	InfoPane.show = !InfoPane.show;
+	full_repaint();
 };
 
 function on_mouse_leave() {
@@ -1187,10 +1156,14 @@ function on_mouse_leave() {
 		p.scrollbar.check("leave", 0, 0);
 	};
 	p.headerBar.buttonCheck("leave_menu", 0, 0);
+	InfoPane.index = -1;
+	if(InfoPane.show) {
+		InfoPane.show = false;
+		full_repaint();
+	}
 };
 
 // Callbacks
-
 function update_playlist(iscollapsed) {
 	g_selHolder = fb.AcquireUiSelectionHolder();
 	// activate playlist selection tracking
@@ -1206,6 +1179,7 @@ function update_playlist(iscollapsed) {
 		window.SetCursor(IDC_ARROW);
 		cHeaderBar.sortRequested = false;
 	};
+	InfoPane = new oInfoPane();
 };
 
 function on_playlist_switch() {
@@ -1409,10 +1383,10 @@ function on_key_down(vkey) {
 			case VK_BACK:
 				if (cList.search_string.length > 0) {
 					cList.inc_search_noresult = false;
-					p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2)) / 2);
+					p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * z(13)) + (g_z10 * 2)) / 2);
 					p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - g_z30);
-					p.list.tt_w = ((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2));
-					p.list.tt_h = zoom(60, zdpi);
+					p.list.tt_w = ((cList.search_string.length * z(13)) + (g_z10 * 2));
+					p.list.tt_h = z(60);
 					cList.search_string = cList.search_string.substring(0, cList.search_string.length - 1);
 					full_repaint();
 					cList.clear_incsearch_timer && window.ClearTimeout(cList.clear_incsearch_timer);
@@ -1429,10 +1403,10 @@ function on_key_down(vkey) {
 			case VK_ESCAPE:
 			case 222:
 				//
-				p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2)) / 2);
+				p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * z(13)) + (g_z10 * 2)) / 2);
 				p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - g_z30);
-				p.list.tt_w = ((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2));
-				p.list.tt_h = zoom(60, zdpi);
+				p.list.tt_w = ((cList.search_string.length * z(13)) + (g_z10 * 2));
+				p.list.tt_h = z(60);
 				cList.search_string = "";
 				window.RepaintRect(0, p.list.tt_y - 2, p.list.w, p.list.tt_h + 4);
 				break;
@@ -1639,6 +1613,13 @@ function on_key_down(vkey) {
 					};
 				};
 				break;
+			/*case VK_SPACEBAR:
+				if (cSettings.visible || p.list.count == 0) return;
+				if(!cList.incsearch_timer && cList.search_string.length == 0){
+					InfoPane.show = !InfoPane.show;
+					full_repaint();
+				}
+				break;*/
 			case VK_END:
 				if (p.list.count > 0) {
 					plman.SetPlaylistFocusItem(act_pls, p.list.count - 1);
@@ -1866,10 +1847,10 @@ function on_char(code) {
 	}
 	else {
 		if (p.list.count > 0) {
-			p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2)) / 2);
+			p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * z(13)) + (g_z10 * 2)) / 2);
 			p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - g_z30);
-			p.list.tt_w = ((cList.search_string.length * zoom(13, zdpi)) + (g_z10 * 2));
-			p.list.tt_h = zoom(60, zdpi);
+			p.list.tt_w = ((cList.search_string.length * z(13)) + (g_z10 * 2));
+			p.list.tt_h = z(60);
 			if (code == 32 && cList.search_string.length == 0) return true; // SPACE Char not allowed on 1st char
 			if (cList.search_string.length <= 20 && p.list.tt_w <= p.list.w - 20) {
 				if (code > 31) {
@@ -2044,8 +2025,8 @@ function get_font() {
 	zdpi = g_fsize / 12;
 	g_font_b = GdiFont(g_fname, g_fsize, 1);
 	g_font_2 = GdiFont(g_fname, g_fsize - 1, g_fstyle);
-	g_font_queue_idx = GdiFont("tahoma", zoom(11, zdpi), 1);
-	g_font_wd3_scrollBar = GdiFont("wingdings 3", zoom(10, zdpi), 0);
+	g_font_queue_idx = GdiFont("tahoma", z(11), 1);
+	g_font_wd3_scrollBar = GdiFont("wingdings 3", z(10), 0);
 	g_font_blank = GdiFont(g_fname, g_fsize + 4, 1);
 	// group font
 	g_font_group1 = GdiFont(g_fname, g_fsize + 4, 0);
@@ -2075,6 +2056,7 @@ function get_colors() {
 };
 
 function get_images_color() {
+	g_color_infopanebg = blendColors(g_color_highlight, g_color_normal_bg, 0.8);
 	var color_ico_bg = blendColors(g_color_normal_bg, g_color_normal_txt, 0.065);
 	var color_ico = blendColors(g_color_normal_bg, g_color_normal_txt, 0.13);
 	let mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0);
@@ -2128,13 +2110,12 @@ function get_images_color() {
 	gb.SetSmoothingMode(0);
 	images.star_h.ReleaseGraphics(gb);
 	
-	var imgw = Math.floor(16*zdpi);
-	imgh = Math.floor(18*zdpi);
-	images.mood_ico = gdi.CreateImage(imgw, imgh*2);
+	imgh = z(18);
+	images.mood_ico = gdi.CreateImage(g_z16, imgh*2);
 	gb = images.mood_ico.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("♥", mood_font, g_color_star, 0, 0, imgw, imgh, cc_stringformat);
-	gb.DrawString("♥", mood_font, g_color_star_h, 0, imgh, imgw, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, g_color_star, 0, 0, g_z16, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, g_color_star_h, 0, imgh, g_z16, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	images.mood_ico.ReleaseGraphics(gb);
 	
@@ -2154,7 +2135,7 @@ function get_images_color() {
 	gb.SetSmoothingMode(0);
 	images.loading.ReleaseGraphics(gb);
 
-	images.sortdirection = gdi.CreateImage(g_z7, 5*zdpi);
+	images.sortdirection = gdi.CreateImage(g_z7, g_z5);
 	gb = images.sortdirection.GetGraphics();
 	gb.SetSmoothingMode(2);
 	var points_arr = new Array(g_z4,g_z4,zdpi,zdpi,g_z7,zdpi);
@@ -2162,30 +2143,30 @@ function get_images_color() {
 	gb.SetSmoothingMode(0);
 	images.sortdirection.ReleaseGraphics(gb);
 	
-	imgh = Math.floor(14*zdpi);
+	imgh = z(14);
 	images.selected_ico = gdi.CreateImage(imgh, imgh);
 	gb = images.selected_ico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(g_z2, g_z8, g_z7, 12*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(g_z7, 12*zdpi, 13*zdpi, g_z3, 1, g_color_normal_txt);
+	gb.DrawLine(g_z2, g_z8, g_z7, g_z12, 1, g_color_normal_txt);
+	gb.DrawLine(g_z7, g_z12, z(13), g_z3, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.selected_ico.ReleaseGraphics(gb);
 }
 
 function get_images_static() {
 	var gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0), color_playing_alpha = g_color_playing_txt & 0x2dffffff;
-	var imgh = Math.floor(14*zdpi);
-	images.playing_ico = gdi.CreateImage(Math.floor(16*zdpi), imgh*2);
+	var imgh = z(14);
+	images.playing_ico = gdi.CreateImage(g_z16, imgh*2);
 	gb = images.playing_ico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	var ponit_arr = new Array(3*zdpi,2*zdpi,3*zdpi,12*zdpi,13*zdpi,7*zdpi);
+	var ponit_arr = new Array(g_z3,g_z2,g_z3,g_z12,z(13),g_z7);
 	gb.FillPolygon(RGBA(255, 255, 255,100), 0, ponit_arr);
-	ponit_arr = new Array(3*zdpi,2*zdpi+imgh,3*zdpi,12*zdpi+imgh,13*zdpi,7*zdpi+imgh);
+	ponit_arr = new Array(g_z3,g_z2+imgh,g_z3,g_z12+imgh,z(13),g_z7+imgh);
 	gb.FillPolygon(RGBA(255, 255, 255,255), 0, ponit_arr);
 	gb.SetSmoothingMode(0);
 	images.playing_ico.ReleaseGraphics(gb);
 
-	imgh = Math.floor(15*zdpi);
+	imgh = z(15);
 	images.star_h_playing = gdi.CreateImage(imgh, imgh);
 	gb = images.star_h_playing.GetGraphics();
 	gb.SetSmoothingMode(2);
@@ -2200,13 +2181,12 @@ function get_images_static() {
 	gb.SetSmoothingMode(0);
 	images.star_playing.ReleaseGraphics(gb);
 	
-	let imgw = Math.floor(16*zdpi);
-	imgh = Math.floor(18*zdpi);
-	images.mood_ico_playing = gdi.CreateImage(imgw, imgh*2);
+	imgh = z(18);
+	images.mood_ico_playing = gdi.CreateImage(g_z16, imgh*2);
 	gb = images.mood_ico_playing.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("♥", mood_font, color_playing_alpha, 0, 0, imgw, imgh, cc_stringformat);
-	gb.DrawString("♥", mood_font, g_color_playing_txt, 0, imgh, imgw, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, color_playing_alpha, 0, 0, g_z16, imgh, cc_stringformat);
+	gb.DrawString("♥", mood_font, g_color_playing_txt, 0, imgh, g_z16, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	images.mood_ico_playing.ReleaseGraphics(gb);
 }
