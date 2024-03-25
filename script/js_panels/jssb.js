@@ -2627,8 +2627,8 @@ function get_images() {
 	// draw no cover art image
 	gb.SetSmoothingMode(2);
 	gb.FillSolidRect(0, 0, nw, nh, g_color_normal_txt & 0x10ffffff);
-	gb.DrawEllipse(30,30,nw-60,nh-60,4,g_color_normal_txt & 0x15ffffff)
-	gb.DrawEllipse(100,100,nw-200,nh-200,4,g_color_normal_txt & 0x15ffffff)
+	gb.DrawEllipse(30,30,nw-60,nh-60,4,g_color_normal_txt & 0x15ffffff);
+	gb.DrawEllipse(90,90,nw-180,nh-180,4,g_color_normal_txt & 0x15ffffff);
 	gb.SetSmoothingMode(0);
 	images.noart.ReleaseGraphics(gb);
 

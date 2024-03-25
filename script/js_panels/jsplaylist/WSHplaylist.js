@@ -1825,10 +1825,12 @@ oList = function(object_name, playlist) {
 		p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 		if (properties.smoothscrolling) set_scroll_delta();
 		
-		if(this.items[InfoPane.rowindex].empty_row_index != 0 || this.items[InfoPane.rowindex].type != 0) {
-			InfoPane.index = -1;
-		}else {
-			InfoPane.index = this.items[InfoPane.rowindex].row_index;
+		if(InfoPane.rowindex > -1){
+			if(this.items[InfoPane.rowindex].empty_row_index != 0 || this.items[InfoPane.rowindex].type != 0) {
+				InfoPane.index = -1;
+			}else {
+				InfoPane.index = this.items[InfoPane.rowindex].row_index;
+			}
 		}
 		if(InfoPane.show || !p.list.drawRectSel) {
 			InfoPane.show = false;

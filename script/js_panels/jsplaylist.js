@@ -2056,9 +2056,10 @@ function get_colors() {
 };
 
 function get_images_color() {
-	g_color_infopanebg = blendColors(g_color_highlight, g_color_normal_bg, 0.8);
+	g_color_infopanebg = blendColors(g_color_selected_bg, g_color_normal_bg, 0.5);
+	g_color_infopanebg = blendColors(g_color_infopanebg, g_color_highlight, 0.055);
 	var color_ico_bg = blendColors(g_color_normal_bg, g_color_normal_txt, 0.065);
-	var color_ico = blendColors(g_color_normal_bg, g_color_normal_txt, 0.13);
+	var color_ico = g_color_normal_txt & 0x12ffffff;
 	let mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0);
 
 	images.nocover = gdi.CreateImage(300, 300);
