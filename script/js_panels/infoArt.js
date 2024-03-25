@@ -1959,11 +1959,11 @@ function Controller(imgArray, imgDisplay, prop) {
 				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
 				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
 			}
-			else if(dark_mode && imgColor[0]<75 && imgColor[1]<75 && imgColor[2]<75){
-				var reduction = Math.round((225-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
-				imgColor[0] = Math.min(imgColor[0]+reduction, 255);
-				imgColor[1] = Math.min(imgColor[1]+reduction, 255);
-				imgColor[2] = Math.min(imgColor[2]+reduction, 255);
+			else if(dark_mode && imgColor[0]<85 && imgColor[1]<85 && imgColor[2]<85){
+				var reduction = Math.round((255-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
+				imgColor[0] = imgColor[0]+reduction;
+				imgColor[1] = imgColor[1]+reduction;
+				imgColor[2] = imgColor[2]+reduction;
 			}
 			window.NotifyOthers("color_scheme_updated", imgColor);
 			get_imgCol = false;
