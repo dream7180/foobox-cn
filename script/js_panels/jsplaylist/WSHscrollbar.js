@@ -167,6 +167,7 @@ oScrollbar = function( /*themed*/ ) {
 				};
 
 				p.list.offset = this.setOffsetFromCursorPos();
+				InfoPane.show = false;
 				if (!g_mouse_wheel_timer) {
 					g_mouse_wheel_timer = window.SetTimeout(function() {
 						p.list.setItems(false);
