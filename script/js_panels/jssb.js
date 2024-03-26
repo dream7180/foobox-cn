@@ -295,15 +295,17 @@ image_cache = function() {
 				if (cover_type == 1) {
 					if (!timers.saveCover) {
 						timers.saveCover = window.SetInterval(function() {
-							let crc = brw.groups[albumId].cachekey;
-							let s = Math.min(ppt.cache_size / image.Width, ppt.cache_size / image.Height);
-							if(s > 1){
-								image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-							} else {
-								let w = Math.floor(image.Width * s);
-								let h = Math.floor(image.Height * s);
-								image.Resize(w, h, 2).SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-							}
+							try{
+								let crc = brw.groups[albumId].cachekey;
+								let s = Math.min(ppt.cache_size / image.Width, ppt.cache_size / image.Height);
+								if(s > 1){
+									image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
+								} else {
+									let w = Math.floor(image.Width * s);
+									let h = Math.floor(image.Height * s);
+									image.Resize(w, h, 2).SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
+								}
+							}catch(e){}
 							window.ClearInterval(timers.saveCover);
 							timers.saveCover = false;
 						}, ppt.cache_size/10);
