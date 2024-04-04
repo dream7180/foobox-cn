@@ -534,7 +534,8 @@ function on_init() {
 		cGroup.collapsed_height = 0;
 		cGroup.expanded_height = 0;
 	};
-
+	
+	InfoPane = new oInfoPane();
 	p.list = new oList("p.list", plman.ActivePlaylist);
 	p.headerBar = new oHeaderBar();
 	p.headerBar.initColumns();
@@ -1147,8 +1148,20 @@ function on_mouse_wheel(delta) {
 
 function on_mouse_mbtn_up(x, y, mask) {
 	if (cSettings.visible || p.list.count == 0) return;
-	InfoPane.show = !InfoPane.show;
-	full_repaint();
+	var mask = GetKeyboardMask();
+	if (mask == KMask.shift) {
+		var fin = p.list.items.length;
+		for (var i = 0; i < fin; i++) {
+			if (p.list.items[i].ishover) {
+				plman.SetPlaylistFocusItem(p.list.playlist, p.list.items[i].track_index);
+				fb.RunContextCommandWithMetadb("添加到播放队列", fb.GetFocusItem()) 
+			}
+		};
+	} else {
+		if(InfoPane.ItemReset) p.list.check("move", InfoPane.mouse[0], InfoPane.mouse[1]);
+		InfoPane.show = !InfoPane.show;
+		full_repaint();
+	}
 };
 
 function on_mouse_leave() {
@@ -1156,7 +1169,8 @@ function on_mouse_leave() {
 		p.scrollbar.check("leave", 0, 0);
 	};
 	p.headerBar.buttonCheck("leave_menu", 0, 0);
-	InfoPane.index = -1;
+	InfoPane.metadb = null;
+	InfoPane.rowindex = -1;
 	if(InfoPane.show) {
 		InfoPane.show = false;
 		full_repaint();
@@ -1168,10 +1182,8 @@ function update_playlist(iscollapsed) {
 	g_selHolder = fb.AcquireUiSelectionHolder();
 	// activate playlist selection tracking
 	g_selHolder.SetPlaylistSelectionTracking();
-
 	g_group_id_focused = 0;
 	p.list.updateHandleList(plman.ActivePlaylist, iscollapsed);
-
 	p.list.setItems(false);
 	p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 	// if sort by header click was requested, reset mouse cursor to default
@@ -1179,7 +1191,6 @@ function update_playlist(iscollapsed) {
 		window.SetCursor(IDC_ARROW);
 		cHeaderBar.sortRequested = false;
 	};
-	InfoPane = new oInfoPane();
 };
 
 function on_playlist_switch() {
@@ -1342,7 +1353,7 @@ function on_key_up(vkey) {
 };
 
 function on_key_down(vkey) {
-
+	InfoPane.show = false;
 	var mask = GetKeyboardMask();
 
 	if (cSettings.visible) {

@@ -339,7 +339,7 @@ let properties = [
 
 	['Source All', false, 'sourceAll'],
 	['Source Bio 0-Am 1-Lfm 2-Wiki 3-Text', 1, 'sourcebio'],
-	['Source Rev 0-Am 1-Lfm 2-Wiki 3-Text', 0, 'sourcerev'],
+	['Source Rev 0-Am 1-Lfm 2-Wiki 3-Text', 3, 'sourcerev'],
 
 	['Statistics Show Last.fm Metacritic Score', true, 'score'],
 	['Statistics Show Last.fm Scrobbles & Listeners', true, 'stats'],
@@ -411,11 +411,11 @@ let properties = [
 	['Text Reader 1 Lyrics', true, 'lyricsTxtReader0'],
 	['Text Reader 2 Lyrics', true, 'lyricsTxtReader1'],
 	['Text Reader 3 Lyrics', true, 'lyricsTxtReader2'],
-	['Text Reader 4 Lyrics', false, 'lyricsTxtReader3'],
+	//['Text Reader 4 Lyrics', false, 'lyricsTxtReader3'],
 	['Text Reader 5 Lyrics', true, 'lyricsTxtReader4'],
 	['Text Reader 6 Lyrics', true, 'lyricsTxtReader5'],
 	['Text Reader 7 Lyrics', true, 'lyricsTxtReader6'],
-	['Text Reader 8 Lyrics', false, 'lyricsTxtReader7'],
+	//['Text Reader 8 Lyrics', false, 'lyricsTxtReader7'],
 	['Text Reader Lyrics/Nowplaying Drop Shadow Level', 0, 'dropShadowLevel'],
 	['Text Reader Synchronise With Lyrics Download', false, 'syncTxtReaderLyrics'],
 
@@ -443,7 +443,7 @@ properties = undefined;
 if (ppt.get('Update Properties', true)) { // ~22.7.22
 	ppt.nmTxtReader7 = '项目属性';
 	ppt.pthTxtReader7 = '%storage_folder%\\item_properties.json';
-	ppt.lyricsTxtReader7 = false;
+	//ppt.lyricsTxtReader7 = false;
 	if (ppt.summary == '128,228,0') ppt.summary = '128,228,27';
 	const oldProperties = ['Stub Path: Front [No Title Format Except %profile%]', 'Stub Path: Back [No Title Format Except %profile%]', 'Stub Path: Disc [No Title Format Except %profile%]', 'Stub Path: Icon [No Title Format Except %profile%]', 'Stub Path: Artist [No Title Format Except %profile%]'];
 	const props = ['panelFrontStub', 'panelBackStub', 'panelDiscStub', 'panelIconStub', 'panelArtStub'];
