@@ -129,7 +129,8 @@ function get_var() {
 var ww = 0, wh = 0;
 
 function get_colors() {
-	c_background = window.GetColourDUI(ColorTypeDUI.background);
+	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	c_background = c_background_default;
 	fontcolor = window.GetColourDUI(ColorTypeDUI.text);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_highlight = c_default_hl;
@@ -216,7 +217,16 @@ function initMetadb(){
 }
 
 //---------------------------------------
-
+function set_esl_color(reset) {
+	if(!eslPanels) return;
+	if(reset){
+		eslPanels.SetTextHighlightColor(c_default_hl);
+		eslPanels.SetBackgroundColor(c_background_default);
+	} else {
+		eslPanels.SetTextHighlightColor(c_highlight);
+		eslPanels.SetBackgroundColor(c_background);
+	}
+}
 
 // Some functions =======================================
 
@@ -1270,8 +1280,8 @@ function Display(x, y, w, h, prop) {
 		// Draw default cover ----------------
 		cover_default = gdi.CreateImage(w, h);
 		var g = cover_default.GetGraphics();
-		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_w.jpg");
-		else var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_default.jpg");
+		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\version6\\cover_w.jpg");
+		else var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\version6\\cover_default.jpg");
 		var ratio = Math.min(w/cover_img_default.Width, h/cover_img_default.Height);
 		var img_ww = Math.round(ratio * cover_img_default.Width), img_hh = Math.round(ratio * cover_img_default.Height);
 		g.DrawImage(cover_img_default, Math.round((w-img_ww)/2), Math.round((h-img_hh)/2), img_ww, img_hh, 0, 0, cover_img_default.Width, cover_img_default.Height);
@@ -1929,7 +1939,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			if(get_imgCol) {
 				getColorSchemeFromImage();
 				window.NotifyOthers("color_scheme_updated", null);
-				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+				set_esl_color(true);
 			}
 		}
 		SetMenuButtonCaption();
@@ -1946,26 +1956,45 @@ function Controller(imgArray, imgDisplay, prop) {
 		var imgColor = null;
 		if(!currentImage || currentImage == null){
 			window.NotifyOthers("color_scheme_updated", imgColor);
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			set_esl_color(true);
 			get_imgCol = false;
 		}else{
 			var imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
 			imgColor = toRGB(imgColorData[0].col);
 			var c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
-			if(!dark_mode && c_aggr > 732) imgColor = false;
+			var c_blend = imgColor;
+			if(!dark_mode && c_aggr > 732) {
+				imgColor = false;
+				c_blend = false;
+			}
 			else if(c_aggr > 450){
 				var reduction = Math.round((c_aggr - 450) / 3);
-				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
+				c_blend[0] = Math.max(imgColor[0]-reduction, 0);
+				c_blend[1] = Math.max(imgColor[1]-reduction, 0);
+				c_blend[2] = Math.max(imgColor[2]-reduction, 0);
+				c_blend[3] = imgColor[0];
+				c_blend[4] = imgColor[1];
+				c_blend[5] = imgColor[2];
 			}
-			else if(dark_mode && imgColor[0]<85 && imgColor[1]<85 && imgColor[2]<85){
+			else if(imgColor[0]<85 && imgColor[1]<85 && imgColor[2]<85){
 				var reduction = Math.round((255-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
-				imgColor[0] = imgColor[0]+reduction;
-				imgColor[1] = imgColor[1]+reduction;
-				imgColor[2] = imgColor[2]+reduction;
+				if(dark_mode){
+					c_blend[0] = imgColor[0]+reduction;
+					c_blend[1] = imgColor[1]+reduction;
+					c_blend[2] = imgColor[2]+reduction;
+					c_blend[3] = imgColor[0];
+					c_blend[4] = imgColor[1];
+					c_blend[5] = imgColor[2];
+				} else {
+					c_blend[0] = imgColor[0];
+					c_blend[1] = imgColor[1];
+					c_blend[2] = imgColor[2];
+					c_blend[3] = imgColor[0]+reduction;
+					c_blend[4] = imgColor[1]+reduction;
+					c_blend[5] = imgColor[2]+reduction;
+				}
 			}
-			window.NotifyOthers("color_scheme_updated", imgColor);
+			window.NotifyOthers("color_scheme_updated", c_blend);
 			get_imgCol = false;
 		}
 		on_colorscheme_update(imgColor);
@@ -1974,19 +2003,30 @@ function Controller(imgArray, imgDisplay, prop) {
 	on_colorscheme_update = function(imgColor){
 		var c_hl_tmp = c_highlight;
 		if(imgColor) c_highlight = RGB(imgColor[0], imgColor[1], imgColor[2]);
-		else c_highlight = c_default_hl;
+		else {
+			c_highlight = c_default_hl;
+			c_background = c_background_default;
+		}
 		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
-			if(imgColor && dark_mode){
-				var r = getRed(c_background) + 27;
-				var g = getGreen(c_background) + 27;
-				var b = getBlue(c_background) + 27;
-				if(Math.abs(imgColor[0]-r)<25 && Math.abs(imgColor[1]-g)<25 && Math.abs(imgColor[2]-b)<25) c_rating_h = fontcolor;
+			
+			if(imgColor){
+				if(dark_mode){
+					if(imgColor.length == 3) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.1);
+					else c_background = blendColors(c_background_default, RGB(imgColor[3], imgColor[4], imgColor[5]), 0.1);
+					var r = getRed(c_background) + 27;
+					var g = getGreen(c_background) + 27;
+					var b = getBlue(c_background) + 27;
+					if(Math.abs(imgColor[0]-r)<25 && Math.abs(imgColor[1]-g)<25 && Math.abs(imgColor[2]-b)<25) c_rating_h = fontcolor;
+				} else{
+					if(c_background_default != 4294967295) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.1);
+				}
 			}
+			fontcolor2 = blendColors(c_background, fontcolor, 0.75);
 			get_imgs();
 			if (is_mood && show_infobar) btn_mood.resetImg();
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_highlight);
-			window.RepaintRect(0, infobar_y, ww, infobar_h);
+			set_esl_color(false);
+			window.Repaint();
 		}
 	}
 	
@@ -2191,6 +2231,7 @@ var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
 // START ==============================================
 initMetadb();
+set_esl_color(true);
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
@@ -2377,6 +2418,7 @@ function on_colours_changed() {
 		get_imgs();
 	}
 	on_size();
+	set_esl_color(false);
 	window.Repaint();
 };
 
@@ -2401,7 +2443,7 @@ function on_notify_data(name, info) {
 		} else{
 			get_imgCol = false;
 			window.NotifyOthers("color_scheme_updated", null);
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			set_esl_color(true);
 			on_colorscheme_update(false);
 		}
 		break;

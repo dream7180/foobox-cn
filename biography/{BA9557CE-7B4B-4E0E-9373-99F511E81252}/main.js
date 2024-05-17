@@ -2,7 +2,6 @@
 
 if (typeof my_utils === 'undefined') include('utils.js');
 
-let isRadioStreamParser = false;
 const loadAsync = false; // window.GetProperty('Load Biography Asynchronously', true); // changed to false: issue on loading fth with many panels
 
 async function readFiles(files) {

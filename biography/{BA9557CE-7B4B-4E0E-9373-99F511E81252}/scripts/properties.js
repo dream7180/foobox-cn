@@ -87,8 +87,6 @@ class PanelProperties {
 
 let properties = [
 	['- Show Html Dialog Unsupported-0 Supported-1 Autocheck-2', 2, 'isHtmlDialogSupported'],
-	['Album History', JSON.stringify([]), 'albumHistory'],
-	['Artist History', JSON.stringify([]), 'artistHistory'],
 	['Artist View', false, 'artistView'],
 
 	['Bio & Rev Same Style', true, 'sameStyle'],
@@ -234,9 +232,9 @@ let properties = [
 	['Image Smooth Transition Level (%)', 92, 'transLevel'],
 
 	['菜单多语言 EN-0 ZH-CN-1 ZH-TW-2', 1, 'menuLanguage'],
-	['Layout', 1, 'style'],
+	['Layout', 3, 'style'],
 	['Layout Bio Mode', 0, 'bioMode'],
-	['Layout Bio', 0, 'bioStyle'],
+	['Layout Bio', 3, 'bioStyle'],
 	['Layout Image Size 0-1', 0.65, 'rel_imgs'],
 	['Layout Margin Between Image & Text', 20, 'gap'],
 	['Layout Margin Image Left', 20, 'borL'],
@@ -249,7 +247,7 @@ let properties = [
 	['Layout Margin Text Bottom', 20, 'textB'],
 	['Layout Padding Between Thumbnails', 0, 'thumbNailGap'],
 	['Layout Rev Mode', 0, 'revMode'],
-	['Layout Rev', 0, 'revStyle'],
+	['Layout Rev', 3, 'revStyle'],
 
 	['Line Padding', 0, 'textPad'],
 	['Lock Bio', false, 'lockBio'],
@@ -331,8 +329,6 @@ let properties = [
 
 	['Server Name', 'biography', 'serverName'],
 
-	['Show Album History', false, 'showAlbumHistory'],
-	['Show Artist History', false, 'showArtistHistory'],
 	['Show More Tags', true, 'showMoreTags'],
 	['Show Similar Artists', true, 'showSimilarArtists'],
 	['Show Top Albums', true, 'showTopAlbums'],

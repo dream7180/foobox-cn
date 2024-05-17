@@ -445,7 +445,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						// if row is focused, draw focused colors & style ELSE draw with normal colors
 						if (p.list.focusedTrackId == this.track_index) {
 							// frame on focused item
-							gr.DrawRect(tcolumn_x, this.y + 1, line_width, this.h - 2, 1.0, g_color_selected_bg);
+							gr.DrawRect(tcolumn_x, this.y + 1, line_width - 1, this.h - 2, 1.0, g_color_selected_bg);
 						};
 						this.text_colour = g_color_normal_txt;
 					};
@@ -522,20 +522,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								};
 								// *** check aspect ratio *** //
 							};
-
-							//if (p.headerBar.columns[0].w < cover.max_w) {
-							//	gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 1, 1, cv_w-2, cv_h-2);
-							//}
-							//else {
 							gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
-							//};
 						};
 					}
 					else {
-						if(images.loading.Width != cv_w) {
-							images.loading = images.loading.Resize(cv_w, cv_w , 2);
-						}
-						gr.DrawImage(images.loading, cv_x, cv_y, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 255);
+						var img_nocover = images.nocover.Resize(cv_w, cv_w , 2);
+						gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
 					};
 				};
 			};
@@ -617,14 +609,16 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var vpadding = g_z3;
 			var l1_y = this.y - groupDelta;
 			var lg1_right_field_w = gr.CalcTextWidth(this.r1, g_font_group1) + cList.borderWidth * 2;
+			var w_l1 = this.w - g_z8 - lg1_right_field_w;
 			switch (this.heightInRow) {
 			case 1:
-				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
+				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y - 1, w_l1, this.h, lcs_txt);
 				var l1_x1 = gr.CalcTextWidth(this.l1, g_font_group1);
 				var txt_l2 = "";
 				if(this.l2 != "" && !(layout.pattern_idx == 0 && this.l1 == "单曲" && this.obj.count > 1)) {
 					txt_l2 = " | " + this.l2;
-					gr.GdiDrawText(txt_l2, g_font_group2, this.l2_color, line_x + l1_x1, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
+					var w_l2 = w_l1 - Math.min(l1_x1, w_l1);
+					if(w_l2 > g_z30) gr.GdiDrawText(txt_l2, g_font_group2, this.l2_color, line_x + l1_x1, l1_y - 1, w_l2, this.h, lcs_txt);
 				}
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y - 1, this.w - g_z7, this.h, rcs_txt);
 				l1_x1 = line_x + l1_x1 + gr.CalcTextWidth(txt_l2, g_font_group2) + g_z7;
@@ -727,21 +721,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									};
 									// *** check aspect ratio *** //
 								};
-
-								//if (this.obj.collapsed) {
-								//	gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 0, 0, cv_w, cv_h);
-								//}
-								//else {
 								gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
-								//};
-								//gr.DrawRect(cv_x, cv_y, cv_w, cv_h, 1.0, RGBA(255, 255, 255, 50));
 							};
 						}
 						else {
-							if(images.loading.Width != cv_w) {
-								images.loading = images.loading.Resize(cv_w, cv_w, 2);
-							}
-							gr.DrawImage(images.loading, cv_x, cv_y, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 255);
+							var img_nocover = images.nocover.Resize(cv_w, cv_w , 2);
+							gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
 						};
 					};
 				};
@@ -1932,12 +1917,6 @@ oList = function(object_name, playlist) {
 		};
 	};
 
-	this.getOffsetFromCursorPos = function() {
-		var r = (this.cursorPos / this.h);
-		this.offset = Math.round(r * this.totalRows);
-		if (this.offset < 0) this.offset = 0;
-	};
-
 	this.isFocusedItemVisible = function() {
 		if (this.totalRows <= this.totalRowVisible) {
 			return true;
@@ -2417,7 +2396,7 @@ oInfoPane = function(){
 		}
 		maxl = maxl + 3*g_z10 + clw;
 		this.h = this.rowh * 7 + g_z10 * 2;
-		var panew = Math.min(window.Width*0.8, maxl);
+		var panew = Math.min(window.Width*0.85, maxl);
 		var x0 = Math.round((window.Width - panew)/2);
 		var sety = this.y + cTrack.height*0.8;
 		var upset = false;
@@ -2429,11 +2408,21 @@ oInfoPane = function(){
 		gr.DrawRoundRect(x0, sety, panew, this.h, g_z10, g_z10, 1, this.c_border);
 		gr.FillRoundRect(x0, sety, panew, this.h-0.5, g_z10, g_z10, g_color_infopanebg);
 		if(upset){
-			gr.DrawPolygon(this.c_border, 1, [x0, sety+this.h-g_z10, x0+g_z10,sety+this.h, x0,sety+this.h+g_z10/1.25]);
-			gr.FillPolygon(g_color_infopanebg, 1, [x0, sety+this.h-g_z10-1, x0+g_z10+1,sety+this.h-1,x0,sety+this.h+g_z10/1.25]);
+			if(x0 > p.headerBar.columns[0].w){
+				gr.DrawPolygon(this.c_border, 1, [x0,sety+this.h-g_z10, x0+g_z10,sety+this.h, x0,sety+this.h+g_z10/1.25]);
+				gr.FillPolygon(g_color_infopanebg, 1, [x0,sety+this.h-g_z10-1, x0+g_z10+1,sety+this.h-1, x0,sety+this.h+g_z10/1.25]);
+			}else{
+				gr.DrawPolygon(this.c_border, 1, [x0+panew,sety+this.h-g_z10, x0-g_z10+panew,sety+this.h, x0+panew,sety+this.h+g_z10/1.25]);
+				gr.FillPolygon(g_color_infopanebg, 1, [x0+panew,sety+this.h-g_z10-1, x0-g_z10-1+panew,sety+this.h-1, x0+panew,sety+this.h+g_z10/1.25]);
+			}
 		}else{
-			gr.DrawPolygon(this.c_border, 1, [x0, sety+g_z10, x0+g_z10,sety, x0,sety-g_z10/1.25]);
-			gr.FillPolygon(g_color_infopanebg, 1, [x0, sety+g_z10+1, x0+g_z10+1,sety+1,x0,sety-g_z10/1.25]);
+			if(x0 > p.headerBar.columns[0].w){
+				gr.DrawPolygon(this.c_border, 1, [x0, sety+g_z10, x0+g_z10,sety, x0,sety-g_z10/1.25]);
+				gr.FillPolygon(g_color_infopanebg, 1, [x0, sety+g_z10+1, x0+g_z10+1, sety+1,x0,sety-g_z10/1.25]);
+			}else{
+				gr.DrawPolygon(this.c_border, 1, [x0+panew, sety+g_z10, x0-g_z10+panew,sety, x0+panew,sety-g_z10/1.25]);
+				gr.FillPolygon(g_color_infopanebg, 1, [x0+panew, sety+g_z10+1, x0-g_z10-1+panew,sety+1, x0+panew,sety-g_z10/1.25]);
+			}
 		}
 		gr.SetSmoothingMode(0);
 		

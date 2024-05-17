@@ -1,12 +1,9 @@
 ﻿// *****************************************************************************************************************************************
 // Common functions & flags by Br3tt aka Falstaff (c)2013-2015
 // *****************************************************************************************************************************************
-
 //=================================================// General declarations
 SM_CXVSCROLL = 2;
 SM_CYHSCROLL = 3;
-
-DLGC_WANTALLKEYS = 0x0004; /* Control wants all keys */
 // Used in window.SetCursor()
 // {{
 IDC_ARROW = 32512;
@@ -85,12 +82,12 @@ function replaceAll(str, search, repl) {
 
 //=================================================// Button object
 ButtonStates = {normal: 0, hover: 1, down: 2};
-button = function (normal, hover, down ,tooltipText) {
+button = function (normal, hover, down, tooltipText) {
 	this.img = Array(normal, hover, down);
 	this.w = this.img[0].Width;
 	this.h = this.img[0].Height;
 	if(tooltipText){
-		this.Tooltip = window.CreateTooltip("",g_fsize);
+		this.Tooltip = window.CreateTooltip("", g_fsize);
 		this.Tooltip.Text = tooltipText;
 	}
 	this.state = ButtonStates.normal;

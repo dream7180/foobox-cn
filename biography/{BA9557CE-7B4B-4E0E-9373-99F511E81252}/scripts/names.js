@@ -36,8 +36,7 @@ class Names {
 
 	albumArtist(focus, ignoreLock) {
 		let albumArtist = $.eval('[$trim(' + cfg.tf.albumArtist + ')]', focus, ignoreLock);
-		const radioTrackArtist = !isRadioStreamParser || !panel.isRadio(focus) ? '' : radioStreamParser.getStreamInfo(focus, ignoreLock).artist;
-		return radioTrackArtist || albumArtist;
+		return albumArtist;
 	}
 
 	albumClean(n) {
@@ -50,8 +49,7 @@ class Names {
 
 	artist(focus, ignoreLock) {
 		let artist = $.eval('[$trim(' + cfg.tf.artist + ')]', focus, ignoreLock);
-		const radioTrackArtist = !isRadioStreamParser || !panel.isRadio(focus) ? '' : radioStreamParser.getStreamInfo(focus, ignoreLock).artist;
-		return radioTrackArtist || artist;
+		return artist;
 	}
 
 	composition(focus, ignoreLock) {
@@ -70,8 +68,7 @@ class Names {
 
 	title(focus, ignoreLock) {
 		let title = $.eval('[$trim(' + cfg.tf.title + ')]', focus, ignoreLock);
-		const radioTrackTitle = !isRadioStreamParser || !panel.isRadio(focus) ? '' : radioStreamParser.getStreamInfo(focus, ignoreLock).title;
-		return radioTrackTitle || title;
+		return title;
 	}
 
 	trackID(focus) {

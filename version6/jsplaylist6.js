@@ -18,7 +18,7 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var radiom3u = "";
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.26";
+var g_script_version = "6.26 (Remastered)";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -1937,14 +1937,32 @@ function on_notify_data(name, info) {
 	case "color_scheme_updated":
 		var c_ol_tmp = g_color_highlight;
 		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
-		else g_color_highlight = c_default_hl;
+		else {
+			g_color_highlight = c_default_hl;
+			g_color_normal_bg = g_color_normal_bg_default;
+			g_color_selected_bg = g_color_selected_bg_default;
+		}
 		g_color_star_h = g_color_highlight;
 		if(g_color_highlight != c_ol_tmp){
-			if(info && dark_mode){
-				var r = getRed(g_color_normal_bg) + 27;
-				var g = getGreen(g_color_normal_bg) + 27;
-				var b = getBlue(g_color_normal_bg) + 27;
-				if(Math.abs(info[0]-r)<25 && Math.abs(info[0]-g)<25 && Math.abs(info[0]-b)<25) g_color_star_h = g_color_normal_txt;
+			if(info){
+				if(dark_mode){
+					var r = getRed(g_color_normal_bg) + 27;
+					var g = getGreen(g_color_normal_bg) + 27;
+					var b = getBlue(g_color_normal_bg) + 27;
+					if(Math.abs(info[0]-r)<25 && Math.abs(info[0]-g)<25 && Math.abs(info[0]-b)<25) g_color_star_h = g_color_normal_txt;
+					if(info.length == 3) {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
+					} else {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[3], info[4], info[5]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[3], info[4], info[5]), 0.2);
+					}
+				} else {
+					if(g_color_normal_bg_default != 4294967295) {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
+					}
+				}
 			}
 			get_images_color();
 			if(p.list){
@@ -1960,6 +1978,9 @@ function on_notify_data(name, info) {
 			layout.ids[pl_index] = info[1];
 			save_config("ids");
 		}
+		break;
+	case "foobox_setting":
+		show_setting(3);
 		break;
 	};
 };
@@ -2000,11 +2021,13 @@ function get_font() {
 };
 
 function get_colors() {
-	g_color_normal_bg = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
 	g_color_selected_txt = g_color_normal_txt;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg = g_color_selected_bg_default;
 	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;

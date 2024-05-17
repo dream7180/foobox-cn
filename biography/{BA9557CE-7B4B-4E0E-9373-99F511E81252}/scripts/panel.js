@@ -26,14 +26,12 @@ class Panel {
 			init: [],
 			ix: 0,
 			list: [],
-			history: $.jsonParse(ppt.albumHistory, []),
 			uniq: []
 		}
 
 		this.art = {
 			cur: '',
 			fields: cfg.artFields.map(v => '%' + v + '%'),
-			history: $.jsonParse(ppt.artistHistory, []),
 			init: [],
 			ix: 0,
 			list: [],
@@ -662,8 +660,8 @@ class Panel {
 		const composition = isAlbum ? false : ppt.classicalMusicMode && (txt.rev.loaded.am && !txt.rev.amFallback || txt.rev.loaded.wiki && !txt.rev.wikiFallback);
 		const album = !composition ? name.album(this.id.focus, true) || lg['Album Unknown'] : name.composition(this.id.focus, true) || lg['Composition Unknown'];
 		if (this.lock) {
-			this.logArtistHistory(artist);
-			this.logAlbumHistory(albumArtist, album, composition);
+			//this.logArtistHistory(artist);
+			//this.logAlbumHistory(albumArtist, album, composition);
 			return;
 		}
 
@@ -778,25 +776,14 @@ class Panel {
 		}
 
 		if (!artist || !this.art.cur || artist != this.art.cur) {
-			this.logArtistHistory(artist);
+			//this.logArtistHistory(artist);
 			this.art.cur = artist;
 		}
 
 		if (!(albumArtist + album) || !this.alb.cur || albumArtist + album != this.alb.cur) {
-			this.logAlbumHistory(albumArtist, album, composition);
+			//this.logAlbumHistory(albumArtist, album, composition);
 			this.style.inclTrackRev = ppt.inclTrackRev;
 			this.alb.cur = albumArtist + album;
-		}
-
-		if (this.art.history.length && ppt.showArtistHistory) {
-			this.art.list.push({
-				name: lg['Artist History:'],
-				field: '',
-				type: 'label'
-			});
-			for (let h = 0; h < this.art.history.length; h++)
-				if (h || this.art.history[0].name != artist) this.art.list.push(this.art.history[h]);
-			this.art.list[this.art.list.length - 1].type = 'historyend';
 		}
 
 		this.art.list.forEach((v, i) => v.ix = i);
@@ -845,19 +832,6 @@ class Panel {
 				composition: composition,
 				type: 'Current Album'
 			});
-		}
-
-		if (this.alb.history.length && ppt.showAlbumHistory) {
-			this.alb.list.push({
-				artist: '',
-				album: lg['Album History:'],
-				type: 'label'
-			});
-			for (let h = 0; h < this.alb.history.length; h++) {
-				if (h || this.alb.history[0].artist != albumArtist || this.alb.history[0].album != album)
-					this.alb.list.push(this.alb.history[h]);
-			}
-			this.alb.list[this.alb.list.length - 1].type = 'historyend';
 		}
 
 		this.alb.list.forEach((v, i) => v.ix = i);
@@ -1016,29 +990,6 @@ class Panel {
 			this.mode(0);
 			this.style.enlarged_img = false;
 		}
-	}
-
-	logAlbumHistory(albumArtist, album, composition) {
-		if (albumArtist != lg['Artist Unknown'] && album != lg['Album Unknown']) this.alb.history.unshift({
-			artist: albumArtist,
-			album: album,
-			composition: composition,
-			type: 'history'
-		});
-		this.alb.history = this.uniqAlbum(this.alb.history);
-		if (this.alb.history.length > 20) this.alb.history.length = 20;
-		ppt.albumHistory = JSON.stringify(this.alb.history);
-	}
-
-	logArtistHistory(artist) {
-		if (artist != lg['Artist Unknown']) this.art.history.unshift({
-			name: artist,
-			field: '',
-			type: 'history'
-		});
-		this.art.history = this.uniqArtist(this.art.history);
-		if (this.art.history.length > 20) this.art.history.length = 20;
-		ppt.artistHistory = JSON.stringify(this.art.history);
 	}
 
 	mbtn_up(x, y, menuLock, bypass) {
@@ -1215,24 +1166,6 @@ class Panel {
 			}
 			ok_callback(status, ns);
 		}
-	}
-
-	resetAlbumHistory() {
-		this.alb.ix = 0;
-		this.lock = 0;
-		this.alb.history = [];
-		ppt.albumHistory = JSON.stringify([]);
-		this.alb.cur = '';
-		this.getList(true, true);
-	}
-
-	resetArtistHistory() {
-		this.art.ix = 0;
-		this.lock = 0;
-		this.art.history = [];
-		ppt.artistHistory = JSON.stringify([]);
-		this.art.cur = '';
-		this.getList(true);
 	}
 
 	resetStyle(n) {
@@ -1549,7 +1482,7 @@ class Panel {
 
 	simTagTopLookUp() {
 		const li = ppt.artistView ? this.art : this.alb;
-		return li.ix && li.list[li.ix] && li.list[li.ix].type != 'history';
+		return li.ix && li.list[li.ix];
 	}
 
 	stndItem() {

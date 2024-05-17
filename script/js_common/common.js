@@ -29,6 +29,7 @@ var MF_STRING = 0x00000000;
 var MF_POPUP = 0x00000010;
 var MF_RIGHTJUSTIFY = 0x00004000;
 // Keyboard Flags & Tools
+DLGC_WANTALLKEYS = 0x0004; /* Control wants all keys */
 // {{
 var VK_F1 = 0x70;
 var VK_F2 = 0x71;
@@ -162,6 +163,7 @@ function isDarkMode(background) {
 	g = getGreen(background);
 	b = getBlue(background);
 	if ((r + g + b) < 383) return true;
+	else return false;
 }
 
 function z(value) {

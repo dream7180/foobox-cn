@@ -258,11 +258,11 @@ class UserInterface {
 		return this.getLuminance(c, bypass) > 0.35 ? 50 : 200;
 	}
 
-	getColours(highlight_new) {
+	getColours(highlight_new, bg_new) {
 		this.assignColours();
 		this.getBlurColours();
 		this.setStarType();
-		this.getUIColours(highlight_new);
+		this.getUIColours(highlight_new, bg_new);
 		this.getItemColours();
 		if (ppt.themed) {
 			if ((ppt.theme == 0 || ppt.theme == 6 || ppt.theme == 7) && this.themeColour && ppt.themeColour) {
@@ -473,7 +473,7 @@ class UserInterface {
 		return this.getLuminance(c, bypass) > 0.35 ? RGB(0, 0, 0) : RGB(255, 255, 255);
 	}
 
-	getUIColours(highlight_new) {
+	getUIColours(highlight_new, bg_new) {
 		const colours = Object.keys(colourSelector);
 		this.themeColour = ppt.themeColour && colours.length ? colourSelector[colours[ppt.themeColour]] : null;
 		if (ppt.themed && (ppt.theme == 0 || ppt.theme == 6 || ppt.theme == 7) && this.themeColour && ppt.themeColour) {
@@ -490,7 +490,8 @@ class UserInterface {
 					this.col.txt_h = highlight_new ? highlight_new : window.GetColourCUI(2);
 					break;
 				case 1:
-					if (this.col.bg === '') this.col.bg = this.blur.light ? RGB(245, 247, 255) : window.GetColourDUI(1);
+					if(bg_new) this.col.bg = bg_new;
+					else if (this.col.bg === '') this.col.bg = this.blur.light ? RGB(245, 247, 255) : window.GetColourDUI(1);
 					this.col.bgSel = this.blur.dark ? RGBA(255, 255, 255, 36) : this.blur.light ? RGBA(50, 50, 50, 36) : window.GetColourDUI(3);
 					this.col.txt = window.GetColourDUI(0);
 					this.col.txt_h = highlight_new ? highlight_new : window.GetColourDUI(2);
@@ -813,6 +814,7 @@ class Vkeys {
 	}
 }
 
+let switchbgcolour = 0;
 let colourSelector = {}
 let sync = {image: () => {}}
 const syncer = fb.ProfilePath + 'settings\\themed\\bioSyncTheme.js';

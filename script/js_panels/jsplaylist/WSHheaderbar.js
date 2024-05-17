@@ -786,9 +786,9 @@ oHeaderBar = function() {
 		_menu.AppendMenuSeparator();
 
 		if (layout.showgroupheaders) {
-			_groups.AppendTo(_menu, MF_STRING, "折叠与展开分组");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Shift+Tab)");	
+			_groups.AppendTo(_menu, MF_STRING, "折叠与展开分组 (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部");	
 		};
 		_sorting.AppendTo(_menu, MF_STRING, "排序");
 		_sorting.AppendMenuItem(MF_STRING, 205, "专辑艺术家");
@@ -818,7 +818,7 @@ oHeaderBar = function() {
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 12):
-			show_setting(3, column_index);
+			show_setting(3);
 			break;
 		case (idx == 14):
 			window.ShowProperties();
@@ -946,7 +946,7 @@ oHeaderBar = function() {
 			this.initColumns();
 
 			// set minimum rows / cover column size
-			get_grprow_minimum(this.columns[0].w, true);
+			get_grprow_minimum(this.columns[0].w);
 			update_playlist(layout.collapseGroupsByDefault);
 			break;
 		case (idx == 205):

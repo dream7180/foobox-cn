@@ -183,7 +183,7 @@ class MenuItems {
 					func: () => this.lookUpArtist(i),
 					flags: v.type != 'label' ? MF_STRING : MF_GRAYED,
 					checkRadio: i == panel.art.ix,
-					separator: !i || v.type == 'similarend' || v.type == 'label' || v.type == 'tagend' || v.type == 'historyend'
+					separator: !i || v.type == 'similarend' || v.type == 'label' || v.type == 'tagend'
 				}));
 				for (let i = 0; i < 4; i++) bMenu.newItem({
 					str: this.getlookUpStr(i, 0),
@@ -200,17 +200,17 @@ class MenuItems {
 					menuName: lg['More...'],
 					str: this.getlookUpStr(i, 1, artist),
 					func: () => this.lookUpArtistItems(i),
-					checkItem: i < 4 && [ppt.showSimilarArtists, ppt.showMoreTags, ppt.showArtistHistory, ppt.autoLock][i],
-					separator: i == 2 || i == 3 || i == 4 || i == 5
+					checkItem: i < 3 && [ppt.showSimilarArtists, ppt.showMoreTags, ppt.autoLock][i],
+					separator: i == 1 || i == 2
 				});
 				break;
 			case false:
 				panel.alb.list.forEach((v, i) => bMenu.newItem({
-					str: ((!i || v.type.includes('history') ? v.artist.replace(/&/g, '&&') + ' - ' + v.album.replace(/&/g, '&&') : v.album.replace(/&/g, '&&')) + (!v.composition ? '' : ' [composition]')).replace(/^\s-\s/, ''),
+					str: ((!i ? v.artist.replace(/&/g, '&&') + ' - ' + v.album.replace(/&/g, '&&') : v.album.replace(/&/g, '&&')) + (!v.composition ? '' : ' [composition]')).replace(/^\s-\s/, ''),
 					func: () => this.lookUpAlbum(i),
-					flags: v.type != 'label' && v.album != lg['Album History:'] ? MF_STRING : MF_GRAYED,
+					flags: v.type != 'label' ? MF_STRING : MF_GRAYED,
 					checkRadio: i == panel.alb.ix,
-					separator: !i || v.type == 'albumend' || v.type == 'label' || v.type == 'historyend'
+					separator: !i || v.type == 'albumend' || v.type == 'label'
 				}));
 				for (let i = 0; i < 4; i++) bMenu.newItem({
 					str: this.getlookUpStr(i, 0),
@@ -227,8 +227,8 @@ class MenuItems {
 					menuName: lg['More...'],
 					str: this.getlookUpStr(i, 2, artist),
 					func: () => this.lookUpAlbumItems(i),
-					checkItem: i < 3 && [ppt.showTopAlbums, ppt.showAlbumHistory, ppt.autoLock][i],
-					separator: i == 1 || i == 2 || i == 3 || i == 4
+					checkItem: i < 2 && [ppt.showTopAlbums, ppt.autoLock][i],
+					separator: i == 0 || i == 1
 				});
 				break;
 		}
@@ -670,8 +670,8 @@ class MenuItems {
 	getlookUpStr(i, j, artist) {
 		return [
 			[lg['Manual cycle: wheel over button'], lg['Auto cycle items'], popUpBox.ok ? lg['Options...'] : lg['Options: see console'], lg['Reload']][i],
-			[lg['Show similar artists'], lg['Show more tags (circle button if present)'], lg['Show artist history'], lg['Auto lock'], lg['Reset artist history...'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i],
-			[lg['Show top albums'], lg['Show album history'], lg['Auto lock'], lg['Reset album history...'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i]
+			[lg['Show similar artists'], lg['Show more tags (circle button if present)'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i],
+			[lg['Show top albums'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i]
 		][j];
 	}
 	
@@ -749,8 +749,6 @@ class MenuItems {
 				panel.callServer(false, panel.id.focus, 'bio_lookUpItem', 0);
 				filmStrip.check();
 				if (ppt.autoLock) panel.mbtn_up(1, 1, true);
-				if (panel.alb.list[panel.alb.ix].type.includes('history')) break;
-				panel.logAlbumHistory(panel.alb.list[panel.alb.ix].artist, panel.alb.list[panel.alb.ix].album);
 				panel.getList();
 				break;
 			}
@@ -775,25 +773,17 @@ class MenuItems {
 				panel.getList(!ppt.showTopAlbums ? true : false, true);
 				break;
 			case 1:
-				panel.alb.ix = 0;
-				ppt.toggle('showAlbumHistory');
-				panel.getList(!ppt.showAlbumHistory ? true : false, true);
-				break;
-			case 2:
 				ppt.toggle('autoLock');
-				break;
-			case 3:
-				panel.resetAlbumHistory();
 				break;
 			default: {
 				const artist = panel.art.list.length ? panel.art.list[0].name : name.artist(panel.id.focus);
 				const brArr = ['', '/+similar', '/+albums'];
-				if (i < 7) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 4], true);
+				if (i < 5) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 4], true);
 				else $.browser('https://www.allmusic.com/search/artists/' + encodeURIComponent(artist), true);
 				break;
 			}
 		}
-		if (i < 4) {
+		if (i < 2) {
 			txt.logScrollPos();
 			filmStrip.logScrollPos();
 			img.get = false;
@@ -804,7 +794,6 @@ class MenuItems {
 			}
 			panel.style.inclTrackRev = ppt.inclTrackRev;
 			if (ppt.inclTrackRev) {
-				if (panel.alb.list[panel.alb.ix].type.includes('history')) panel.style.inclTrackRev = 0;
 				txt.albumFlush();
 			}
 			txt.getItem(false, panel.art.ix, panel.alb.ix, true);
@@ -835,8 +824,6 @@ class MenuItems {
 				panel.callServer(false, panel.id.focus, 'bio_lookUpItem', 0);
 				filmStrip.check();
 				if (ppt.autoLock) panel.mbtn_up(1, 1, true);
-				if (panel.art.list[panel.art.ix].type.includes('history')) break;
-				panel.logArtistHistory(panel.art.list[panel.art.ix].name);
 				panel.getList();
 				break;
 			case i == panel.art.list.length + 1:
@@ -865,25 +852,17 @@ class MenuItems {
 				panel.getList(!ppt.showMoreTags ? true : false);
 				break;
 			case 2:
-				panel.art.ix = 0;
-				ppt.toggle('showArtistHistory');
-				panel.getList(!ppt.showArtistHistory ? true : false);
-				break;
-			case 3:
 				ppt.toggle('autoLock');
-				break;
-			case 4:
-				panel.resetArtistHistory();
 				break;
 			default: {
 				const artist = panel.art.list.length ? panel.art.list[0].name : name.artist(panel.id.focus);
 				const brArr = ['', '/+similar', '/+albums'];
-				if (i < 8) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 5], true);
+				if (i < 6) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 5], true);
 				else $.browser('https://www.allmusic.com/search/artists/' + encodeURIComponent(artist), true);
 				break;
 			}
 		}
-		if (i < 5) {
+		if (i < 3) {
 			txt.logScrollPos();
 			filmStrip.logScrollPos();
 			if (ppt.sourcebio == 3) {
@@ -1403,8 +1382,6 @@ class MenuItems {
 					this.setSource('Bio');
 				}
 				panel.art.ix = panel.art.uniq[i].ix;
-				if (panel.art.list[panel.art.ix].type.includes('history')) break;
-				panel.logArtistHistory(panel.art.list[panel.art.ix].name);
 				panel.getList();
 				break;
 			case !ppt.artistView:
@@ -1422,14 +1399,6 @@ class MenuItems {
 				}
 				panel.alb.ix = panel.alb.uniq[i].ix;
 				if (panel.alb.ix) seeker.show = false;
-				if (ppt.showAlbumHistory && ppt.inclTrackRev) {
-					panel.style.inclTrackRev = ppt.inclTrackRev;
-					if (panel.alb.list[panel.alb.ix].type.includes('history')) panel.style.inclTrackRev = 0;
-					txt.albumFlush();
-					force = true;
-				}
-				if (panel.alb.list[panel.alb.ix].type.includes('history')) break;
-				panel.logAlbumHistory(panel.alb.list[panel.alb.ix].artist, panel.alb.list[panel.alb.ix].album);
 				panel.getList();
 				break;
 		}

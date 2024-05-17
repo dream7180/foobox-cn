@@ -1915,8 +1915,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				var _radiom3u = radiom3u;
-				//radiom3u = "https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u;https://raw.githubusercontent.com/dream7180/foobox-icons/main/radio/Kimentanm.m3u";
-				radiom3u = "https://cdn.jsdelivr.us/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.us/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+				radiom3u = "https://cdn.jsdelivr.net/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.net/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
 				if (radiom3u != _radiom3u){
 					save_misccfg();
 					window.NotifyOthers("Radio_list", radiom3u);
@@ -1999,7 +1998,7 @@ oPage = function(id, objectName, label, nbrows) {
 				if(idx == layout.index){
 					get_layout_cache(layout.playlistName);
 					p.headerBar.initColumns();
-					get_grprow_minimum(p.headerBar.columns[0].w, false);
+					get_grprow_minimum(p.headerBar.columns[0].w);
 					if (!layout.showgroupheaders) {
 						cGroup.collapsed_height = 0;
 						cGroup.expanded_height = 0;

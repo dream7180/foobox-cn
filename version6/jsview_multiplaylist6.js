@@ -1,4 +1,4 @@
-﻿// Name "Simple playlist viewer, based on jsspm"
+﻿// Name "Simple playlist viewer (multiple), based on jsspm"
 // Author "dreamawake"
 // foobox https://github.com/dream7180
 
@@ -35,9 +35,9 @@ var g_start_ = 0,
 	g_end_ = 0;
 
 var pidx = -1;
-var tf_string = ["$if2(%album%,单曲)", "$if2(%album artist%,未知艺术家)", "$if2(%artist%,未知艺术家)", "$if2(%genre%,未知流派)", "%directoryname%"];
 var playing_ico, btn_sw;
-var btn_w = 24, btn_h = 24;
+var btn_clicked = false;
+var btn_w = 22, btn_h = 22;
 
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
@@ -47,8 +47,6 @@ ppt = {
 	refreshRate: 20,
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
-	show_activepl: window.GetProperty("List: Show active playlist", false),
-	title_type: window.GetProperty("List: Group type", 1),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
 
@@ -140,43 +138,10 @@ oBrowser = function(name) {
 		};
 		this.rowsCount = this.rows.length;
 		this.show_tracknum = false;
-		this.getlimits(); 
-		
-		if (!ppt.show_activepl){
-			this.tag = "\uF02C";
-			if(this.rows.length == 0){
-				this.name = "";
-				return;
-			}
-			if(ppt.title_type == 6){
-				var path_start = fb.GetLibraryRelativePath(_list[0]).split("\\");
-				var path_end = fb.GetLibraryRelativePath(_list[total - 1]).split("\\");
-				if(path_start.length == 1) {
-					if(path_start[0] != "") subject_start = "媒体库根目录";
-					else subject_start = "非媒体库目录";
-				} else {
-					subject_start = path_start[0];
-				}
-				if(path_end.length == 1) {
-					if(path_end[0] != "") subject_end = "媒体库根目录";
-					else subject_end = "非媒体库目录";
-				} else {
-					subject_end = path_end[0];
-				}
-			} else {
-				subject_start = fb.TitleFormat(tf_string[ppt.title_type - 1]).EvalWithMetadb(_list[0]);
-				subject_end = fb.TitleFormat(tf_string[ppt.title_type - 1]).EvalWithMetadb(_list[total - 1]);
-			}
-			if(subject_start.toUpperCase() != subject_end.toUpperCase()) this.name = "所有项目";
-			else {
-				this.name = subject_start;
-				if(ppt.title_type == 1 && this.name != "单曲") this.show_tracknum = true;
-			}
-		} else {
-			this.name = plman.GetPlaylistName(pidx);
-			if(pidx > -1 && plman.IsAutoPlaylist(pidx)) this.tag = "\uF023";
-			else this.tag = "\uF03A";
-		}
+		this.getlimits();
+		this.name = plman.GetPlaylistName(pidx);
+		if(pidx > -1 && plman.IsAutoPlaylist(pidx)) this.tag = "\uF023";
+		else this.tag = "\uF03A";
 	};
 
 	this.getlimits = function() {
@@ -243,6 +208,7 @@ oBrowser = function(name) {
 			var tx = ax + rh + this.paddingLeft + 4;
 
 			if (this.rows.length > 0) {
+				
 				for (var i = g_start_; i <= g_end_; i++) {
 					queue_idx = plman.FindPlaybackQueueItemIndex(this.rows[i].metadb, pidx, this.rows[i].idx) + 1;
 					ay = Math.floor(this.y + (i * ah) - scroll_);
@@ -284,8 +250,8 @@ oBrowser = function(name) {
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight - 2, g_color_topbar);
 			gr.DrawLine(0, ppt.headerBarHeight, ww, ppt.headerBarHeight, 1, g_color_line_div);
 			gr.GdiDrawText(this.tag, g_font_tag, tag_color, this.paddingLeft, 0, this.paddingLeft*2, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_w - rh - this.paddingLeft*6, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_w - rh - this.paddingLeft, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
+			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_w - rh - this.paddingLeft*6.5, ppt.headerBarHeight, lc_txt);
+			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_w - rh - this.paddingLeft*1.5, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
 			
 			brw.scrollbar && brw.scrollbar.draw(gr);
 		};
@@ -444,6 +410,7 @@ oBrowser = function(name) {
 		var Context = fb.CreateContextMenuManager();
 		var metadblist_selection = plman.GetPlaylistSelectedItems(pidx);
 		if(metadblist_selection.Count > 0){
+			_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "播放队列")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "移除");
 			Context.InitContext(metadblist_selection);
 			Context.BuildMenu(_menu, 3, -1);
 			_child01.AppendTo(_menu, MF_STRING, "选择添加到...");
@@ -464,6 +431,9 @@ oBrowser = function(name) {
 			Context.ExecuteByID(ret - 3);
 		}else{
 			switch (ret) {
+			case 800:
+				plman.RemovePlaylistSelection(pidx, false);
+				break;
 			case 801:
 				plman.CreatePlaylist(plman.PlaylistCount, '');
 				plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, metadblist_selection, false);
@@ -476,24 +446,31 @@ oBrowser = function(name) {
 	};
 };
 
- 
-//=================================== Main ================================================================
-function init_btn(){
-	if (ppt.show_activepl) btn_sw = new button(img_plsw_2, img_plsw_2, img_plsw_2, "切换到视图列表");
-	else btn_sw = new button(img_plsw, img_plsw, img_plsw, "切换到当前列表");
-}
-
-function check_pidx() {
-	if (ppt.show_activepl) pidx = plman.ActivePlaylist;
+PL_Menu = function(x, y) {
+	var PLmenu = window.CreatePopupMenu();
+	var total = plman.PlaylistCount;
+	if (!total) PLmenu.AppendMenuItem(MF_DISABLED, 0, "无播放列表");
 	else {
-		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i) == "媒体库视图") {
-				pidx = i;
-			}
+			if(fb.IsPlaying && i == plman.PlayingPlaylist) PLmenu.AppendMenuItem(MF_STRING, 100+i, plman.GetPlaylistName(i) + " >>>");
+			else PLmenu.AppendMenuItem(MF_STRING, 100+i, plman.GetPlaylistName(i));
+		}
+		PLmenu.CheckMenuRadioItem(100, 100 + total, 100 + plman.ActivePlaylist);
+	}
+	var ret = PLmenu.TrackPopupMenu(x, y);
+	if (ret) {
+		switch (ret) {
+		default:
+			plman.ActivePlaylist = ret - 100;
+			pidx = ret;
+			PLmenu.CheckMenuRadioItem(100, 100 + total, ret);
+			break;
 		}
 	}
-	return pidx;
+}
+//=================================== Main ================================================================
+function init_btn(){
+	btn_sw = new button(img_menubt, img_menubt_ov, img_menubt_ov, "");
 }
 
 function SelectAtoB(start_id, end_id) {
@@ -524,7 +501,7 @@ function on_init() {
 	get_metrics();
 	get_images();
 	init_btn();
-	check_pidx();
+	pidx = plman.ActivePlaylist;
 	brw = new oBrowser("brw");
 };
 
@@ -548,7 +525,8 @@ function on_paint(gr) {
 	if (!ww) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
 	brw && brw.draw(gr);
-	btn_sw.draw(gr, ww - btn_w - 1, Math.floor((ppt.headerBarHeight - btn_h) / 2), 255);
+	btn_sw.draw(gr, Math.round(ww - btn_w - 3*zdpi), Math.floor((ppt.headerBarHeight - btn_h) / 2), 255);
+	gr.DrawImage(img_plsw, Math.round(ww - btn_w), Math.floor((ppt.headerBarHeight - btn_h) / 2 + img_plsw.Height/4), img_plsw.Width, img_plsw.Height, 0, 0, img_plsw.Width, img_plsw.Height);
 };
 
 function on_mouse_lbtn_down(x, y) {
@@ -594,11 +572,16 @@ function on_mouse_lbtn_down(x, y) {
 	else {
 		brw.on_mouse("down", x, y);
 	};
-	btn_sw.checkstate("down", x, y);
+	if(brw.scrollbar.cursorDrag && uiHacks) UIHacks.DisableSizing = true;
+	if(btn_sw.checkstate("down", x, y) == ButtonStates.down) {
+		btn_clicked = true;
+		btn_sw.state = ButtonStates.hover;
+	};
 };
 
 function on_mouse_lbtn_up(x, y) {
 	brw.on_mouse("up", x, y);
+	if(uiHacks && UIHacks.MainWindowState != 2 && UIHacks.DisableSizing) UIHacks.DisableSizing = false;
 	if (timers.mouseDown) {
 		window.ClearTimeout(timers.mouseDown);
 		timers.mouseDown = false;
@@ -628,13 +611,12 @@ function on_mouse_lbtn_up(x, y) {
 			}, 75);
 		};
 	};
-	if (btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		ppt.show_activepl = !ppt.show_activepl;
-		window.SetProperty("List: Show active playlist", ppt.show_activepl);
-		init_btn();
-		check_pidx();
-		brw.populate();
+	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
+		PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		btn_sw.state = ButtonStates.normal;
+		btn_sw.repaint();
 	}
+	btn_clicked = false;
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
@@ -653,9 +635,7 @@ function on_mouse_rbtn_up(x, y) {
 	if (!utils.IsKeyPressed(VK_SHIFT)) {
 		brw.on_mouse("right", x, y);
 	};
-	//if (!utils.IsKeyPressed(VK_SHIFT)) {
 	return true;
-	//};
 };
 
 function on_mouse_move(x, y) {
@@ -696,7 +676,6 @@ function on_mouse_wheel(step) {
 
 function on_mouse_leave() {
 	brw.on_mouse("leave", 0, 0);
-	btn_sw.checkstate("leave", 0, 0);
 };
 
 //=================================================// Metrics & Fonts & Colors & Images
@@ -715,27 +694,33 @@ function get_metrics() {
 };
 
 function get_images() {
-	btn_w = Math.floor(24 * zdpi);
-	btn_h = Math.floor(12 * zdpi) + 12;
-	var gb, x5 = 5*zdpi;
-	img_plsw = gdi.CreateImage(btn_w, btn_h);
-	gb = img_plsw.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_color_bt_overlay);
-	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
-	img_plsw.ReleaseGraphics(gb)
+	var gb;
+	var add_h = z(4), bt_h = z(24), _x2 = 2*zdpi, x2 = Math.floor(_x2), _x12 = 12*zdpi;
+	btn_w = z(22);
+	btn_h = z(22);
 	
-	img_plsw_2 = gdi.CreateImage(btn_w, btn_h);
-	gb = img_plsw_2.GetGraphics();
+	img_menubt = gdi.CreateImage(bt_h, bt_h);
+	gb = img_menubt.GetGraphics();
+	img_menubt.ReleaseGraphics(gb);
+		
+	img_menubt_ov = gdi.CreateImage(bt_h, bt_h);
+	gb = img_menubt_ov.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_color_bt_overlay);
-	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
-	img_plsw_2.ReleaseGraphics(gb);
+	gb.FillRoundRect(zdpi, zdpi, z(20)-1, z(20)-1, z(3), z(3), g_color_bt_overlay);
+	img_menubt_ov.ReleaseGraphics(gb);
+	
+	img_plsw = gdi.CreateImage(z(14), add_h*3+3);
+	gb = img_plsw.GetGraphics();
+	gb.SetSmoothingMode(0);
+	gb.DrawLine(Math.ceil(_x2), x2+1, Math.ceil(_x12), x2+1, 1, g_color_normal_txt);
+	gb.DrawLine(Math.ceil(_x2), x2+add_h+1, Math.ceil(_x12), x2+add_h+1, 1, g_color_normal_txt);
+	gb.DrawLine(Math.ceil(_x2), x2+add_h*2+1, Math.ceil(_x12), x2+add_h*2+1, 1, g_color_normal_txt);	
+	img_plsw.ReleaseGraphics(gb)
 	
 	playing_ico = gdi.CreateImage(z(16), z(14));
 	gb = playing_ico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	var ponit_arr = new Array(3 * zdpi, 2 * zdpi, 3 * zdpi, 12 * zdpi, 13 * zdpi, 7 * zdpi);
+	var ponit_arr = new Array(3 * zdpi, _x2, 3 * zdpi, _x12, 13 * zdpi, 7 * zdpi);
 	gb.FillPolygon(RGB(255, 255, 255), 0, ponit_arr);
 	gb.SetSmoothingMode(0);
 	playing_ico.ReleaseGraphics(gb);
@@ -754,10 +739,12 @@ function get_font() {
 function get_colors() {
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
 	g_color_selected_txt = g_color_normal_txt;
-	g_color_normal_bg = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg = g_color_selected_bg_default;
 	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
@@ -885,15 +872,13 @@ function on_playlists_changed() {
 	if (plman.PlaylistCount > 0 && (plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1)) {
 		plman.ActivePlaylist = 0;
 	};
-	pidx = check_pidx();
+	pidx = plman.ActivePlaylist;
 	brw.repaint();
 };
 
 function on_playlist_switch() {
-	if (ppt.show_activepl) {
 		pidx = plman.ActivePlaylist;
 		brw.populate();
-	}
 };
 
 function on_playlist_items_added(playlist_idx) {
@@ -942,14 +927,30 @@ function on_notify_data(name, info) {
 	case "color_scheme_updated":
 		var c_ol_tmp = g_color_highlight;
 		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
-		else g_color_highlight = c_default_hl;
+		else {
+			g_color_highlight = c_default_hl;
+			g_color_normal_bg = g_color_normal_bg_default;
+			g_color_selected_bg = g_color_selected_bg_default;
+		}
 		if(g_color_highlight != c_ol_tmp){
+			if(info){
+				if(dark_mode){
+					if(info.length == 3) {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
+					} else {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[3], info[4], info[5]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[3], info[4], info[5]), 0.2);
+					}
+				} else{
+					if(g_color_normal_bg_default != 4294967295) {
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
+					}
+				}
+			}
 			brw.repaint();
 		}
-		break;
-	case "lib_cover_type":
-		ppt.title_type = info;
-		window.SetProperty("List: Group type", ppt.title_type);
 		break;
 	case "scrollbar_width":
 		sys_scrollbar = info;
