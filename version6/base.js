@@ -504,7 +504,7 @@ function repaintWin(section){
 	}
 }
 
-main_Menu = function(x, y) {
+function main_Menu(x, y) {
 	var basemenu = window.CreatePopupMenu();
 	var child1 = window.CreatePopupMenu(); //File
 	var child2 = window.CreatePopupMenu(); //Edit
@@ -531,7 +531,7 @@ main_Menu = function(x, y) {
 
 	menuman1.Init("file");
 	menuman2.Init("edit");
-	menuman3.Init("View");
+	menuman3.Init("view");
 	menuman4.Init("playback");
 	menuman5.Init("library");
 	menuman6.Init("help");
