@@ -17,8 +17,9 @@ var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var radiom3u = "";
 let dark_mode = 0;
+let tab_collapse;
 // GLOBALS
-var g_script_version = "6.26 (Remastered)";
+var g_script_version = "6.27 (Remastered)";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -64,9 +65,6 @@ var g_avoid_on_playlist_items_reordered = false;
 var g_avoid_on_item_focus_change = false;
 var g_avoid_on_playlist_items_added = false;
 var g_avoid_on_playlist_items_removed = false;
-var g_first_launch = true;
-var tab_collapse = 0;
-//var g_instancetype = window.InstanceType;
 
 //albumart
 var albumart_id, cache_subdir;
@@ -100,7 +98,7 @@ properties = {
 	cursor_min: 25,
 	cursor_max: 110,
 	repaint_rate1: 20,
-	repaint_rate2: 35,
+	repaint_rate2: 30,
 	max_columns: 24,
 	max_patterns: 25
 };
@@ -365,7 +363,7 @@ image_cache = function() {
 						} catch(e) {};
 						cover.load_timer && window.ClearTimeout(cover.load_timer);
 						cover.load_timer = false;
-					}, 10);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 20 : 6));
+					}, 5);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 20 : 6));
 				};
 			}
 			else if(p.list.groups[albumIndex].load_requested == 0 && !g_mouse_wheel_timer && !cScrollBar.timerID2){
@@ -396,7 +394,7 @@ image_cache = function() {
 						} catch(e) {};
 						cover.load_timer && window.ClearTimeout(cover.load_timer);
 						cover.load_timer = false;
-					}, 15);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 25 : 8));
+					}, 10);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 25 : 8));
 				};
 			}
 		};
@@ -483,7 +481,7 @@ function resize_panels() {
 	// set Size of List
 	p.list.setSize(0, (wh - list_h), ww, list_h);
 	if (!g_init_window) {
-		p.list.setItems(true);
+		p.list.setItems(2);
 	};
 	// set Size of scrollbar
 	p.scrollbar.setSize(p.list.x + p.list.w - cScrollBar.width, p.list.y, cScrollBar.width, p.list.h);
@@ -626,7 +624,7 @@ function on_size() {
 		update_playlist(layout.collapseGroupsByDefault);
 		g_init_window = false;
 	} else {
-		if(p.headerBar.columns[0].w > 0 && cGroup.count_minimum != cGroup.count_minimum_pre) update_playlist(layout.collapseGroupsByDefault);
+		if(p.headerBar.columns[0].w > 0 && cGroup.count_minimum != cGroup.count_minimum_pre) update_playlist(tab_collapse, 2);
 	}
 	cover.previous_max_size = p.headerBar.columns[0].w;
 };
@@ -869,16 +867,9 @@ function on_mouse_lbtn_up(x, y) {
 		// after a cover column resize, update cover image cache
 		if (cover.resized == true) {
 			cover.resized = false;
-			// reset cache
-			if (!g_first_launch) {
-				cover.max_w = (layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height);
-				//g_image_cache = new image_cache;
-				//CollectGarbage();
-			}
-			else {
-				g_first_launch = false;
-			};
-			update_playlist(layout.collapseGroupsByDefault);
+			cover.max_w = (layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height);
+			//g_image_cache = new image_cache;// reset cache
+			update_playlist(layout.collapseGroupsByDefault, true);
 		};
 
 		// check list
@@ -1172,13 +1163,14 @@ function on_mouse_leave() {
 };
 
 // Callbacks
-function update_playlist(iscollapsed) {
+function update_playlist(iscollapsed, listnochange) {
 	g_selHolder = fb.AcquireUiSelectionHolder();
 	// activate playlist selection tracking
 	g_selHolder.SetPlaylistSelectionTracking();
 	g_group_id_focused = 0;
-	p.list.updateHandleList(plman.ActivePlaylist, iscollapsed);
-	p.list.setItems(g_init_window);
+	p.list.updateHandleList(plman.ActivePlaylist, iscollapsed, listnochange);
+	if(listnochange == 2) p.list.setItems(listnochange);
+	else p.list.setItems(!listnochange);
 	p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 	// if sort by header click was requested, reset mouse cursor to default
 	if (cHeaderBar.sortRequested) {
@@ -1330,7 +1322,7 @@ function on_key_up(vkey) {
 		// after a cover column resize, update cover image and empty rows to show the whole cover if low tracks count in group
 		if (cover.resized == true) {
 			cover.resized = false;
-			update_playlist(layout.collapseGroupsByDefault);
+			update_playlist(layout.collapseGroupsByDefault, true);
 		};
 
 		// scroll keys up and down RESET (step and timers)
@@ -1374,8 +1366,8 @@ function on_key_down(vkey) {
 				tab_collapse = !tab_collapse;
 				if (!cSettings.visible && p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0) {
 					resize_panels();
-					p.list.updateHandleList(plman.ActivePlaylist, tab_collapse);
-					p.list.setItems(true);
+					p.list.updateHandleList(plman.ActivePlaylist, tab_collapse, true);
+					p.list.setItems(2);
 					p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 					full_repaint();
 				}
@@ -2243,8 +2235,8 @@ function showhide_groupheader(){
 	};
 
 	// refresh playlist
-	p.list.updateHandleList(plman.ActivePlaylist, false);
-	p.list.setItems(true);
+	p.list.updateHandleList(plman.ActivePlaylist, false, true);
+	p.list.setItems(2);
 	p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 }
 

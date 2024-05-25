@@ -52,7 +52,7 @@ foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.co
 
 <span style="display:block;text-align:left">![](info/dui.png)</span>
 
-[**查看 foobox 帮助**](https://dream7180.gitee.io/2023/foobox-release/)
+[**查看 foobox 帮助**](https://dream7180.github.io/2023/foobox-release/)
 
 ![alt text](info/screenshot-light.jpg "foobox - DUI foobar2000 media player")
 

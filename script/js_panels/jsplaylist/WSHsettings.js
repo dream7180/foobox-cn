@@ -812,7 +812,7 @@ oLink = function (){
 					fb.RunMainMenuCommand("文件/参数选项");
 					break;
 				case 2:
-					this.ShellExecute("https://dream7180.gitee.io/2023/foobox-release/", "", "", "open", 1);
+					this.ShellExecute("https://dream7180.github.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 				case 3:
 					//if(Number(fb.Version.substr(0, 1)) > 1) this.ShellExecute("https://www.esnpc.com/foobar2000-20-simplified-chinese-version/", "", "", "open", 1);

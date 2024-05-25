@@ -342,8 +342,24 @@ oBrowser = function(name) {
 		if(repaint_now) this.repaint();
 	};
 
+	this.getRowIdFromIdx = function(idx) {
+		if(g_filterbox.inputbox.text.length == 0) return idx;
+		var total = this.rows.length;
+		var rowId = -1;
+		if (plman.PlaylistCount > 0) {
+			for (var i = 0; i < total; i++) {
+				if (this.rows[i].idx == idx) {
+					rowId = i;
+					break;
+				};
+			};
+		};
+		return rowId;
+	};
+
 	this.isVisiblePlaylist = function(idx) {
-		var offset_active_pl = ppt.rowHeight * idx;
+		var rowId = this.getRowIdFromIdx(idx);
+		var offset_active_pl = ppt.rowHeight * rowId;
 		if (offset_active_pl < scroll || offset_active_pl + ppt.rowHeight > scroll + this.h) {
 			return false;
 		}
@@ -353,17 +369,19 @@ oBrowser = function(name) {
 	};
 
 	this.showSelectedPlaylist = function() {
+		var rowId = this.getRowIdFromIdx(brw.selectedRow);
 		this.activeRow = this.selectedRow;
 		if (!this.isVisiblePlaylist(brw.selectedRow)) {
-			scroll = (brw.selectedRow - Math.floor(this.totalRowsVis / 2)) * ppt.rowHeight;
+			scroll = (rowId - Math.floor(this.totalRowsVis / 2)) * ppt.rowHeight;
 			scroll = check_scroll(scroll);
 			this.scrollbar.updateScrollbar();
 		} else this.repaint();
 	};
 
 	this.showActivePlaylist = function() {
+		var rowId = this.getRowIdFromIdx(plman.ActivePlaylist);
 		if (!this.isVisiblePlaylist(plman.ActivePlaylist)) {
-			scroll = (plman.ActivePlaylist - Math.floor(this.totalRowsVis / 2)) * ppt.rowHeight;
+			scroll = (rowId - Math.floor(this.totalRowsVis / 2)) * ppt.rowHeight;
 			scroll = check_scroll(scroll);
 			this.scrollbar.updateScrollbar();
 		};

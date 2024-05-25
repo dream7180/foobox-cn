@@ -873,7 +873,7 @@ function get_images() {
 	img_max = gdi.CreateImage(imgh, imgh);
 	gb = img_max.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(_x8, _x8, _x10, _x10, 1, c_toptxt);
+	gb.DrawRect(_x8, _x8, _x10-1, _x10-1, 1, c_toptxt);
 	img_max.ReleaseGraphics(gb);
 	
 	img_min = gdi.CreateImage(imgh, imgh);

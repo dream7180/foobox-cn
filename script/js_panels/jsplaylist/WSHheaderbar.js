@@ -863,14 +863,14 @@ oHeaderBar = function() {
 			break;
 		case (idx == 80):
 			resize_panels();
-			p.list.updateHandleList(plman.ActivePlaylist, true);
-			p.list.setItems(true);
+			p.list.updateHandleList(plman.ActivePlaylist, true, true);
+			p.list.setItems(2);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 90):
 			resize_panels();
-			p.list.updateHandleList(plman.ActivePlaylist, false);
-			p.list.setItems(true);
+			p.list.updateHandleList(plman.ActivePlaylist, false, true);
+			p.list.setItems(2);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 99):
@@ -880,8 +880,8 @@ oHeaderBar = function() {
 			layout.gopts[7] = layout.enableExtraLine.toString();
 			save_config("config");
 			resize_panels();
-			p.list.updateHandleList(plman.ActivePlaylist, false);
-			p.list.setItems(true);
+			p.list.updateHandleList(plman.ActivePlaylist, false, true);
+			p.list.setItems(2);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx >= 100 && idx <= 200):
@@ -947,7 +947,7 @@ oHeaderBar = function() {
 
 			// set minimum rows / cover column size
 			get_grprow_minimum(this.columns[0].w);
-			update_playlist(layout.collapseGroupsByDefault);
+			update_playlist(layout.collapseGroupsByDefault, true);
 			break;
 		case (idx == 205):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_albumartist, 1);
