@@ -19,7 +19,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "6.27 (Remastered)";
+var g_script_version = "6.28 (Remastered)";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -868,8 +868,9 @@ function on_mouse_lbtn_up(x, y) {
 		if (cover.resized == true) {
 			cover.resized = false;
 			cover.max_w = (layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height);
+			cover.previous_max_size = p.headerBar.columns[0].w;
 			//g_image_cache = new image_cache;// reset cache
-			update_playlist(layout.collapseGroupsByDefault, true);
+			update_playlist(layout.collapseGroupsByDefault, 2);
 		};
 
 		// check list
@@ -1318,11 +1319,10 @@ function on_key_up(vkey) {
 		};
 	}
 	else {
-
 		// after a cover column resize, update cover image and empty rows to show the whole cover if low tracks count in group
 		if (cover.resized == true) {
 			cover.resized = false;
-			update_playlist(layout.collapseGroupsByDefault, true);
+			update_playlist(layout.collapseGroupsByDefault, 2);
 		};
 
 		// scroll keys up and down RESET (step and timers)
@@ -2633,7 +2633,7 @@ function get_misccfg(){
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
 	if(!misccfg){
-		radiom3u = "https://cdn.jsdelivr.net/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.net/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+		radiom3u = "https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/fmm.m3u;https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/Kimentanm.m3u";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");

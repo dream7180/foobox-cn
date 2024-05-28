@@ -1915,7 +1915,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				var _radiom3u = radiom3u;
-				radiom3u = "https://cdn.jsdelivr.net/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.net/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+				radiom3u = "https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/fmm.m3u;https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/Kimentanm.m3u";
 				if (radiom3u != _radiom3u){
 					save_misccfg();
 					window.NotifyOthers("Radio_list", radiom3u);

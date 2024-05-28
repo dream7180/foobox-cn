@@ -23,6 +23,8 @@ try{
 } catch (e){
 	console.log("ESLyric 接口创建失败，请把工具->ESLyric->高级选项: pref.script.expose 设置为 1");
 }
+var sw_eslcolor = window.GetProperty("ESLyric.hightlight.follow.cover", true);
+var setEslHL = eslPanels && sw_eslcolor;
 function GetCaption(name) {
 	var str = Caption_Pack[name];
 	if (!str) str = name;
@@ -1609,6 +1611,10 @@ function Controller(imgArray, imgDisplay, prop) {
 			baseMenu.AppendMenuSeparator();
 			funcs[id] = [_this.CloseInfo, null];
 			baseMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, id++, "隐藏歌曲信息");
+			if(color_bycover){
+				funcs[id] = [_this.EslHighlightSW, null];
+				baseMenu.AppendMenuItem(sw_eslcolor ? MF_STRING : MF_CHECKED, id++, "歌词面板高亮色不跟随封面");
+			}
 			funcs[id] = [_this.ShowProperties, null];
 			baseMenu.AppendMenuItem(MF_STRING, id++, "面板属性");
 		}
@@ -1749,13 +1755,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentMetadb) return;
 		switch (arr[0]) {
 		case 0:
-			fb.RunContextCommandWithMetadb("属性", arr[1]) || fb.RunContextCommandWithMetadb("Properties", arr[1]);
+			fb.RunContextCommandWithMetadb("属性", arr[1]);
 			break;
 		case 1:
-			fb.RunContextCommandWithMetadb("批量内嵌图像", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("批量内嵌图像", arr[1]);
 			break;
 		case 2:
-			fb.RunContextCommandWithMetadb("移除所有图像", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("移除所有图像", arr[1]);
 			break;
 		}
 	}
@@ -1852,6 +1858,15 @@ function Controller(imgArray, imgDisplay, prop) {
 		window.Reload();
 		on_size();
 	}
+	
+	this.EslHighlightSW = function() {
+		sw_eslcolor = !sw_eslcolor;
+		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
+		setEslHL = eslPanels && sw_eslcolor;
+		if(!sw_eslcolor) {
+			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+		}
+	}
 
 	this.ShowProperties = function() {
 		window.ShowProperties();
@@ -1929,7 +1944,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			if(get_imgCol) {
 				getColorSchemeFromImage();
 				window.NotifyOthers("color_scheme_updated", null);
-				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+				if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			}
 		}
 		SetMenuButtonCaption();
@@ -1946,7 +1961,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		var imgColor = null;
 		if(!currentImage || currentImage == null){
 			window.NotifyOthers("color_scheme_updated", imgColor);
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			get_imgCol = false;
 		}else{
 			var imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
@@ -1985,7 +2000,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			}
 			get_imgs();
 			if (is_mood && show_infobar) btn_mood.resetImg();
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_highlight);
+			if(setEslHL) eslPanels.SetTextHighlightColor(c_highlight);
 			window.RepaintRect(0, infobar_y, ww, infobar_h);
 		}
 	}
@@ -2328,6 +2343,8 @@ function on_mouse_rbtn_up(x, y, vkey) {
 		rMenu.AppendMenuItem(MF_STRING, 2, "属性");
 		rMenu.AppendMenuSeparator();
 		rMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, 6, "隐藏歌曲信息");
+		if(color_bycover)
+			rMenu.AppendMenuItem(sw_eslcolor ? MF_STRING : MF_CHECKED, 7, "歌词面板高亮色不跟随封面");
 		rMenu.AppendMenuItem(MF_STRING, 5, "面板属性");
 		var a = rMenu.TrackPopupMenu(x, y);
 		switch (a) {
@@ -2354,6 +2371,14 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			window.SetProperty("Display.InfoBar", show_infobar);
 			window.Reload();
 			on_size();
+			break;
+		case 7:
+			sw_eslcolor = !sw_eslcolor;
+			window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
+			setEslHL = eslPanels && sw_eslcolor;
+			if(!sw_eslcolor) {
+				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			}
 			break;
 		}
 	}
@@ -2401,7 +2426,7 @@ function on_notify_data(name, info) {
 		} else{
 			get_imgCol = false;
 			window.NotifyOthers("color_scheme_updated", null);
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			on_colorscheme_update(false);
 		}
 		break;
@@ -2454,10 +2479,10 @@ function ButtonUI_R() {
 				var derating_flag = (i == rating ? true : false);
 				if (derating_flag) {
 					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + "<not set>", currentMetadb) || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + "<未设置>", currentMetadb);
+					fb.RunContextCommandWithMetadb("播放统计信息/等级/" + "<未设置>", currentMetadb);
 				} else {
 					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : i}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + i, currentMetadb) || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + i, currentMetadb);
+					fb.RunContextCommandWithMetadb("播放统计信息/等级/" + i, currentMetadb);
 				}
 			}
 		}

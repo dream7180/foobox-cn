@@ -1759,13 +1759,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentMetadb) return;
 		switch (arr[0]) {
 		case 0:
-			fb.RunContextCommandWithMetadb("属性", arr[1]) || fb.RunContextCommandWithMetadb("Properties", arr[1]);
+			fb.RunContextCommandWithMetadb("属性", arr[1]);
 			break;
 		case 1:
-			fb.RunContextCommandWithMetadb("批量内嵌图像", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("批量内嵌图像", arr[1]);
 			break;
 		case 2:
-			fb.RunContextCommandWithMetadb("移除所有图像", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("移除所有图像", arr[1]);
 			break;
 		}
 	}
@@ -2496,10 +2496,10 @@ function ButtonUI_R() {
 				var derating_flag = (i == rating ? true : false);
 				if (derating_flag) {
 					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + "<not set>", currentMetadb) || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + "<未设置>", currentMetadb);
+					fb.RunContextCommandWithMetadb("播放统计信息/等级/" + "<未设置>", currentMetadb);
 				} else {
 					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : i}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + i, currentMetadb) || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + i, currentMetadb);
+					fb.RunContextCommandWithMetadb("播放统计信息/等级/" + i, currentMetadb);
 				}
 			}
 		}
