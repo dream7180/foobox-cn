@@ -2367,7 +2367,7 @@ oInfoPane = function(){
 		l.push(fb.TitleFormat("$if2(%title%,)").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("$if2(%artist%,)").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("$if2(%album%,)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%channels% | %bitrate% kbps | %samplerate% Hz").EvalWithMetadb(this.metadb));
+		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%channels% | %__bitspersample% bits | %bitrate% kbps | %samplerate% Hz").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("%filesize_natural%").EvalWithMetadb(this.metadb));
 		var clw = gr.CalcTextWidth("所在文件夹: ", g_font);
 		var maxl = gr.CalcTextWidth(l[0], g_font);

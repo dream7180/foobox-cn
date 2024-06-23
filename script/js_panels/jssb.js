@@ -38,8 +38,8 @@ ppt = {
 	dirMode: window.GetProperty("_PROPERTY: Folder or Library directory", 0), //0-Folder, 1-Library directory
 	albumArtId: 0,
 	// 0 = front
-	panelMode: window.GetProperty("_PROPERTY: Display Mode", 1),
-	// 0 = text, 1 = stamps + text, 2 = lines + text, 3 = stamps no text
+	panelMode: window.GetProperty("_PROPERTY: Display Mode", 0),
+	// 0 = compact, 1 = stamps + text, 2 = lines + text, 3 = stamps no text
 	showAllItem: window.GetProperty("_PROPERTY: Show ALL item", true),
 	showloading: window.GetProperty("_PROPERTY: Show loading animation", false),
 	default_thumbnailWidthMin: window.GetProperty("SYSTEM thumbnails Minimal Width", 130),
@@ -851,11 +851,17 @@ oBrowser = function() {
 	};
 
 	this.update = function() {
-		this.stampDrawMode = (ppt.panelMode == 1 ? true : false);
+		this.stampDrawMode = (ppt.panelMode <= 1 ? true : false);
 		this.thumb_w = ppt.thumbnailWidthMin;
 		this.marginLR = 0;
 		// set margins betweens album stamps
-		if (ppt.panelMode == 1) {
+		if (ppt.panelMode == 0) {
+			this.marginTop = 1;
+			this.marginBot = 5;
+			this.marginSide = 1;
+			this.marginCover = 1;
+		}
+		else if (ppt.panelMode == 1) {
 			this.marginTop = 2;
 			this.marginBot = 2;
 			this.marginSide = 2;
@@ -877,7 +883,7 @@ oBrowser = function() {
 		// calc size of the cover art
 		cover.max_w = (this.thumbnailWidth - (this.marginSide * 2) - (this.marginCover * 2));
 		// Adjust Row & showList bloc Height
-		if (ppt.panelMode == 1) {
+		if (ppt.panelMode <= 1) {
 			this.rowHeight = 10 + cover.max_w + ppt.botStampHeight;
 		} else {
 			this.rowHeight = cover.max_w + 1;
@@ -1439,7 +1445,7 @@ oBrowser = function() {
 					};
 					
 					if (i == this.playingIndex) {
-						txt_color = ppt.panelMode == 1 ? RGBA(255, 255, 255) : g_color_highlight;
+						txt_color = ppt.panelMode <= 1 ? RGBA(255, 255, 255) : g_color_highlight;
 						//txt_color2 = txt_color1;
 						if (this.stampDrawMode) {
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
@@ -1522,11 +1528,11 @@ oBrowser = function() {
 							};
 						};
 					//};
-					if(i == this.playingIndex && ppt.panelMode != 1){
+					if(i == this.playingIndex && ppt.panelMode > 1){
 						gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_highlight);
 					}
 
-					if (ppt.panelMode == 1) { // panelMode = 1 (Art + bottom labels)
+					if (ppt.panelMode <= 1) { //(Art + bottom labels)
 						// draw text
 						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
 							try {
@@ -1655,7 +1661,7 @@ oBrowser = function() {
 				gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, frame_col);
 
 				// redraw hover frame selection on ALL item for Grid view
-				if (ppt.panelMode != 1) { // grid
+				if (ppt.panelMode > 1) { // grid
 					if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
 						gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg & 0xddffffff);
 					};
@@ -1951,7 +1957,7 @@ oBrowser = function() {
 				if(ppt.tagMode == 3){
 					if(ppt.dirMode == 1){
 						var string_n = fb.GetLibraryRelativePath(fb.GetFocusItem()).split("\\")[0];
-						if(string_n !== "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\"\\");
+						if(string_n != "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\\\"");
 					}else{
 						var string_n = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
 						plman.CreateAutoPlaylist(pl_n, this.groups[albumIndex].groupkey, "%path%" + " HAS \"" + string_n + "\"");
@@ -2016,10 +2022,11 @@ oBrowser = function() {
 			break;
 		}
 		_menu1.AppendTo(_menu, MF_STRING, "视图");
+		_menu2.AppendMenuItem(MF_STRING, 900, "紧凑排列模式");
 		_menu2.AppendMenuItem(MF_STRING, 901, "间距排列模式");
 		_menu2.AppendMenuItem(MF_STRING, 902, "网格排列无文字模式");
 		_menu2.AppendMenuItem(MF_STRING, 903, "网格排列模式");
-		_menu2.CheckMenuRadioItem(901, 903, 900 + ppt.panelMode);
+		_menu2.CheckMenuRadioItem(900, 903, 900 + ppt.panelMode);
 		_menu2.AppendMenuSeparator();
 		_menu2.AppendMenuItem(MF_STRING, 911, "合计项目");
 		_menu2.CheckMenuItem(911, ppt.showAllItem);

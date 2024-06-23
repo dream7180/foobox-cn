@@ -16,6 +16,7 @@ var currentMetadb = null, l_mood;
 var get_imgCol = false;
 var dark_mode = false;
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
 try{
 	eslCtrl = new ActiveXObject("ESLyric");
@@ -32,11 +33,8 @@ function GetCaption(name) {
 }
 
 //===================================
-
 var window_id = window.ID;
-//menu of online search links
 var SearchItems = [];
-//var getColor = false;
 function SearchItem(name, url, keyword) {
 	this.name = name;
 	this.url = url;
@@ -49,11 +47,13 @@ SearchItems.push(new SearchItem("Last.fm", "http://www.last.fm/search?q=%s&type=
 
 //----------infobar---------------------
 var show_infobar = window.GetProperty("Display.InfoBar", true);
+var show_rating = window.GetProperty("Display.Rating", true);
 var rating_to_tag =  window.GetProperty("foobox.rating.write.to.file", false);
 var is_mood = window.GetProperty("Display.Mood", false);
+if(!show_rating) is_mood = false;
 var g_font, g_font2;
 var currentMetadb;
-var rating_x, imgw, imgh, mood_h, infobar_h, pointArr, line2_y, infobar_y = 0;
+var rating_x, imgw, imgh, mood_h, infobar_h, pointArr, line2_h, infobar_y = 0;
 g_tfo = {
 	rating: fb.TitleFormat("%rating%"),
 	title: fb.TitleFormat("$if2(%title%,)"),
@@ -124,7 +124,7 @@ function get_var() {
 	imgw = Math.floor(18*zdpi);
 	imgh = imgw;
 	mood_h = Math.floor(20*zdpi);
-	infobar_h = show_infobar ? Math.floor(80*zdpi) : 0;
+	line2_h = 25*zdpi;
 	pointArr = Array(9*zdpi, zdpi, 6.4*zdpi, 5.6*zdpi, zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi);
 }
 
@@ -217,11 +217,7 @@ function initMetadb(){
 	}
 }
 
-//---------------------------------------
-
-
 // Some functions =======================================
-
 function CalcNewImgSize(img, dstW, dstH, srcW, srcH, strch, kar, fill) { // Calculate image's new size and offsets in new width and height range. 
 	if (!img) return;
 	if (!srcW) srcW = img.Width;
@@ -1591,6 +1587,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			baseMenu.AppendMenuSeparator();
 
 			var subMenu_IS = window.CreatePopupMenu();
+			var subMenu_ep = window.CreatePopupMenu();
 			subMenus.push(subMenu_IS);
 			subMenu_IS.AppendTo(baseMenu, MF_POPUP, "图像拉伸");
 
@@ -1611,10 +1608,11 @@ function Controller(imgArray, imgDisplay, prop) {
 			baseMenu.AppendMenuSeparator();
 			funcs[id] = [_this.CloseInfo, null];
 			baseMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, id++, "隐藏歌曲信息");
-			if(color_bycover){
-				funcs[id] = [_this.EslHighlightSW, null];
-				baseMenu.AppendMenuItem(sw_eslcolor ? MF_STRING : MF_CHECKED, id++, "歌词面板高亮色不跟随封面");
-			}
+			subMenu_ep.AppendTo(baseMenu, MF_POPUP, "切换歌词和属性面板");
+			funcs[id] = [on_mouse_mbtn_up, null];
+			subMenu_ep.AppendMenuItem(MF_STRING, id++, "切换 (鼠标中键)");
+			funcs[id] = [toggle_autoswitch, null]
+			subMenu_ep.AppendMenuItem(auto_eslprop ? MF_CHECKED : MF_STRING, id++, "自动切换");
 			funcs[id] = [_this.ShowProperties, null];
 			baseMenu.AppendMenuItem(MF_STRING, id++, "面板属性");
 		}
@@ -1853,27 +1851,11 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 	
 	this.CloseInfo = function() {
-		show_infobar = !show_infobar;
-		window.SetProperty("Display.InfoBar", show_infobar);
-		window.Reload();
-		on_size();
-	}
-	
-	this.EslHighlightSW = function() {
-		sw_eslcolor = !sw_eslcolor;
-		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
-		setEslHL = eslPanels && sw_eslcolor;
-		if(!sw_eslcolor) {
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
-		}
+		switch_infobar();
 	}
 
 	this.ShowProperties = function() {
 		window.ShowProperties();
-	}
-
-	this.OnRightClick = function(x, y) {
-		if (CoverDisplay.isXYIn(x, y) && this.funcMenu) this.funcMenu.Pop(x, y);
 	}
 
 	this.OnDoubleClick = function(x, y) {
@@ -1958,24 +1940,25 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 	
 	getColorSchemeFromImage = function() {
-		var imgColor = null;
+		let imgColor = null;
 		if(!currentImage || currentImage == null){
 			window.NotifyOthers("color_scheme_updated", imgColor);
 			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			get_imgCol = false;
 		}else{
-			var imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
+			let imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
 			imgColor = toRGB(imgColorData[0].col);
-			var c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
-			if(!dark_mode && c_aggr > 732) imgColor = false;
+			let c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
+			let cv_max = Math.max(...imgColor);
+			let c_dev = cv_max - Math.min(...imgColor);
+			if(c_dev < 16) imgColor = false;
 			else if(c_aggr > 450){
-				var reduction = Math.round((c_aggr - 450) / 3);
+				let reduction = Math.round((c_aggr - 450) / 3);
 				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
 				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
 				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-			}
-			else if(dark_mode && imgColor[0]<85 && imgColor[1]<85 && imgColor[2]<85){
-				var reduction = Math.round((255-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
+			}else if(dark_mode && cv_max<90){
+				let reduction = Math.round((270-c_aggr) / 3);
 				imgColor[0] = imgColor[0]+reduction;
 				imgColor[1] = imgColor[1]+reduction;
 				imgColor[2] = imgColor[2]+reduction;
@@ -2105,15 +2088,8 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.Init();
 }
 
-/*/ ===================================================
-var VBE;
-try {
-	VBE = new ActiveXObject("ScriptControl");
-	VBE.Language = "VBScript";
-} catch (e) {
-	PopMessage("Can not create ActiveX object (ScriptControl), some functions are not available.\nPlease check your system authorities.", 1);
-}
-*/
+// ===================================================
+
 function PopMessage(text, type) {
 	fb.ShowPopupMessage(text, "Foobox Cover Panel", type);
 }
@@ -2122,7 +2098,7 @@ var Properties = new function() {
 		this.Controller = {
 			GroupFormat: window.GetProperty("Image.GroupFormat", "%album artist%|%album%"),
 			//false: When not playing, true: Always.
-			FollowCursor: window.GetProperty("foobox.infoArt.follow.cursor", false),//fbx_set[10],
+			FollowCursor: window.GetProperty("foobox.infoArt.follow.cursor", false),
 			Cycle: {
 				SingleImageMode: window.GetProperty("Cycle.SingleImageMode", false),
 				Period: window.GetProperty("Cycle.Period", 20000)
@@ -2155,7 +2131,6 @@ var Properties = new function() {
 			BuildinPathFormat: '<front>||<back>||<disc>||<artist>||<icon>',
 			GenrePathFormat: GenrePathFormat,
 			TreatGenrePathAsBackup: window.GetProperty("Image.Genre.Image.TreatAsBackup", true),
-			//SupportedTypes: ['jpg', 'png', 'gif', 'bmp', 'jpeg'],
 			SupportedTypes: ['jpg', 'png'],
 			SingleImageMode: this.Controller.Cycle.SingleImageMode,
 			CycleInWildCard: window.GetProperty("Cycle.CycleInWildCard", true),
@@ -2199,25 +2174,28 @@ window.DlgCode = DLGC_WANTALLKEYS;
 get_font();
 get_var();
 get_colors();
-if(show_infobar) get_imgs();
+get_imgs();
 //-------------------
 var Covers = new ImagesArray(Properties.Image);
 var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
 // START ==============================================
 initMetadb();
+if(show_infobar) activate_infotimer();
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
 	CoverDisplay.Draw(gr);
 	if (currentMetadb && show_infobar) {
-		for (var i = 1; i < rbutton.length + 1; i++) {
-			rbutton[i - 1].Paint(gr, i);
+		if(show_rating){
+			for (var i = 1; i < rbutton.length + 1; i++) {
+				rbutton[i - 1].Paint(gr, i);
+			}
+			if (is_mood) btn_mood.Paint(gr);
 		}
-		if (is_mood) btn_mood.Paint(gr);
-		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh + 1*zdpi, ww, 30*zdpi, cc_txt);
+		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh*show_rating, ww, 28*zdpi, cc_txt);
 		var txt_line2 = (txt_info !="" && show_info) ? txt_info : txt_profile;
-		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, line2_y, ww, 25*zdpi, cc_txt);
+		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, wh - line2_h, ww, line2_h, cc_txt);
 	}
 }
 
@@ -2225,26 +2203,7 @@ function on_size() {
 	if (!window.Width || !window.Height) return;
 	ww = window.Width;
 	wh = window.Height;
-	MainController.Resize(Math.max(ww, 50), Math.max(wh, 50) - infobar_h);
-	
-	if(show_infobar){
-		infobar_y = Math.round(wh - infobar_h + 5 * zdpi);
-		line2_y = infobar_y + imgh + 30*zdpi;
-		initbutton();
-		
-		if(is_mood) {
-			var spacing = Math.min(15, Math.round(ww / 25));
-		}else{
-			var spacing = imgw;
-		}
-		var img_rating_w = imgw * 5 + spacing * 4;
-		rating_x = Math.round((ww - img_rating_w) / 2);
-		if(is_mood) btn_mood.setx(rating_x - btn_mood.w - spacing);
-		for(var i = 0; i < rbutton.length; i++){
-			rbutton[i].setx(rating_x + imgw * i + spacing * i);
-		}
-		TextBtn_info.setSize(0, imgh + infobar_y, ww, infobar_h - imgh);
-	}
+	panel_setsize();
 }
 
 function on_selection_changed(metadb) {
@@ -2296,6 +2255,10 @@ function on_mouse_lbtn_up(x, y) {
 	}
 }
 
+function on_mouse_mbtn_up(x, y, mask){
+	window.NotifyOthers("SwitchESLProp", true);
+}
+
 function on_mouse_leave() {
 	CoverDisplay.OnMouseLeave && CoverDisplay.OnMouseLeave();
 }
@@ -2333,18 +2296,22 @@ function on_load_image_done(cookie, image) {
 }
 
 function on_mouse_rbtn_up(x, y, vkey) {
-	MainController.OnRightClick(x, y, vkey);
-	if (show_infobar && TextBtn_info.isXYInButton(x, y)) {
+	if (CoverDisplay.isXYIn(x, y)) MainController.funcMenu.Pop(x, y);
+	else if (show_infobar && TextBtn_info.isXYInButton(x, y)) {
 		var rMenu = window.CreatePopupMenu();
-		rMenu.AppendMenuItem(MF_STRING, 3, "显示喜爱按钮");
-		rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
-		rMenu.AppendMenuSeparator();
+		var rpSubMenu = window.CreatePopupMenu();
 		rMenu.AppendMenuItem(MF_STRING, 1, "激活正在播放项目");
 		rMenu.AppendMenuItem(MF_STRING, 2, "属性");
 		rMenu.AppendMenuSeparator();
+		if(show_rating) {
+			rMenu.AppendMenuItem(MF_STRING, 3, "显示喜爱按钮");
+			rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
+		}
+		rMenu.AppendMenuItem(show_rating ? MF_STRING : MF_CHECKED, 7, "隐藏评级");
 		rMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, 6, "隐藏歌曲信息");
-		if(color_bycover)
-			rMenu.AppendMenuItem(sw_eslcolor ? MF_STRING : MF_CHECKED, 7, "歌词面板高亮色不跟随封面");
+		rpSubMenu.AppendTo(rMenu, MF_POPUP, "切换歌词和属性面板");
+		rpSubMenu.AppendMenuItem(MF_STRING, 8, "切换 (鼠标中键)");
+		rpSubMenu.AppendMenuItem(auto_eslprop ? MF_CHECKED : MF_STRING, 9, "自动切换");
 		rMenu.AppendMenuItem(MF_STRING, 5, "面板属性");
 		var a = rMenu.TrackPopupMenu(x, y);
 		switch (a) {
@@ -2360,25 +2327,25 @@ function on_mouse_rbtn_up(x, y, vkey) {
 		case 3:
 			is_mood = !is_mood;
 			window.SetProperty("Display.Mood", is_mood);
-			on_size();
+			panel_setsize();
 			window.RepaintRect(0, infobar_y, ww, mood_h);
 			break;
 		case 5:
 			window.ShowProperties();
 			break;
 		case 6:
-			show_infobar = !show_infobar;
-			window.SetProperty("Display.InfoBar", show_infobar);
-			window.Reload();
-			on_size();
+			switch_infobar();
 			break;
 		case 7:
-			sw_eslcolor = !sw_eslcolor;
-			window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
-			setEslHL = eslPanels && sw_eslcolor;
-			if(!sw_eslcolor) {
-				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
-			}
+			show_rating = !show_rating;
+			window.SetProperty("Display.Rating", show_rating);
+			panel_setsize();
+			break;
+		case 8:
+			on_mouse_mbtn_up();
+			break;
+		case 9:
+			toggle_autoswitch();
 			break;
 		}
 	}
@@ -2390,8 +2357,7 @@ function on_font_changed() {
 	if(show_infobar){
 		get_var();
 		get_imgs();
-		on_size();
-		window.RepaintRect(0, infobar_y, ww, infobar_h);
+		panel_setsize();
 	}
 	CoverDisplay.menuButton.ClearCache();
 };
@@ -2401,7 +2367,6 @@ function on_colours_changed() {
 	if(show_infobar){
 		get_imgs();
 	}
-	on_size();
 	window.Repaint();
 };
 
@@ -2430,11 +2395,55 @@ function on_notify_data(name, info) {
 			on_colorscheme_update(false);
 		}
 		break;
+	case "foobox_color_noesl":
+		sw_eslcolor = !info;
+		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
+		setEslHL = eslPanels && sw_eslcolor;
+		if(eslPanels) eslPanels.SetTextHighlightColor(sw_eslcolor ? c_highlight : c_default_hl);
+		break;
 	}
 }
 
 //----------------infobar-----------------------
 var timer_cycle = false;
+
+function switch_infobar(){
+	show_infobar = !show_infobar;
+	window.SetProperty("Display.InfoBar", show_infobar);
+	panel_setsize();
+	OnMetadbChanged();
+	if(show_infobar) activate_infotimer();
+	else dactivate_infotimer();
+	window.NotifyOthers("MetadataInfo", show_infobar);
+}
+
+function toggle_autoswitch(){
+	auto_eslprop = !auto_eslprop;
+	window.SetProperty("auto.switch.esl.prop", auto_eslprop);
+	window.NotifyOthers("AutoESLProp", auto_eslprop);
+}
+function panel_setsize(){
+	infobar_h = show_infobar ? Math.floor((50+23*show_rating)*zdpi) : 0;
+	MainController.Resize(Math.max(ww, 50), Math.max(wh, 50) - infobar_h);
+	if(show_infobar){
+		infobar_y = Math.round(wh - infobar_h + 5*zdpi*show_rating);
+		initbutton();
+		if(show_rating){
+			if(is_mood) {
+				var spacing = Math.min(15, Math.round(ww / 25));
+			}else{
+				var spacing = imgw;
+			}
+			var img_rating_w = imgw * 5 + spacing * 4;
+			rating_x = Math.round((ww - img_rating_w) / 2);
+			if(is_mood) btn_mood.setx(rating_x - btn_mood.w - spacing);
+			for(var i = 0; i < rbutton.length; i++){
+				rbutton[i].setx(rating_x + imgw * i + spacing * i);
+			}
+		}
+		TextBtn_info.setSize(0, wh - infobar_h, ww, infobar_h);
+	}
+}
 
 if (timer_cycle) {
 	window.KillTimer(timer_cycle);
@@ -2444,7 +2453,7 @@ if (timer_cycle) {
 function activate_infotimer(){
 	if(!timer_cycle) timer_cycle = window.SetInterval(function() {
 		show_info = !show_info;
-		window.RepaintRect(0, line2_y, ww, 25*zdpi);
+		window.RepaintRect(0, wh - line2_h, ww, line2_h);
 	}, time_circle);
 }
 
@@ -2452,8 +2461,6 @@ function dactivate_infotimer(){
 	timer_cycle && window.ClearInterval(timer_cycle);
 	timer_cycle = false;
 }
-
-if(show_infobar) activate_infotimer();
 
 /****************************************
  * DEFINE CLASS ButtonUI  for RATING

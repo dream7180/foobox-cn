@@ -12,6 +12,7 @@ var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;f
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var track_edit_app = "";
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var color_noesl = window.GetProperty("foobox.color.by.cover.except.ESL", false);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
@@ -19,7 +20,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "6.28 (Remastered)";
+var g_script_version = "6.29 (Remastered)";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;

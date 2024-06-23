@@ -9,16 +9,16 @@ var c_default_hl = 0, g_color_highlight = 0;
 function get_colors() {
 	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	g_color_background = g_color_background_default;
-	var color_text = window.GetColourDUI(ColorTypeDUI.text);
+	let color_text = window.GetColourDUI(ColorTypeDUI.text);
 	g_color_topbar = color_text & 0x09ffffff;
 	dark_mode = isDarkMode(g_color_background);
-	c_line = dark_mode ? RGBA(0,0,0,90) : RGBA(0,0,0,75);
+	c_line = dark_mode ? RGBA(0,0,0,120) : RGBA(0,0,0,75);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 }
 
 function get_font() {
-	var g_font = window.GetFontDUI(FontTypeDUI.playlists);
+	let g_font = window.GetFontDUI(FontTypeDUI.playlists);
 	zdpi = g_font.Size / 12;
 	g_topbarheight = z(26) + 2;
 };
@@ -76,6 +76,11 @@ function on_mouse_rbtn_up() {
 
 function on_colours_changed() {
 	get_colors();
+	window.Repaint();
+}
+
+function on_font_changed() {
+	get_font();
 	window.Repaint();
 }
 

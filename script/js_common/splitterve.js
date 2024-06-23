@@ -3,10 +3,21 @@ let ww = 0;
 let wh = 0;
 let sp_drag = false;
 var upperratio = 0;
+var linecolor, divcolor;
+var draw_splitter = window.GetProperty("Splitter.on", true);
+var splitter_hover = false;
 PUpper.ShowCaption = PLower.ShowCaption = false;
 
 function get_colors() {
 	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
+	let dark_mode = isDarkMode(g_color_background);
+	if(dark_mode){
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.51);
+		divcolor = RGBA(0, 0, 0, 150);
+	}else{
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.255);
+		divcolor = RGBA(0, 0, 0, 75);
+	}
 }
 
 //////////////
@@ -28,11 +39,17 @@ function on_size() {
 
 function on_paint(gr) {
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
-	gr.FillSolidRect(0, PUpper.Height, ww, 1, RGBA(0, 0, 0, 80));
-	gr.FillSolidRect(0, PUpper.Height+1, ww, 1, RGBA(0, 0, 0, 160));
+		var line_w = Math.round(ww / 2);
+	if(draw_splitter){
+		gr.FillGradRect(0, PUpper.Height, line_w, 1, 0, g_color_background, linecolor, 1.0);
+		gr.FillGradRect(line_w, PUpper.Height, ww - line_w, 1, 0, linecolor, g_color_background, 1.0);
+		gr.FillSolidRect(line_w, PUpper.Height, 1, 1, linecolor);
+	} else if(splitter_hover) gr.DrawLine(0, PUpper.Height, ww, PUpper.Height, 1, divcolor);
+	
 }
 
 function on_mouse_move(x, y) {
+	var splitter_tmp = splitter_hover;
 	if(x > 0 && y > 0 && x < ww && y < wh) {
 		window.SetCursor(32645);//IDC_SIZE
 		if(sp_drag){
@@ -41,7 +58,9 @@ function on_mouse_move(x, y) {
 			window.Repaint();
 			upperratio = PUpper.Height/(wh-2);
 		}
-	}
+		splitter_hover = true;
+	} else splitter_hover = false;
+	if(!draw_splitter && (splitter_tmp != splitter_hover)) window.RepaintRect(0, PUpper.Height - 1, ww, 3);
 }
 
 function on_mouse_lbtn_down(x, y) {
@@ -56,7 +75,22 @@ function on_mouse_rbtn_up() {
 	return true;
 }
 
+function on_mouse_leave(){
+	splitter_hover = false;
+	if(!draw_splitter) window.RepaintRect(0, PUpper.Height - 1, ww, 3);
+}
+
 function on_colours_changed() {
 	get_colors();
 	window.Repaint();
+}
+
+function on_notify_data(name, info) {
+	switch (name) {
+	case "MetadataInfo":
+		draw_splitter = info;
+		window.SetProperty("Splitter.on", draw_splitter);
+		window.Repaint();
+		break;
+	}
 }

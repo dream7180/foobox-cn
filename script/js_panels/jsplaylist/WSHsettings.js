@@ -75,6 +75,17 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 5:
 			if (status) {
+				color_noesl = true;
+			}
+			else {
+				color_noesl = false;
+			}
+			window.NotifyOthers("foobox_color_noesl", color_noesl);
+			window.SetProperty("foobox.color.by.cover.except.ESL", color_noesl);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 6:
+			if (status) {
 				albcov_lt = true;
 			}
 			else {
@@ -85,7 +96,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 7:
+		case 8:
 			if (status) {
 				show_extrabtn = true;
 			}
@@ -206,16 +217,16 @@ function settings_radioboxes_action(id, status, parentId) {
 				resize_panels();
 			//}
 			break;
-		case 8:
-			p.settings.pages[pid].elements[8].status = true;
-			p.settings.pages[pid].elements[9].status = false;
+		case 9:
+			p.settings.pages[pid].elements[9].status = true;
+			p.settings.pages[pid].elements[10].status = false;
 			libbtn_fuc = true;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
 			break;
-		case 9:
-			p.settings.pages[pid].elements[8].status = false;
-			p.settings.pages[pid].elements[9].status = true;
+		case 10:
+			p.settings.pages[pid].elements[9].status = false;
+			p.settings.pages[pid].elements[10].status = true;
 			libbtn_fuc = false;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
@@ -720,7 +731,7 @@ function settings_textboxes_action(pageId, elementId) {
 		break;
 	case 3:
 		switch (elementId) {
-		case 6:
+		case 7:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -730,7 +741,7 @@ function settings_textboxes_action(pageId, elementId) {
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
 			break;
-		case 10:
+		case 11:
 			var _radiom3u = radiom3u;
 			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_m3u == "") new_m3u = _radiom3u;
@@ -850,28 +861,30 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		// normal unchecked box
 		this.checkbox_normal_off = gdi.CreateImage(48, 48);
 		var gb = this.checkbox_normal_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(6, 6, 36, 36, 6, p.settings.color1);
+		gb.SetSmoothingMode(0);
+		gb.DrawRect(6, 6, 36, 36, 6, p.settings.color1);
 		this.checkbox_normal_off.ReleaseGraphics(gb);
 		// hover unchecked box
 		this.checkbox_hover_off = gdi.CreateImage(48, 48);
 		gb = this.checkbox_hover_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(6, 6, 36, 36, 6, p.settings.color2);
+		gb.SetSmoothingMode(0);
+		gb.DrawRect(6, 6, 36, 36, 6, p.settings.color2);
 		this.checkbox_hover_off.ReleaseGraphics(gb);
 		// normal checked box
 		this.checkbox_normal_on = gdi.CreateImage(48, 48);
 		var gb = this.checkbox_normal_on.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(6, 6, 36, 36, 6, p.settings.color1);
-		gb.FillEllipse(12, 12, 24, 24, p.settings.color1);
+		gb.SetSmoothingMode(0);
+		gb.DrawRect(6, 6, 36, 36, 6, p.settings.color1);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uF00C", p.settings.checkbox_font, p.settings.color1, 6, 6, 36, 36, cc_stringformat);
 		this.checkbox_normal_on.ReleaseGraphics(gb);
 		// hover checked box
 		this.checkbox_hover_on = gdi.CreateImage(48, 48);
 		gb = this.checkbox_hover_on.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(6, 6, 36, 36, 6, p.settings.color2);
-		gb.FillEllipse(12, 12, 24, 24, p.settings.color2);
+		gb.SetSmoothingMode(0);
+		gb.DrawRect(6, 6, 36, 36, 6, p.settings.color2);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uF00C", p.settings.checkbox_font, p.settings.color2, 6, 6, 36, 36, cc_stringformat);
 		this.checkbox_hover_on.ReleaseGraphics(gb);
 
 		// button
@@ -1569,14 +1582,15 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "封面信息面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "高亮色跟随封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "性能优先，缓存专辑封面的依据不区分专辑艺术家", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，含扩展名，以分号 ';' 来分隔 (封面在该文件夹内)", dir_cover_name, "settings_textboxes_action", this.id));			
-			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 12.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(8, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(9, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "播放列表管理面板中添加网络电台的地址 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "右栏封面信息及属性面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "高亮色跟随较鲜艳的封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, z(240), cSettings.topBarHeight + rh * 7.25, "歌词高亮色除外", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 8.25, "性能优先，缓存专辑封面的依据不区分专辑艺术家", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，含扩展名，以分号 ';' 来分隔 (封面在该文件夹内)", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "播放列表管理面板中添加网络电台的地址 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1919,7 +1933,7 @@ oPage = function(id, objectName, label, nbrows) {
 				if (radiom3u != _radiom3u){
 					save_misccfg();
 					window.NotifyOthers("Radio_list", radiom3u);
-					p.settings.pages[3].elements[10].inputbox.text = radiom3u;
+					p.settings.pages[3].elements[11].inputbox.text = radiom3u;
 					full_repaint();
 				}
 			}
@@ -2198,6 +2212,7 @@ oSettings = function() {
 		this.tab_font = GdiFont(g_fname, g_fsize + 2, 1);
 		this.txtHeight = g_fsize;
 		this.lineHeight = this.txtHeight + 10;
+		this.checkbox_font = GdiFont("FontAwesome", 30, 1);
 	}
 	this.setFont();
 	// var for custom color settings (widgets/sliders)

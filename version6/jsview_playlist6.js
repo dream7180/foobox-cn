@@ -91,14 +91,14 @@ oPlaylist = function(idx, metadb) {
 };
 
 oBrowser = function(name) {
-	this.name = name;
+	this.name = "";
 	this.rows = [];
 	this.scrollbar = new oScrollbar();
 	this.focusRow = plman.GetPlaylistFocusItemIndex(pidx);
 	this.activeRow = this.focusRow;
 	this.SHIFT_start_id = null;
 	this.show_tracknum = false;
-	this.tag = "\uF02C";
+	this.tag = "";
 	
 	this.launch_populate = function() {
 		var launch_timer = window.SetTimeout(function() {
@@ -143,7 +143,7 @@ oBrowser = function(name) {
 		this.getlimits(); 
 		
 		if (!ppt.show_activepl){
-			this.tag = "\uF02C";
+			this.tag = "\uF041";
 			if(this.rows.length == 0){
 				this.name = "";
 				return;
@@ -230,7 +230,6 @@ oBrowser = function(name) {
 		if (repaint_main || !repaintforced) {
 			repaint_main = false;
 			repaintforced = false;
-			
 			var isplaying_pidx = (fb.IsPlaying && plman.PlayingPlaylist == pidx);
 			var playing_itemidx = plman.GetPlayingItemLocation().PlaylistItemIndex;
 			var queue_idx = -1;
@@ -241,7 +240,6 @@ oBrowser = function(name) {
 			var ah = ppt.rowHeight;
 			var rh = gr.CalcTextWidth("0" + this.rows.length.toString(), g_font);
 			var tx = ax + rh + this.paddingLeft + 4;
-
 			if (this.rows.length > 0) {
 				for (var i = g_start_; i <= g_end_; i++) {
 					queue_idx = plman.FindPlaybackQueueItemIndex(this.rows[i].metadb, pidx, this.rows[i].idx) + 1;
@@ -286,7 +284,6 @@ oBrowser = function(name) {
 			gr.GdiDrawText(this.tag, g_font_tag, tag_color, this.paddingLeft, 0, this.paddingLeft*2, ppt.headerBarHeight, lc_txt);
 			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_w - rh - this.paddingLeft*6, ppt.headerBarHeight, lc_txt);
 			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_w - rh - this.paddingLeft, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
-			
 			brw.scrollbar && brw.scrollbar.draw(gr);
 		};
 	};
@@ -525,7 +522,7 @@ function on_init() {
 	get_images();
 	init_btn();
 	check_pidx();
-	brw = new oBrowser("brw");
+	brw = new oBrowser();
 };
 
 // START
@@ -681,7 +678,6 @@ function on_mouse_move(x, y) {
 };
 
 function on_mouse_wheel(step) {
-
 	if (cTouch.timer) {
 		window.ClearInterval(cTouch.timer);
 		cTouch.timer = false;
@@ -750,7 +746,7 @@ function get_font() {
 	g_font_b = GdiFont(g_font.Name, g_font.Size, 1);
 	g_track_size = Math.max(10, g_font.Size - 2);
 	g_font_track = GdiFont(g_font.Name, g_track_size, g_font.Style);
-	g_font_tag = GdiFont("FontAwesome", g_fsize, 0);
+	g_font_tag = GdiFont("FontAwesome", g_fsize+2, 0);
 };
 
 function get_colors() {
@@ -829,10 +825,12 @@ function on_key_down(vkey) {
 				window.ClearInterval(cTouch.timer);
 				cTouch.timer = false;
 			};
-			var g_start_y = brw.rows[g_start_].y;
-			var voffset = g_start_y - ppt.headerBarHeight;
-			scroll += ppt.rowHeight * (brw.totalRowsVis - 1) - voffset;
-			scroll = check_scroll(scroll);
+			if (brw.rowsCount >0){
+				var g_start_y = brw.rows[g_start_].y;
+				var voffset = g_start_y - ppt.headerBarHeight;
+				scroll += ppt.rowHeight * (brw.totalRowsVis - 1) - voffset;
+				scroll = check_scroll(scroll);
+			}
 			break;
 		case VK_RETURN:
 			if (brw.rowsCount > 0) {

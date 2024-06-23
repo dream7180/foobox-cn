@@ -216,8 +216,7 @@ oPlaylist = function(idx, rowId, name) {
 	if (ppt.lockReservedPlaylist && this.name == "媒体库" && this.idx == 0) this.islocked = true;
 };
 
-oBrowser = function(name) {
-	this.name = name;
+oBrowser = function() {
 	this.rows = [];
 	this.scrollbar = new oScrollbar();
 	this.inputbox = null;
@@ -1285,7 +1284,7 @@ function on_init() {
 	g_filterbox = new oFilterBox();
 	g_searchbox = new searchbox();
 	g_searchbox.on_init();
-	brw = new oBrowser("brw");
+	brw = new oBrowser();
 	if (ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
 };
 on_init();
@@ -1451,19 +1450,19 @@ function on_mouse_move(x, y) {
 };
 
 function on_mouse_wheel(step) {
-
 	if (cTouch.timer) {
 		window.ClearInterval(cTouch.timer);
 		cTouch.timer = false;
 	};
-
-	var g_start_y = brw.rows[g_start_].y;
-	if(g_start_ && g_start_y) {
-		var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
-		scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
+	if (brw.rowsCount >0) {
+		var g_start_y = brw.rows[g_start_].y;
+		if(g_start_ && g_start_y) {
+			var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
+			scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
+		}
+		else scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
+		scroll = check_scroll(scroll);
 	}
-	else scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
-	scroll = check_scroll(scroll);
 };
 
 function on_mouse_leave() {
@@ -1848,10 +1847,12 @@ function on_key_down(vkey) {
 					window.ClearInterval(cTouch.timer);
 					cTouch.timer = false;
 				};
-				var g_start_y = brw.rows[g_start_].y;
-				var voffset = g_start_y - ppt.headerBarHeight;
-				scroll += ppt.rowHeight * (brw.totalRowsVis - 1) - voffset;
-				scroll = check_scroll(scroll);
+				if (brw.rowsCount >0){
+					var g_start_y = brw.rows[g_start_].y;
+					var voffset = g_start_y - ppt.headerBarHeight;
+					scroll += ppt.rowHeight * (brw.totalRowsVis - 1) - voffset;
+					scroll = check_scroll(scroll);
+				}
 				break;
 			case VK_END:
 				if (brw.rowsCount > 0) {
