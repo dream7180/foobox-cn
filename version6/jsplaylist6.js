@@ -1,7 +1,13 @@
-﻿// Name "JSPlaylist"
-// Version "1.3.2"
-// Author "Br3tt aka Falstaff >> http://br3tt.deviantart.com"
-// mod for foobox https://github.com/dream7180
+﻿//foobox https://github.com/dream7180; JSPlaylist http://br3tt.deviantart.com
+window.DefinePanel('JSPlaylist', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '1.3.2', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHscrollbar.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHheaderbar.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHplaylist.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHsettings.js');
 
 var zdpi = 1;
 var follow_cursor = window.GetProperty("foobox.infoArt.follow.cursor", false);

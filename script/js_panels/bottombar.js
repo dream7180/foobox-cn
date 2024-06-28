@@ -1,4 +1,8 @@
 ﻿//foobox https://github.com/dream7180
+window.DefinePanel('foobox playback control panel', {author: 'dreamawake'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
+
 var time_length = 0;
 var zdpi, c_background, c_font, c_normal, c_shadow, c_shadow_h, c_seek_bg, c_tip_bg, c_seekoverlay, c_default_hl, c_seeker_core, c_pb_ov, c_pb_down;
 var img_play, img_pause, img_next, img_previous, img_vol, img_pbo = [], img_list, img_cover, img_lib, img_bio, img_vis, img_video;

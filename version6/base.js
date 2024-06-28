@@ -1,4 +1,9 @@
 ﻿//foobox https://github.com/dream7180
+window.DefinePanel('foobox base panel', {author: 'dreamawake'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
+include(fb.ProfilePath + 'foobox\\version6\\uihacks.js');
+
 var time_length = 0;
 var zdpi, dark_mode;
 var c_tip_bg = RGBA(0, 0, 0, 200), c_seeker_core = RGB(0, 0, 0), c_seek_bg = RGBA(255, 255, 255, 35);
@@ -84,7 +89,7 @@ oSwitchbar = function() {
 			break;
 		case "lbtn_up":
 			if (this.hover_tab > 0 && this.hover_tab-1 != active_pid){
-				this.swith_panel(this.hover_tab);
+				this.switch_panel(this.hover_tab);
 				this.down = 0;
 			}
 			break;
@@ -104,7 +109,7 @@ oSwitchbar = function() {
 		g_switchbar.tip_timer && window.ClearInterval(g_switchbar.tip_timer);
 		g_switchbar.tip_timer = false;
 	}
-	this.swith_panel = function(id) {
+	this.switch_panel = function(id) {
 		active_p.Show(false);
 		active_pid = id - 1;
 		switch(active_pid){
@@ -566,6 +571,10 @@ function main_Menu(x, y) {
 		break;
 	case (ret == 1301):
 		window.NotifyOthers("foobox_setting", 1);
+		if(active_pid != 0) {
+			g_switchbar.switch_panel(1);
+			g_switchbar.repaint();
+		}
 		break;
 	}
 	MenuBtn.Reset();

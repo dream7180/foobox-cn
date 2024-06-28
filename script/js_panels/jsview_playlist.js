@@ -1,6 +1,8 @@
-﻿// Name "Simple playlist viewer, based on jsspm"
-// Author "dreamawake"
-// foobox https://github.com/dream7180
+﻿// foobox https://github.com/dream7180
+window.DefinePanel('simple js playlist viewer', {author: 'dreamawake'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;

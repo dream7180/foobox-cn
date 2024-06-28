@@ -1,7 +1,10 @@
-﻿// Name "JS Smooth Playlist Manager"
-// Version "20151115-1000-151"
-// Author "Br3tt aka Falstaff >> http://br3tt.deviantart.com"
-//mod for foobox https://github.com/dream7180
+﻿//foobox https://github.com/dream7180, jsspm http://br3tt.deviantart.com
+window.DefinePanel('JS Smooth Playlist Manager', {author: 'Br3tt, Asion, dreamawake, always_beta(CN)', version: '20151115-1000-151', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;

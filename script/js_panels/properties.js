@@ -1,18 +1,14 @@
 ﻿'use strict';
-
-window.DefineScript('Track properties', {author:'marc2003, dreamawake'});
+window.DefinePanel('Track properties', {author:'marc2003, dreamawake'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+window.DlgCode = DLGC_WANTALLKEYS;
 let g_font, zdpi;
 const IDC_ARROW = 32512;
 const IDC_HAND = 32649;
-const SF_CENTRE = 285212672;
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-window.DlgCode = DLGC_WANTALLKEYS;
-
-get_font();
-
-const LM = z(5);
-const TM = z(20);
-const z12 = z(12);
+let margin_L, margin_T, z12, sb_font, tooltip;
+let showheader = window.GetProperty('List.show.header', false);
+let _bmp = gdi.CreateImage(1, 1);
+let _gr = _bmp.GetGraphics();
 
 let lang_meta = {
 	"TITLE" : "标题",
@@ -48,23 +44,15 @@ let lang_tech = {
 	"TOTALTRACKS" : "合计音轨"
 }
 
-let tooltip = window.CreateTooltip('Segoe UI', z12);
-tooltip.SetMaxWidth(1200);
-let fontawesome = gdi.Font('FontAwesome', 48);
-let _bmp = gdi.CreateImage(1, 1);
-let _gr = _bmp.GetGraphics();
-
-let showheader = window.GetProperty('LIST.SHOW.HEADER', false);
-
+//main
+get_font();
 let panel = new _panel();
-let list = new _list(LM, TM*showheader, 0, 0);
-
+let list = new _list();
 panel.item_focus_change();
 
+//callback function
 function on_size() {
 	panel.size();
-	list.w = panel.w - (LM * 2);
-	list.h = panel.h - TM * showheader;
 	list.size();
 }
 
@@ -72,7 +60,7 @@ function on_paint(gr) {
 	panel.paint(gr);
 	if(showheader){
 		var line_w = Math.round(list.w/2);
-		gr.GdiDrawText(list.header_text(), panel.fonts.title, panel.colours.text, LM, 0, panel.w - (LM * 2), TM, cc_txt);
+		gr.GdiDrawText(list.header_text(), panel.fonts.title, panel.colours.text, margin_L, 0, panel.w - (margin_L * 2), margin_T, cc_txt);
 		gr.FillGradRect(list.x, list.y + 1, line_w, 1, 0, panel.colours.background, panel.colours.line, 1.0);
 		gr.FillGradRect(line_w, list.y + 1, line_w, 1, 0, panel.colours.line, panel.colours.background, 1.0);
 		gr.FillSolidRect(line_w, list.y + 1, 1, 1, panel.colours.line);
@@ -103,7 +91,6 @@ function on_key_down(k) {
 	list.key_down(k);
 }
 
-
 function on_colours_changed() {
 	panel.colours_changed();
 	window.Repaint();
@@ -111,6 +98,7 @@ function on_colours_changed() {
 
 function on_font_changed() {
 	get_font();
+	list.size();
 	panel.font_changed();
 	window.Repaint();
 }
@@ -141,9 +129,7 @@ function on_notify_data(name, info) {
 	switch (name) {
 	case "MetadataInfo":
 		showheader = !info;
-		window.SetProperty('LIST.SHOW.HEADER', showheader);
-		list.y = TM * showheader;
-		list.h = panel.h - TM;
+		window.SetProperty('List.show.header', showheader);
 		list.size();
 		window.Repaint();
 		break;
@@ -166,6 +152,12 @@ function on_script_unload() {
 function get_font() {
 	g_font = window.GetFontDUI(FontTypeDUI.playlists);
 	zdpi = g_font.Size / 12;
+	margin_L = z(5);
+	margin_T = z(20);
+	z12 = z(12);
+	sb_font = GdiFont('FontAwesome', margin_L*2, 0);
+	tooltip = window.CreateTooltip(g_font.Name, g_font.Size);
+	tooltip.SetMaxWidth(z(1200));
 }
 
 function _cc(name) {
@@ -196,12 +188,18 @@ function _p(a, b) {
 	this.b = window.GetProperty(a, b);
 }
 
-function _sb(t, x, y, w, h, v, fn) {
+function _sb(t, v, fn) {
 	this.paint = (gr, colour) => {
-		gr.SetTextRenderingHint(4);
 		if (this.v()) {
-			gr.DrawString(this.t, this.font, colour, this.x, this.y, this.w, this.h, SF_CENTRE);
+			gr.GdiDrawText(this.t, sb_font, colour, this.x, this.y, this.w, this.h, cc_txt);
 		}
+	}
+	
+	this.size = (x, y, w, h) => {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
 	}
 	
 	this.trace = (x, y) => {
@@ -230,13 +228,8 @@ function _sb(t, x, y, w, h, v, fn) {
 	}
 	
 	this.t = t;
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
 	this.v = v;
 	this.fn = fn;
-	this.font = gdi.Font('FontAwesome', Math.floor(this.h/1.35));
 }
 
 function _textWidth(value, font) {
@@ -350,8 +343,8 @@ function _panel() {
 	this.w = 0;
 	this.h = 0;
 	this.metadb = fb.GetFocusItem();
-	this.selection = new _p('PANEL.SELECTION', 0);
-	this.click_plfunc = new _p('PANEL.CLICK.AUTOPLAYLIST', true);
+	this.selection = new _p('Panel.Selection', 0);
+	this.click_plfunc = new _p('Panel.click.autoplaylist', true);
 	this.list_objects = [];
 	this.tfo = {
 		'$if2(%__@%,%path%)' : fb.TitleFormat('$if2(%__@%,%path%)')
@@ -360,15 +353,17 @@ function _panel() {
 	this.colours_changed();
 }
 
-function _list(x, y, w, h) {
+function _list() {
 	this.size = () => {
 		this.index = 0;
 		this.offset = 0;
+		this.x = margin_L;
+		this.y = margin_T*showheader;
+		this.w = panel.w - (margin_L * 2);
+		this.h = panel.h - margin_T * showheader;
 		this.rows = Math.floor((this.h - z(24)) / panel.row_height);
-		this.up_btn.x = this.x + Math.round((this.w - z12) / 2);
-		this.down_btn.x = this.up_btn.x;
-		this.up_btn.y = this.y;
-		this.down_btn.y = this.y + this.h - z12;
+		this.up_btn.size(this.x + Math.round((this.w - z12) / 2), this.y, z12, z12);
+		this.down_btn.size(this.up_btn.x, this.y + this.h - z12, z12, z12);
 	}
 	
 	this.paint = (gr) => {
@@ -663,21 +658,17 @@ function _list(x, y, w, h) {
 		}
 			
 		this.properties = {
-			meta : new _p('LIST.PROPERTIES.META', true),
-			location : new _p('LIST.PROPERTIES.LOCATION', false),
-			tech : new _p('LIST.PROPERTIES.TECH', true),
-			playcount : new _p('LIST.PROPERTIES.PLAYCOUNT', true),
-			rg : new _p('LIST.PROPERTIES.RG', false)
+			meta : new _p('List.properties.meta', true),
+			location : new _p('List.properties.location', true),
+			tech : new _p('List.properties.tech', true),
+			playcount : new _p('List.properties.playcount', true),
+			rg : new _p('List.properties.rg', false)
 		};
 	
 		this.foo_playcount = _cc('foo_playcount');
 	}
 	
 	panel.list_objects.push(this);
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
 	this.mx = 0;
 	this.my = 0;
 	this.index = 0;
@@ -687,7 +678,7 @@ function _list(x, y, w, h) {
 	this.spacer_w = 0;
 	this.artist = '';
 	this.filename = '';
-	this.up_btn = new _sb('\uF077', this.x, this.y, z12, z12, () => { return this.offset > 0; }, () => { this.wheel(1); });
-	this.down_btn = new _sb('\uF078', this.x, this.y, z12, z12, () => { return this.offset < this.items - this.rows; }, () => { this.wheel(-1); });
+	this.up_btn = new _sb('\uF077', () => { return this.offset > 0; }, () => { this.wheel(1); });
+	this.down_btn = new _sb('\uF078', () => { return this.offset < this.items - this.rows; }, () => { this.wheel(-1); });
 	this.init();
 }

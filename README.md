@@ -15,7 +15,7 @@ foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.co
 
 **到最新 Releases (发行版) 页面下载安装包，从 7.24 起，安装包不再集成 foobar2000 汉化版，仅包含 foobox 主题及所需组件，绿色安装，自由便捷。**  
 
-* 从 7.26版开始增加 foobox 6 重制版，foobox 7 专注 64 位版，foobox 6 重制版为 32 位版，其实是在 foobox 7 的基础上添加 UI Hacks 并整合了两个版本的特点，适合喜欢隐藏菜单栏状态栏 UI 的朋友。  
+* 从 7.26 版开始增加 foobox 6 重制版 (仅 32 位)，其实是在 foobox 7 的基础上添加 UI Hacks 并整合了两个版本的特点，适合喜欢隐藏菜单栏状态栏 UI 的朋友。  
 
 * 额外的视频面板可选安装，它基于 [foo-youtube](https://fy.3dyd.com/download/) 和 [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) 组件。  
 <!-- * 感谢[南陇居士](https://www.nljs.site/)制作的整合安装包: [https://www.nljs.site/foobar2000.html](https://www.nljs.site/foobar2000.html)

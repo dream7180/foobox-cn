@@ -1,3 +1,4 @@
+window.DefinePanel('Jsplitter R02');
 window.DlgCode = 0x0004;
 let ww = 0;
 let wh = 0;

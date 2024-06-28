@@ -1,7 +1,11 @@
-﻿// Name "JS Smooth Browser"
-// Version "20151114-1630-340"
-// Author "Br3tt aka Falstaff >> http://br3tt.deviantart.com"
-// mod for foobox https://github.com/dream7180
+﻿// foobox https://github.com/dream7180; JSSB http://br3tt.deviantart.com
+window.DefinePanel('JS Smooth Browser', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '20151114-1630-340', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
+
 var zdpi = 1;
 var dark_mode = 0;
 //}

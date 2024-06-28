@@ -1,7 +1,10 @@
-﻿//Name"WSH Cover Panel"
-//Version 2.0.1f
-//Author Jensen (jensen-yg@163.com) ------------
-//mod for foobox https://github.com/dream7180
+﻿//Jensen (jensen-yg@163.com)
+//foobox https://github.com/dream7180
+window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
+
 var zdpi = 1;
 var g_fname, g_fsize;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";

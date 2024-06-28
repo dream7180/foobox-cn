@@ -1,3 +1,4 @@
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0;
 let wh = 0;

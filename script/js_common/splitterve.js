@@ -1,3 +1,7 @@
+window.DefinePanel('Jsplitter V01');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+var PUpper = window.GetPanel('infoart');
+var PLower = window.GetPanel('ESLProp');
 window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0;
 let wh = 0;
