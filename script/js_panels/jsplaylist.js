@@ -26,7 +26,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.29";
+var g_script_version = "7.30";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -63,8 +63,8 @@ var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
 var g_color_highlight = 0;
 var c_default_hl = 0;
-var g_color_playing_txt = RGB(255, 255, 255), g_color_line = RGBA(0, 0, 0, 20);
-var g_color_line_div = RGBA(0, 0, 0, 45), g_group_header_bg = RGBA(0, 0, 0, 6);
+var g_color_playing_txt = RGB(255, 255, 255);
+var g_color_line, g_color_line_div, g_group_header_bg, g_group_header_div;
 
 // main window vars
 var g_avoid_on_playlists_changed = false;
@@ -2004,13 +2004,25 @@ function get_colors() {
 	g_color_selected_txt = g_color_normal_txt;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
-	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	g_color_star = g_color_normal_txt & 0x2dffffff;
 	g_color_star_h = g_color_highlight;
-	if (isDarkMode(g_color_normal_bg)) dark_mode = 1;
-	else dark_mode = 0;
+	if(isDarkMode(g_color_normal_bg)){
+		dark_mode = 1;
+		g_color_topbar = RGBA(0,0,0,30);
+		g_color_line = RGBA(0, 0, 0, 30);
+		g_color_line_div = RGBA(0, 0, 0, 60);
+		g_group_header_bg = RGBA(0, 0, 0, 25);
+		g_group_header_div = RGBA(255, 255, 255, 10);
+	}else{
+		dark_mode = 0;
+		g_color_topbar = RGBA(0,0,0,12);
+		g_color_line = RGBA(0, 0, 0, 20);
+		g_color_line_div = RGBA(0, 0, 0, 45);
+		g_group_header_bg = RGBA(0, 0, 0, 6);
+		g_group_header_div = RGBA(255, 255, 255, 50);
+	}
 };
 
 function get_images_color() {

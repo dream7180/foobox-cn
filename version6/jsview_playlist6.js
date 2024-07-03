@@ -761,12 +761,17 @@ function get_colors() {
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	g_color_selected_bg = g_color_selected_bg_default;
-	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	g_color_tracknum = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
-	if (isDarkMode(g_color_normal_bg)) dark_mode = 1;
-	else dark_mode = 0;
+	if(isDarkMode(g_color_normal_bg)) {
+		dark_mode = 1;
+		g_color_topbar = RGBA(0,0,0,30);
+	}
+	else {
+		dark_mode = 0;
+		g_color_topbar = RGBA(0,0,0,12);
+	}
 };
 
 function on_script_unload() {
@@ -956,15 +961,15 @@ function on_notify_data(name, info) {
 			if(info){
 				if(dark_mode){
 					if(info.length == 3) {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.24);
 						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
 					} else {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[3], info[4], info[5]), 0.1);
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[3], info[4], info[5]), 0.24);
 						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[3], info[4], info[5]), 0.2);
 					}
 				} else {
 					if(g_color_normal_bg_default != 4294967295) {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.24);
 						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
 					}
 				}

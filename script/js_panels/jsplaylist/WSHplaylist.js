@@ -598,8 +598,9 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				this.l1_color = p.list.lcolor_85;
 				this.l2_color = p.list.lcolor_75;
 			}else{
-				gr.FillSolidRect(this.x, (this.y - groupDelta) + 1, line_width, this.h - 1, g_group_header_bg);
-				gr.FillSolidRect(this.x, (this.y + this.h - groupDelta), line_width, 1, g_color_line);
+				gr.FillSolidRect(this.x, (this.y - groupDelta), line_width, this.h, g_group_header_bg);
+				gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_color_line);
+				if(this.obj.collapsed)gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)+1, line_width, 1, g_group_header_div);
 				this.l1_color = g_color_normal_txt;
 				this.l2_color = p.list.lcolor_30;
 			}
@@ -608,8 +609,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var line_x = this.x + cover.w + g_z2;
 			var vpadding = g_z3;
 			var l1_y = this.y - groupDelta;
-			var lg1_right_field_w = gr.CalcTextWidth(this.r1, g_font_group1) + cList.borderWidth * 2;
-			var w_l1 = this.w - g_z8 - lg1_right_field_w;
+			var r1_w = gr.CalcTextWidth(this.r1, g_font_group1) + g_z10;
+			var w_l1 = this.w - r1_w;
 			switch (this.heightInRow) {
 			case 1:
 				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y - 1, w_l1, this.h, lcs_txt);
@@ -623,23 +624,23 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y - 1, this.w - g_z7, this.h, rcs_txt);
 				l1_x1 = line_x + l1_x1 + gr.CalcTextWidth(txt_l2, g_font_group2) + g_z7;
 				if(this.r1 == " ") var addon_w = 0;
-				else var addon_w = gr.CalcTextWidth(this.r1, g_font_group2) + g_z10;
+				else var addon_w = r1_w;
 				gr.FillSolidRect(l1_x1, (this.y + this.h/2 - groupDelta), this.w - l1_x1 - addon_w, 1, g_color_highlight);
 				break;
 			case 2:
 				if(this.obj){
 					this.r2 = this.obj.count + "首";
 				}
-				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
-				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
-				gr.GdiDrawText(this.l2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z8 - lg2_right_field_w, cTrack.height, lcs_txt);
+				var r2_w = gr.CalcTextWidth(this.r2, g_font_group2) + g_z10;
+				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - r1_w, cTrack.height * 1.15, lcs_txt);
+				gr.GdiDrawText(this.l2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - r2_w, cTrack.height, lcs_txt);
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				break;
 			case 3:
-				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
-				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
-				gr.GdiDrawText(this.l2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z8 - lg2_right_field_w, cTrack.height, lcs_txt);
+				var r2_w = gr.CalcTextWidth(this.r2, g_font_group2) + g_z10;
+				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - r1_w, cTrack.height * 1.15, lcs_txt);
+				gr.GdiDrawText(this.l2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - r2_w, cTrack.height, lcs_txt);
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
@@ -649,9 +650,9 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					var lg3_left_field = "";
 				}
 				var lg3_right_field = (this.group_index + 1) + " / " + p.list.groups.length;
-				var lg3_right_field_w = gr.CalcTextWidth(lg3_right_field, g_font) + cList.borderWidth * 2;
-				gr.GdiDrawText(lg3_left_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8 - lg3_right_field_w, cTrack.height, lcs_txt);
-				gr.GdiDrawText(lg3_right_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z10 + 01, cTrack.height, rcs_txt);
+				var r3_w = gr.CalcTextWidth(lg3_right_field, g_font) + g_z10;
+				gr.GdiDrawText(lg3_left_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - r3_w, cTrack.height, lcs_txt);
+				gr.GdiDrawText(lg3_right_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8, cTrack.height, rcs_txt);
 				break;
 			};
 

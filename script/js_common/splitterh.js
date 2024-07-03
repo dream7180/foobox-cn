@@ -8,10 +8,14 @@ PLeft.ShowCaption = PRight.ShowCaption = false;
 
 function get_colors() {
 	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
-	let color_text = window.GetColourDUI(ColorTypeDUI.text);
-	g_color_topbar = color_text & 0x09ffffff;
 	let dark_mode = isDarkMode(g_color_background);
-	c_line = dark_mode ? RGBA(0,0,0,120) : RGBA(0,0,0,60);
+	if(dark_mode){
+		c_line = RGBA(0,0,0,120);
+		g_color_topbar = RGBA(0,0,0,30);
+	}else{
+		c_line = RGBA(0,0,0,60);
+		g_color_topbar = RGBA(0,0,0,12);
+	}
 }
 
 function get_font() {

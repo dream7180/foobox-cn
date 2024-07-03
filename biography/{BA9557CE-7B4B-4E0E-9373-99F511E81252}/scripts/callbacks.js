@@ -438,9 +438,9 @@ function on_notify_data(name, info) {
 				if(info && switchbgcolour > 0){
 					let c_bg_default = window.GetColourDUI(1);
 					if(switchbgcolour == 2){
-						if(info.length == 3) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.9);
-						else c_bg = ui.getBlend(c_bg_default, RGB(info[3], info[4], info[5]), 0.9);
-					} else if(c_bg_default != 4294967295) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.9);
+						if(info.length == 3) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.76);
+						else c_bg = ui.getBlend(c_bg_default, RGB(info[3], info[4], info[5]), 0.76);
+					} else if(c_bg_default != 4294967295) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.76);
 				}
 				ui.getColours(c_h, c_bg);
 				txt.rev.cur = '';

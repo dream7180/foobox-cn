@@ -947,7 +947,7 @@ oHeaderBar = function() {
 
 			// set minimum rows / cover column size
 			get_grprow_minimum(this.columns[0].w);
-			update_playlist(layout.collapseGroupsByDefault, true);
+			update_playlist(layout.collapseGroupsByDefault, 2);
 			break;
 		case (idx == 205):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_albumartist, 1);

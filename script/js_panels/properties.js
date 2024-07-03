@@ -299,7 +299,6 @@ function _panel() {
 	
 	this.rbtn_up = (x, y, object) => {
 		this.m = window.CreatePopupMenu();
-		this.s2 = window.CreatePopupMenu();
 		// panel 1-999
 		// object 1000+
 		if (object) {

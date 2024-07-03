@@ -110,12 +110,12 @@ function on_notify_data(name, info) {
 		if(g_color_highlight != c_hl_tmp){
 			if(info){
 				if(dark_mode){
-					if(info.length == 3) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.1);
-					else g_color_background = blendColors(g_color_background_default, RGB(info[3], info[4], info[5]), 0.1);
+					if(info.length == 3) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.24);
+					else g_color_background = blendColors(g_color_background_default, RGB(info[3], info[4], info[5]), 0.24);
 					linecolor = blendColors(g_color_background, RGB(0,0,0), 0.51);
 				} else{
 					if(g_color_background_default != 4294967295) {
-						g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.1);
+						g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.24);
 						linecolor = blendColors(g_color_background, RGB(0,0,0), 0.255);
 					}
 				}

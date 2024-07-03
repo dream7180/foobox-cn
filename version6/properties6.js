@@ -147,13 +147,13 @@ function on_notify_data(name, info) {
 		if(panel.colours.highlight != c_hl_tmp){
 			if(info){
 				if(panel.dark_mode){
-					if(info.length == 3) panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.1);
-					else panel.colours.background = blendColors(panel.colours.background_default, RGB(info[3], info[4], info[5]), 0.1);
+					if(info.length == 3) panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.24);
+					else panel.colours.background = blendColors(panel.colours.background_default, RGB(info[3], info[4], info[5]), 0.24);
 					panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.510);
 					panel.colours.tagtext = blendColors(panel.colours.background, panel.colours.text, 0.65);
 				} else{
 					if(panel.colours.background_default != 4294967295) {
-						panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.1);
+						panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.24);
 						panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.255);
 						panel.colours.tagtext = blendColors(panel.colours.background, panel.colours.text, 0.65);
 					}
@@ -327,7 +327,6 @@ function _panel() {
 	
 	this.rbtn_up = (x, y, object) => {
 		this.m = window.CreatePopupMenu();
-		this.s2 = window.CreatePopupMenu();
 		// panel 1-999
 		// object 1000+
 		if (object) {

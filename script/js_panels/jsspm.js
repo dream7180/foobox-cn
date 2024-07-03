@@ -10,7 +10,7 @@ var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;
 var default_sort =  window.GetProperty("_PROPERTY: New playlist sortorder", "%album% | %discnumber% | %tracknumber% | %title%");
 var g_font, g_font_b, g_font_track;
-var g_color_line = RGBA(0, 0, 0, 20), g_color_line_div = RGBA(0, 0, 0, 45), g_color_playing_txt = RGB(255, 255, 255);
+var g_color_line, g_color_line_div, g_color_playing_txt = RGB(255, 255, 255);
 
 var brw = null;
 var isScrolling = false;
@@ -1716,11 +1716,19 @@ function get_colors() {
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
-	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
-	if (isDarkMode(g_color_normal_bg)) dark_mode = 1;
-	else dark_mode = 0;
+	if(isDarkMode(g_color_normal_bg)){
+		dark_mode = 1;
+		g_color_topbar = RGBA(0,0,0,30);
+		g_color_line = g_color_topbar;
+		g_color_line_div = RGBA(0, 0, 0, 60);
+	}else{
+		dark_mode = 0;
+		g_color_topbar = RGBA(0,0,0,12);
+		g_color_line = RGBA(0, 0, 0, 20);
+		g_color_line_div = RGBA(0, 0, 0, 45);
+	}
 };
 
 function on_script_unload() {

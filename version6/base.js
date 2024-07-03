@@ -270,7 +270,7 @@ function get_color() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	dark_mode = isDarkMode(c_background_default);
 	if(!dark_mode) {
-		c_background = blendColors(RGB(0, 0, 0), c_background_default, 0.92);
+		c_background = blendColors(RGB(0, 0, 0), c_background_default, 0.85);
 		c_btmbg = blendColors(RGB(0, 0, 0), c_background_default, 0.125);
 	} else {
 		c_background = blendColors(RGB(0, 0, 0), c_background_default, 0.8);
@@ -1186,7 +1186,8 @@ function on_mouse_rbtn_up() {
 function on_notify_data(name, info) {
 	switch (name) {
 	case "color_scheme_updated":
-		var c_ol_tmp = c_seekoverlay; 
+		var c_ol_tmp = c_seekoverlay;
+		var add_c = !dark_mode*0.12;
 		if(!info) {
 			c_seekoverlay = c_default_hl;
 			c_btmbg = c_btmbg_default;
@@ -1195,15 +1196,15 @@ function on_notify_data(name, info) {
 		else if(info.length == 3){
 			c_btmbg = blendColors(c_btmbg_default, RGB(info[0], info[1], info[2]), 0.12);
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
-			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12);
+			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12+add_c);
 		} else if(dark_mode){
-			c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.12);
+			c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.12+add_c);
 			c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.12);
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
 		} else{
 			c_btmbg = blendColors(c_btmbg_default, RGB(info[0], info[1], info[2]), 0.12);
 			c_seekoverlay = RGB(info[3], info[4], info[5]);
-			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12);
+			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12+add_c);
 		}
 		if(c_seekoverlay != c_ol_tmp){
 			c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);

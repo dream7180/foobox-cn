@@ -10,10 +10,14 @@ var c_default_hl = 0, g_color_highlight = 0;
 function get_colors() {
 	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	g_color_background = g_color_background_default;
-	let color_text = window.GetColourDUI(ColorTypeDUI.text);
-	g_color_topbar = color_text & 0x09ffffff;
 	dark_mode = isDarkMode(g_color_background);
-	c_line = dark_mode ? RGBA(0,0,0,120) : RGBA(0,0,0,75);
+	if(dark_mode){
+		c_line = RGBA(0,0,0,120);
+		g_color_topbar = RGBA(0,0,0,30);
+	}else{
+		c_line = RGBA(0,0,0,75);
+		g_color_topbar = RGBA(0,0,0,12);
+	}
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 }
@@ -97,10 +101,10 @@ function on_notify_data(name, info) {
 		if(g_color_highlight != c_hl_tmp){
 			if(info){
 				if(dark_mode){
-					if(info.length == 3) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.1);
-					else g_color_background = blendColors(g_color_background_default, RGB(info[3], info[4], info[5]), 0.1);
+					if(info.length == 3) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.24);
+					else g_color_background = blendColors(g_color_background_default, RGB(info[3], info[4], info[5]), 0.24);
 				} else{
-					if(g_color_background_default != 4294967295) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.1);
+					if(g_color_background_default != 4294967295) g_color_background = blendColors(g_color_background_default, RGB(info[0], info[1], info[2]), 0.24);
 				}
 			}
 			window.Repaint();

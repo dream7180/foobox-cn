@@ -2016,14 +2016,14 @@ function Controller(imgArray, imgDisplay, prop) {
 			
 			if(imgColor){
 				if(dark_mode){
-					if(imgColor.length == 3) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.1);
-					else c_background = blendColors(c_background_default, RGB(imgColor[3], imgColor[4], imgColor[5]), 0.1);
+					if(imgColor.length == 3) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.24);
+					else c_background = blendColors(c_background_default, RGB(imgColor[3], imgColor[4], imgColor[5]), 0.24);
 					var r = getRed(c_background) + 27;
 					var g = getGreen(c_background) + 27;
 					var b = getBlue(c_background) + 27;
 					if(Math.abs(imgColor[0]-r)<25 && Math.abs(imgColor[1]-g)<25 && Math.abs(imgColor[2]-b)<25) c_rating_h = fontcolor;
 				} else{
-					if(c_background_default != 4294967295) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.1);
+					if(c_background_default != 4294967295) c_background = blendColors(c_background_default, RGB(imgColor[0], imgColor[1], imgColor[2]), 0.24);
 				}
 			}
 			fontcolor2 = blendColors(c_background, fontcolor, 0.75);
