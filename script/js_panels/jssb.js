@@ -2753,7 +2753,7 @@ function get_colors() {
 	}
 	else {
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,15);
+		g_color_topbar = RGBA(0,0,0,12);
 	}
 	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
 };

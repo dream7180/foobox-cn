@@ -2017,7 +2017,7 @@ function get_colors() {
 		g_group_header_div = RGBA(255, 255, 255, 10);
 	}else{
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,15);
+		g_color_topbar = RGBA(0,0,0,12);
 		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 		g_group_header_bg = RGBA(0, 0, 0, 8);

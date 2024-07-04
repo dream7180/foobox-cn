@@ -14,7 +14,7 @@ function get_colors() {
 		g_color_topbar = RGBA(0,0,0,30);
 	}else{
 		c_line = RGBA(0,0,0,60);
-		g_color_topbar = RGBA(0,0,0,15);
+		g_color_topbar = RGBA(0,0,0,12);
 	}
 }
 

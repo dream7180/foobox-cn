@@ -749,7 +749,7 @@ function get_colors() {
 	}
 	else {
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,15);
+		g_color_topbar = RGBA(0,0,0,12);
 		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
