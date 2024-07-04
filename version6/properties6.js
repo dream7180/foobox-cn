@@ -149,12 +149,12 @@ function on_notify_data(name, info) {
 				if(panel.dark_mode){
 					if(info.length == 3) panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.24);
 					else panel.colours.background = blendColors(panel.colours.background_default, RGB(info[3], info[4], info[5]), 0.24);
-					panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.510);
+					panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.45);
 					panel.colours.tagtext = blendColors(panel.colours.background, panel.colours.text, 0.65);
 				} else{
 					if(panel.colours.background_default != 4294967295) {
 						panel.colours.background = blendColors(panel.colours.background_default, RGB(info[0], info[1], info[2]), 0.24);
-						panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.255);
+						panel.colours.line = blendColors(panel.colours.background, RGB(0,0,0), 0.3);
 						panel.colours.tagtext = blendColors(panel.colours.background, panel.colours.text, 0.65);
 					}
 				}
@@ -297,7 +297,7 @@ function _panel() {
 		this.colours.background = this.colours.background_default;
 		this.dark_mode = isDarkMode(this.colours.background);
 		this.colours.text = window.GetColourDUI(0);
-		this.colours.line = blendColors(this.colours.background, RGB(0,0,0), this.dark_mode ? 0.510 : 0.255);
+		this.colours.line = blendColors(this.colours.background, RGB(0,0,0), this.dark_mode ? 0.45 : 0.3);
 		this.colours.tagtext = blendColors(this.colours.background, this.colours.text, 0.65);
 		this.colours.hl_default = window.GetColourDUI(ColorTypeDUI.highlight);
 		this.colours.highlight = this.colours.hl_default;

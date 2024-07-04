@@ -271,7 +271,7 @@ function _panel() {
 		this.colours.background = window.GetColourDUI(1);
 		this.colours.text = window.GetColourDUI(0);
 		let dark_mode = isDarkMode(this.colours.background);
-		this.colours.line = blendColors(this.colours.background, RGB(0,0,0), dark_mode ? 0.510 : 0.255);
+		this.colours.line = blendColors(this.colours.background, RGB(0,0,0), dark_mode ? 0.45 : 0.25);
 		this.colours.tagtext = blendColors(this.colours.background, this.colours.text, 0.65);
 	}
 	

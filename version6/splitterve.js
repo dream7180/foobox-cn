@@ -18,10 +18,10 @@ function get_colors() {
 	g_color_background = g_color_background_default;
 	dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.51);
-		divcolor = RGBA(0, 0, 0, 150);
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.45);
+		divcolor = RGBA(0, 0, 0, 120);
 	}else{
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.255);
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.3);
 		divcolor = RGBA(0, 0, 0, 75);
 	}
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);

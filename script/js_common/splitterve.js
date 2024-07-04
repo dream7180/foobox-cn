@@ -16,11 +16,11 @@ function get_colors() {
 	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
 	let dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.51);
-		divcolor = RGBA(0, 0, 0, 150);
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.45);
+		divcolor = RGBA(0, 0, 0, 120);
 	}else{
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.255);
-		divcolor = RGBA(0, 0, 0, 75);
+		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.25);
+		divcolor = RGBA(0, 0, 0, 65);
 	}
 }
 

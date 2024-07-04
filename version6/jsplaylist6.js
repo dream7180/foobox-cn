@@ -2034,16 +2034,16 @@ function get_colors() {
 	if(isDarkMode(g_color_normal_bg)){
 		dark_mode = 1;
 		g_color_topbar = RGBA(0,0,0,30);
-		g_color_line = RGBA(0, 0, 0, 30);
-		g_color_line_div = RGBA(0, 0, 0, 60);
+		g_color_line = RGBA(0, 0, 0, 25);
+		g_color_line_div = RGBA(0, 0, 0, 55);
 		g_group_header_bg = RGBA(0, 0, 0, 25);
 		g_group_header_div = RGBA(255, 255, 255, 10);
 	}else{
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
-		g_color_line = RGBA(0, 0, 0, 20);
+		g_color_topbar = RGBA(0,0,0,15);
+		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
-		g_group_header_bg = RGBA(0, 0, 0, 6);
+		g_group_header_bg = RGBA(0, 0, 0, 8);
 		g_group_header_div = RGBA(255, 255, 255, 50);
 	}
 };

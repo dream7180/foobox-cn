@@ -12,11 +12,11 @@ function get_colors() {
 	g_color_background = g_color_background_default;
 	dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
-		c_line = RGBA(0,0,0,120);
+		c_line = RGBA(0,0,0,100);
 		g_color_topbar = RGBA(0,0,0,30);
 	}else{
 		c_line = RGBA(0,0,0,75);
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0,0,0,15);
 	}
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;

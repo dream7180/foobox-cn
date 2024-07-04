@@ -1723,12 +1723,12 @@ function get_colors() {
 	if(isDarkMode(g_color_normal_bg)){
 		dark_mode = 1;
 		g_color_topbar = RGBA(0,0,0,30);
-		g_color_line = g_color_topbar;
-		g_color_line_div = RGBA(0, 0, 0, 60);
+		g_color_line =  RGBA(0,0,0,25);
+		g_color_line_div = RGBA(0, 0, 0, 55);
 	}else{
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
-		g_color_line = RGBA(0, 0, 0, 20);
+		g_color_topbar = RGBA(0,0,0,15);
+		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
 };

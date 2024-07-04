@@ -10,11 +10,11 @@ function get_colors() {
 	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
 	let dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
-		c_line = RGBA(0,0,0,120);
+		c_line = RGBA(0,0,0,100);
 		g_color_topbar = RGBA(0,0,0,30);
 	}else{
 		c_line = RGBA(0,0,0,60);
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0,0,0,15);
 	}
 }
 

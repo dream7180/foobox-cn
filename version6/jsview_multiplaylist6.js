@@ -8,7 +8,7 @@ include(fb.ProfilePath + 'foobox\\version6\\uihacks.js');
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;
 var g_font, g_font_b, g_font_track;
-var g_color_line = RGBA(0, 0, 0, 20), g_color_line_div = RGBA(0, 0, 0, 45), g_color_playing_txt = RGB(255, 255, 255);
+var g_color_line, g_color_line_div, g_color_playing_txt = RGB(255, 255, 255);
 
 var brw = null;
 var isScrolling = false;
@@ -749,10 +749,14 @@ function get_colors() {
 	if(isDarkMode(g_color_normal_bg)) {
 		dark_mode = 1;
 		g_color_topbar = RGBA(0,0,0,30);
+		g_color_line = RGBA(0, 0, 0, 25);
+		g_color_line_div = RGBA(0, 0, 0, 55);
 	}
 	else {
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0,0,0,15);
+		g_color_line = RGBA(0, 0, 0, 18);
+		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
 };
 

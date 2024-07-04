@@ -445,7 +445,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						// if row is focused, draw focused colors & style ELSE draw with normal colors
 						if (p.list.focusedTrackId == this.track_index) {
 							// frame on focused item
-							gr.DrawRect(tcolumn_x, this.y + 1, line_width - 1, this.h - 2, 1.0, g_color_selected_bg);
+							gr.DrawRect(tcolumn_x + 1, this.y + 2, line_width - 2, this.h - 4, 1.0, g_color_selected_bg);
 						};
 						this.text_colour = g_color_normal_txt;
 					};
@@ -599,8 +599,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				this.l2_color = p.list.lcolor_75;
 			}else{
 				gr.FillSolidRect(this.x, (this.y - groupDelta), line_width, this.h, g_group_header_bg);
-				gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_color_line);
-				if(this.obj.collapsed)gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)+1, line_width, 1, g_group_header_div);
+				if(this.obj.collapsed){
+					gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-2, line_width, 1, g_color_line);
+					gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_group_header_div);
+				} else gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_color_line);
 				this.l1_color = g_color_normal_txt;
 				this.l2_color = p.list.lcolor_30;
 			}
@@ -661,7 +663,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			if (this.obj) {
 				for (var k = 0; k < this.obj.count; k++) {
 					if (plman.IsPlaylistItemSelected(p.list.playlist, this.obj.start + k) && this.obj.collapsed) {
-						gr.FillSolidRect(this.x, (this.y - groupDelta), this.w + cScrollBar.width, this.h, g_color_selected_bg & 0x75ffffff);
+						gr.FillSolidRect(this.x, (this.y - groupDelta), this.w + cScrollBar.width, this.h - 2, g_color_selected_bg & 0x75ffffff);
 						break;
 					}
 					else {
@@ -669,7 +671,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						if (fb.IsPlaying) {
 							if (plman.PlayingPlaylist == this.playlist) {
 								if (!now_playing_found && p.list.nowplaying.PlaylistItemIndex >= this.obj.start && p.list.nowplaying.PlaylistItemIndex < this.obj.start + this.obj.count && this.obj.collapsed) {
-									gr.FillSolidRect(this.x, (this.y - groupDelta), this.w + cScrollBar.width, this.h, g_color_highlight & 0x75ffffff);
+									gr.FillSolidRect(this.x, (this.y - groupDelta) - 1, this.w + cScrollBar.width, this.h, g_color_highlight & 0x75ffffff);
 									now_playing_found = true;
 								};
 							};
