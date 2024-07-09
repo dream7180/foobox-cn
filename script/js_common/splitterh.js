@@ -1,7 +1,7 @@
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 window.DlgCode = DLGC_WANTALLKEYS;
-let ww = 0;
-let wh = 0;
+let ww = 0, wh = 0;
+let m_x = 0, m_y = 0;
 let sp_drag = false;
 var leftratio = 0;
 PLeft.ShowCaption = PRight.ShowCaption = false;
@@ -52,6 +52,7 @@ function on_paint(gr) {
 }
 
 function on_mouse_move(x, y) {
+	if(m_x == x && m_y == y) return;
 	if(x > 0 && y > 0 && x < ww && y < wh) {
 		window.SetCursor(32644);//IDC_SIZE
 		if(sp_drag){
@@ -61,6 +62,8 @@ function on_mouse_move(x, y) {
 			leftratio = PLeft.Width/(ww -2);
 		}
 	}
+	m_x = x;
+	m_y = y;
 }
 
 function on_mouse_lbtn_down(x, y) {

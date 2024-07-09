@@ -79,12 +79,9 @@ oHeaderBar = function() {
 	};
 	this.resetSortIndicators();
 	this.buttonClicked = false;
-
 	this.borderHover = false;
 	this.clickX = 0;
-	//font
-	this.icoFont = GdiFont("Tahoma", g_fsize - 2, 1);
-
+	
 	this.setButtons = function() {
 		var menu_ico = g_color_normal_txt&0x88ffffff;
 		var btn_h = cHeaderBar.height;
@@ -92,33 +89,25 @@ oHeaderBar = function() {
 		var y_ini = Math.round((btn_h-add_h*2)/2);
 		var x_ini =  cScrollBar.width / 4;
 
-		this.slide_open_normal = gdi.CreateImage(cScrollBar.width, btn_h);
-		var gb = this.slide_open_normal.GetGraphics();
+		this.menu_btn = gdi.CreateImage(cScrollBar.width, btn_h);
+		var gb = this.menu_btn.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
 		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, menu_ico);
 		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, menu_ico);
 		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, menu_ico);	
-		this.slide_open_normal.ReleaseGraphics(gb);
+		this.menu_btn.ReleaseGraphics(gb);
 
-		this.slide_open_hover = gdi.CreateImage(cScrollBar.width, btn_h);
-		gb = this.slide_open_hover.GetGraphics();
-		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,30));
+		this.menu_btn_ov = gdi.CreateImage(cScrollBar.width, btn_h);
+		gb = this.menu_btn_ov.GetGraphics();
+		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_normal_txt & 0x35ffffff);
 		gb.SetSmoothingMode(2);
 		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, g_color_normal_txt);
 		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, g_color_normal_txt);
 		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, g_color_normal_txt);	
-		this.slide_open_hover.ReleaseGraphics(gb);
+		this.menu_btn_ov.ReleaseGraphics(gb);
 
-		this.slide_open_down = gdi.CreateImage(cScrollBar.width, btn_h);
-		gb = this.slide_open_down.GetGraphics();
-		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,50));
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, g_color_normal_txt);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, g_color_normal_txt);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, g_color_normal_txt);	
-		this.slide_open_down.ReleaseGraphics(gb);
-		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "");
+		this.button = new button(this.menu_btn, this.menu_btn_ov, this.menu_btn_ov, "");
 	};
 	this.setButtons();
 
@@ -511,7 +500,8 @@ oHeaderBar = function() {
 	this.buttonCheck = function(event, x, y) {
 		if (!dragndrop.moved) {
 			if (!this.columnDragged && !this.borderDragged) {
-				var state = this.button.checkstate(event, x, y);
+				var state = 0;
+				if(event != "leave_menu") state = this.button.checkstate(event, x, y);
 				switch (event) {
 				case "down":
 					if (state == ButtonStates.down) {
@@ -527,10 +517,8 @@ oHeaderBar = function() {
 					
 				case "leave_menu":
 					var _state = this.button.state;
-					if(this.buttonClicked && state == ButtonStates.hover) {
-						this.buttonClicked = false;
-						
-					} else this.button.state = ButtonStates.normal;
+					if(this.buttonClicked && _state == ButtonStates.hover) this.buttonClicked = false;
+					else this.button.state = ButtonStates.normal;
 					if(this.button.state != _state) this.button.repaint();
 					break;
 				};

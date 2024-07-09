@@ -11,10 +11,8 @@ var g_color_line, g_color_line_div, g_color_playing_txt = RGB(255, 255, 255);
 
 var brw = null;
 var isScrolling = false;
-var ww = 0,
-	wh = 0;
-var m_x = 0,
-	m_y = 0;
+var ww = 0, wh = 0;
+var m_x = 0, m_y = 0;
 // color vars
 var g_color_normal_bg = 0;
 var g_color_selected_bg = 0;
@@ -492,6 +490,13 @@ function SelectAtoB(start_id, end_id) {
 	brw.focusRow = end_id;
 };
 
+check_leavemenu = function(){
+	var _state = btn_sw.state;
+	if(btn_clicked && _state == ButtonStates.hover) btn_clicked = false;
+	else btn_sw.state = ButtonStates.normal;
+	if(btn_sw.state != _state) btn_sw.repaint();
+};
+
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
 	get_font();
@@ -635,7 +640,7 @@ function on_mouse_rbtn_up(x, y) {
 };
 
 function on_mouse_move(x, y) {
-	if (m_x == x && m_y == y) return;
+	if(m_x == x && m_y == y) return;
 	if (cTouch.down) {
 		cTouch.y_current = y;
 		cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
@@ -671,6 +676,7 @@ function on_mouse_wheel(step) {
 
 function on_mouse_leave() {
 	brw.on_mouse("leave", 0, 0);
+	check_leavemenu();
 };
 
 //=================================================// Metrics & Fonts & Colors & Images

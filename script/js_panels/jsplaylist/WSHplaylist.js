@@ -769,7 +769,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 
 	this.check = function(event, x, y) {
 		var groupDelta = this.groupRowDelta * cTrack.height;
-		this.ishover = (x >= this.x + p.headerBar.columns[0].w * (1 - this.type) && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
+		this.ishover = (x >= this.x && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
 
 		var prev_rating_hover = this.rating_hover;
 		var prev_l_rating = this.l_rating;
@@ -2370,7 +2370,7 @@ oInfoPane = function(){
 		l.push(fb.TitleFormat("$if2(%title%,)").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("$if2(%artist%,)").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("$if2(%album%,)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%channels% | %__bitspersample% bits | %bitrate% kbps | %samplerate% Hz").EvalWithMetadb(this.metadb));
+		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz").EvalWithMetadb(this.metadb));
 		l.push(fb.TitleFormat("%filesize_natural%").EvalWithMetadb(this.metadb));
 		var clw = gr.CalcTextWidth("所在文件夹: ", g_font);
 		var maxl = gr.CalcTextWidth(l[0], g_font);

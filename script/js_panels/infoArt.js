@@ -63,9 +63,7 @@ g_tfo = {
 	artist: fb.TitleFormat("$if2(%artist%,)"),
 	album: fb.TitleFormat("$if2(%album%,)"),
 	mood: fb.TitleFormat("%mood%"),
-	codec: fb.TitleFormat("%codec%"),
-	codec_profile: fb.TitleFormat("$if(%codec_profile%, | %codec_profile%,)"),
-	bitrate: fb.TitleFormat("$if(%bitrate%, | %bitrate%K,)")
+	tracktech: fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz")
 }
 var rating, txt_title, txt_info, txt_profile, show_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
@@ -203,7 +201,7 @@ function OnMetadbChanged() {
 		if(txt_info_album) txt_info = txt_info + "  |  " + txt_info_album;
 	}else if(txt_info_album) txt_info = txt_info_album;
 	else txt_info = "";
-	txt_profile = g_tfo.codec.EvalWithMetadb(currentMetadb) + g_tfo.codec_profile.EvalWithMetadb(currentMetadb) + g_tfo.bitrate.EvalWithMetadb(currentMetadb);
+	txt_profile = g_tfo.tracktech.EvalWithMetadb(currentMetadb);
 	l_mood = g_tfo.mood.EvalWithMetadb(currentMetadb);
 	tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
 	show_info = true;
@@ -1398,15 +1396,8 @@ function Display(x, y, w, h, prop) {
 		}(0, 0, Math.ceil(55*zdpi) + 5, Math.ceil(25*zdpi));
 
 		var btnStatus = -1; // -1: hide.
-		var bugx, bugy; // Prevent a windows menu behaviour bug.
 
 		this.OnMouseMove = function(x, y) {
-			if (x == bugx && y == bugy) {
-				bugx = null, bugy = null;
-				return;
-			}
-			bugx = null, bugy = null;
-
 			if (btnStatus == 2) this.menuButton.ChangeState(this.menuButton.isXYIn(x, y) ? 2 : 1);
 			else if (this.isXYIn(x, y)) {
 				if (btnStatus == -1) this.menuButton.ChangeState2(1);
@@ -1429,7 +1420,6 @@ function Display(x, y, w, h, prop) {
 
 		this.OnMouseUp = function(x, y) {
 			if (this.menuButton.state == 2) {
-				bugx = x, bugy = y;
 				this.menuButton.OnClick(x, y);
 				this.menuButton.ChangeState2(0);
 			}
@@ -2239,9 +2229,9 @@ function on_playback_stop(reason) {
 var cursorX, cursorY;
 
 function on_mouse_move(x, y) {
+	if(cursorX == x && cursorY == y) return;
+	CoverDisplay.OnMouseMove(x, y);
 	cursorX = x, cursorY = y;
-	CoverDisplay.OnMouseMove && CoverDisplay.OnMouseMove(x, y);
-
 }
 
 function on_mouse_lbtn_down(x, y) {

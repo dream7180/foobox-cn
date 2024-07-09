@@ -3,8 +3,8 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 var PUpper = window.GetPanel('infoart');
 var PLower = window.GetPanel('ESLProp');
 window.DlgCode = DLGC_WANTALLKEYS;
-let ww = 0;
-let wh = 0;
+let ww = 0, wh = 0;
+let m_x = 0, m_y = 0;
 let sp_drag = false;
 var upperratio = 0;
 var linecolor, divcolor;
@@ -53,6 +53,7 @@ function on_paint(gr) {
 }
 
 function on_mouse_move(x, y) {
+	if(m_x == x && m_y == y) return;
 	var splitter_tmp = splitter_hover;
 	if(x > 0 && y > 0 && x < ww && y < wh) {
 		window.SetCursor(32645);//IDC_SIZE
@@ -65,6 +66,8 @@ function on_mouse_move(x, y) {
 		splitter_hover = true;
 	} else splitter_hover = false;
 	if(!draw_splitter && (splitter_tmp != splitter_hover)) window.RepaintRect(0, PUpper.Height - 1, ww, 3);
+	m_x = x;
+	m_y = y;
 }
 
 function on_mouse_lbtn_down(x, y) {

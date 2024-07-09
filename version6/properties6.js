@@ -445,6 +445,7 @@ function _list() {
 	}
 	
 	this.move = (x, y) => {
+		if(this.mx == x && this.my == y) return false;
 		this.mx = x;
 		this.my = y;
 		window.SetCursor(IDC_ARROW);

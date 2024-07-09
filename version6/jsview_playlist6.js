@@ -12,10 +12,8 @@ var g_color_line, g_color_line_div, g_color_playing_txt = RGB(255, 255, 255);
 
 var brw = null;
 var isScrolling = false;
-var ww = 0,
-	wh = 0;
-var m_x = 0,
-	m_y = 0;
+var ww = 0, wh = 0;
+var m_x = 0, m_y = 0;
 // color vars
 var g_color_normal_bg = 0;
 var g_color_selected_bg = 0;
@@ -655,13 +653,11 @@ function on_mouse_rbtn_up(x, y) {
 	if (!utils.IsKeyPressed(VK_SHIFT)) {
 		brw.on_mouse("right", x, y);
 	};
-	//if (!utils.IsKeyPressed(VK_SHIFT)) {
 	return true;
-	//};
 };
 
 function on_mouse_move(x, y) {
-	if (m_x == x && m_y == y) return;
+	if(m_x == x && m_y == y) return;
 	if (cTouch.down) {
 		cTouch.y_current = y;
 		cTouch.y_move = (cTouch.y_current - cTouch.y_prev);

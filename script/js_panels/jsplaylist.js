@@ -26,7 +26,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.30";
+var g_script_version = "7.31";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -1161,7 +1161,7 @@ function on_mouse_leave() {
 	if (p.scrollbar && p.list.totalRows > 0 && (p.list.totalRows > p.list.totalRowVisible)) {
 		p.scrollbar.check("leave", 0, 0);
 	};
-	p.headerBar.buttonCheck("leave_menu", 0, 0);
+	p.headerBar.buttonCheck("leave_menu");
 	InfoPane.metadb = null;
 	InfoPane.rowindex = -1;
 	if(InfoPane.show) {

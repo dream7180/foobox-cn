@@ -27,11 +27,8 @@ var g_dragndrop_trackId = -1;
 var g_dragndrop_rowId = -1;
 var g_dragndrop_targetPlaylistId = -1;
 //
-var ww = 0,
-	wh = 0;
-//var g_metadb = null;
-var m_x = 0,
-	m_y = 0;
+var ww = 0, wh = 0;
+var m_x = 0, m_y = 0;
 var g_active_playlist = null;
 // color vars
 var g_color_normal_bg = 0;
@@ -65,7 +62,6 @@ ppt = {
 	SearchBarHeight: 28,
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
-	//drawUpAndDownScrollbar: window.GetProperty("_PROPERTY: Draw Up and Down Scrollbar Buttons", false),
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	winver: null,
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true),
@@ -734,25 +730,12 @@ oBrowser = function() {
 			else {
 				if (this.ishover) {
 					if (this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
-						if (!utils.IsKeyPressed(VK_SHIFT)) {
-							this.repaint();
-							this.selectedRow = this.activeRow;
-							//if (!timers.rightClick) {
-								//timers.rightClick = window.SetTimeout(function() {
-									brw.context_menu(m_x, m_y, brw.selectedRow);
-									//timers.rightClick && window.ClearTimeout(timers.rightClick);
-									//timers.rightClick = false;
-								//}, 50);
-							//};
-						};
-						this.repaint();
+						if (!utils.IsKeyPressed(VK_SHIFT)) this.selectedRow = this.activeRow;
 					}
-					else {
-						this.context_menu(x, y, this.activeRow);
-					};
+					this.repaint();
+					this.context_menu(x, y, this.activeRow);
 				}
 				else {
-					// scrollbar
 					if (/*cScrollBar.enabled && */cScrollBar.visible) {
 						brw.scrollbar && brw.scrollbar.on_mouse(event, x, y);
 					};
@@ -765,7 +748,7 @@ oBrowser = function() {
 			break;
 		case "leave":
 			this.new_bt.checkstate("leave", x, y);
-
+			this.check_leavemenu();
 			// scrollbar
 			if (/*cScrollBar.enabled && */cScrollBar.visible) {
 				this.scrollbar && this.scrollbar.on_mouse(event, 0, 0);
@@ -846,6 +829,13 @@ oBrowser = function() {
 		};
 		scroll_prev = scroll;
 	}, ppt.refreshRate);
+	
+	this.check_leavemenu = function(){
+		var _state = this.new_menu.state;
+		if(this.buttonClicked && _state == ButtonStates.hover) this.buttonClicked = false;
+		else this.new_menu.state = ButtonStates.normal;
+		if(this.new_menu.state != _state) this.new_menu.repaint();
+	}
 
 	this.context_menu = function(x, y, id, setting_mode) {
 		var _menu = window.CreatePopupMenu();
@@ -1382,7 +1372,6 @@ function on_mouse_lbtn_up(x, y) {
 		cTouch.down = false;
 		cTouch.y_end = y;
 		cTouch.scroll_delta = scroll - scroll_;
-		//cTouch.y_delta = cTouch.y_start - cTouch.y_end;
 		if (Math.abs(cTouch.scroll_delta) > 030) {
 			cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
 			cTouch.delta = Math.round((cTouch.scroll_delta) / 030);
@@ -1420,20 +1409,15 @@ function on_mouse_rbtn_up(x, y) {
 		g_searchbox.on_mouse("rbtn_down", x, y);
 		brw.on_mouse("right", x, y);
 	};
-	//if (!utils.IsKeyPressed(VK_SHIFT)) {
 	return true;
-	//};
 };
 
 function on_mouse_move(x, y) {
-
-	if (m_x == x && m_y == y) return;
-
+	if(m_x == x && m_y == y) return;
 	if (!cPlaylistManager.drag_moved) {
 		if(ppt.showFilter) g_filterbox.on_mouse("move", x, y);
 		g_searchbox.on_mouse("move", x, y);
 	};
-	
 	if (cTouch.down) {
 		cTouch.y_current = y;
 		cTouch.y_move = (cTouch.y_current - cTouch.y_prev);
@@ -1444,10 +1428,7 @@ function on_mouse_move(x, y) {
 			cTouch.y_prev = cTouch.y_current;
 		};
 	}
-	else {
-		brw.on_mouse("move", x, y);
-	};
-
+	else brw.on_mouse("move", x, y);
 	m_x = x;
 	m_y = y;
 };

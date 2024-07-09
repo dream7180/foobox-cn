@@ -10,8 +10,8 @@ var img_play, img_pause, img_next, img_previous, img_vol, img_pbo = [], img_list
 //play back order
 var PBOTips = new Array("默认", "重复(列表)", "重复(音轨)", "随机", "乱序(音轨)", "乱序(专辑)", "乱序(目录)");
 var hbtn = false;
-var ww = 0,
-	wh = 0;
+var ww = 0, wh = 0;
+var m_x = 0, m_y = 0;
 var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, RBtnTips, RTips_timer;
@@ -788,6 +788,7 @@ function on_paint(gr) {
 }
 
 function on_mouse_move(x, y) {
+	if(m_x == x && m_y == y) return;
 	if (fb.IsPlaying && seekbar.MouseMove(x, y)) {
 		TimeTip.Text = TimeFmt(seekbar.Value);
 		if (x < seek_start) _x = seek_start;
@@ -819,6 +820,8 @@ function on_mouse_move(x, y) {
 	} else RTips_switch("");
 	if (MuteBtn.MouseMove(x, y)) hbtn = true;
 	g_switchbar.on_mouse("move", x, y);
+	m_x = x;
+	m_y = y;
 }
 
 function on_mouse_lbtn_down(x, y) {
