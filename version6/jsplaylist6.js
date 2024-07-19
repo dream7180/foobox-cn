@@ -2652,18 +2652,18 @@ function get_misccfg(){
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
 	if(!misccfg){
-		radiom3u = "https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/fmm.m3u;https://cdn.jsdelivr.net/gh/dream7180/Resource@main/radio/Kimentanm.m3u";
+		radiom3u = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/dream7180/Resource/main/radio/fmm.m3u;https://mirror.ghproxy.com/https://raw.githubusercontent.com/dream7180/Resource/main/radio/Kimentanm.m3u";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");
-		track_edit_app = misccfg[0];
-		if(misccfg.length > 1) radiom3u = misccfg[1];
+		radiom3u = misccfg[0];
+		if(misccfg.length > 1) track_edit_app = misccfg[1];
 	}
 	window.NotifyOthers("Radio_list", radiom3u);
 }
 
 function save_misccfg(){
-	utils.WriteTextFile(config_dir + "misc", track_edit_app + "##" + radiom3u);
+	utils.WriteTextFile(config_dir + "misc", radiom3u + "##" + track_edit_app);
 }
 
 function get_layout(plname){
