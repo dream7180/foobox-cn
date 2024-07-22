@@ -2301,14 +2301,17 @@ function on_init() {
 	if(ppt.locklibpl) {
 		if(!fb.IsLibraryEnabled()) {
 			ppt.locklibpl = false;
-			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
 		} else {
 			g_active_playlist = 0;
 			if (plman.GetPlaylistName(0) != "媒体库") {
 				g_active_playlist = plman.ActivePlaylist;
-				window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
 			}
 		}
+		var timeout_lock = window.SetTimeout(function() {
+			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
+			timeout_lock && window.ClearTimeout(timeout_lock);
+			timeout_lock = false;
+		}, 400);
 	} else g_active_playlist = plman.ActivePlaylist;
 
 	get_tagprop();

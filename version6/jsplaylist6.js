@@ -121,7 +121,7 @@ layout = {
 	pattern_idx: 0,
 	showCover: true,
 	autocollapse: false,
-	collapsedHeight: 1,
+	collapsedHeight: 2,
 	expandedHeight: 1,
 	collapseGroupsByDefault: 0,
 	showgroupheaders: 1,
@@ -232,7 +232,7 @@ cTrack = {
 
 cGroup = {
 	collapsed_height: 2,
-	expanded_height: 2,
+	expanded_height: 1,
 	default_count_minimum: window.GetProperty("*GROUP: Minimum number of rows in a group", 0),
 	count_minimum: window.GetProperty("*GROUP: Minimum number of rows in a group", 0),
 	count_minimum_pre: 0
@@ -2679,11 +2679,11 @@ function get_layout(plname){
 		layoutcfg_arr = utils.ReadTextFile(config_dir + "layout_config", 0);
 	} catch(e){}
 	if (layoutcfg_arr == "") {
-		var default_gopts = ["0","1","0","1","1","0","1","0"];
+		var default_gopts = ["0","1","0","2","1","0","1","0"];
 		layout.config.push(default_gopts);
 		layoutcfg_arr = default_gopts;
 		for (var i = 1; i < layout.ids.length; i++){
-			layoutcfg_arr = layoutcfg_arr + "##0,1,0,1,1,0,1,0";
+			layoutcfg_arr = layoutcfg_arr + "##0,1,0,2,1,0,1,0";
 			layout.config.push(default_gopts);
 		}
 		utils.WriteTextFile(config_dir + "layout_config", layoutcfg_arr);
@@ -2727,7 +2727,7 @@ function assign_gopts(){
 		layout.pattern_idx = 0;
 		layout.showCover = 1;
 		layout.autocollapse = 0;
-		layout.collapsedHeight = 1;
+		layout.collapsedHeight = 2;
 		layout.expandedHeight = 1;
 		layout.collapseGroupsByDefault = 0;
 		layout.showgroupheaders = 1;
