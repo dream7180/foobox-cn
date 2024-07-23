@@ -1173,8 +1173,8 @@ oBrowser = function() {
 						var cidx = brw.rows[brw.actionRows[i]].idx - i;
 						plman.RemovePlaylistSwitch(cidx);
 					}
-					brw.actionRows.splice(0, brw.actionRows.length);
 				}
+				brw.actionRows.splice(0, brw.actionRows.length);
 			}
 			break;
 		case (idx == 24):
@@ -1906,8 +1906,8 @@ function on_key_down(vkey) {
 							var cidx = brw.rows[brw.actionRows[i]].idx - i;
 							plman.RemovePlaylistSwitch(cidx);
 						}
-						brw.actionRows.splice(0, brw.actionRows.length);
 					}
+					brw.actionRows.splice(0, brw.actionRows.length);
 				}
 				break;
 			}
