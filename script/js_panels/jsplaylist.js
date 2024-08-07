@@ -26,7 +26,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.31";
+var g_script_version = "7.32";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -674,6 +674,7 @@ function on_paint(gr) {
 				};
 			}
 			else {
+				var ww2 = Math.max(1, ww - 80);
 				if (plman.PlaylistCount > 0) {
 					var text_top = layout.playlistName;
 					var text_bot = "空列表";
@@ -688,13 +689,12 @@ function on_paint(gr) {
 					var search_text = text_top.substr(4, text_top.length - 5);
 					gr.GdiDrawText("搜索 \"" + search_text + "\" 无结果", g_font_blank,c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
 					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
-					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, 1, 0, 0, c_txtlight, 0.5);
-				}
-				else {
+					gr.FillGradRect(40, Math.floor(wh / 2), ww2, 1, 0, 0, c_txtlight, 0.5);
+				} else {
 					// if empty playlist, display text info
 					gr.GdiDrawText(text_top, g_font_blank, c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
 					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
-					gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, 1, 0, 0, c_txtlight, 0.5);
+					gr.FillGradRect(40, Math.floor(wh / 2), ww2, 1, 0, 0, c_txtlight, 0.5);
 				};
 			};
 		};

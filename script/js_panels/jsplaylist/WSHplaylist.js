@@ -1714,7 +1714,9 @@ oList = function(object_name, playlist) {
 			return this.offset;
 		}
 		var mid = Math.floor(this.totalRowToLoad / 2) - 1;
-		var mid_track = p.list.items[Math.floor(p.list.items.length/2 - 1)].track_index;
+		var list_mid = Math.floor(p.list.items.length/2 - 1);
+		list_mid = Math.max(0, list_mid);
+		var mid_track = p.list.items[list_mid].track_index;
 
 		var MidRowId = this.getRowId(mid_track);
 

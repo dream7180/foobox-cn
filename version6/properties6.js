@@ -309,7 +309,7 @@ function _panel() {
 		size = g_font.Size;
 		this.fonts.title = GdiFont(name, size + 1, 1);
 		this.fonts.normal = GdiFont(name, size, 0);
-		this.row_height = this.fonts.normal.Height;
+		this.row_height = Math.round(this.fonts.normal.Height * 1.25);
 		this.list_objects.forEach((item) => {
 			item.size();
 			item.update();
