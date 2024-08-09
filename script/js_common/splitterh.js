@@ -43,6 +43,7 @@ function on_size() {
 }
 
 function on_paint(gr) {
+	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
 	if(hasTopbar){
 		gr.FillSolidRect(0, 0, ww, g_topbarheight - 2, g_color_topbar);

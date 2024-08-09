@@ -33,6 +33,7 @@ function on_size() {
 }
 
 function on_paint(gr) {
+	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
 	gr.FillSolidRect(0, PUpper.Height, ww, 1, RGBA(0, 0, 0, 80));
 	gr.FillSolidRect(0, PUpper.Height+1, ww, 1, RGBA(0, 0, 0, 160));

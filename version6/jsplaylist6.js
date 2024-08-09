@@ -63,6 +63,7 @@ var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
 var g_color_highlight = 0;
 var c_default_hl = 0;
+var c_divline = 0;
 var g_color_playing_txt = RGB(255, 255, 255);
 var g_color_line, g_color_line_div, g_group_header_bg, g_group_header_div;
 
@@ -674,7 +675,7 @@ function on_paint(gr) {
 				};
 			}
 			else {
-				var ww2 = Math.max(1, ww - 80);
+				var z20 = z(20);
 				if (plman.PlaylistCount > 0) {
 					var text_top = layout.playlistName;
 					var text_bot = "空列表";
@@ -683,18 +684,16 @@ function on_paint(gr) {
 					var text_top = "从播放列表管理面板创建一个新的播放列表开始！";
 					var text_bot = "当前无播放列表";
 				};
-				var c_txtlight = blendColors(g_color_normal_bg, g_color_normal_txt, 0.4);
-				// if Search Playlist, draw image "No Result"
 				if (text_top.substr(0, 4) == "搜索 [") {
 					var search_text = text_top.substr(4, text_top.length - 5);
-					gr.GdiDrawText("搜索 \"" + search_text + "\" 无结果", g_font_blank,c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
-					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
-					gr.FillGradRect(40, Math.floor(wh / 2), ww2, 1, 0, 0, c_txtlight, 0.5);
+					gr.GdiDrawText("搜索 \"" + search_text + "\" 无结果", g_font_blank, g_color_normal_txt, 0, 0 - z20, ww, wh, cc_txt);
+					gr.GdiDrawText(text_bot, g_font_group2, g_color_normal_txt, 0, 0 + z20, ww, wh, cc_txt);
+					gr.FillGradRect(0, Math.floor(wh / 2), ww, 1, 0, 0, c_divline, 0.5);
 				} else {
 					// if empty playlist, display text info
-					gr.GdiDrawText(text_top, g_font_blank, c_txtlight, 0, 0 - z(20), ww, wh, cc_txt);
-					gr.GdiDrawText(text_bot, g_font_group2, c_txtlight, 0, 0 + z(20), ww, wh, cc_txt);
-					gr.FillGradRect(40, Math.floor(wh / 2), ww2, 1, 0, 0, c_txtlight, 0.5);
+					gr.GdiDrawText(text_top, g_font_blank, g_color_normal_txt, 0, 0 - z20, ww, wh, cc_txt);
+					gr.GdiDrawText(text_bot, g_font_group2, g_color_normal_txt, 0, 0 + z20, ww, wh, cc_txt);
+					gr.FillGradRect(0, Math.floor(wh / 2), ww, 1, 0, 0, c_divline, 0.5);
 				};
 			};
 		};
@@ -2038,6 +2037,7 @@ function get_colors() {
 		g_color_line_div = RGBA(0, 0, 0, 55);
 		g_group_header_bg = RGBA(0, 0, 0, 25);
 		g_group_header_div = RGBA(255, 255, 255, 10);
+		c_divline = blendColors(g_color_normal_bg, RGB(0,0,0), 0.4);
 	}else{
 		dark_mode = 0;
 		g_color_topbar = RGBA(0,0,0,15);
@@ -2045,6 +2045,7 @@ function get_colors() {
 		g_color_line_div = RGBA(0, 0, 0, 45);
 		g_group_header_bg = RGBA(0, 0, 0, 8);
 		g_group_header_div = RGBA(255, 255, 255, 50);
+		c_divline = blendColors(g_color_normal_bg, RGB(0,0,0), 0.25);
 	}
 };
 

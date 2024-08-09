@@ -46,12 +46,10 @@ function on_size() {
 }
 
 function on_paint(gr) {
+	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
-		var line_w = Math.round(ww / 2);
 	if(draw_splitter){
-		gr.FillGradRect(0, PUpper.Height, line_w, 1, 0, g_color_background, linecolor, 1.0);
-		gr.FillGradRect(line_w, PUpper.Height, ww - line_w, 1, 0, linecolor, g_color_background, 1.0);
-		gr.FillSolidRect(line_w, PUpper.Height, 1, 1, linecolor);
+		gr.FillGradRect(0, PUpper.Height, ww, 1, 0, g_color_background, linecolor, 0.5);
 	} else if(splitter_hover) gr.DrawLine(0, PUpper.Height, ww, PUpper.Height, 1, divcolor);
 	
 }
