@@ -320,19 +320,19 @@ function initbuttons(){
 	RBtnTips = new UITextView("", g_font, c_font, rc_txt);
 	PlaybackTimeText = new UITextView(track_time, g_font, c_font, rc_txt);
 	PlaybackLengthText = new UITextView(track_len, g_font, c_font, lc_txt);
-	PBOpen = new ButtonUI(img_open, null);
-	PBPrevious = new ButtonUI(img_previous, null);
-	PBPlay = new ButtonUI((fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play, null);
-	PBNext = new ButtonUI(img_next, null);
-	PBStop = new ButtonUI(img_stop, null);
-	MuteBtn = new ButtonUI(btn_img, null);
-	LibBtn = new ButtonUI(btn_img, null);
-	PBOBtn = new ButtonUI(btn_img, null);
+	PBOpen = new ButtonUI(img_open);
+	PBPrevious = new ButtonUI(img_previous);
+	PBPlay = new ButtonUI((fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play);
+	PBNext = new ButtonUI(img_next);
+	PBStop = new ButtonUI(img_stop);
+	MuteBtn = new ButtonUI(btn_img);
+	LibBtn = new ButtonUI(btn_img);
+	PBOBtn = new ButtonUI(btn_img);
 	g_switchbar = new oSwitchbar();
-	CloseBtn = new ButtonUI(img_close, null);
-	MaxBtn = new ButtonUI(img_winbtn, null);
-	MinBtn = new ButtonUI(img_winbtn, null);
-	MenuBtn = new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2), null);
+	CloseBtn = new ButtonUI(img_close);
+	MaxBtn = new ButtonUI(img_winbtn);
+	MinBtn = new ButtonUI(img_winbtn);
+	MenuBtn = new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2));
 }
 
 function init_overlay_obj(overlay_frame, overlay_seek) {

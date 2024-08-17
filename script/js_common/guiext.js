@@ -176,17 +176,13 @@ function UITextView(txt, FontObj, color, formatStr) {
 }
 
 //DEFINE CLASS ButtonUI 
-function ButtonUI(img, tooltipText) {
+function ButtonUI(img) {
 	this.x = null;
 	this.y = null;
 	this.img = img;
 	this.width = img.Width;
 	this.height = img.Height/3;
 	this.state = 0; //0-normal ;1-hover ;2-down ;3-disable
-	if(tooltipText){
-		this.Tooltip = window.CreateTooltip("",g_fsize);
-		this.Tooltip.Text = tooltipText;
-	} else this.Tooltip = null;
 }
 
 ButtonUI.prototype.SetXY = function(x, y){
@@ -207,7 +203,6 @@ ButtonUI.prototype.MouseMove = function(x, y) {
 	if (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height) {
 		if (this.state == 0) {
 			this.state = 1;
-			this.Tooltip && this.Tooltip.Activate();
 			this.Repaint();
 		}
 		return true;
@@ -227,7 +222,8 @@ ButtonUI.prototype.MouseDown = function(x, y) {
 
 ButtonUI.prototype.MouseUp = function() {
 	if (this.state == 2) {
-		this.Reset();
+		this.state = 1;
+		this.Repaint();
 		return true;
 	} else return false;
 }
@@ -235,7 +231,6 @@ ButtonUI.prototype.MouseUp = function() {
 ButtonUI.prototype.Reset = function() {
 	if (this.state != 0) {
 		this.state = 0;
-		this.Tooltip && this.Tooltip.Deactivate();
 		this.Repaint();
 	}
 }
