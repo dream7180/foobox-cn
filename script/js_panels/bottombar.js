@@ -348,7 +348,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seeker.ReleaseGraphics(gb);
 	
 	seekbar = new UISlider(seek_frame, seek_time, seeker);
-	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, vol_div);
+	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, true);
 	
 	let c_pb_ov = blendColors(RGB(255,255,255), c_seekoverlay, 0.85);
 	let c_pb_down = blendColors(RGB(0,0,0), c_seekoverlay, 0.85);
@@ -640,12 +640,6 @@ function get_images() {
 	gb.FillRoundRect(1, 1, 48, 20, 5, 5, c_tip_bg);
 	gb.SetSmoothingMode(0);
 	tip_bg.ReleaseGraphics(gb);
-	
-	vol_div = gdi.CreateImage(1, 4);
-	gb = vol_div.GetGraphics();
-	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, 0, 1, 4, c_background);
-	vol_div.ReleaseGraphics(gb);
 
 	vol_active = gdi.CreateImage(100, z(18));
 	gb = vol_active.GetGraphics();

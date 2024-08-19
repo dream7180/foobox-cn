@@ -4,7 +4,6 @@ TOOLTIP_TEXT_PADDING_RIGHT = 6;
 TOOLTIP_TEXT_PADDING_BOTTOM = 2;
 
 function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
-	this.Enabled = true;
 	this.State = 0; //0-normal 1-mouse hover 2-mouse down
 	this.Value = 0;
 	this.MinValue = 0;
@@ -24,19 +23,27 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 	}
 
 	this.Paint = function(gr) {
-		if (this.Enabled) {
-			var pos = this.Value / (this.MaxValue - this.MinValue);
-			if (pos > 1) pos = 1;
-			pos = (pos * this.Width) | 0;
-			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg);
-			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
-			if(ImgDiv) {
-				for (var i = 1; i < 10; i++) {
-					gr.DrawImage(ImgDiv, this.X + this.sub_w * i + i - 1, this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
+		var pos = this.Value / (this.MaxValue - this.MinValue);
+		if (pos > 1) pos = 1;
+		pos = (pos * this.Width) | 0;
+		if(ImgDiv) {
+			var xf = true;
+			for (var i = 1; i < 11; i++) {
+				var _x = this.X + (this.sub_w + 1) * (i-1);
+				DrawThemedBox(gr, _x, this.Y, this.sub_w, this.Height, ImgBg);
+				var w_sum = i * this.sub_w + i - 1;
+				if(w_sum <= pos) {
+					DrawThemedBox(gr, _x, this.Y, this.sub_w, this.Height, ImgOverlay);
+				} else if(xf) {
+					DrawThemedBox(gr, _x, this.Y, this.sub_w - (w_sum - pos), this.Height, ImgOverlay);
+					xf = false;
 				}
 			}
-			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);
+		} else {
+			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg);
+			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
 		}
+		gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);
 	}
 
 	this.MouseDown = function(_x, _y) {
@@ -66,7 +73,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 			this.Repaint();
 			return true;
 		} else {
-			if (_x > this.X - ImgKnob.Width / 2 && _x < this.X + this.Width + ImgKnob.Width / 2 && _y > this.Y && _y < this.Y + this.Height && this.Enabled) {
+			if (_x > this.X - ImgKnob.Width / 2 && _x < this.X + this.Width + ImgKnob.Width / 2 && _y > this.Y && _y < this.Y + this.Height) {
 				this.State = 1;
 				return true;
 			} else this.State = 0;

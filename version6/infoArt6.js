@@ -6,7 +6,7 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
 
 var zdpi = 1;
-var g_fname, g_fsize;
+var g_fname, g_fsize, menubutton_w, menubutton_h;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var Caption_Pack = {
 	"Front": "封面",
@@ -71,7 +71,7 @@ if (time_circle > 60000) time_circle = 60000;
 var rbutton = Array();
 var c_background, c_highlight, fontcolor, fontcolor2, icocolor, c_default_hl, c_rating_h;
 var tracktype;
-var img_rating_on, img_rating_off, mood_img, btn_mood, TextBtn_info;
+var img_rating_on, img_rating_off, mood_img, btn_mood, TextBtn_info, img_btn;
 
 function TextBtn() {
 	this.setSize = function (x, y , w, h){
@@ -171,8 +171,21 @@ function get_imgs() {
 	gb.SetTextRenderingHint(4);
 	gb.DrawString("♥", mood_font,mood_color, 0, -2*zdpi, imgw, mood_h, cc_stringformat);
 	gb.DrawString("♥", mood_font, icocolor, 0, mood_h-2*zdpi, imgw, mood_h, cc_stringformat);
+	menubutton_w = gb.CalcTextWidth("封面宽度w", g_font);
+	menubutton_h = gb.CalcTextHeight("高", g_font) * 1.65;
 	gb.SetTextRenderingHint(0);
 	mood_img.ReleaseGraphics(gb);
+	
+	var arc = Math.round(menubutton_h / 4);
+	img_btn = gdi.CreateImage(menubutton_w, menubutton_h * 3);
+	gb = img_btn.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(1, 1, menubutton_w - 2, menubutton_h - 2, arc, arc, RGBA(0, 0, 0, 80));
+	gb.FillRoundRect(1, menubutton_h + 1, menubutton_w - 2, menubutton_h - 2, arc, arc, RGBA(0, 0, 0, 120));
+	gb.FillRoundRect(1, menubutton_h * 2 + 1, menubutton_w - 2, menubutton_h - 2, arc, arc, RGBA(0, 0, 0, 140));
+	gb.SetSmoothingMode(0);
+	img_btn.ReleaseGraphics(gb);
+	img_btn = CreateRawBitmap2(img_btn);
 }
 
 function initbutton() {
@@ -1274,7 +1287,7 @@ function Display(x, y, w, h, prop) {
 		animation.CalcData(this.h);
 
 		if (this.menuButton) {
-			this.menuButton.x = this.x + Math.round(this.w / 2) - this.menuButton.w / 2;
+			this.menuButton.x = this.x + Math.round(this.w / 2 - this.menuButton.w / 2);
 			this.menuButton.y = this.ImageRange.y + this.ImageRange.h - this.menuButton.h - 1;
 		}
 	}
@@ -1313,18 +1326,15 @@ function Display(x, y, w, h, prop) {
 				img: null,
 				text: ""
 			};
-			var img_btn = gdi.CreateImage(this.w, this.h * 3);
-			var g = img_btn.GetGraphics();
-			g.SetSmoothingMode(2);
-			g.FillRoundRect(1, 1, img_btn.Width - 2, img_btn.Height / 3 - 2, 8, 8, RGBA(0, 0, 0, 80));
-			g.FillRoundRect(1, img_btn.Height / 3 + 1, img_btn.Width - 2, img_btn.Height / 3 - 2, 8, 8, RGBA(0, 0, 0, 120));
-			g.FillRoundRect(1, img_btn.Height * 2 / 3 + 1, img_btn.Width - 2, img_btn.Height / 3 - 2, 8, 8, RGBA(0, 0, 0, 140));
-			g.SetSmoothingMode(0);
-			img_btn.ReleaseGraphics(g);
-			img_btn = CreateRawBitmap2(img_btn);
 
 			this.isXYIn = function(x, y) {
 				return x >= this.x && y >= this.y && x <= this.x + this.w && y <= this.y + this.h;
+			}
+			
+			this.update_wh = function(){
+				this.w = menubutton_w;
+				this.h = menubutton_h;
+				if(ww) this.x = Math.round(ww / 2 - this.w / 2);
 			}
 
 			this.Draw = function(g) {
@@ -1338,7 +1348,7 @@ function Display(x, y, w, h, prop) {
 					imgCache.img = gdi.CreateImage(this.w, this.h);
 					var g2 = imgCache.img.GetGraphics();
 					g2.SetTextRenderingHint(4);
-					g2.DrawString(this.caption, g_font, RGBA(255, 255, 255, 255), 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
+					g2.DrawString(this.caption, g_font, RGB(255, 255, 255), 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
 					g2.SetTextRenderingHint(0);
 					//}
 					imgCache.img.ReleaseGraphics(g2);
@@ -1407,7 +1417,7 @@ function Display(x, y, w, h, prop) {
 				imgCache.text = "";
 			}
 
-		}(0, 0, Math.ceil(55*zdpi) + 5, Math.ceil(25*zdpi));
+		}(0, 0, menubutton_w, menubutton_h);
 
 		var btnStatus = -1; // -1: hide.
 
@@ -2397,6 +2407,7 @@ function on_font_changed() {
 		panel_setsize();
 	}
 	CoverDisplay.menuButton.ClearCache();
+	CoverDisplay.menuButton.update_wh();
 };
 
 function on_colours_changed() {
