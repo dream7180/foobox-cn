@@ -1310,7 +1310,8 @@ function on_init() {
 	g_searchbox = new searchbox();
 	g_searchbox.on_init();
 	brw = new oBrowser();
-	if (ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
+	if(ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
+	if(ppt.radiolist.length == 0) window.NotifyOthers("get_radio_list", true);
 };
 on_init();
 

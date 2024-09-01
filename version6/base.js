@@ -448,7 +448,7 @@ function init_obj() {
 	seek_start = 3*btn_space+time_length;
 	vol_start = ww - vol_len - seek_start;
 	var volbtn_x = vol_start - img_vol.Width - z(9);
-	seek_len = ww - seek_start*2;
+	seek_len = Math.max(0, ww - seek_start*2);
 	PlaybackTimeText.SetSize(btn_space*2, win_y2, time_length, seek_h);
 	PlaybackLengthText.SetSize(seek_len + seek_start + btn_space, win_y2, time_length, seek_h);
 	TimeTip = new UITooltip(seek_start + z(12), win_y2, "", g_font, c_font, tip_bg);

@@ -104,10 +104,8 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 	}
 
 	this.Repaint = function() {
-		try{window.RepaintRect(this.X - (ImgKnob.Width / 2), this.Y, this.Width + ImgKnob.Width, this.Height)}
-		catch(e){};
+		window.RepaintRect(this.X - ImgKnob.Width, this.Y, this.Width + 2 * ImgKnob.Width, this.Height)
 	}
-
 }
 //////////////////////
 

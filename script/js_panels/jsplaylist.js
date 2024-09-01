@@ -26,7 +26,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.32";
+var g_script_version = "7.33";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -1958,6 +1958,9 @@ function on_notify_data(name, info) {
 			layout.ids[pl_index] = info[1];
 			save_config("ids");
 		}
+		break;
+	case "get_radio_list":
+		window.NotifyOthers("Radio_list", radiom3u);
 		break;
 	};
 };

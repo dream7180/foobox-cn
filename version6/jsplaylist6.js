@@ -26,7 +26,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "6.32 (Remastered)";
+var g_script_version = "6.33 (Remastered)";
 var g_queue_origin = -1;
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -1979,6 +1979,9 @@ function on_notify_data(name, info) {
 		break;
 	case "foobox_setting":
 		show_setting(3);
+		break;
+	case "get_radio_list":
+		window.NotifyOthers("Radio_list", radiom3u);
 		break;
 	};
 };

@@ -500,25 +500,17 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								// *** check aspect ratio *** //
 								if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
 									var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-									var pw = cv_w * ratio;
-									var ph = cv_h;
-									this.left = Math.floor((ph - pw) / 2);
-									this.top = 0;
-									cv_x += this.left;
-									cv_y += this.top;
-									cv_w = cv_w - this.left * 2 - 1;
-									cv_h = cv_h - this.top * 2 - 1;
+									var cv_offset = Math.floor((cv_w * ratio - cv_h) / 2);
+									cv_x += cv_offset;
+									cv_w = cv_w - cv_offset * 2 - 1;
+									cv_h = cv_h - 1;
 								}
 								else {
 									var ratio = p.list.groups[this.group_index].cover_img.Height / p.list.groups[this.group_index].cover_img.Width;
-									var pw = cv_w;
-									var ph = cv_h * ratio;
-									this.top = Math.floor((pw - ph) / 2);
-									this.left = 0;
-									cv_x += this.left;
-									cv_y += this.top;
-									cv_w = cv_w - this.left * 2 - 1;
-									cv_h = cv_h - this.top * 2 - 1;
+									var cv_offset = Math.floor((cv_w - cv_h * ratio) / 2);
+									cv_y += cv_offset;
+									cv_w = cv_w - 1;
+									cv_h = cv_h - cv_offset * 2 - 1;
 								};
 								// *** check aspect ratio *** //
 							};
@@ -526,7 +518,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						};
 					}
 					else {
-						var img_nocover = images.nocover.Resize(cv_w, cv_w , 2);
+						var cv_resizew = Math.max(1, cv_w);
+						var img_nocover = images.nocover.Resize(cv_resizew, cv_resizew , 2);
 						gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
 					};
 				};
@@ -702,25 +695,17 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									// *** check aspect ratio *** //
 									if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
 										var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-										var pw = cv_w * ratio;
-										var ph = cv_h;
-										this.left = Math.floor((ph - pw) / 2);
-										this.top = 0;
-										cv_x += this.left;
-										cv_y += this.top;
-										cv_w = cv_w - this.left * 2 - 1;
-										cv_h = cv_h - this.top * 2 - 1;
+										var cv_offset = Math.floor((cv_w * ratio - cv_h) / 2);
+										cv_x += cv_offset;
+										cv_w = cv_w - cv_offset * 2 - 1;
+										cv_h = cv_h - 1;
 									}
 									else {
 										var ratio = p.list.groups[this.group_index].cover_img.Height / p.list.groups[this.group_index].cover_img.Width;
-										var pw = cv_w;
-										var ph = cv_h * ratio;
-										this.top = Math.floor((pw - ph) / 2);
-										this.left = 0;
-										cv_x += this.left;
-										cv_y += this.top;
-										cv_w = cv_w - this.left * 2 - 1;
-										cv_h = cv_h - this.top * 2 - 1;
+										var cv_offset = Math.floor((cv_w - cv_h * ratio) / 2);
+										cv_y += cv_offset;
+										cv_w = cv_w - 1;
+										cv_h = cv_h - cv_offset * 2 - 1;
 									};
 									// *** check aspect ratio *** //
 								};
@@ -728,7 +713,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							};
 						}
 						else {
-							var img_nocover = images.nocover.Resize(cv_w, cv_w , 2);
+							var cv_resizew = Math.max(1, cv_w);
+							var img_nocover = images.nocover.Resize(cv_resizew, cv_resizew , 2);
 							gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
 						};
 					};
