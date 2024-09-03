@@ -4,6 +4,7 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\radiom3u.js');
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
@@ -63,8 +64,7 @@ ppt = {
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	winver: null,
-	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true),
-	radiolist: []
+	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
 
 cPlaylistManager = {
@@ -870,7 +870,7 @@ oBrowser = function() {
 		var _options = window.CreatePopupMenu();
 		var PLRecManager = plman.PlaylistRecycler;
 		var _restorepl = window.CreatePopupMenu();
-		if(ppt.radiolist.length > 1) var _radiolist = window.CreatePopupMenu();
+		var _radiolist = window.CreatePopupMenu();
 		var idx;
 		var total_area, visible_area;
 		var bout, z;
@@ -976,13 +976,14 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 222, "音轨评级为 2");
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
-		if(ppt.radiolist.length > 1){
-			_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
-			for(var urlcount = 0; urlcount < ppt.radiolist.length; urlcount++){
-				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, ppt.radiolist[urlcount]);
+		_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
+		_radiolist.AppendMenuItem(MF_STRING, 30, "live.m3u (ghproxy 加速)");
+		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github)");
+		if(radiom3u.length > 2){
+			for(var urlcount = 2; urlcount < radiom3u.length; urlcount++){
+				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
 			}
-		} else
-			_newplaylist.AppendMenuItem(MF_STRING, 30, "网络电台列表");
+		}
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 15, "载入播放列表");
 		_menu.AppendMenuItem(MF_STRING, 16, "保存所有播放列表");
@@ -1059,10 +1060,13 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("网络电台", ppt.radiolist[0]);
+			LoadRadio("网络电台", radiom3u[0]);
 			break;
-		case (idx >= 300 && idx < 300 + ppt.radiolist.length):
-			LoadRadio("网络电台", ppt.radiolist[idx - 300]);
+		case (idx == 31):
+			LoadRadio("网络电台", radiom3u[1]);
+			break;
+		case (idx >= 302 && idx < 300 + radiom3u.length):
+			LoadRadio("网络电台", radiom3u[idx - 300]);
 			break;
 		case (idx == 100):
 			plman.CreatePlaylist(total, "");
@@ -1311,7 +1315,14 @@ function on_init() {
 	g_searchbox.on_init();
 	brw = new oBrowser();
 	if(ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
-	if(ppt.radiolist.length == 0) window.NotifyOthers("get_radio_list", true);
+	try{
+		var _radiolist = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misc", 0);
+		_radiolist = _radiolist.split("##")[0];
+	}catch(e){}
+	if(_radiolist && _radiolist != "null") {
+		_radiolist = _radiolist.split(";");
+		radiom3u.push(..._radiolist);
+	}
 };
 on_init();
 
@@ -2134,7 +2145,11 @@ function on_notify_data(name, info) {
 		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
 		break;
 	case "Radio_list":
-		ppt.radiolist = info.split(";");
+		radiom3u.splice(2, radiom3u.length - 2);
+		if(info && info != "null") {
+			var _radiolist = info.split(";");
+			radiom3u.push(..._radiolist);
+		}
 		break;
 	}
 };

@@ -188,16 +188,10 @@ oHeaderBar = function() {
 				var chh = cy + this.h/2;
 				if (j != this.columnDraggedId || (this.columnDragged == 1)) {
 					// draw column header bg
-					if (this.columnRightClicked == j) {
+					if (this.columnDragged == 1 && j == this.columnDraggedId) {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-					}
-					else { // normal box
-						if (this.columnDragged == 1 && j == this.columnDraggedId) {
-							gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-						}
-						else {
-							gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
-						};
+					} else {
+						gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 					};
 					gr.FillGradRect(cx + cw - 1, cy, 1, chh, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
 					gr.FillGradRect(cx + cw - 1, chh, 1, chh, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
@@ -229,16 +223,10 @@ oHeaderBar = function() {
 				var chh = cy + this.h/2;
 				if (j != this.columnDraggedId || (this.columnDragged == 1)) {
 					// draw last column bg
-					if (this.columnRightClicked == j) {
+					if (this.columnDragged == 1 && j == this.columnDraggedId) {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-					}
-					else { // normal box
-						if (this.columnDragged == 1 && j == this.columnDraggedId) {
-							gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-						}
-						else {
-							gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
-						};
+					} else {
+						gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 					};
 					gr.FillGradRect(cx + cw - 1, cy, 1, chh, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
 					gr.FillGradRect(cx + cw - 1, chh, 1, chh, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
@@ -644,7 +632,6 @@ oHeaderBar = function() {
 						for (var i = 0; i < this.columns.length; i++) {
 							if (this.columns[i].percent > 0 && this.columns[i].isHover(x, y)) {
 								this.columnRightClicked = i;
-								this.repaint();
 								break;
 							};
 						};

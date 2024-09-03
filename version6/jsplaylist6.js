@@ -1980,9 +1980,6 @@ function on_notify_data(name, info) {
 	case "foobox_setting":
 		show_setting(3);
 		break;
-	case "get_radio_list":
-		window.NotifyOthers("Radio_list", radiom3u);
-		break;
 	};
 };
 
@@ -2645,9 +2642,6 @@ function get_playlist_layout_id(){
 	}else{
 		layout.ids = layout_id.split("##");
 	}
-	//for (var i = 0; i < layout.ids.length; i++){
-	//	layout.config.push(null);
-	//}
 }
 
 function get_misccfg(){
@@ -2656,14 +2650,13 @@ function get_misccfg(){
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
 	if(!misccfg){
-		radiom3u = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/dream7180/Resource/main/radio/fmm.m3u;https://mirror.ghproxy.com/https://raw.githubusercontent.com/dream7180/Resource/main/radio/Kimentanm.m3u";
+		radiom3u = "null";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");
 		radiom3u = misccfg[0];
 		if(misccfg.length > 1) track_edit_app = misccfg[1];
 	}
-	window.NotifyOthers("Radio_list", radiom3u);
 }
 
 function save_misccfg(){

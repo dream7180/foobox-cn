@@ -10,8 +10,8 @@ foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.co
 * 播放列表管理器，播放列表，封面浏览原作者 br3tt，汉化 always_beta;  
 * 封面面板原作者 Jensen;  
 * 搜索框原作者 [Asion](https://www.cnblogs.com/asionwu);  
-* [简介面板](https://github.com/Wil-B/Biography)作者 Wil-B;
-* 网络电台列表维护 [范明明](https://github.com/fanmingming);
+* [简介面板](https://github.com/Wil-B/Biography)作者 Wil-B;  
+* 网络电台列表收集自 [范明明](https://github.com/fanmingming)、[Kimentanm](https://github.com/Kimentanm).  
 
 **到最新 Releases (发行版) 页面下载安装包，从 7.24 起，安装包不再集成 foobar2000 汉化版，仅包含 foobox 主题及所需组件，绿色安装，自由便捷。**  
 
