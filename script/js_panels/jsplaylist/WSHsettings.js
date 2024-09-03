@@ -742,14 +742,17 @@ function settings_textboxes_action(pageId, elementId) {
 			window.NotifyOthers("set_dir_name", dir_cover_name);
 			break;
 		case 11:
-			var _radiom3u = radiom3u;
 			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_m3u == "") new_m3u = _radiom3u;
-			if (new_m3u){
+			if (new_m3u == "") {
+				new_m3u = "null";
+				p.settings.pages[pageId].elements[elementId].inputbox.text = new_m3u;
+				full_repaint();
+			}
+			if (new_m3u != radiom3u){
 				radiom3u = new_m3u;
 				save_misccfg();
+				window.NotifyOthers("Radio_list", radiom3u);
 			}
-			window.NotifyOthers("Radio_list", radiom3u);
 			break;
 		}
 		break;
