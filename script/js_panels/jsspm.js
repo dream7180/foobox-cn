@@ -4,7 +4,6 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\radiom3u.js');
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
@@ -50,6 +49,7 @@ var scroll_ = 0,
 	scroll_prev = 0;
 var g_start_ = 0,
 	g_end_ = 0;
+var radiom3u = [];
 
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
@@ -979,8 +979,8 @@ oBrowser = function() {
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
 		_radiolist.AppendMenuItem(MF_STRING, 30, "live.m3u (ghproxy 加速)");
 		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github)");
-		if(radiom3u.length > 2){
-			for(var urlcount = 2; urlcount < radiom3u.length; urlcount++){
+		if(radiom3u.length > 0){
+			for(var urlcount = 0; urlcount < radiom3u.length; urlcount++){
 				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
 			}
 		}
@@ -1060,12 +1060,12 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("网络电台", radiom3u[0]);
+			LoadRadio("网络电台", "https://ghproxy.net/https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
 			break;
 		case (idx == 31):
-			LoadRadio("网络电台", radiom3u[1]);
+			LoadRadio("网络电台", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
 			break;
-		case (idx >= 302 && idx < 300 + radiom3u.length):
+		case (idx >= 300 && idx < 300 + radiom3u.length):
 			LoadRadio("网络电台", radiom3u[idx - 300]);
 			break;
 		case (idx == 100):
@@ -1320,8 +1320,7 @@ function on_init() {
 		_radiolist = _radiolist.split("##")[0];
 	}catch(e){}
 	if(_radiolist && _radiolist != "null") {
-		_radiolist = _radiolist.split(";");
-		radiom3u.push(..._radiolist);
+		radiom3u = _radiolist.split(";");
 	}
 };
 on_init();
@@ -2123,10 +2122,9 @@ function on_notify_data(name, info) {
 		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
 		break;
 	case "Radio_list":
-		radiom3u.splice(2, radiom3u.length - 2);
+		radiom3u.splice(0, radiom3u.length);
 		if(info && info != "null") {
-			var _radiolist = info.split(";");
-			radiom3u.push(..._radiolist);
+			radiom3u = info.split(";");
 		}
 		break;
 	}
