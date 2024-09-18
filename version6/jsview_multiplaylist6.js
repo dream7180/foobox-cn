@@ -40,6 +40,9 @@ var playing_ico, btn_sw;
 var btn_clicked = false;
 var btn_w = 22, btn_h = 22;
 
+var g_delay_refresh_items = false;
+var Queue_timer = false;
+
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
 	rowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
@@ -142,7 +145,7 @@ oBrowser = function(name) {
 		this.getlimits();
 		this.name = plman.GetPlaylistName(pidx);
 		if(pidx > -1 && plman.IsAutoPlaylist(pidx)) this.tag = "\uF023";
-		else this.tag = "\uF03A";
+		else this.tag = "\uF0CA";
 	};
 
 	this.getlimits = function() {
@@ -883,6 +886,17 @@ function on_playlist_items_selection_change() {
 	brw.repaint();
 };
 
+function on_playback_queue_changed(origin) {
+	if (!Queue_timer) {
+		g_delay_refresh_items = true;
+		Queue_timer = window.SetTimeout(function() {
+			window.ClearTimeout(Queue_timer);
+			g_delay_refresh_items = false
+			Queue_timer = false;
+		}, 250);
+	}
+}
+
 function on_playlists_changed() {
 	if (plman.PlaylistCount > 0 && (plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1)) {
 		plman.ActivePlaylist = 0;
@@ -897,14 +911,18 @@ function on_playlist_switch() {
 };
 
 function on_playlist_items_added(playlist_idx) {
-	if (playlist_idx == pidx) {
-		brw.populate();
+	if (!g_delay_refresh_items) {
+		if (playlist_idx == pidx) {
+			brw.populate();
+		}
 	}
 }
 
 function on_playlist_items_removed(playlist_idx) {
-	if (playlist_idx == pidx) {
-		brw.populate();
+	if (!g_delay_refresh_items) {
+		if (playlist_idx == pidx) {
+			brw.populate();
+		}
 	}
 }
 

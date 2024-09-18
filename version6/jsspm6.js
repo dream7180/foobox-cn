@@ -520,9 +520,12 @@ oBrowser = function() {
 			this.down = true;
 			if (!cTouch.down && !timers.mouseDown && this.ishover && this.activeRow > -1 && Math.abs(scroll - scroll_) < 2) {
 				if (this.activeRow == this.inputboxID) {
-					this.inputbox.check("down", x, y);
+					this.inputbox.check("down", x, y, true);
 				} else {
-					if (this.inputboxID > -1) this.inputboxID = -1;
+					if (this.inputboxID > -1) {
+						this.inputbox.check("down", x, y, true);
+						this.inputboxID = -1;
+					}
 					if(utils.IsKeyPressed(VK_CONTROL)){
 						var cid = this.getRowIdFromIdx(plman.ActivePlaylist);
 						var rid = this.actionRows.indexOf(this.activeRow);
@@ -563,6 +566,7 @@ oBrowser = function() {
 				this.repaint();
 			} else {
 				if (this.inputboxID > -1) {
+					this.inputbox.check("down", x, y, true);
 					this.inputboxID = -1;
 					this.repaint();
 				}
@@ -1989,7 +1993,7 @@ function on_focus(is_focused) {
 	g_searchbox.on_focus(is_focused);
 	if(ppt.showFilter) g_filterbox.on_focus(is_focused);
 	if (brw.inputboxID >= 0) {
-		brw.inputbox.on_focus(is_focused);
+		brw.inputbox.on_focus(is_focused, true);
 	};
 	if (!is_focused) {
 		brw.inputboxID = -1;

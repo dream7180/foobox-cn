@@ -5,7 +5,6 @@ cInputbox = {
 	temp_gr : gdi.CreateImage(1, 1).GetGraphics(),
 	timer_cursor : false,
 	cursor_state : true,
-	doc : new ActiveXObject("htmlfile"),
 	clipboard : null
 }
 
@@ -160,11 +159,12 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		return i;
 	}
 
-	this.on_focus = function (is_focused) {
+	this.on_focus = function (is_focused, validate) {
 		if (!is_focused && this.edit) {
 			if (this.text.length == 0) {
 				this.text = this.default_text;
 			};
+			if(validate) try{this.func();}catch(e){eval(this.func);};
 			this.edit = false;
 			// clear timer
 			if (cInputbox.timer_cursor) {
@@ -190,7 +190,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 			}, 500);
 	}
 
-	this.check = function (callback, x, y) {
+	this.check = function (callback, x, y, validate) {
 		this.hover = (x >= this.x - 2 && x <= (this.x + this.w + 1) && y > this.y && y < (this.y + this.h)) ? true : false;
 		switch (callback) {
 		case "down":
@@ -204,6 +204,9 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 				this.SelEnd = this.Cpos;
 				this.resetCursorTimer();
 			} else {
+				if (validate && this.edit && this.text.length >= 0) {
+					try{this.func();}catch(e){eval(this.func);};
+				}
 				this.edit = false;
 				this.select = false;
 				this.SelBegin = 0;
@@ -312,7 +315,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 	this.show_context_menu = function (x, y) {
 		var idx;
 		var _menu = window.CreatePopupMenu();
-		cInputbox.clipboard = cInputbox.doc.parentWindow.clipboardData.getData("Text");
+		cInputbox.clipboard = utils.GetClipboardText();
 		_menu.AppendMenuItem(this.select ? MF_STRING : MF_GRAYED | MF_DISABLED, 1, "复制");
 		_menu.AppendMenuItem(this.select ? MF_STRING : MF_GRAYED | MF_DISABLED, 2, "剪切");
 		_menu.AppendMenuSeparator();
@@ -321,12 +324,12 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		switch (idx) {
 		case 1:
 			if (this.edit && this.select) {
-				cInputbox.doc.parentWindow.clipboardData.setData("Text", this.text_selected);
+				utils.SetClipboardText(this.text_selected);
 			}
 			break;
 		case 2:
 			if (this.edit && this.select) {
-				cInputbox.doc.parentWindow.clipboardData.setData("Text", this.text_selected);
+				utils.SetClipboardText(this.text_selected);
 				var p1 = this.SelBegin;
 				var p2 = this.SelEnd;
 				this.offset = this.offset >= this.text_selected.length ? this.offset - this.text_selected.length : 0;
@@ -649,7 +652,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 				};
 				if (vkey == 67) { // CTRL+C
 					if (this.edit && this.select) {
-						cInputbox.doc.parentWindow.clipboardData.setData("Text", this.text_selected);
+						utils.SetClipboardText(this.text_selected);
 					}
 				};
 				if (vkey == 88) { // CTRL+X
@@ -657,7 +660,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 						//save text avant MAJ
 						this.stext = this.text;
 						//
-						cInputbox.doc.parentWindow.clipboardData.setData("Text", this.text_selected);
+						utils.SetClipboardText(this.text_selected);
 						var p1 = this.SelBegin;
 						var p2 = this.SelEnd;
 						this.select = false;
@@ -676,7 +679,7 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 					}
 				};
 				if (vkey == 86) { // CTRL+V
-					cInputbox.clipboard = cInputbox.doc.parentWindow.clipboardData.getData("Text");
+					cInputbox.clipboard = utils.GetClipboardText();
 					if (this.edit && cInputbox.clipboard) {
 						//save text avant MAJ
 						this.stext = this.text;

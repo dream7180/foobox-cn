@@ -500,7 +500,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								// *** check aspect ratio *** //
 								if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
 									var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-									var cv_offset = Math.floor((cv_w * ratio - cv_h) / 2);
+									var cv_offset = Math.floor((cv_h - cv_w * ratio) / 2);
 									cv_x += cv_offset;
 									cv_w = cv_w - cv_offset * 2 - 1;
 									cv_h = cv_h - 1;
@@ -695,7 +695,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									// *** check aspect ratio *** //
 									if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
 										var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-										var cv_offset = Math.floor((cv_w * ratio - cv_h) / 2);
+										var cv_offset = Math.floor((cv_h - cv_w * ratio) / 2);
 										cv_x += cv_offset;
 										cv_w = cv_w - cv_offset * 2 - 1;
 										cv_h = cv_h - 1;
@@ -2224,14 +2224,13 @@ oList = function(object_name, playlist) {
 		var o_genre = fb.TitleFormat("$ifequal($stricmp(%genre%,?),1,,%genre%)");
 
 		_menu.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "移除");
-		_menu.AppendMenuSeparator();
 		if (plman.GetPlaybackQueueHandles().Count > 0) {
 			if (layout.playlistName != "播放队列") {
 				_menu.AppendMenuItem(MF_STRING, 2, "显示播放队列");
 			};
 		};
+		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 3, -1);
-		
 		if(track_edit_app != ""){
 			if(utils.FileExists(track_edit_app) && (g_track_type < 2)){
 				_menu.AppendMenuSeparator();

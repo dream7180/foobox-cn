@@ -1303,22 +1303,16 @@ oBrowser = function() {
 	};
 	
 	this.change_active_item = function(){
+		g_avoid_on_playlist_items_removed = true;
+		g_avoid_on_item_focus_change = true;
+		this.sendItemToPlaylist(this.activeIndex);
 		if (ppt.sourceMode == 0) {
-			g_avoid_on_playlist_items_removed = true;
-			g_avoid_on_item_focus_change = true;
-			this.sendItemToPlaylist(this.activeIndex);
 			plman.ActivePlaylist = pidx;
 			g_active_playlist = pidx;
 			avoid_checkscroll = true;
 		} else {
-			g_avoid_on_playlist_items_removed = true;
-			g_avoid_on_item_focus_change = true;
-			this.sendItemToPlaylist(this.activeIndex);
-			if (ppt.locklibpl) {
-				plman.ActivePlaylist = 0;
-			}
-			if (this.activeIndex > (ppt.showAllItem - 1))
-				this.focusItemToPlaylist(this.groups[this.activeIndex].metadb);
+			if (ppt.locklibpl) plman.ActivePlaylist = 0;
+			if (this.activeIndex > (ppt.showAllItem - 1)) this.focusItemToPlaylist(this.groups[this.activeIndex].metadb);
 		};
 	}
 
@@ -2246,13 +2240,8 @@ var g_scroll_color = 0;
 var g_color_grid_bg = 0;
 var g_btn_color1, g_color_bt_overlay;
 // boolean to avoid callbacks
-var g_avoid_on_playlists_changed = false;
-var g_avoid_on_playlist_switch = false;
 var g_avoid_on_item_focus_change = false;
-var g_avoid_on_playlist_items_added = false;
 var g_avoid_on_playlist_items_removed = false;
-//var g_avoid_on_playlist_switch_callbacks_on_sendItemToPlaylist = false;
-var g_avoid_on_playlist_items_reordered = false;
 // mouse actions
 var g_lbtn_click = false;
 var g_rbtn_click = false;
@@ -3044,7 +3033,6 @@ function on_playback_new_track(metadb) {
 //================// Playlist Callbacks
 
 function on_playlists_changed() {
-	//g_avoid_on_playlist_switch = true;
 	if (plman.PlaylistCount > 0 && (plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1)) {
 		plman.ActivePlaylist = 0;
 	};
@@ -3141,9 +3129,6 @@ function on_playlist_items_selection_change() {
 
 function on_focus(is_focused) {
 	g_filterbox.on_focus(is_focused);
-	//if (!is_focused) {
-	//	brw.repaint();
-	//};
 };
 
 //=================================================// Custom functions

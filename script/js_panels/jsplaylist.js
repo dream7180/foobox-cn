@@ -22,12 +22,12 @@ var color_noesl = window.GetProperty("foobox.color.by.cover.except.ESL", false);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
+var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
 var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.33";
-var g_queue_origin = -1;
+var g_script_version = "7.34";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -68,11 +68,8 @@ var g_color_playing_txt = RGB(255, 255, 255);
 var g_color_line, g_color_line_div, g_group_header_bg, g_group_header_div;
 
 // main window vars
-var g_avoid_on_playlists_changed = false;
-var g_avoid_on_playlist_items_reordered = false;
+var g_delay_refresh_items = false;
 var g_avoid_on_item_focus_change = false;
-var g_avoid_on_playlist_items_added = false;
-var g_avoid_on_playlist_items_removed = false;
 
 //albumart
 var albumart_id, cache_subdir;
@@ -915,7 +912,6 @@ function on_mouse_lbtn_up(x, y) {
 					} else {
 						// 1st: move selected item at the full end of the playlist to make then contigus
 						g_avoid_on_item_focus_change = true;
-						g_avoid_on_playlist_items_reordered = true;
 						plman.MovePlaylistSelection(p.list.playlist, plman.PlaylistItemCount(p.list.playlist));
 						// 2nd: move bottom selection to new drop_id place (to redefine first...)
 						plman.SetPlaylistFocusItemByHandle(p.list.playlist, drop_handle);
@@ -928,7 +924,6 @@ function on_mouse_lbtn_up(x, y) {
 							var mdelta = p.list.count - nb_selected_items - drop_id_new - 1;
 						};
 						plman.MovePlaylistSelection(p.list.playlist, mdelta * -1);
-						g_avoid_on_playlist_items_reordered = false;
 						g_avoid_on_item_focus_change = false;
 					};
 				};
@@ -1207,13 +1202,10 @@ function on_playlist_switch() {
 };
 
 function on_playlists_changed() {
-
-	if (!g_avoid_on_playlists_changed) {
-
+	if (!g_delay_refresh_items) {
 		if (plman.PlaylistCount > 0 && (plman.ActivePlaylist < 0 || plman.ActivePlaylist > plman.PlaylistCount - 1)) {
 			plman.ActivePlaylist = 0;
 		};
-
 		// close timers if dragging tracks is running
 		if (g_dragndrop_status) {
 			if (dragndrop.timerID) {
@@ -1224,14 +1216,13 @@ function on_playlists_changed() {
 			dragndrop.leave_flag = false;
 			on_mouse_move(mouse_x + 1, mouse_y); // to reset window cursor style to a simple arrow
 		};
-
 		p.list.playlist = plman.ActivePlaylist;
 		full_repaint();
 	};
 };
 
 function on_playlist_items_added(playlist_idx) {
-	if (!g_avoid_on_playlist_items_added) {
+	if (!g_delay_refresh_items) {
 		if (playlist_idx == p.list.playlist) {
 			update_playlist(layout.collapseGroupsByDefault);
 			p.headerBar.resetSortIndicators();
@@ -1241,7 +1232,7 @@ function on_playlist_items_added(playlist_idx) {
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if (!g_avoid_on_playlist_items_removed) {
+	if (!g_delay_refresh_items) {
 		if (playlist_idx == p.list.playlist) {
 			update_playlist(layout.collapseGroupsByDefault);
 			p.headerBar.resetSortIndicators();
@@ -1251,7 +1242,7 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 };
 
 function on_playlist_items_reordered(playlist_idx) {
-	if (!g_avoid_on_playlist_items_reordered) {
+	if (!g_avoid_on_item_focus_change) {
 		if (playlist_idx == p.list.playlist && p.headerBar.columnDragged == 0) {
 			update_playlist(layout.collapseGroupsByDefault);
 			p.headerBar.resetSortIndicators();
@@ -1890,9 +1881,10 @@ function on_playback_order_changed(new_order_index) {
 };
 
 function on_focus(is_focused) {
-	//if (!is_focused) {
-	//	full_repaint();
-	//}
+	if (cSettings.visible) {
+		p.settings.on_focus(is_focused);
+		full_repaint();
+	}
 };
 
 function on_font_changed() {
@@ -2259,61 +2251,12 @@ function isQueuePlaylistPresent() {
 	return -1;
 };
 
-function SetPlaylistQueue() {
-	var total_pl = plman.PlaylistCount;
-	var queue_pl_idx = isQueuePlaylistPresent();
-	if (queue_pl_idx < 0) {
-		return true;
-	}
-	else {
-		var total_in_pls = plman.PlaylistItemCount(queue_pl_idx);
-		if (total_in_pls > 0) {
-			var affected_items = Array();
-			for (var i = 0; i < total_in_pls; i++) {
-				affected_items.push(i);
-			};
-			plman.SetPlaylistSelection(queue_pl_idx, affected_items, true);
-			plman.RemovePlaylistSelection(queue_pl_idx);
-		};
-	};
-	var vbarr = plman.GetPlaybackQueueContents();
-	var queue_total = vbarr.length;
-	var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-	for (var j = 0; j < queue_total; j++) {
-		q_handlelist.Add(vbarr[j].Handle);
-	};
-	plman.InsertPlaylistItems(queue_pl_idx, j, q_handlelist, false);
-};
-
-function ShowPlaylistQueue() {
-	var total_pl = plman.PlaylistCount;
-	var queue_pl_idx = isQueuePlaylistPresent();
-	if (queue_pl_idx < 0) {
-		plman.CreatePlaylist(total_pl, "播放队列");
-		queue_pl_idx = total_pl;
-		plman.ActivePlaylist = queue_pl_idx;
-	}
-	else {
-		plman.ActivePlaylist = queue_pl_idx;
-		fb.ClearPlaylist();
-	};
-	var vbarr = plman.GetPlaybackQueueContents();
-	var queue_total = vbarr.length;
-	var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-	for (var i = 0; i < queue_total; i++) {
-		q_handlelist.Add(vbarr[i].Handle);
-	};
-	plman.InsertPlaylistItems(queue_pl_idx, i, q_handlelist, false);
-};
-
 function ClearQueuePlaylist() {
 	var current_pl = plman.ActivePlaylist;
-	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
 	if (queue_pl_idx >= 0) {
 		plman.ActivePlaylist = queue_pl_idx;
 		plman.RemovePlaylist(queue_pl_idx);
-		//fb.ClearPlaylist();
 		plman.ActivePlaylist = current_pl < plman.PlaylistCount ? current_pl : current_pl - 1;
 	};
 };
@@ -2336,83 +2279,54 @@ function CheckPlaylistQueue() {
 };
 
 function on_playback_queue_changed(origin) {
-	g_queue_origin = origin;
-
 	if (!cList.addToQueue_timer) {
-
-		g_avoid_on_playlists_changed = true;
-		g_avoid_on_playlist_items_added = true;
-		g_avoid_on_playlist_items_removed = true;
-
-		switch (g_queue_origin) {
+		g_delay_refresh_items = true;
+		switch (origin) {
 		case 0:
 			// changed_user_added
-			// Prepare/Clear Queue playlist
-			var current = plman.ActivePlaylist;
 			var total_pl = plman.PlaylistCount;
 			var queue_pl_idx = isQueuePlaylistPresent();
-			if (queue_pl_idx < 0) {
+			if (queue_pl_idx < 0 && queue_pl_on) {
 				plman.CreatePlaylist(total_pl, "播放队列");
 				queue_pl_idx = total_pl;
-			}
-			else {
-				if (current == queue_pl_idx) {
-					fb.ClearPlaylist();
-				}
-				else {
-					plman.RemovePlaylist(queue_pl_idx);
-					plman.CreatePlaylist(queue_pl_idx, "播放队列");
-				};
+			} else {
+				plman.ClearPlaylist(queue_pl_idx);
 			};
 			// fill it
-			//var queue_total = plman.GetPlaybackQueueCount();
-			var vbarr = plman.GetPlaybackQueueContents();
-			var queue_total = vbarr.length;
-			//var arr = vbarr.toArray();
-			var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-			for (var i = 0; i < queue_total; i++) {
-				q_handlelist.Add(vbarr[i].Handle);
-			};
-			plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
-			break;
-		case 1:
-			// changed_user_removed
-			// clear Queue playlist
-			var current = plman.ActivePlaylist;
-			var total_pl = plman.PlaylistCount;
-			var queue_pl_idx = isQueuePlaylistPresent();
-			if (queue_pl_idx < 0) {
-				return false;
-			}
-			else {
-				if (current == queue_pl_idx) {
-					fb.ClearPlaylist();
-				}
-				else {
-					plman.RemovePlaylist(queue_pl_idx);
-					plman.CreatePlaylist(queue_pl_idx, "播放队列");
-				};
-			};
-			// fill it
-			var vbarr = plman.GetPlaybackQueueContents();
-			var queue_total = vbarr.length;
-			if (queue_total > 0) {
-				//var arr = vbarr.toArray();
+			if(queue_pl_idx > -1){
+				var vbarr = plman.GetPlaybackQueueContents();
+				var queue_total = vbarr.length;
 				var q_handlelist = plman.GetPlaylistSelectedItems(-1);
 				for (var i = 0; i < queue_total; i++) {
 					q_handlelist.Add(vbarr[i].Handle);
 				};
 				plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
 			}
-			else { // remove queue playlist!
+			break;
+		case 1:
+			// changed_user_removed
+			var queue_pl_idx = isQueuePlaylistPresent();
+			if (queue_pl_idx < 0) {
+				return false;
+			} else {
+				plman.ClearPlaylist(queue_pl_idx);
+			};
+			// fill it
+			var vbarr = plman.GetPlaybackQueueContents();
+			var queue_total = vbarr.length;
+			if (queue_total > 0) {
+				var q_handlelist = plman.GetPlaylistSelectedItems(-1);
+				for (var i = 0; i < queue_total; i++) {
+					q_handlelist.Add(vbarr[i].Handle);
+				};
+				plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
+			}
+			else {
 				plman.RemovePlaylist(queue_pl_idx);
 			};
 			break;
 		case 2:
 			// changed_playback_advance
-			// clear Queue playlist
-			var current = plman.ActivePlaylist;
-			var total_pl = plman.PlaylistCount;
 			var queue_pl_idx = isQueuePlaylistPresent();
 			if (queue_pl_idx < 0) {
 				return false;
@@ -2421,13 +2335,7 @@ function on_playback_queue_changed(origin) {
 				var vbarr = plman.GetPlaybackQueueContents();
 				var queue_total = vbarr.length;
 				if (queue_total > 0) {
-					if (current == queue_pl_idx) {
-						fb.ClearPlaylist();
-					}
-					else {
-						plman.RemovePlaylist(queue_pl_idx);
-						plman.CreatePlaylist(queue_pl_idx, "播放队列");
-					};
+					plman.ClearPlaylist(queue_pl_idx);
 					// fill it
 					var q_handlelist = plman.GetPlaylistSelectedItems(-1);
 					for (var i = 0; i < queue_total; i++) {
@@ -2442,25 +2350,16 @@ function on_playback_queue_changed(origin) {
 			break;
 		};
 
-		if (isQueuePlaylistActive()) {
-			ShowPlaylistQueue();
-			full_repaint();
-		}
-		else {
-			SetPlaylistQueue();
-		};
-
-		g_avoid_on_playlists_changed = false;
-		g_avoid_on_playlist_items_added = false;
-		g_avoid_on_playlist_items_removed = false;
-
 		cList.addToQueue_timer = window.SetTimeout(function() {
 			window.ClearTimeout(cList.addToQueue_timer);
 			cList.addToQueue_timer = false;
+			g_delay_refresh_items = false;
+			if (isQueuePlaylistActive()) {
+				update_playlist(layout.collapseGroupsByDefault);
+			}
+			full_repaint();
 		}, 250);
-
 	};
-
 };
 
 //=================================================// Drag'n'Drop Callbacks
