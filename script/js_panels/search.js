@@ -214,7 +214,6 @@ searchbox = function() {
 			if (this.inputbox.text.length > 0 || ppts.showreset) this.reset_bt.checkstate("move", x, y);
 			break;
 		case "leave":
-			this.inputbox.check("leave", 0, 0);
 			this.reset_bt.checkstate("leave", 0, 0);
 		}
 	}
