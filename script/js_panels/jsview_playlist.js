@@ -43,8 +43,8 @@ var g_delay_refresh_items = false;
 var Queue_timer = false;
 
 ppt = {
-	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
-	rowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
+	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
+	rowHeight: 0,
 	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
 	scrollSmoothness: 3.0,
 	refreshRate: 20,
@@ -948,7 +948,7 @@ function on_font_changed() {
 	get_metrics();
 	init_btn();
 	get_images();
-	on_size();
+	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 	brw.repaint();
 };
 
@@ -988,6 +988,13 @@ function on_notify_data(name, info) {
 	case "ScrollStep":
 		ppt.rowScrollStep = info;
 		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
+		break;
+	case "row_height_changed":
+		ppt.defaultRowHeight = info;
+		window.SetProperty("_PROPERTY: Row Height", ppt.defaultRowHeight),
+		get_metrics();
+		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
+		brw.repaint();
 		break;
 	}
 };

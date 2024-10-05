@@ -17,18 +17,18 @@ function settings_checkboxes_action(id, status, parentId) {
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("SYSTEM.Enable Touch Scrolling", status);
 			p.settings.pages[parentId].elements[id].repaint();
-		case 6:
+		case 7:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("CUSTOM Enable Selection Menu", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 			break;
-		case 7:
+		case 8:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("PLAYBACK: Repeat playlists", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 8:
+		case 9:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("Playlist: Turn on queue playlist", status);
 			p.settings.pages[parentId].elements[id].repaint();
@@ -586,25 +586,43 @@ function settings_textboxes_action(pageId, elementId) {
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
 		switch (elementId) {
 		case 2:
-			cList.scrollstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
-			if(cList.scrollstep < 0) cList.scrollstep = 1;
+			var org_scrollstep = cList.scrollstep;
+			cList.scrollstep = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
+			else if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
 			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
 			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
-			cList.touchstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
-			if(cList.touchstep < 0) cList.touchstep = 1;
+			var org_scrollstep = cList.scrollstep;
+			cList.touchstep = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
+			else if(cList.touchstep < 0) cList.touchstep = 1;
 			else if(cList.touchstep > 20) cList.touchstep = 20;
 			window.SetProperty("SYSTEM.Playlist Touch Step", cList.touchstep);
 			break;
-		case 9:
+		case 6:
+			let org_default_playlist_h = cRow.default_playlist_h;
+			cRow.default_playlist_h = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!cRow.default_playlist_h) cRow.default_playlist_h = org_default_playlist_h;
+			else if(cRow.default_playlist_h < 15) cRow.default_playlist_h = 15;
+			else if(cRow.default_playlist_h > 100) cRow.default_playlist_h = 100;
+			if(cRow.default_playlist_h != org_default_playlist_h) {
+				window.SetProperty("SYSTEM.Playlist Row Height in Pixel", cRow.default_playlist_h);
+				resize_panels();
+				get_grprow_minimum(p.headerBar.columns[0].w);
+				update_playlist(layout.collapseGroupsByDefault, 2);
+				window.NotifyOthers("row_height_changed", cRow.default_playlist_h);
+			}
+			break;
+		case 10:
 			p.settings.ext_app[0] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
 			save_misccfg();
 			break;
-		case 10:
+		case 11:
 			p.settings.ext_app[1] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
@@ -1512,12 +1530,12 @@ oPage = function(id, objectName, label, nbrows) {
 			var spaceBetween_w = z(70);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
-
-			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 9.25, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 10.25, "顺序播放时自动播放下一个播放列表", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 11.25, "播放队列非空时, 自动为其创建播放列表", "queue_pl_on", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(9, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.75), oTextBox_2, cHeaderBar.height, "音轨外部编辑程序路径", p.settings.ext_app[0], "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(10, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 12.75), 115*zdpi, cHeaderBar.height, "程序名称", p.settings.ext_app[1], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), 50*zdpi, cHeaderBar.height, "列表行高（全局）", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "顺序播放时自动播放下一个播放列表", "repeat_pls", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 13.5, "播放队列非空时, 自动为其创建播放列表", "queue_pl_on", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15), oTextBox_2, cHeaderBar.height, "音轨外部编辑程序路径", p.settings.ext_app[0], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(11, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 15), 115*zdpi, cHeaderBar.height, "程序名称", p.settings.ext_app[1], "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1671,9 +1689,10 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("(范围: 1-20)", g_font, p.settings.color1, txtbox_x + 82*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			var bx = txtbox_x+350*zdpi, by = cSettings.topBarHeight + rh * 13.55 - (this.offset * cSettings.rowHeight);
+			gr.GdiDrawText("(范围: 15-100, 默认值: 33)", g_font, p.settings.color1, txtbox_x + 82*zdpi, cSettings.topBarHeight + rh * 9.55 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 10.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("设置后可在右键菜单里调用， 如 MusicTag, Mp3tag 等", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			var bx = txtbox_x+350*zdpi, by = cSettings.topBarHeight + rh * 15.75 - (this.offset * cSettings.rowHeight);
 			p.settings.browsebutton.draw(gr, bx, by, 255);
 			gr.GdiDrawText("浏览", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
@@ -2066,17 +2085,17 @@ oPage = function(id, objectName, label, nbrows) {
 				if (Folder != null) {
 					let FolderItem = Folder.Items().Item().Path;
 					if(FolderItem.substr(FolderItem.length-1, 1) != "\\") FolderItem += "\\";
-					p.settings.pages[0].elements[9].inputbox.text = FolderItem;
+					p.settings.pages[0].elements[10].inputbox.text = FolderItem;
 					p.settings.ext_app[0] = FolderItem;
 					if (utils.FileExists(FolderItem + "MusicTag.exe")) {
 						p.settings.ext_app[1] = "MusicTag.exe";
-						p.settings.pages[0].elements[10].inputbox.text = "MusicTag.exe";
+						p.settings.pages[0].elements[11].inputbox.text = "MusicTag.exe";
 					} else if(utils.FileExists(FolderItem + "Mp3tag.exe")){
 						p.settings.ext_app[1] = "Mp3tag.exe";
-						p.settings.pages[0].elements[10].inputbox.text = "Mp3tag.exe";
+						p.settings.pages[0].elements[11].inputbox.text = "Mp3tag.exe";
 					} else if(p.settings.ext_app[1] == "MusicTag.exe" || p.settings.ext_app[1] == "Mp3tag.exe"){
 						p.settings.ext_app[1] = "";
-						p.settings.pages[0].elements[10].inputbox.text = "";
+						p.settings.pages[0].elements[11].inputbox.text = "";
 					}
 					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 					else track_edit_app = "";
@@ -2356,7 +2375,7 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 15));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 18));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "编辑列", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "编辑分组", 22));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 19));
@@ -2484,8 +2503,9 @@ oSettings = function() {
 			case 0:
 				this.pages[this.currentPageId].elements[2].inputbox.on_focus(is_focused, true);
 				this.pages[this.currentPageId].elements[3].inputbox.on_focus(is_focused, true);
-				this.pages[this.currentPageId].elements[9].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[6].inputbox.on_focus(is_focused, true);
 				this.pages[this.currentPageId].elements[10].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[11].inputbox.on_focus(is_focused, true);
 				break;
 			case 1:
 				this.pages[this.currentPageId].elements[1].inputbox.on_focus(is_focused, true);

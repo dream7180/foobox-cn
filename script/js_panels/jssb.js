@@ -167,8 +167,9 @@ function reset_cover_timers() {
 image_cache = function() {
 	this._cachelist = {};
 	this._noartlist = {};
-	this.hit = function(metadb, albumIndex) {
+	this.hit = function(albumIndex) {
 		var img = this._cachelist[brw.groups[albumIndex].cachekey];
+		var metadb = brw.groups[albumIndex].metadb;
 		if (this._noartlist[brw.groups[albumIndex].cachekey] == 1) img = images.noart;
 		if (typeof(img) == "undefined" || img == null) {
 			var crc_exist = check_cache(albumIndex);
@@ -202,7 +203,7 @@ image_cache = function() {
 											if(path_img(_path)) {
 												var genre_img = gdi.Image(_path);
 												try {
-													brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img, _path);
+													brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, _path);
 													brw.groups[albumIndex].load_requested = 1;
 												}catch(e) {}
 												if(brw.groups[albumIndex].cover_img != null) break;
@@ -214,7 +215,7 @@ image_cache = function() {
 										var genre_img = gdi.Image(_path);
 										if(!genre_img) this._noartlist[brw.groups[albumIndex].cachekey] = 1;
 										try {
-											brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img, _path);
+											brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, _path);
 											brw.groups[albumIndex].load_requested = 1;
 											brw.repaint();
 										} catch(e) {}
@@ -240,17 +241,15 @@ image_cache = function() {
 		}
 	};
 
-	this.preload = function(metadb, albumIndex) {
+	this.preload = function(albumIndex) {
 		var img = this._cachelist[brw.groups[albumIndex].cachekey];
 		if (this._noartlist[brw.groups[albumIndex].cachekey] == 1) img = images.noart;
 		if (typeof(img) == "undefined" || img == null) {
 			var crc_exist = check_cache(albumIndex);
-			if(brw.groups[albumIndex].load_requested == 0){
-				if (crc_exist) {
-					brw.groups[albumIndex].load_requested = 1;
-					load_image_from_cache(brw.groups[albumIndex].cachekey, albumIndex);
-				}
-			};
+			if (crc_exist) {
+				brw.groups[albumIndex].load_requested = 1;
+				load_image_from_cache(brw.groups[albumIndex].cachekey, albumIndex);
+			}
 			if (typeof(img) != "undefined" || img != null || ppt.showloading) return img;
 			else {
 				if(brw.groups[albumIndex].tracktype != 3) return images.noart;
@@ -264,7 +263,7 @@ image_cache = function() {
 		this._noartlist[key] = null;
 	};
 
-	this.getit = function(metadb, albumId, image, image_path) {
+	this.getit = function(albumId, image, image_path) {
 		var cw = cover.max_w;
 		var ch = cw;
 		var img = null;
@@ -288,7 +287,7 @@ image_cache = function() {
 			//	var pw = cw;
 			//	var ph = ch;
 			//};
-			if (metadb) {
+			if (brw.groups[albumId].metadb) {
 				img = image.Resize(pw, ph, 2);
 				cover_type = 1;
 			};
@@ -933,10 +932,9 @@ oBrowser = function() {
 			timers.preload = setInterval(() => {
 				if(i < end){
 					try{
-						this.groups[i].load_requested = 0;
 						if (this.groups[i].cover_type == null && i > ppt.showAllItem - 1) {
 							if (this.groups[i].load_requested == 0) {
-								this.groups[i].cover_img = g_image_cache.preload(this.groups[i].metadb, i);
+								this.groups[i].cover_img = g_image_cache.preload(i);
 							};
 						}
 					}catch(e){
@@ -1434,7 +1432,7 @@ oBrowser = function() {
 					} else {
 						if (this.groups[i].cover_type == null) {
 							if (this.groups[i].load_requested == 0) {
-								this.groups[i].cover_img = g_image_cache.hit(this.groups[i].metadb, i);
+								this.groups[i].cover_img = g_image_cache.hit(i);
 							};
 						} else if (this.groups[i].cover_type == 0) {
 							if(this.groups[i].tracktype != 3) this.groups[i].cover_img = images.noart;
@@ -3263,7 +3261,7 @@ const load_image_from_cache = async (crc, albumIndex) =>
 {
 	const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 	try{
-		brw.groups[albumIndex].cover_img = g_image_cache.getit(brw.groups[albumIndex].metadb, albumIndex, image, false);
+		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, image, false);
 		if (albumIndex < brw.groups.length && albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
@@ -3288,9 +3286,9 @@ const get_album_art_async = async (albumIndex) =>
 		if(!result.image) g_image_cache._noartlist[brw.groups[albumIndex].cachekey] = 1;
 		let image_path = result.path;
 		if(path_img(image_path)){
-			brw.groups[albumIndex].cover_img = g_image_cache.getit(brw.groups[albumIndex].metadb, albumIndex, result.image, image_path);
+			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, image_path);
 		} else{
-			brw.groups[albumIndex].cover_img = g_image_cache.getit(brw.groups[albumIndex].metadb, albumIndex, result.image, 1);
+			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, 1);
 		}
 		if (albumIndex < brw.groups.length && albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {

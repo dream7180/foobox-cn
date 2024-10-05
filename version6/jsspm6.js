@@ -52,8 +52,8 @@ var g_start_ = 0,
 var radiom3u = [];
 
 ppt = {
-	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
-	rowHeight: window.GetProperty("_PROPERTY: Row Height", 35),
+	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
+	rowHeight: 0,
 	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
 	scrollSmoothness: 3.0,
 	refreshRate: 20,
@@ -1505,7 +1505,6 @@ function on_mouse_leave() {
 //=================================================// Metrics & Fonts & Colors & Images
 
 function get_metrics() {
-	cFilterBox.h = Math.round(20*zdpi);
 	cScrollBar.minCursorHeight = 25*zdpi;
 	if(sys_scrollbar){
 		cScrollBar.width = get_system_scrollbar_width();
@@ -1517,6 +1516,7 @@ function get_metrics() {
 	ppt.rowHeight = Math.round(ppt.defaultRowHeight * zdpi);
 	ppt.SearchBarHeight = z(26) + 2;
 	ppt.headerBarHeight = ppt.SearchBarHeight + (ppt.showFilter ? ppt.rowHeight : 0);
+	cFilterBox.h = Math.min(ppt.rowHeight, z(20));
 	cFilterBox.y = Math.round(ppt.SearchBarHeight + (ppt.rowHeight - cFilterBox.h)/2);
 	cSearchBox.h = 22 * zdpi;
 	cSearchBox.y = Math.round((ppt.SearchBarHeight - cSearchBox.h)/2);
@@ -2077,7 +2077,8 @@ function on_font_changed() {
 	brw.getImages();
 	g_filterbox.inputbox.FontUpdte();
 	g_filterbox.getImages();
-	on_size();
+	cSearchBox.w = ww - brw.images.topbar_btn.Width * 2 - cSearchBox.x;
+	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 	brw.repaint();
 };
 
@@ -2152,6 +2153,13 @@ function on_notify_data(name, info) {
 		if(info && info != "null") {
 			radiom3u = info.split(";");
 		}
+		break;
+	case "row_height_changed":
+		ppt.defaultRowHeight = info;
+		window.SetProperty("_PROPERTY: Row Height", ppt.defaultRowHeight),
+		get_metrics();
+		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
+		brw.repaint();
 		break;
 	}
 };

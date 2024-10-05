@@ -201,12 +201,8 @@ function detect_video() {
 
 function set_panel() {
 	var ph = win_y - topbarh;
-	try{
-		if(active_p.Width != ww || active_p.Height != ph)
-		active_p.Move(0, topbarh, ww, ph);
-	} catch(e){//快速设置布局的bug
-		get_panel();
-	}
+	if(active_p.Width != ww || active_p.Height != ph)
+	active_p.Move(0, topbarh, ww, ph);
 }
 
 function TimeFmt(t) {

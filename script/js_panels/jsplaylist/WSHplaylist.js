@@ -50,6 +50,8 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 		var tf_crc;
 		switch (layout.pattern_idx) {
 			case 0:
+				tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
+				break;
 			case 1:
 				tf_crc = albcov_lt ? fb.TitleFormat("$crc32('alb'%album%)") : fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
 				break;
@@ -489,7 +491,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					var cv_h = Math.floor(cover.h - cMargin * 2);
 
 					var groupmetadb = p.list.handleList[p.list.groups[this.group_index].start];
-					p.list.groups[this.group_index].cover_img = g_image_cache.hit(groupmetadb, this.group_index);
+					if(p.list.groups[this.group_index].load_requested == 0)
+						p.list.groups[this.group_index].cover_img = g_image_cache.hit(groupmetadb, this.group_index);
 					//
 					if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 						if (p.list.groups[this.group_index].cover_img == null) {
@@ -684,7 +687,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						var cv_w = Math.floor(cover.w - cover.margin * 2);
 						var cv_h = Math.floor(cover.h - cover.margin * 2);
 						//
-						p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.metadb, this.group_index);
+						if(p.list.groups[this.group_index].load_requested == 0)
+							p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.metadb, this.group_index);
 						//
 						if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 							if (p.list.groups[this.group_index].cover_img == null) {
@@ -1476,9 +1480,8 @@ oList = function(object_name, playlist) {
 		cover.show = (layout.showCover == "1" ? true : false);
 		cGroup.collapsed_height = layout.collapsedHeight;
 		cGroup.expanded_height = layout.expandedHeight;
-		// update max_w et max_h for cover loading and repaint in cache image handle functions
+		// update max_w for cover loading and repaint in cache image handle functions
 		cover.max_w = layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height;
-		cover.max_h = layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height;
 		// refresh playlist
 		g_image_cache = new image_cache;
 	};
@@ -1490,9 +1493,7 @@ oList = function(object_name, playlist) {
 		var count = 0;
 		var start = 0;
 		var total_time_length = 0;
-		//var global_time = 0;
 		var arr_pl, fin, fin2;
-		//var t1 = fb.CreateProfiler("Init Groups");
 
 		// update group key TF pattern
 		if (layout.showgroupheaders) {
@@ -1512,7 +1513,6 @@ oList = function(object_name, playlist) {
 				if (this.count == 1) {
 					count++;
 					total_time_length += handle.Length;
-					//global_time += handle.Length;
 					this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, handle));
 				}
 				else {
@@ -1551,11 +1551,29 @@ oList = function(object_name, playlist) {
 				total_time_length += handle.Length;
 			};
 		};
-		// calc total rows for this total handles + groups
 		this.totalRows = this.getTotalRows();
-		// total seconds playlist for playlist header panel
-		//console.log("init groups delay = " + t1.Time + " ms /handleList count=" + this.count);
-		//t1 = null;
+		if (p.headerBar.columns[0].w > 0 || (layout.showgroupheaders && cGroup.expanded_height > 1)){
+			let end = this.groups.length;
+			let j=0;
+			if (!cover.preload_timer) {
+				cover.preload_timer = setInterval(() => {
+					if(j < end){
+						try{
+							if (this.groups[j].load_requested == 0) {
+								this.groups[j].cover_img = g_image_cache.preload(j);
+							};
+						}catch(e){
+							clearInterval(cover.preload_timer);
+							cover.preload_timer = null;
+						}
+						j++;
+					} else {
+						clearInterval(cover.preload_timer);
+						cover.preload_timer = null;				
+					}
+				}, 2);
+			}
+		}
 	};
 
 	this.updateHandleList = function(playlist, iscollapsed, listnochange) {

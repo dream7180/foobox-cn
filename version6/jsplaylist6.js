@@ -27,7 +27,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "6.34 (Remastered)";
+var g_script_version = "6.35 (Remastered)";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -172,7 +172,7 @@ var sort_pattern_codec = "%codec% | %album artist% | $if(%album%,%date%,'9999') 
 var sort_pattern_queue = "%queue_index% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %title%";
 // Singletons
 cRow = {
-	default_playlist_h: window.GetProperty("SYSTEM.Playlist Row Height in Pixel", 35),
+	default_playlist_h: window.GetProperty("SYSTEM.Playlist Row Height in Pixel", 33),
 	playlist_h: 29,
 	extra_line_h: window.GetProperty("SYSTEM.Playlist Extra-row Height in Pixel", 10),
 //	headerBar_h: 26,
@@ -245,8 +245,8 @@ cover = {
 	w: 0,
 	max_w: layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height,
 	h: 0,
-	max_h: layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height,
 	previous_max_size: -1,
+	preload_timer: false,
 	resized: false
 };
 
@@ -323,13 +323,13 @@ const load_image_from_cache = async (metadb, crc, albumIndex) =>
 	try{
 		const image = await gdi.LoadImageAsyncV2(0, fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg");
 		p.list.groups[albumIndex].cover_img = g_image_cache.getit(metadb, image, albumIndex);
-		if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
+		if (!cList.repaint_timer) {
 			if (!cover.repaint_timer) {
 				cover.repaint_timer = setInterval(() => {
-					if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
+					cover_repaint();
 					clearInterval(cover.repaint_timer);
 					cover.repaint_timer = null;
-				}, 5);
+				}, 2);
 			};
 		};
 	} catch(e) {}
@@ -359,7 +359,7 @@ image_cache = function() {
 		var img = this._cachelist[_crc];
 		if (typeof img == "undefined" || img == null || force) { // if image not in cache, we load it asynchronously
 			var crc_exist = check_cache(albumIndex);
-			if (crc_exist && p.list.groups[albumIndex].load_requested == 0 && !g_mouse_wheel_timer && !cScrollBar.timerID2){
+			if (crc_exist){
 				if (!cover.load_timer) {
 					cover.load_timer = window.SetTimeout(function() {
 						try {
@@ -368,43 +368,42 @@ image_cache = function() {
 						} catch(e) {};
 						cover.load_timer && window.ClearTimeout(cover.load_timer);
 						cover.load_timer = false;
-					}, 5);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 20 : 6));
+					}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 2 : 10));
 				};
 			}
-			else if(p.list.groups[albumIndex].load_requested == 0 && !g_mouse_wheel_timer && !cScrollBar.timerID2){
-				if (!cover.load_timer) {
-					cover.load_timer = window.SetTimeout(function() {
-						try{
-							if (layout.pattern_idx == 4) {
-								var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(metadb));
-								var genre_img = gdi.Image( _path + ".jpg") || gdi.Image( _path + ".png");
+			else if (!cover.load_timer) {
+				cover.load_timer = window.SetTimeout(function() {
+					try{
+						if (layout.pattern_idx == 4) {
+							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(metadb));
+							var genre_img = gdi.Image( _path + ".jpg") || gdi.Image( _path + ".png");
+							p.list.groups[albumIndex].load_requested = 1;
+							img = g_image_cache.getit(metadb, genre_img, albumIndex);
+							full_repaint();
+						} else if (layout.pattern_idx == 5) {
+							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
+							var dc_arr = dir_cover_name.split(";");
+							for (var i = 0; i <= dc_arr.length; i++) {
+								var dir_img = gdi.Image( _path + dc_arr[i]);
 								p.list.groups[albumIndex].load_requested = 1;
-								img = g_image_cache.getit(metadb, genre_img, albumIndex);
-								full_repaint();
-							} else if (layout.pattern_idx == 5) {
-								var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
-								var dc_arr = dir_cover_name.split(";");
-								for (var i = 0; i <= dc_arr.length; i++) {
-									var dir_img = gdi.Image( _path + dc_arr[i]);
-									p.list.groups[albumIndex].load_requested = 1;
-									img = g_image_cache.getit(metadb, dir_img, albumIndex);
-									if(img != null) break;
-								}
-								full_repaint();
+								img = g_image_cache.getit(metadb, dir_img, albumIndex);
+								if(img != null) break;
 							}
-							else {
-								p.list.groups[albumIndex].load_requested = 1;
-								get_album_art_async(metadb, albumIndex);
-							}
-						} catch(e) {};
-						cover.load_timer && window.ClearTimeout(cover.load_timer);
-						cover.load_timer = false;
-					}, 10);//(g_mouse_wheel_timer || cScrollBar.timerID2 ? 25 : 8));
-				};
-			}
+								full_repaint();
+						}
+						else {
+							p.list.groups[albumIndex].load_requested = 1;
+							get_album_art_async(metadb, albumIndex);
+						}
+					} catch(e) {};
+					cover.load_timer && window.ClearTimeout(cover.load_timer);
+					cover.load_timer = false;
+				}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 5 : 10));
+			};
 		};
 		return img;
 	};
+	
 	this.getit = function(metadb, image, albumIndex) {
 		var cw = (p.headerBar.columns[0].w >0) ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
 		var ch = cw;
@@ -441,6 +440,18 @@ image_cache = function() {
 		} catch(e){}
 		return img;
 	};
+	
+	this.preload = function(metadb, albumIndex) {
+		var img = this._cachelist[p.list.groups[albumIndex].cachekey];
+		if (typeof(img) == "undefined" || img == null) {
+			var crc_exist = check_cache(albumIndex);
+			if (crc_exist) {
+				p.list.groups[albumIndex].load_requested = 1;
+				load_image_from_cache(metadb, p.list.groups[albumIndex].cachekey, albumIndex);
+			}
+			return img;
+		}
+	}
 };
 var g_image_cache = new image_cache;
 
