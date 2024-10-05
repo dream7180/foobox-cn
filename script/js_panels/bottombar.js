@@ -194,9 +194,9 @@ function detect_video() {
 }
 
 function set_panel() {
-	var ph = win_y - topbarh;
+	var ph = win_y - z(2);
 	if(active_p.Width != ww || active_p.Height != ph)
-	active_p.Move(0, topbarh, ww, ph);
+	active_p.Move(0, 0, ww, ph);
 }
 
 function TimeFmt(t) {
