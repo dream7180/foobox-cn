@@ -201,8 +201,10 @@ function detect_video() {
 
 function set_panel() {
 	var ph = win_y - topbarh;
-	if(active_p.Width != ww || active_p.Height != ph)
-	active_p.Move(0, topbarh, ww, ph);
+	try{
+		if(active_p.Width != ww || active_p.Height != ph)
+		active_p.Move(0, topbarh, ww, ph);
+	}catch(e){}
 }
 
 function TimeFmt(t) {

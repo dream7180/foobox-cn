@@ -83,7 +83,7 @@ oSwitchbar = function() {
 			break;
 		case "lbtn_up":
 			if (this.hover_tab > 0 && this.hover_tab-1 != active_pid){
-				this.swith_panel(this.hover_tab);
+				this.switch_panel(this.hover_tab);
 				this.down = 0;
 			}
 			break;
@@ -103,7 +103,7 @@ oSwitchbar = function() {
 		g_switchbar.tip_timer && window.ClearInterval(g_switchbar.tip_timer);
 		g_switchbar.tip_timer = false;
 	}
-	this.swith_panel = function(id) {
+	this.switch_panel = function(id) {
 		active_p.Show(false);
 		active_pid = id - 1;
 		switch(active_pid){
@@ -195,8 +195,10 @@ function detect_video() {
 
 function set_panel() {
 	var ph = win_y - z(2);
-	if(active_p.Width != ww || active_p.Height != ph)
-	active_p.Move(0, 0, ww, ph);
+	try{
+		if(active_p.Width != ww || active_p.Height != ph)
+		active_p.Move(0, 0, ww, ph);
+	}catch(e){}
 }
 
 function TimeFmt(t) {
