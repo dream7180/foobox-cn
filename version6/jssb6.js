@@ -180,7 +180,7 @@ image_cache = function() {
 						timers.coverLoad = setInterval(() => {
 							try {
 								brw.groups[albumIndex].load_requested = 1;
-								load_image_from_cache(brw.groups[albumIndex].cachekey, albumIndex);
+								load_image_from_cache(albumIndex);
 							}
 							catch (e) {};
 							clearInterval(timers.coverLoad);
@@ -248,7 +248,7 @@ image_cache = function() {
 			var crc_exist = check_cache(albumIndex);
 			if (crc_exist) {
 				brw.groups[albumIndex].load_requested = 1;
-				load_image_from_cache(brw.groups[albumIndex].cachekey, albumIndex);
+				load_image_from_cache(albumIndex);
 			}
 			if (typeof(img) != "undefined" || img != null || ppt.showloading) return img;
 			else {
@@ -2100,7 +2100,6 @@ oBrowser = function() {
 		case (idx >= 900 && idx <= 903):
 			ppt.panelMode = idx - 900;
 			window.SetProperty("_PROPERTY: Display Mode", ppt.panelMode);
-			g_image_cache = new image_cache;
 			get_metrics();
 			brw.setList();
 			brw.update();
@@ -3280,10 +3279,11 @@ function check_cache(albumIndex) {
 	return false;
 };
 
-const load_image_from_cache = async (crc, albumIndex) =>
+const load_image_from_cache = async (albumIndex) =>
 {
-	const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 	try{
+		var crc = brw.groups[albumIndex].cachekey;
+		const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, image, false);
 		if (albumIndex < brw.groups.length && albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {

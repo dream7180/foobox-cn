@@ -10,6 +10,7 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 	this.total_group_duration_txt = TimeFmt(total_time_length);
 	this.load_requested = 0;
 	this.cover_img = null;
+	this.metadb = handle;
 
 	if (count < cGroup.count_minimum) {
 		this.rowsToAdd = cGroup.count_minimum - count;
@@ -490,9 +491,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					var cv_w = Math.floor(cover.w - cMargin * 2);
 					var cv_h = Math.floor(cover.h - cMargin * 2);
 
-					var groupmetadb = p.list.handleList[p.list.groups[this.group_index].start];
 					if(p.list.groups[this.group_index].load_requested == 0)
-						p.list.groups[this.group_index].cover_img = g_image_cache.hit(groupmetadb, this.group_index);
+						p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
 					//
 					if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 						if (p.list.groups[this.group_index].cover_img == null) {
@@ -688,7 +688,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						var cv_h = Math.floor(cover.h - cover.margin * 2);
 						//
 						if(p.list.groups[this.group_index].load_requested == 0)
-							p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.metadb, this.group_index);
+							p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
 						//
 						if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 							if (p.list.groups[this.group_index].cover_img == null) {
@@ -1482,8 +1482,6 @@ oList = function(object_name, playlist) {
 		cGroup.expanded_height = layout.expandedHeight;
 		// update max_w for cover loading and repaint in cache image handle functions
 		cover.max_w = layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height;
-		// refresh playlist
-		g_image_cache = new image_cache;
 	};
 
 	this.init_groups = function(iscollapsed) {
