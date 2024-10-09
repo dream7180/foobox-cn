@@ -166,11 +166,8 @@ function reset_cover_timers() {
 //=================================================// Cover Tools
 image_cache = function() {
 	this._cachelist = {};
-	this._noartlist = {};
 	this.hit = function(albumIndex) {
 		var img = this._cachelist[brw.groups[albumIndex].cachekey];
-		var metadb = brw.groups[albumIndex].metadb;
-		if (this._noartlist[brw.groups[albumIndex].cachekey] == 1) img = images.noart;
 		if (typeof(img) == "undefined" || img == null) {
 			var crc_exist = check_cache(albumIndex);
 			if(brw.groups[albumIndex].load_requested == 0){
@@ -196,7 +193,7 @@ image_cache = function() {
 									var arr = brw.groups[albumIndex].groupkey.split(" ^^ ");
 									if(ppt.tagMode == 3){
 										var dc_arr = dir_cover_name.split(";");
-										var folder_path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
+										var folder_path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(brw.groups[albumIndex].metadb);
 										var _path;
 										for (var i = 0; i <= dc_arr.length; i++) {
 											_path = folder_path + dc_arr[i];
@@ -207,13 +204,12 @@ image_cache = function() {
 													brw.groups[albumIndex].load_requested = 1;
 												}catch(e) {}
 												if(brw.groups[albumIndex].cover_img != null) break;
-											} else this._noartlist[brw.groups[albumIndex].cachekey] = 1;
+											}
 										}
 										brw.repaint();
 									} else {
 										var _path = fb.ProfilePath + "foobox\\genre\\" + GetGenre(arr[0]) + ".jpg";
 										var genre_img = gdi.Image(_path);
-										if(!genre_img) this._noartlist[brw.groups[albumIndex].cachekey] = 1;
 										try {
 											brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, _path);
 											brw.groups[albumIndex].load_requested = 1;
@@ -233,55 +229,41 @@ image_cache = function() {
 					};
 				};
 			}
-		};
-		if (typeof(img) != "undefined" || img != null || ppt.showloading) return img;
-		else {
-			if(brw.groups[albumIndex].tracktype != 3) return images.noart;
-			else return images.stream;
-		}
+		} else brw.groups[albumIndex].load_requested = 1;
+		return img;
 	};
 
 	this.preload = function(albumIndex) {
 		var img = this._cachelist[brw.groups[albumIndex].cachekey];
-		if (this._noartlist[brw.groups[albumIndex].cachekey] == 1) img = images.noart;
 		if (typeof(img) == "undefined" || img == null) {
 			var crc_exist = check_cache(albumIndex);
 			if (crc_exist) {
 				brw.groups[albumIndex].load_requested = 1;
-				load_image_from_cache(albumIndex);
+				load_image_from_cache(albumIndex, true);
 			}
-			if (typeof(img) != "undefined" || img != null || ppt.showloading) return img;
-			else {
-				if(brw.groups[albumIndex].tracktype != 3) return images.noart;
-				else return images.stream;
-			}
-		}
+		} else brw.groups[albumIndex].load_requested = 1;
+		return img;
 	}
 
 	this.reset = function(key) {
 		this._cachelist[key] = null;
-		this._noartlist[key] = null;
 	};
 
 	this.getit = function(albumId, image, image_path) {
 		var cw = cover.max_w;
 		var ch = cw;
 		var img = null;
-		var cover_type = null;
-
-		if (!image) {
-			cover_type = 0;
-		} else {
+		if (image) {
 			//if (cover.keepaspectratio) {
-				if (image.Height >= image.Width) {
-					var ratio = image.Width / image.Height;
-					var pw = cw * ratio;
-					var ph = ch;
-				} else {
-					var ratio = image.Height / image.Width;
-					var pw = cw;
-					var ph = ch * ratio;
-				};
+			if (image.Height >= image.Width) {
+				var ratio = image.Width / image.Height;
+				var pw = cw * ratio;
+				var ph = ch;
+			} else {
+				var ratio = image.Height / image.Width;
+				var pw = cw;
+				var ph = ch * ratio;
+			}
 			//}
 			//else {
 			//	var pw = cw;
@@ -289,35 +271,30 @@ image_cache = function() {
 			//};
 			if (brw.groups[albumId].metadb) {
 				img = image.Resize(pw, ph, 2);
-				cover_type = 1;
-			};
+			}
 			this._cachelist[brw.groups[albumId].cachekey] = img;
 
 			// save img to cache
 			if (image_path) {
-				if (cover_type == 1) {
-					if (!timers.saveCover) {
-						timers.saveCover = window.SetInterval(function() {
-							try{
-								let crc = brw.groups[albumId].cachekey;
-								let s = Math.min(ppt.cache_size / image.Width, ppt.cache_size / image.Height);
-								if(s > 1){
-									image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-								} else {
-									let w = Math.floor(image.Width * s);
-									let h = Math.floor(image.Height * s);
-									image.Resize(w, h, 2).SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-								}
-							}catch(e){}
-							window.ClearInterval(timers.saveCover);
-							timers.saveCover = false;
-						}, ppt.cache_size/10);
-					};
+				if (!timers.saveCover) {
+					timers.saveCover = window.SetInterval(function() {
+						try{
+							let crc = brw.groups[albumId].cachekey;
+							let s = Math.min(ppt.cache_size / image.Width, ppt.cache_size / image.Height);
+							if(s > 1){
+								image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
+							} else {
+								let w = Math.floor(image.Width * s);
+								let h = Math.floor(image.Height * s);
+								image.Resize(w, h, 2).SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
+							}
+						}catch(e){}
+						window.ClearInterval(timers.saveCover);
+						timers.saveCover = false;
+					}, ppt.cache_size/10);
 				};
 			}
-		};
-
-		brw.groups[albumId].cover_type = cover_type;
+		}
 		return img;
 	};
 };
@@ -358,8 +335,6 @@ oSwitchbar = function() {
 				ppt.tagMode = this.hover_tab;
 				window.SetProperty("_PROPERTY: Tag Mode", ppt.tagMode);
 				get_tagprop();
-				//g_image_cache = new image_cache;
-				//CollectGarbage();
 				brw.reset_swbtn();
 				brw.populate();
 				brw.showItemPanelInit();
@@ -816,7 +791,6 @@ oGroup = function(index, handle, groupkey) {
 		this.tracktype = 0;
 	};
 	this.cover_img = null;
-	this.cover_type = null;
 	this.load_requested = 0;
 
 	this.finalize = function(count, tracks, handles) {
@@ -932,7 +906,7 @@ oBrowser = function() {
 			timers.preload = setInterval(() => {
 				if(i < end){
 					try{
-						if (this.groups[i].cover_type == null && i > ppt.showAllItem - 1) {
+						if (this.groups[i].cover_img == null && i > ppt.showAllItem - 1) {
 							if (this.groups[i].load_requested == 0) {
 								this.groups[i].cover_img = g_image_cache.preload(i);
 							};
@@ -1430,13 +1404,16 @@ oBrowser = function() {
 					if (ppt.showAllItem && i == 0) {
 						this.groups[i].cover_img = images.all;
 					} else {
-						if (this.groups[i].cover_type == null) {
+						if (this.groups[i].cover_img == null) {
 							if (this.groups[i].load_requested == 0) {
 								this.groups[i].cover_img = g_image_cache.hit(i);
 							};
-						} else if (this.groups[i].cover_type == 0) {
-							if(this.groups[i].tracktype != 3) this.groups[i].cover_img = images.noart;
-							else this.groups[i].cover_img = images.stream;
+						}
+						if (typeof(this.groups[i].cover_img) != "undefined") {
+							if (this.groups[i].cover_img == null) {
+								if(this.groups[i].tracktype != 3) this.groups[i].cover_img = images.noart;
+								else this.groups[i].cover_img = images.stream;
+							}
 						};
 					};
 					
@@ -1458,7 +1435,7 @@ oBrowser = function() {
 					// draw cover
 					if (this.groups[i].cover_img) {
 						//if (cover.keepaspectratio) {
-							var max = this.groups[i].cover_img.Width > this.groups[i].cover_img.Height ? this.groups[i].cover_img.Width : this.groups[i].cover_img.Height;
+							var max = Math.max(this.groups[i].cover_img.Width, this.groups[i].cover_img.Height);
 							var rw = this.groups[i].cover_img.Width / max;
 							var rh = this.groups[i].cover_img.Height / max;
 							var im_w = (rw * coverWidth) - 2;
@@ -1475,9 +1452,11 @@ oBrowser = function() {
 							all_w = im_w;
 							all_h = im_h;
 						} else {
-							gr.DrawImage(this.groups[i].cover_img, ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w, im_h, 1, 1, this.groups[i].cover_img.Width - 2, this.groups[i].cover_img.Height - 2);
+							let this_x = ax + Math.round((aw - im_w) / 2);
+							let this_y = coverTop + coverWidth - im_h;
+							gr.DrawImage(this.groups[i].cover_img, this_x, this_y, im_w, im_h, 1, 1, this.groups[i].cover_img.Width - 2, this.groups[i].cover_img.Height - 2);
 							//cover frame:
-							gr.DrawRect(ax + Math.round((aw - im_w) / 2), coverTop + coverWidth - im_h, im_w - 1, im_h - 1, 1.0, g_color_normal_txt & 0x25ffffff);
+							gr.DrawRect(this_x, this_y, im_w - 1, im_h - 1, 1.0, g_color_normal_txt & 0x25ffffff);
 							// grid text background rect
 							if (ppt.panelMode == 3) {
 								if (i == this.playingIndex) {
@@ -1491,10 +1470,8 @@ oBrowser = function() {
 							};
 						};
 					} else if(ppt.showloading) {
-						var im_w = coverWidth;
-						var im_h = coverWidth;
 						gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 255);
-					};
+					} else gr.DrawImage(images.noart, ax + Math.round((aw - coverWidth) / 2), ay + Math.round((aw - coverWidth) / 2), coverWidth, coverWidth, 1, 1, images.noart.Width - 2, images.noart.Height - 2);
 
 					// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
 					if (ppt.panelMode == 3 && im_h > im_w) {
@@ -1505,25 +1482,23 @@ oBrowser = function() {
 						var frame_h = im_h;
 					};
 					var _cx = ax + Math.round((aw - frame_w) / 2);
-					//if (!ppt.showAllItem || (ppt.showAllItem && i > 0) || (ppt.panelMode != 3)) {
-						if (g_rightClickedIndex > -1) {
-							if (g_rightClickedIndex == i) {
-								if (this.stampDrawMode) {
-									gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
-								} else {
-									gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
-								};
-							};
-						} else {
-							if (i == this.activeIndex) {
-								if (this.stampDrawMode) {
-									gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
-								} else {
-									gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
-								};
+					if (g_rightClickedIndex > -1) {
+						if (g_rightClickedIndex == i) {
+							if (this.stampDrawMode) {
+								gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
+							} else {
+								gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
 							};
 						};
-					//};
+					} else {
+						if (i == this.activeIndex) {
+							if (this.stampDrawMode) {
+								gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
+							} else {
+								gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
+							};
+						};
+					};
 					if(i == this.playingIndex && ppt.panelMode > 1){
 						gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_highlight);
 					}
@@ -2125,7 +2100,6 @@ oBrowser = function() {
 				brw.groups[k].load_requested = 0;
 				g_image_cache.reset(crc);
 				brw.groups[k].cover_img = null;
-				brw.groups[k].cover_type = null;
 			}
 			brw.cover_repaint();
 			break;
@@ -2207,10 +2181,7 @@ oBrowser = function() {
 //===================================================================================================
 
 var fso = new ActiveXObject("Scripting.FileSystemObject");
-var cover_img = null;//cover.masks.split(";");
-
 var brw = null;
-var g_1x1 = false;
 var isScrolling = false;
 var g_switchbar = null;
 var g_filterbox = null;
@@ -2326,27 +2297,19 @@ function on_size() {
 	window.MinWidth = ppt.default_lineHeightMin;
 	window.MinHeight = ppt.default_lineHeightMin;
 	// set Size of browser
-	//if (cScrollBar.enabled) {
-		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
-	//}
-	//else {
-	//	brw.setSize(0, ppt.headerBarHeight, ww, wh - ppt.headerBarHeight);
-	//};
+	//if (cScrollBar.enabled)
+	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
+	//else brw.setSize(0, ppt.headerBarHeight, ww, wh - ppt.headerBarHeight);
 	g_switchbar.setSize(g_switchbar.x, g_switchbar.y, g_switchbar.w, g_switchbar.h);
 };
 
 function on_paint(gr) {
 	if (!window.Width || !window.Height) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
-	if (!g_1x1) {
-		brw && brw.draw(gr);
-		if (pman.offset > 0) {
-			pman.draw(gr);
-		};
-	
+	brw && brw.draw(gr);
+	if (pman.offset > 0) pman.draw(gr);
 	g_filterbox.draw(gr, cFilterBox.x, cFilterBox.y);
 	g_switchbar.draw(gr);
-	};
 };
 
 function on_mouse_lbtn_down(x, y) {
@@ -3109,12 +3072,10 @@ function on_item_focus_change(playlist_idx, from, to) {
 
 function on_metadb_changed(handles, fromhook) {
 	if(!fromhook) {
-		g_image_cache._noartlist = {};
 		var total = brw.groups.length;
 		for (var i = 0; i < total; i++) {
 			brw.groups[i].load_requested = 0;
 			brw.groups[i].cover_img = null;
-			brw.groups[i].cover_type = null;
 		};
 		brw.repaint();
 	}
@@ -3256,26 +3217,21 @@ function check_cache(albumIndex) {
 	return false;
 };
 
-const load_image_from_cache = async (albumIndex) =>
+const load_image_from_cache = async (albumIndex, preload) =>
 {
 	try{
 		var crc = brw.groups[albumIndex].cachekey;
 		const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
 		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, image, false);
-		if (albumIndex < brw.groups.length && albumIndex >= g_start_ && albumIndex <= g_end_) {
+		if (!preload && albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
-					g_1x1 = false;
 					brw.cover_repaint();
 					clearInterval(timers.coverDone);
 					timers.coverDone = false;
 				}, 2);
 			};
-		} else {
-        	g_1x1 = true;
-        	window.RepaintRect(0, 0, 1, 1);
-        	g_1x1 = false;
-    	};
+		}
     } catch(e){}
 };
 
@@ -3283,27 +3239,21 @@ const get_album_art_async = async (albumIndex) =>
 {
 	try{
 		let result = await utils.GetAlbumArtAsyncV2(0, brw.groups[albumIndex].metadb, ppt.albumArtId, false);
-		if(!result.image) g_image_cache._noartlist[brw.groups[albumIndex].cachekey] = 1;
 		let image_path = result.path;
 		if(path_img(image_path)){
 			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, image_path);
 		} else{
 			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, 1);
 		}
-		if (albumIndex < brw.groups.length && albumIndex >= g_start_ && albumIndex <= g_end_) {
+		if (albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
-					g_1x1 = false;
 					brw.cover_repaint();
 					clearInterval(timers.coverDone);
 					timers.coverDone = false;
 				}, 2);
 			};
-		} else {
-       		g_1x1 = true;
-        	window.RepaintRect(0, 0, 1, 1);
-        	g_1x1 = false;
-    	};
+		}
     } catch(e){}
 };
 
@@ -3386,7 +3336,6 @@ function reset_this_cache(idx, crc){
 	brw.groups[idx].load_requested = 0;
 	g_image_cache.reset(crc);
 	brw.groups[idx].cover_img = null;
-	brw.groups[idx].cover_type = null;
 }
 
 function refresh_cover() {
@@ -3395,7 +3344,6 @@ function refresh_cover() {
 	for (var i = 0; i < total; i++) {
 		brw.groups[i].load_requested = 0;
 		brw.groups[i].cover_img = null;
-		brw.groups[i].cover_type = null;
 	};
 	brw.repaint();
 }

@@ -318,13 +318,13 @@ function set_scroll_delta() {
 };
 
 // Images cache
-const load_image_from_cache = async (albumIndex) =>
+const load_image_from_cache = async (albumIndex, preload) =>
 {
 	try{
 		var crc = p.list.groups[albumIndex].cachekey;
 		const image = await gdi.LoadImageAsyncV2(0, fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg");
 		p.list.groups[albumIndex].cover_img = g_image_cache.getit(image, albumIndex);
-		if (!cList.repaint_timer) {
+		if (!preload && !cList.repaint_timer) {
 			if (!cover.repaint_timer) {
 				cover.repaint_timer = setInterval(() => {
 					cover_repaint();
@@ -358,7 +358,6 @@ image_cache = function() {
 	this.hit = function(albumIndex) {
 		var _crc = p.list.groups[albumIndex].cachekey;
 		var img = this._cachelist[_crc];
-		var metadb = p.list.groups[albumIndex].metadb;
 		if (typeof img == "undefined" || img == null) { // if image not in cache, we load it asynchronously
 			var crc_exist = check_cache(albumIndex);
 			if (crc_exist){
@@ -377,13 +376,13 @@ image_cache = function() {
 				cover.load_timer = window.SetTimeout(function() {
 					try{
 						if (layout.pattern_idx == 4) {
-							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(metadb));
+							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(p.list.groups[albumIndex].metadb));
 							var genre_img = gdi.Image( _path + ".jpg") || gdi.Image( _path + ".png");
 							p.list.groups[albumIndex].load_requested = 1;
 							img = g_image_cache.getit(genre_img, albumIndex);
 							full_repaint();
 						} else if (layout.pattern_idx == 5) {
-							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
+							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(p.list.groups[albumIndex].metadb);
 							var dc_arr = dir_cover_name.split(";");
 							for (var i = 0; i <= dc_arr.length; i++) {
 								var dir_img = gdi.Image( _path + dc_arr[i]);
@@ -401,8 +400,8 @@ image_cache = function() {
 					cover.load_timer && window.ClearTimeout(cover.load_timer);
 					cover.load_timer = false;
 				}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 5 : 10));
-			};
-		};
+			}
+		} else p.list.groups[albumIndex].load_requested = 1;
 		return img;
 	};
 	
@@ -449,10 +448,12 @@ image_cache = function() {
 			var crc_exist = check_cache(albumIndex);
 			if (crc_exist) {
 				p.list.groups[albumIndex].load_requested = 1;
-				load_image_from_cache(albumIndex);
+				load_image_from_cache(albumIndex, true);
 			}
-			return img;
+		} else {
+			p.list.groups[albumIndex].load_requested = 1;
 		}
+		return img;
 	}
 };
 var g_image_cache = new image_cache;

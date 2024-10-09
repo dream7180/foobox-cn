@@ -23,7 +23,6 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 	if (layout.autocollapse) {
 		if (focusedTrackId >= this.start && focusedTrackId < this.start + this.count) { // focused track is in this group!
 			this.collapsed = false;
-			// save in globals the current group id of the focused track (used for autocollapse option)
 			g_group_id_focused = this.index;
 		}
 		else {
