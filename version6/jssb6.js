@@ -113,7 +113,6 @@ cPlaylistManager = {
 };
 
 cScrollBar = {
-	//enabled: window.GetProperty("_DISPLAY: Show Scrollbar", true),
 	visible: true,
 	width: 12,
 	ButtonType: {
@@ -1455,8 +1454,6 @@ oBrowser = function() {
 							let this_x = ax + Math.round((aw - im_w) / 2);
 							let this_y = coverTop + coverWidth - im_h;
 							gr.DrawImage(this.groups[i].cover_img, this_x, this_y, im_w, im_h, 1, 1, this.groups[i].cover_img.Width - 2, this.groups[i].cover_img.Height - 2);
-							//cover frame:
-							gr.DrawRect(this_x, this_y, im_w - 1, im_h - 1, 1.0, g_color_normal_txt & 0x25ffffff);
 							// grid text background rect
 							if (ppt.panelMode == 3) {
 								if (i == this.playingIndex) {
@@ -1569,16 +1566,12 @@ oBrowser = function() {
 			};
 
 			// draw scrollbar
-			//if (cScrollBar.enabled) {
 			try{
 				brw.scrollbar && brw.scrollbar.draw(gr);
 			}catch(e){
 				brw.scrollbar.updateScrollbar();
 				brw.scrollbar.draw(gr);
 			}
-				
-			//};
-
 			// Incremental Search Display
 			if (cList.search_string.length > 0) {
 				var string_w = gr.CalcTextWidth(cList.search_string, cList.incsearch_font);
@@ -1666,9 +1659,9 @@ oBrowser = function() {
 			};
 			var source_width = gr.CalcTextWidth(source_name, g_font_b);
 			gr.FillSolidRect(0, 0, ww, brw.y + 1, g_color_normal_bg);
-			gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + cScrollBar.width/*(cScrollBar.enabled ? cScrollBar.width : 0)*/, 1, g_color_line);
+			gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + cScrollBar.width, 1, g_color_line);
 			var tx = cFilterBox.x + cFilterBox.w + z(22) + 10;
-			var tw = (this.w - tx - cSwitchBtn.w - 2 + cScrollBar.width/*(cScrollBar.enabled ? cScrollBar.width : 0)*/)*2/3;
+			var tw = (this.w - tx - cSwitchBtn.w - 2 + cScrollBar.width)*2/3;
 			var source_w = Math.min(tw, source_width);
 			gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
 			try {
@@ -1718,14 +1711,14 @@ oBrowser = function() {
 				};
 				if(ppt.sourceMode == 0) this.repaint();
 			} else {
-				if (/*cScrollBar.enabled && */cScrollBar.visible) {
+				if (cScrollBar.visible) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 				};
 			};
 			break;
 		case "up":
 			this.drag_clicked = false;
-			if (/*cScrollBar.enabled && */cScrollBar.visible) {
+			if (cScrollBar.visible) {
 				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
@@ -1740,7 +1733,7 @@ oBrowser = function() {
 					};
 				};
 			} else {
-				if (/*cScrollBar.enabled && */cScrollBar.visible) {
+				if (cScrollBar.visible) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 				};
 			};
@@ -1756,7 +1749,7 @@ oBrowser = function() {
 			};
 			g_rightClickedIndex = -1;
 			if (!this.ishover) {
-				if (/*cScrollBar.enabled && */cScrollBar.visible) {
+				if (cScrollBar.visible) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 				};
 			};
@@ -1779,17 +1772,17 @@ oBrowser = function() {
 			if (this.drag_moving && !timers.hidePlaylistManager && !timers.showPlaylistManager) {
 				pman.on_mouse("move", x, y);
 			};
-			if (/*cScrollBar.enabled && */cScrollBar.visible) {
+			if (cScrollBar.visible) {
 				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
 		case "wheel":
-			if (/*cScrollBar.enabled && */cScrollBar.visible) {
+			if (cScrollBar.visible) {
 				this.scrollbar.updateScrollbar();
 			};
 			break;
 		case "leave":
-			if (/*cScrollBar.enabled && */cScrollBar.visible) {
+			if (cScrollBar.visible) {
 				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
@@ -2272,6 +2265,7 @@ function on_init() {
 	} else g_active_playlist = plman.ActivePlaylist;
 
 	get_tagprop();
+	get_images_static();
 	get_images();
 	get_images_loading();
 	brw = new oBrowser();
@@ -2297,9 +2291,7 @@ function on_size() {
 	window.MinWidth = ppt.default_lineHeightMin;
 	window.MinHeight = ppt.default_lineHeightMin;
 	// set Size of browser
-	//if (cScrollBar.enabled)
 	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
-	//else brw.setSize(0, ppt.headerBarHeight, ww, wh - ppt.headerBarHeight);
 	g_switchbar.setSize(g_switchbar.x, g_switchbar.y, g_switchbar.w, g_switchbar.h);
 };
 
@@ -2427,7 +2419,7 @@ function on_mouse_lbtn_up(x, y) {
 function on_mouse_lbtn_dblclk(x, y, mask) {
 	if (y >= brw.y) {
 		brw.on_mouse("dblclk", x, y);
-	} else if (x > brw.x && x < brw.x + brw.w - cSwitchBtn.w - 2 + cScrollBar.width/*(cScrollBar.enabled ? cScrollBar.width : 0)*/) {
+	} else if (x > brw.x && x < brw.x + brw.w - cSwitchBtn.w - 2 + cScrollBar.width) {
 		brw.showNowPlaying();
 	}
 };
@@ -2562,34 +2554,27 @@ function get_metrics() {
 	cSwitchBtn.y = Math.ceil((ppt.headerBarHeight - cSwitchBtn.h) / 2);
 	cSwitchBtn.w = 24 * zdpi;
 	if (brw) {
-		//if (cScrollBar.enabled) {
-			brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
-		//}
-		//else {
-		//	brw.setSize(0, ppt.headerBarHeight, ww, wh - ppt.headerBarHeight);
-		//};
+		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 	};
 };
 
-function get_images() {
-	var gb;
-	var txt = "";
-	var x5 = 5*zdpi, _x10 = 10*zdpi, _x14 = 14*zdpi;
+function get_images_static() {
+	let gb;
+	let color_ico_bg = RGBA(130,130,130,30);
+	let color_ico = RGBA(130,130,130,60);
+	let nw = 250, nh = 250;
+	
 	images.all = gdi.CreateImage(150, 150);
 	gb = images.all.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, g_color_normal_txt & 0x10ffffff);
+	gb.FillSolidRect(0, 0, 150, 150, color_ico_bg);
 	images.all.ReleaseGraphics(gb);
-
-	var nw = 250,
-		nh = 250;
-	var _font = GdiFont(g_fname, Math.round(nh / 12 * 1.75), 1)
+	
 	images.noart = gdi.CreateImage(nw, nh);
 	gb = images.noart.GetGraphics();
-	// draw no cover art image
 	gb.SetSmoothingMode(2);
-	gb.FillSolidRect(0, 0, nw, nh, g_color_normal_txt & 0x10ffffff);
-	gb.DrawEllipse(30,30,nw-60,nh-60,4,g_color_normal_txt & 0x15ffffff);
-	gb.DrawEllipse(90,90,nw-180,nh-180,4,g_color_normal_txt & 0x15ffffff);
+	gb.FillSolidRect(0, 0, nw, nh, color_ico_bg);
+	gb.DrawEllipse(30,30,nw-60,nh-60,4,color_ico);
+	gb.DrawEllipse(90,90,nw-180,nh-180,4,color_ico);
 	gb.SetSmoothingMode(0);
 	images.noart.ReleaseGraphics(gb);
 
@@ -2597,8 +2582,8 @@ function get_images() {
 	gb = stream_1.GetGraphics();
 	// draw no cover art image
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(44,44,nw-80,nh-80,3,g_color_normal_txt & 0x15ffffff)
-	gb.DrawEllipse(62,62,nw-130,nh-130,3,g_color_normal_txt & 0x15ffffff)
+	gb.DrawEllipse(44,44,nw-80,nh-80,3,color_ico)
+	gb.DrawEllipse(62,62,nw-130,nh-130,3,color_ico)
 	gb.SetSmoothingMode(0);
 	stream_1.ReleaseGraphics(gb);
 	
@@ -2607,6 +2592,12 @@ function get_images() {
 	gb.DrawImage(images.noart, 0, 0, nw, nh, 0, 0, nw, nh);
 	gb.DrawImage(stream_1, 0, 0, stream_1.Width, stream_1.Height, 0, 0, stream_1.Width, stream_1.Height);
 	images.stream.ReleaseGraphics(gb);
+}
+
+function get_images() {
+	var gb;
+	var txt = "";
+	var x5 = 5*zdpi, _x10 = 10*zdpi, _x14 = 14*zdpi;
 	
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
@@ -2622,8 +2613,8 @@ function get_images() {
 	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	images.sw_btn_n1.ReleaseGraphics(gb);
 	
-	nw = Math.round(16*zdpi);
-	nh = Math.round(15*zdpi);
+	let nw = Math.round(16*zdpi);
+	let nh = Math.round(15*zdpi);
 	images.album = gdi.CreateImage(nw, nw);
 	gb = images.album.GetGraphics();
 	gb.SetSmoothingMode(2);
@@ -3204,7 +3195,6 @@ function on_notify_data(name, info) {
 	case "scrollbar_width":
 		sys_scrollbar = info;
 		window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
-		//if (!cScrollBar.enabled) break;
 		cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
 		cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 		get_metrics();

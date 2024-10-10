@@ -484,11 +484,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				};
 				if ((this.track_index_in_group == 0 || (this.row_index == 0 && cover_draw_delta > 0))) {
 					// cover bg
-					var cMargin = 0;
-					var cv_x = Math.floor(this.x + cMargin);
-					var cv_y = Math.floor((this.y - cover_draw_delta) + cMargin);
-					var cv_w = Math.floor(cover.w - cMargin * 2);
-					var cv_h = Math.floor(cover.h - cMargin * 2);
+					var cv_x = Math.floor(this.x);
+					var cv_y = Math.floor(this.y - cover_draw_delta);
+					var cv_w = Math.floor(cover.w);
+					var cv_h = Math.floor(cover.h);
 
 					if(p.list.groups[this.group_index].load_requested == 0)
 						p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
@@ -521,8 +520,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					}
 					else {
 						var cv_resizew = Math.max(1, cv_w);
-						var img_nocover = images.nocover.Resize(cv_resizew, cv_resizew , 2);
-						gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
+						gr.DrawImage(images.nocover, cv_x, cv_y, cv_resizew, cv_resizew, 0, 0, images.nocover.Width, images.nocover.Height);
 					};
 				};
 			};
@@ -717,8 +715,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						}
 						else {
 							var cv_resizew = Math.max(1, cv_w);
-							var img_nocover = images.nocover.Resize(cv_resizew, cv_resizew , 2);
-							gr.DrawImage(img_nocover, cv_x, cv_y, img_nocover.Width, img_nocover.Height, 0, 0, img_nocover.Width, img_nocover.Height);
+							gr.DrawImage(images.nocover, cv_x, cv_y, cv_resizew, cv_resizew, 0, 0, images.nocover.Width, images.nocover.Height);
 						};
 					};
 				};

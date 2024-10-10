@@ -168,9 +168,6 @@ oHeaderBar = function() {
 			this.columnDragged_saved = 0;
 		};
 
-		// calc column metrics for calculating border metrics as well
-		this.calculateColumns();
-
 		// draw borders and left column from each one!
 		tmp = this.x;
 		for (var i = 0; i < this.borders.length; i++) {
@@ -481,7 +478,7 @@ oHeaderBar = function() {
 					previousColumnToDrawId = k;
 				};
 			};
-			this.calculateColumns();
+			if(this.w > 0) this.calculateColumns();
 		};
 	};
 
@@ -669,6 +666,7 @@ oHeaderBar = function() {
 									this.columns[this.borders[i].leftId].percent = Math.round(Math.abs(this.columns[this.borders[i].leftId].w / this.w * 10000));
 									this.columns[this.borders[i].rightId].percent = addedPercent - this.columns[this.borders[i].leftId].percent;
 									this.borders[i].sourceX = x;
+									this.calculateColumns();
 									full_repaint();
 								};
 							};
