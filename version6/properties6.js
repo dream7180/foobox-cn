@@ -312,7 +312,7 @@ function _panel() {
 		this.row_height = Math.round(this.fonts.normal.Height * 1.25);
 		this.list_objects.forEach((item) => {
 			item.size();
-			item.update();
+			item.metadb_changed();
 		});
 	}
 	

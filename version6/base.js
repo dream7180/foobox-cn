@@ -800,7 +800,7 @@ function get_images() {
 	gb.DrawLine(zdpi, _x5, Math.floor(_x6), _x5, 2, c_normal);
 	gb.DrawLine(zdpi, floor_x62-_x3, Math.floor(_x6), floor_x62-_x3, 2, c_normal);
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("B", GdiFont("Tahoma", Math.floor(_x11), 1), c_normal, _x2, zdpi, _x18, _x13, cc_stringformat);
+	gb.DrawString("B", GdiFont("Tahoma", Math.round(_x10), 1), c_normal, z(2), z(1.3), _x18, _x13, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	img_bio.ReleaseGraphics(gb);
 
