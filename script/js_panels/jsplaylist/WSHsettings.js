@@ -256,6 +256,12 @@ function settings_radioboxes_action(id, status, parentId) {
 				layout.config[selectedLayoutId][4] = "0";
 				if(selectedLayoutId == layout.index) layout.expandedHeight = 0;
 			};
+			if(p.settings.pages[pid].elements[11].status){
+				p.settings.pages[pid].elements[11].status = false;
+				p.settings.pages[pid].elements[12].status = true;
+				layout.config[selectedLayoutId][5] = "0";
+				if(selectedLayoutId == layout.index) layout.collapseGroupsByDefault = 0;
+			}
 			layout.config[selectedLayoutId][3] = "0";
 			if(selectedLayoutId == layout.index) layout.collapsedHeight = 0;
 			save_config("config");
@@ -325,6 +331,12 @@ function settings_radioboxes_action(id, status, parentId) {
 				layout.config[selectedLayoutId][3] = "0";
 				if(selectedLayoutId == layout.index) layout.collapsedHeight = 0;
 			};
+			if(p.settings.pages[pid].elements[11].status){
+				p.settings.pages[pid].elements[11].status = false;
+				p.settings.pages[pid].elements[12].status = true;
+				layout.config[selectedLayoutId][5] = "0";
+				if(selectedLayoutId == layout.index) layout.collapseGroupsByDefault = 0;
+			}
 			layout.config[selectedLayoutId][4] = "0";
 			if(selectedLayoutId == layout.index) layout.expandedHeight = 0;
 			save_config("config");
@@ -381,11 +393,13 @@ function settings_radioboxes_action(id, status, parentId) {
 			save_config("config");
 			break;
 		case 11:
-			p.settings.pages[pid].elements[11].status = true;
-			p.settings.pages[pid].elements[12].status = false;
-			layout.config[selectedLayoutId][5] = "1";
-			if(selectedLayoutId == layout.index) layout.collapseGroupsByDefault = 1;
-			save_config("config");
+			if(!p.settings.pages[pid].elements[3].status) {
+				p.settings.pages[pid].elements[11].status = true;
+				p.settings.pages[pid].elements[12].status = false;
+				layout.config[selectedLayoutId][5] = "1";
+				if(selectedLayoutId == layout.index) layout.collapseGroupsByDefault = 1;
+				save_config("config");
+			}
 			break;
 		case 12:
 			p.settings.pages[pid].elements[11].status = false;
@@ -851,9 +865,7 @@ oLink = function (){
 					this.ShellExecute("https://dream7180.github.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 				case 3:
-					//if(Number(fb.Version.substr(0, 1)) > 1) this.ShellExecute("https://www.esnpc.com/foobar2000-20-simplified-chinese-version/", "", "", "open", 1);
-					//else 
-						this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
+					this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
 					break;
 			};
 			this.link_hover = 0;
@@ -1513,7 +1525,7 @@ oPage = function(id, objectName, label, nbrows) {
 
 	this.init = function() {
 		var txtbox_x = 20;
-		var oTextBox_1 = 600*zdpi;//ww - txtbox_x * 2 - this.scrollbarWidth;
+		var oTextBox_1 = 600*zdpi;
 		var oTextBox_2 = 340*zdpi;
 		var oTextBox_3 = 250*zdpi;
 		switch (this.id) {
@@ -1619,7 +1631,6 @@ oPage = function(id, objectName, label, nbrows) {
 			var arr = [];
 			var rh = cSettings.rowHeight;
 			var fin = layout.ids.length;
-			//var listBoxCurrentId = 0;
 			for (var i = 0; i < fin; i++) {
 				arr.push(layout.ids[i]);
 				if(layout.playlistName == arr[i]) layout.setting_idx = i;
@@ -1630,21 +1641,12 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "播放列表布局", arr, layout.setting_idx, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 			this.elements.push(new oCheckBox(1, txtbox_x, cSettings.topBarHeight + rh * 7.75, "在分组标题中显示封面 (分组标题高度 ≥ 2，及不显示封面列时生效. 推荐值: 勾选)", "layout.config[layout.setting_idx][1] == '1' ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, txtbox_x, cSettings.topBarHeight + rh * 8.75, "自动折叠", "layout.config[layout.setting_idx][2] == '1' ? true : false", "settings_checkboxes_action", this.id));
-			/*if (layout.gopts[3] < 0 || layout.gopts[3] > 3) {
-				layout.gopts[3] = (layout.gopts[3] < 0 ? 0 : 3);
-			};*/
 			var spaceBetween_w = z(50);
 			var v = layout.config[layout.setting_idx][3];
 			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 10.75, "0", (v == "0"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 10.75, "1", (v == "1"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 10.75, "2", (v == "2"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(6, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 10.75, "3", (v == "3"), "settings_radioboxes_action", this.id));
-			// Create radio buttons / group header EXPANDED height
-			/* force value if set to an unauthirized one [0;3]
-			if (layout.gopts[4] < 0 || layout.gopts[4] > 3) {
-				layout.gopts[4] = (layout.gopts[4] < 0 ? 0 : 3);
-				//p.list.saveGroupBy();
-			};*/
 			var v = layout.config[layout.setting_idx][4];
 			this.elements.push(new oRadioButton(7, txtbox_x, cSettings.topBarHeight + rh * 12.5, "0", (v == "0"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(8, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 12.5, "1", (v == "1"), "settings_radioboxes_action", this.id));

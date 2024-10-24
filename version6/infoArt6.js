@@ -62,7 +62,7 @@ g_tfo = {
 	artist: fb.TitleFormat("$if2(%artist%,)"),
 	album: fb.TitleFormat("$if2(%album%,)"),
 	mood: fb.TitleFormat("%mood%"),
-	tracktech: fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz")
+	tracktech: fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz")
 }
 var rating, txt_title, txt_info, txt_profile, show_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
