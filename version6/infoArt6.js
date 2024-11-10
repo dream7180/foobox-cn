@@ -18,6 +18,8 @@ var Caption_Pack = {
 var currentMetadb = null, l_mood;
 var get_imgCol = false;
 var dark_mode = false;
+var timer_cycle = null;
+var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
@@ -64,7 +66,7 @@ g_tfo = {
 	mood: fb.TitleFormat("%mood%"),
 	tracktech: fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz")
 }
-var rating, txt_title, txt_info, txt_profile, show_info = true;
+var rating, txt_title, txt_info, txt_profile, main_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
 if (time_circle < 3000) time_circle = 3000;
 if (time_circle > 60000) time_circle = 60000;
@@ -217,7 +219,7 @@ function OnMetadbChanged() {
 	txt_profile = g_tfo.tracktech.EvalWithMetadb(currentMetadb);
 	l_mood = g_tfo.mood.EvalWithMetadb(currentMetadb);
 	tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
-	show_info = true;
+	main_info = true;
 	window.RepaintRect(0, infobar_y, ww, infobar_h);
 }
 
@@ -2227,7 +2229,7 @@ var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
 // START ==============================================
 initMetadb();
-if(show_infobar) activate_infotimer();
+if(show_infobar && info_cycle) activate_infotimer();
 set_esl_color(true);
 function on_paint(gr) {
 	if (!ww || !wh) return;
@@ -2241,7 +2243,7 @@ function on_paint(gr) {
 			if (is_mood) btn_mood.Paint(gr);
 		}
 		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh*show_rating, ww, 28*zdpi, cc_txt);
-		var txt_line2 = (txt_info !="" && show_info) ? txt_info : txt_profile;
+		var txt_line2 = (txt_info !="" && main_info) ? txt_info : txt_profile;
 		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, wh - line2_h, ww, line2_h, cc_txt);
 	}
 }
@@ -2355,6 +2357,8 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
 		}
 		rMenu.AppendMenuItem(show_rating ? MF_STRING : MF_CHECKED, 7, "隐藏评级");
+		rMenu.AppendMenuItem(info_cycle ? MF_CHECKED : MF_STRING, 4, "循环歌曲信息");
+		rMenu.AppendMenuSeparator();
 		rMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, 6, "隐藏歌曲信息");
 		rpSubMenu.AppendTo(rMenu, MF_POPUP, "切换歌词和属性面板");
 		rpSubMenu.AppendMenuItem(MF_STRING, 8, "切换 (鼠标中键)");
@@ -2376,6 +2380,18 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			window.SetProperty("Display.Mood", is_mood);
 			panel_setsize();
 			window.RepaintRect(0, infobar_y, ww, mood_h);
+			break;
+		case 4:
+			info_cycle = !info_cycle;
+			window.SetProperty("Info: Circle enable", info_cycle);
+			if(info_cycle) activate_infotimer();
+			else {
+				if(!main_info){
+					main_info = true;
+					window.RepaintRect(0, wh - line2_h, ww, line2_h);
+				}
+				deactivate_infotimer();
+			}
 			break;
 		case 5:
 			window.ShowProperties();
@@ -2453,15 +2469,15 @@ function on_notify_data(name, info) {
 }
 
 //----------------infobar-----------------------
-var timer_cycle = false;
-
 function switch_infobar(){
 	show_infobar = !show_infobar;
 	window.SetProperty("Display.InfoBar", show_infobar);
 	panel_setsize();
 	OnMetadbChanged();
-	if(show_infobar) activate_infotimer();
-	else dactivate_infotimer();
+	if(info_cycle){
+		if(show_infobar) activate_infotimer();
+		else deactivate_infotimer();
+	}
 	window.NotifyOthers("MetadataInfo", show_infobar);
 }
 
@@ -2493,21 +2509,16 @@ function panel_setsize(){
 	}
 }
 
-if (timer_cycle) {
-	window.KillTimer(timer_cycle);
-	timer_cycle = false;
-}
-
 function activate_infotimer(){
 	if(!timer_cycle) timer_cycle = window.SetInterval(function() {
-		show_info = !show_info;
+		main_info = !main_info;
 		window.RepaintRect(0, wh - line2_h, ww, line2_h);
 	}, time_circle);
 }
 
-function dactivate_infotimer(){
+function deactivate_infotimer(){
 	timer_cycle && window.ClearInterval(timer_cycle);
-	timer_cycle = false;
+	timer_cycle = null;
 }
 
 /****************************************
@@ -2557,6 +2568,6 @@ function on_key_down(vkey) {
 }
 
 function on_script_unload() {
-	dactivate_infotimer();
+	deactivate_infotimer();
 }
 //EOF

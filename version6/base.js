@@ -19,7 +19,7 @@ var ww = 0, wh = 0;
 var m_x = 0, m_y = 0;
 var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r, topbarh, topbtnw, menubtnw, title_w;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
-var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, RBtnTips, RTips_timer;
+var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn;
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\version6\\foobar2000.png");
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
@@ -884,17 +884,28 @@ function get_images() {
 	img_min.ReleaseGraphics(gb);
 }
 
+function on_init(){
+	if(bio_panel) BIO.ShowCaption = false; 
+	if(video_panel) VIDEO.ShowCaption = false;
+	get_font();
+	uiHacksInit();
+	get_color();
+	get_images();
+	get_panel();
+	init_overlay_obj(c_seek_bg, c_seekoverlay);
+	initbuttons();
+	try{
+		var _addtext = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misc", 0);
+		_addtext = _addtext.split("##")[2];
+	}catch(e){}
+	if(_addtext && _addtext != "null") {
+		top_addtext = _addtext;
+	}
+}
+
 //=============start=====================
 window.DlgCode = 0x0004;
-if(bio_panel) BIO.ShowCaption = false; 
-if(video_panel) VIDEO.ShowCaption = false;
-get_font();
-uiHacksInit();
-get_color();
-get_images();
-get_panel();
-init_overlay_obj(c_seek_bg, c_seekoverlay);
-initbuttons();
+on_init();
 
 function on_size() {
 	ww = window.Width;
@@ -1121,6 +1132,7 @@ function on_playback_new_track(info) {
 	
 	TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(info);
 	TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)").EvalWithMetadb(info) + fb.TitleFormat("$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
+	if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(info);
 	repaintWin("TX");
 }
 
@@ -1221,6 +1233,9 @@ function on_notify_data(name, info) {
 			window.SetProperty("Library.button: Show.Albumlist", lib_albumlist);
 			lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 		}
+		break;
+	case "titlebar_addinfo":
+		top_addtext = info;
 		break;
 	}
 }

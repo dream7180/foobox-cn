@@ -23,11 +23,13 @@ var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
+var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
 var g_script_version = "6.37 (Remastered)";
+var g_version = g_script_version.substr(0, 1);
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -563,65 +565,53 @@ function on_init() {
 	p.scrollbar = new oScrollbar( /*cScrollBar.themed*/ );
 	p.settings = new oSettings();
 
-	if (g_timer1) {
-		window.KillTimer(g_timer1);
-		g_timer1 = false;
-	};
-	g_timer1 = window.SetInterval(function() {
-		if (!window.IsVisible) {
-			window_visible = false;
-			return;
-		};
-
-		if (!window_visible) {
-			window_visible = true;
-		};
-
-		if (repaint_main1 == repaint_main2) {
-			repaint_main2 = !repaint_main1;
-			window.Repaint();
-		};
-	}, properties.repaint_rate1);
-
-	if (g_timer2) {
-		window.KillTimer(g_timer2);
-		g_timer2 = false;
-	};
-	g_timer2 = window.SetInterval(function() {
-
-		if (repaint_main1 == repaint_main2) {
-			return;
-		};
-
-		if (!window.IsVisible) {
-			window_visible = false;
-			return;
-		};
-
-		var repaint_2 = false;
-
-		if (!window_visible) {
-			window_visible = true;
-		};
-
-		if (repaint_cover1 == repaint_cover2) {
-			repaint_cover2 = !repaint_cover1;
-			if (!cScrollBar.timerID2 && !g_mouse_wheel_timer) repaint_2 = true;
-		};
-
-		if (repaint_2) {
-			if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
-				var bigger_grp_height = (layout.expandedHeight > layout.collapsedHeight ? layout.expandedHeight : layout.collapsedHeight);
-				if (p.headerBar.columns[0].percent > 0) {
-					var cw = cover.margin + p.headerBar.columns[0].w;
-				}
-				else if (cover.show) {
-					var cw = cover.margin + (cTrack.height * bigger_grp_height);
-				};
-				window.RepaintRect(p.list.x, p.list.y, cw, p.list.h);
+	if (!g_timer1) {
+		g_timer1 = window.SetInterval(function() {
+			if (!window.IsVisible) {
+				window_visible = false;
+				return;
 			};
-		};
-	}, properties.repaint_rate2);
+			if (!window_visible) {
+				window_visible = true;
+			};
+			if (repaint_main1 == repaint_main2) {
+				repaint_main2 = !repaint_main1;
+				window.Repaint();
+			};
+		}, properties.repaint_rate1);
+	}
+
+	if (!g_timer2) {
+		g_timer2 = window.SetInterval(function() {
+			if (repaint_main1 == repaint_main2) {
+				return;
+			};
+			if (!window.IsVisible) {
+				window_visible = false;
+				return;
+			};
+			var repaint_2 = false;
+			if (!window_visible) {
+				window_visible = true;
+			};
+			if (repaint_cover1 == repaint_cover2) {
+				repaint_cover2 = !repaint_cover1;
+				if (!cScrollBar.timerID2 && !g_mouse_wheel_timer) repaint_2 = true;
+			};
+			if (repaint_2) {
+				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
+					var bigger_grp_height = (layout.expandedHeight > layout.collapsedHeight ? layout.expandedHeight : layout.collapsedHeight);
+					if (p.headerBar.columns[0].percent > 0) {
+						var cw = cover.margin + p.headerBar.columns[0].w;
+					}
+					else if (cover.show) {
+						var cw = cover.margin + (cTrack.height * bigger_grp_height);
+					};
+					window.RepaintRect(p.list.x, p.list.y, cw, p.list.h);
+				};
+			};
+		}, properties.repaint_rate2);
+	}
 };
 on_init();
 
@@ -1613,13 +1603,6 @@ function on_key_down(vkey) {
 					};
 				};
 				break;
-			/*case VK_SPACEBAR:
-				if (cSettings.visible || p.list.count == 0) return;
-				if(!cList.incsearch_timer && cList.search_string.length == 0){
-					InfoPane.show = !InfoPane.show;
-					full_repaint();
-				}
-				break;*/
 			case VK_END:
 				if (p.list.count > 0) {
 					plman.SetPlaylistFocusItem(act_pls, p.list.count - 1);
@@ -2547,17 +2530,38 @@ function get_misccfg(){
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
 	if(!misccfg){
-		radiom3u = "null";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");
 		radiom3u = misccfg[0];
-		if(misccfg.length > 1) track_edit_app = misccfg[1];
+		if(radiom3u == "null") radiom3u = "";
+		if(misccfg.length > 1) {
+			track_edit_app = misccfg[1];
+			if(track_edit_app == "null") track_edit_app = "";
+			else if(track_edit_app == "") save_misccfg();
+		} else {
+			track_edit_app = "";
+			save_misccfg();
+		}
+		if(misccfg.length > 2) {
+			title_add = misccfg[2];
+			if(title_add == "null") title_add = "";
+			else if(title_add == "") save_misccfg();
+		} else {
+			title_add = "";
+			save_misccfg();
+		}
 	}
 }
 
 function save_misccfg(){
-	utils.WriteTextFile(config_dir + "misc", radiom3u + "##" + track_edit_app);
+	var _radiom3u = radiom3u;
+	var _track_edit_app = track_edit_app;
+	var _title_add = title_add;
+	if(_radiom3u == "") _radiom3u = "null";
+	if(_track_edit_app == "") _track_edit_app = "null";
+	if(_title_add == "") _title_add = "null";
+	utils.WriteTextFile(config_dir + "misc", _radiom3u + "##" + _track_edit_app + "##" + _title_add);
 }
 
 function get_layout(plname){
