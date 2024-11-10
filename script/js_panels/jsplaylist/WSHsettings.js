@@ -1629,7 +1629,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 17.55), oTextBox_1, cHeaderBar.height, "播放时标题栏显示额外的信息，如: %codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz", title_add, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息，如: %codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1768,7 +1768,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("封面相关", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("底部工具栏", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("媒体库按钮功能 (仅 foobar2000 v2+ 有效)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
-			if(g_version == "6") p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.25);
+			if(g_version == "6") p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
 			else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
 			break;
 		case 4:
