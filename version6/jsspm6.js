@@ -133,17 +133,40 @@ timers = {
 };
 
 //=================================================// Extra functions for playlist manager panel
-function renamePlaylist() {
-	var org_name = brw.rows[brw.inputboxID].name;
+function renamePlaylist(autopl_pending) {
+	let org_name = brw.rows[brw.inputboxID].name;
+	let rowid = brw.rows[brw.inputboxID].idx;
 	if (!brw.inputbox.text || brw.inputbox.text == "" || brw.inputboxID == -1) brw.inputbox.text = brw.rows[brw.inputboxID].name;
 	if (brw.inputbox.text.length > 0) {
 		brw.rows[brw.inputboxID].name = brw.inputbox.text;
-		plman.RenamePlaylist(brw.rows[brw.inputboxID].idx, brw.inputbox.text);
+		plman.RenamePlaylist(rowid, brw.inputbox.text);
 		window.SetCursor(IDC_ARROW);
 		brw.repaint();
 		window.NotifyOthers("Playlist_Renamed", [org_name, brw.inputbox.text]);
 	};
 	brw.inputboxID = -1;
+	if(autopl_pending) plman.ShowAutoPlaylistUI(rowid);
+}
+
+function pop_rename(id, pl_idx, autopl_pending) {
+	var rh = ppt.rowHeight - 10;
+	var tw = brw.w - rh - 20;
+	brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, autopl_pending ? "renamePlaylist(true)" : "renamePlaylist(false)", "brw");
+	brw.inputboxID = id;
+	// activate inputbox for edit
+	brw.inputbox.on_focus(true);
+	brw.inputbox.edit = true;
+	brw.inputbox.Cpos = brw.inputbox.text.length;
+	brw.inputbox.anchor = brw.inputbox.Cpos;
+	if (!cInputbox.timer_cursor) {
+		brw.inputbox.resetCursorTimer();
+	};
+	brw.inputbox.dblclk = true;
+	brw.inputbox.SelBegin = 0;
+	brw.inputbox.SelEnd = brw.inputbox.text.length;
+	brw.inputbox.text_selected = brw.inputbox.text;
+	brw.inputbox.select = true;
+	brw.repaint();
 }
 
 function DeletePlaylist(){
@@ -596,27 +619,7 @@ oBrowser = function() {
 					var id = this.rowsCount;
 					plman.CreatePlaylist(pl_idx, "");
 					plman.ActivePlaylist = pl_idx;
-					// set rename it
-					var rh = ppt.rowHeight - 10;
-					var tw = this.w - rh - 20;
-					this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, "renamePlaylist()", "brw");
-					this.inputboxID = id;
-					// activate inputbox for edit
-					this.inputbox.on_focus(true);
-					this.inputbox.edit = true;
-					this.inputbox.Cpos = this.inputbox.text.length;
-					this.inputbox.anchor = this.inputbox.Cpos;
-					this.inputbox.SelBegin = this.inputbox.Cpos;
-					this.inputbox.SelEnd = this.inputbox.Cpos;
-					if (!cInputbox.timer_cursor) {
-						this.inputbox.resetCursorTimer();
-					};
-					this.inputbox.dblclk = true;
-					this.inputbox.SelBegin = 0;
-					this.inputbox.SelEnd = this.inputbox.text.length;
-					this.inputbox.text_selected = this.inputbox.text;
-					this.inputbox.select = true;
-					this.repaint();
+					pop_rename(id, pl_idx);
 				};
 				
 				if (this.buttonClicked && this.new_menu.checkstate("up", x, y) == ButtonStates.hover) {
@@ -1080,54 +1083,13 @@ oBrowser = function() {
 			plman.CreatePlaylist(total, "");
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
-			// set rename it
-			var rh = ppt.rowHeight - 10;
-			var tw = this.w - rh - 20;
-			this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, "renamePlaylist()", "brw");
-			this.inputboxID = id;
-			// activate inputbox for edit
-			this.inputbox.on_focus(true);
-			this.inputbox.edit = true;
-			this.inputbox.Cpos = this.inputbox.text.length;
-			this.inputbox.anchor = this.inputbox.Cpos;
-			this.inputbox.SelBegin = this.inputbox.Cpos;
-			this.inputbox.SelEnd = this.inputbox.Cpos;
-			if (!cInputbox.timer_cursor) {
-				this.inputbox.resetCursorTimer();
-			};
-			this.inputbox.dblclk = true;
-			this.inputbox.SelBegin = 0;
-			this.inputbox.SelEnd = this.inputbox.text.length;
-			this.inputbox.text_selected = this.inputbox.text;
-			this.inputbox.select = true;
-			this.repaint();
+			pop_rename(id, pl_idx);
 			break;
 		case (idx == 101):
 			plman.CreateAutoPlaylist(total, "", "在这里输入你的查询", "", 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
-			plman.ShowAutoPlaylistUI(pl_idx);
-			// set rename it
-			var rh = ppt.rowHeight - 10;
-			var tw = this.w - rh - 20;
-			this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, "renamePlaylist()", "brw");
-			this.inputboxID = id;
-			// activate inputbox for edit
-			this.inputbox.on_focus(true);
-			this.inputbox.edit = true;
-			this.inputbox.Cpos = this.inputbox.text.length;
-			this.inputbox.anchor = this.inputbox.Cpos;
-			this.inputbox.SelBegin = this.inputbox.Cpos;
-			this.inputbox.SelEnd = this.inputbox.Cpos;
-			if (!cInputbox.timer_cursor) {
-				this.inputbox.resetCursorTimer();
-			};
-			this.inputbox.dblclk = true;
-			this.inputbox.SelBegin = 0;
-			this.inputbox.SelEnd = this.inputbox.text.length;
-			this.inputbox.text_selected = this.inputbox.text;
-			this.inputbox.select = true;
-			this.repaint();
+			pop_rename(id, pl_idx, true);
 			break;
 		case (idx == 15):
 			fb.RunMainMenuCommand("文件/载入播放列表...");
@@ -1136,27 +1098,7 @@ oBrowser = function() {
 			fb.RunMainMenuCommand("文件/保存所有播放列表...");
 			break;
 		case (idx == 11):
-			// set rename it
-			var rh = ppt.rowHeight - 10;
-			var tw = this.w - rh - 10;
-			this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, "renamePlaylist()", "brw");
-			this.inputboxID = id;
-			// activate inputbox for edit
-			this.inputbox.on_focus(true);
-			this.inputbox.edit = true;
-			this.inputbox.Cpos = this.inputbox.text.length;
-			this.inputbox.anchor = this.inputbox.Cpos;
-			this.inputbox.SelBegin = this.inputbox.Cpos;
-			this.inputbox.SelEnd = this.inputbox.Cpos;
-			if (!cInputbox.timer_cursor) {
-				this.inputbox.resetCursorTimer();
-			};
-			this.inputbox.dblclk = true;
-			this.inputbox.SelBegin = 0;
-			this.inputbox.SelEnd = this.inputbox.text.length;
-			this.inputbox.text_selected = this.inputbox.text;
-			this.inputbox.select = true;
-			this.repaint();
+			pop_rename(id, pl_idx);
 			break;
 		case (idx == 17):
 			fb.RunMainMenuCommand("文件/保存播放列表...");
@@ -1812,26 +1754,7 @@ function on_key_down(vkey) {
 				if (brw.rowsCount > 0) {
 					var rowId = brw.activeRow;
 					if (rowId > (ppt.lockReservedPlaylist ? 0 : -1)) {
-						var rh = ppt.rowHeight - 10;
-						var tw = brw.w - rh - 10;
-						brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(brw.rows[rowId].idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, "renamePlaylist()", "brw");
-						brw.inputboxID = rowId;
-						// activate inputbox for edit
-						brw.inputbox.on_focus(true);
-						brw.inputbox.edit = true;
-						brw.inputbox.Cpos = brw.inputbox.text.length;
-						brw.inputbox.anchor = brw.inputbox.Cpos;
-						brw.inputbox.SelBegin = brw.inputbox.Cpos;
-						brw.inputbox.SelEnd = brw.inputbox.Cpos;
-						if (!cInputbox.timer_cursor) {
-							brw.inputbox.resetCursorTimer();
-						};
-						brw.inputbox.dblclk = true;
-						brw.inputbox.SelBegin = 0;
-						brw.inputbox.SelEnd = brw.inputbox.text.length;
-						brw.inputbox.text_selected = brw.inputbox.text;
-						brw.inputbox.select = true;
-						brw.repaint();
+						pop_rename(rowId, brw.rows[rowId].idx);
 					};
 				}
 				break;

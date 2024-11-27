@@ -28,7 +28,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "6.37 (Remastered)";
+var g_script_version = "6.38 (Remastered)";
 var g_version = g_script_version.substr(0, 1);
 var g_textbox_tabbed = false;
 var g_init_window = true;
