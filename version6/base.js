@@ -920,7 +920,7 @@ function on_paint(gr) {
 	gr.FillSolidRect(0, 0, ww, topbarh, c_background);
 	gr.DrawLine(0,topbarh-1,ww,topbarh-1,1,RGBA(0,0,0,45));
 	gr.FillSolidRect(0, win_y, ww, wh-win_y, c_btmbg);
-	gr.DrawLine(0,wh-1,ww,wh-1,1,c_btmbg);//bug of uihacks
+	gr.FillGradRect(0, wh-3, ww, 3, 0, c_btmbg, c_btmbg, 1);//bug of uihacks
 	gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
 	CloseBtn.Paint(gr);
 	MaxBtn.Paint(gr);

@@ -148,27 +148,6 @@ function renamePlaylist(autopl_pending) {
 	if(autopl_pending) plman.ShowAutoPlaylistUI(rowid);
 }
 
-function pop_rename(id, pl_idx, autopl_pending) {
-	var rh = ppt.rowHeight - 10;
-	var tw = brw.w - rh - 20;
-	brw.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, autopl_pending ? "renamePlaylist(true)" : "renamePlaylist(false)", "brw");
-	brw.inputboxID = id;
-	// activate inputbox for edit
-	brw.inputbox.on_focus(true);
-	brw.inputbox.edit = true;
-	brw.inputbox.Cpos = brw.inputbox.text.length;
-	brw.inputbox.anchor = brw.inputbox.Cpos;
-	if (!cInputbox.timer_cursor) {
-		brw.inputbox.resetCursorTimer();
-	};
-	brw.inputbox.dblclk = true;
-	brw.inputbox.SelBegin = 0;
-	brw.inputbox.SelEnd = brw.inputbox.text.length;
-	brw.inputbox.text_selected = brw.inputbox.text;
-	brw.inputbox.select = true;
-	brw.repaint();
-}
-
 function DeletePlaylist(){
 	function delete_confirmation(status, confirmed) {
 		if(confirmed){
@@ -413,6 +392,27 @@ oBrowser = function() {
 			this.scrollbar.updateScrollbar();
 		};
 	};
+	
+	this.callRename = function(id, pl_idx, autopl_pending) {
+		var rh = ppt.rowHeight - 10;
+		var tw = this.w - rh - 20;
+		this.inputbox = new oInputbox(tw, rh, plman.GetPlaylistName(pl_idx), "", g_color_normal_txt, g_color_normal_bg, RGB(0, 0, 0), g_color_selected_bg, autopl_pending ? "renamePlaylist(true)" : "renamePlaylist(false)", "brw");
+		this.inputboxID = id;
+		// activate inputbox for edit
+		this.inputbox.on_focus(true);
+		this.inputbox.edit = true;
+		this.inputbox.Cpos = this.inputbox.text.length;
+		this.inputbox.anchor = this.inputbox.Cpos;
+		if (!cInputbox.timer_cursor) {
+			this.inputbox.resetCursorTimer();
+		};
+		this.inputbox.dblclk = true;
+		this.inputbox.SelBegin = 0;
+		this.inputbox.SelEnd = this.inputbox.text.length;
+		this.inputbox.text_selected = this.inputbox.text;
+		this.inputbox.select = true;
+		this.repaint();
+	}
 
 	this.draw = function(gr) {
 		if (repaint_main || !repaintforced) {
@@ -619,7 +619,7 @@ oBrowser = function() {
 					var id = this.rowsCount;
 					plman.CreatePlaylist(pl_idx, "");
 					plman.ActivePlaylist = pl_idx;
-					pop_rename(id, pl_idx);
+					this.callRename(id, pl_idx);
 				};
 				
 				if (this.buttonClicked && this.new_menu.checkstate("up", x, y) == ButtonStates.hover) {
@@ -1083,13 +1083,13 @@ oBrowser = function() {
 			plman.CreatePlaylist(total, "");
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
-			pop_rename(id, pl_idx);
+			this.callRename(id, pl_idx);
 			break;
 		case (idx == 101):
 			plman.CreateAutoPlaylist(total, "", "在这里输入你的查询", "", 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
-			pop_rename(id, pl_idx, true);
+			this.callRename(id, pl_idx, true);
 			break;
 		case (idx == 15):
 			fb.RunMainMenuCommand("文件/载入播放列表...");
@@ -1098,7 +1098,7 @@ oBrowser = function() {
 			fb.RunMainMenuCommand("文件/保存所有播放列表...");
 			break;
 		case (idx == 11):
-			pop_rename(id, pl_idx);
+			this.callRename(id, pl_idx);
 			break;
 		case (idx == 17):
 			fb.RunMainMenuCommand("文件/保存播放列表...");
@@ -1695,12 +1695,12 @@ function get_colors() {
 	g_color_highlight = c_default_hl;
 	if(isDarkMode(g_color_normal_bg)){
 		dark_mode = 1;
-		g_color_topbar = RGBA(0,0,0,30);
-		g_color_line = RGBA(0,0,0,25);
+		g_color_topbar = RGBA(0, 0, 0, 30);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_line_div = RGBA(0, 0, 0, 55);
 	}else{
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0, 0, 0, 12);
 		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
@@ -1752,7 +1752,7 @@ function on_key_down(vkey) {
 				if (brw.rowsCount > 0) {
 					var rowId = brw.activeRow;
 					if (rowId > (ppt.lockReservedPlaylist ? 0 : -1)) {
-						pop_rename(rowId, brw.rows[rowId].idx);
+						brw.callRename(rowId, brw.rows[rowId].idx);
 					};
 				}
 				break;

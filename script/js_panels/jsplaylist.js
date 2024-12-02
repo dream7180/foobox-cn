@@ -23,6 +23,7 @@ var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
+var title_add = "";
 var radiom3u = "";
 var miscfg3 = "";
 let dark_mode = 0;

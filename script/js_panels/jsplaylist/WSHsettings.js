@@ -800,8 +800,66 @@ function settings_textboxes_action(pageId, elementId) {
 
 // =================================================================== // Objects
 
-oLink = function (){
-	//thix.id = id;
+oTextBtn = function(text){
+	this.x = 0;
+	this.y = 0;
+	this.h = p.settings.lineHeight;
+	this.text = text;
+	this.link_hover = 0;
+	var pic = gdi.CreateImage(100, 20);
+	gpic = pic.GetGraphics();
+	this.w = gpic.CalcTextWidth(this.text, g_font);
+	this.xoffset = gpic.CalcTextWidth("标题栏显示更多音轨信息. ", g_font_b);
+	pic.ReleaseGraphics(gpic);
+	
+	this.draw = function(gr, x, y){
+		this.x = x;
+		this.y = y;
+		gr.GdiDrawText(this.text, this.ishover ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w, this.h, lc_txt);
+	}
+	
+	this.repaint = function(){
+		window.RepaintRect(this.x, this.y, this.w, this.h);
+	}
+	
+	this._isHover = function(x, y) {
+		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
+	};
+	
+	this.on_mouse = function(event, x, y) {
+		var state_old = this.ishover;
+		this.ishover = this._isHover(x, y);
+		switch (event) {
+		case "move":
+			if(this.ishover){
+				window.SetCursor(IDC_HAND);
+			}
+			else {
+				window.SetCursor(IDC_ARROW);
+			}
+			break;
+		case "up":
+			if (this.ishover){
+				p.settings.pages[3].elements[12].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
+				var new_titleadd = p.settings.pages[3].elements[12].inputbox.text;
+				if (new_titleadd != title_add){
+					full_repaint();
+					title_add = new_titleadd;
+					save_misccfg();
+					window.NotifyOthers("titlebar_addinfo", title_add);
+				}
+			}
+			break;
+		case "leave":
+			window.SetCursor(IDC_ARROW);
+			break;
+		}
+		if(state_old != this.ishover) this.repaint();
+		return this.ishover;
+	}
+}
+
+oLink = function(){
 	this.x = 0;
 	this.y = 0;
 	this.h = p.settings.lineHeight;
@@ -852,6 +910,7 @@ oLink = function (){
 				else if (x > this.x + this.x2 && x < this.x + this.x2 + this.w2) this.link_hover = 2;
 				else this.link_hover = 0;
 				if(this.link_hover) window.SetCursor(IDC_HAND);
+				else window.SetCursor(IDC_ARROW);
 			}
 			else {
 				this.link_hover = 0;
@@ -1629,7 +1688,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息，如: %codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz", title_add, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息.", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1768,8 +1827,10 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("封面相关", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("底部工具栏", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("媒体库按钮功能 (仅 foobar2000 v2+ 有效)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
-			if(g_version == "6") p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
-			else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
+			if(g_version == "6") {
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 18.15);
+				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
+			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -2182,6 +2243,14 @@ oPage = function(id, objectName, label, nbrows) {
 					this.elements[i].on_mouse(event, x, y, delta);
 				};
 			}
+			if(g_version == "6" && !p.settings.g_link.ishover){
+				if(!p.settings.textBtn1.on_mouse(event, x, y)) {
+					var fin = this.elements.length;
+					for (var i = 0; i < fin; i++) {
+						this.elements[i].on_mouse(event, x, y, delta);
+					};
+				}
+			}
 			break;
 		case 4:
 			if (this.delButtonLayoutCheck(event, x, y) != ButtonStates.hover) {
@@ -2359,12 +2428,11 @@ oSettings = function() {
 			this.tabButtons.push(new button(this.tab_img, this.tab_img, this.tab_img));
 		};
 		pic.ReleaseGraphics(gpic);
+		this.textBtn1 = new oTextBtn("设置为推荐值");
 		this.g_link = new oLink();
-		//pic.Dispose();
 	};
 
 	this.refreshColors = function() {
-		//get_colors();
 		this.setColors();
 		this.setButtons();
 		for (var p = 0; p < this.pages.length; p++) {
