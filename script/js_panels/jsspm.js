@@ -63,7 +63,6 @@ ppt = {
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
-	winver: null,
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
 
@@ -166,43 +165,9 @@ function DeletePlaylist(){
 }
 
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
-	utils.ShowHtmlDialog(window.ID, htmlCode(fb.ProfilePath + "foobox\\script\\html","ConfirmDialog.html"), {
+	utils.ShowHtmlDialog(window.ID, `file://${fb.ProfilePath}foobox\\script\\html\\ConfirmDialog.html`, {
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],
 	});
-}
-
-function htmlCode(directory,filename) {
-    let htmlCode = utils.ReadTextFile(directory+"\\"+filename);
-    let cssPath = directory;
-	if(ppt.winver == null) ppt.winver = get_windows_version();
-    if ( ppt.winver === '6.1' ) {
-        cssPath += "\\styles7.css";
-    }
-    else {
-        cssPath += "\\styles10.css";
-    }
-    htmlCode = htmlCode.replace(/href="styles10.css"/i, `href="${cssPath}"`);
-    return htmlCode;
-}
-
-function get_windows_version() {
-    let version = '';
-	var WshShell = new ActiveXObject("WScript.Shell");
-    try {
-        version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
-        version += '.';
-        version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
-        return version;
-    }
-    catch (e) {
-    }
-    try {
-        version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
-        return version;
-    }
-    catch (e) {
-    }
-    return '6.1';
 }
 
 //==============Objects======================================================

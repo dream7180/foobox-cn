@@ -809,7 +809,7 @@ oTextBtn = function(text){
 	var pic = gdi.CreateImage(100, 20);
 	gpic = pic.GetGraphics();
 	this.w = gpic.CalcTextWidth(this.text, g_font);
-	this.xoffset = gpic.CalcTextWidth("标题栏显示更多音轨信息. ", g_font_b);
+	this.xoffset = gpic.CalcTextWidth("标题栏显示更多音轨信息 | ", g_font_b);
 	pic.ReleaseGraphics(gpic);
 	
 	this.draw = function(gr, x, y){
@@ -868,8 +868,8 @@ oLink = function(){
 		gpic = pic.GetGraphics();
 	this.w1 = gpic.CalcTextWidth("参数选项", g_font);
 	this.x2 = gpic.CalcTextWidth("参数选项  |  ", g_font);
-	this.w2 = gpic.CalcTextWidth("foobx 帮助", g_font);
-	this.x3 = gpic.CalcTextWidth("参数选项  |  foobx 帮助  |  ", g_font);
+	this.w2 = gpic.CalcTextWidth("foobx 主页", g_font);
+	this.x3 = gpic.CalcTextWidth("参数选项  |  foobx 主页  |  ", g_font);
 	this.w3 = gpic.CalcTextWidth("foobar2000 汉化版", g_font);
 	this.w_sep = gpic.CalcTextWidth("  |  ", g_font);
 	this.w = this.x3 + this.w3;
@@ -880,7 +880,7 @@ oLink = function(){
 		this.y = y;
 		gr.GdiDrawText("参数选项", (this.link_hover == 1) ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w1, this.h, lc_txt);
 		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.w1, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobx 帮助", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
+		gr.GdiDrawText("foobx 主页", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
 		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.x2 + this.w2, this.y, this.w_sep, this.h, lc_txt);
 		gr.GdiDrawText("foobar2000 汉化版", (this.link_hover == 3) ? g_font_ud : g_font, g_color_highlight, this.x + this.x3, this.y, this.w3, this.h, lc_txt);
 	}
@@ -1688,7 +1688,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息.", title_add, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息 |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -2237,19 +2237,13 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 3:
-			if(!p.settings.g_link.on_mouse(event, x, y)) {
+			var check_link = !p.settings.g_link.on_mouse(event, x, y);
+			if(g_version == "6") check_link = check_link && !p.settings.textBtn1.on_mouse(event, x, y);
+			if(check_link) {
 				var fin = this.elements.length;
 				for (var i = 0; i < fin; i++) {
 					this.elements[i].on_mouse(event, x, y, delta);
 				};
-			}
-			if(g_version == "6" && !p.settings.g_link.ishover){
-				if(!p.settings.textBtn1.on_mouse(event, x, y)) {
-					var fin = this.elements.length;
-					for (var i = 0; i < fin; i++) {
-						this.elements[i].on_mouse(event, x, y, delta);
-					};
-				}
 			}
 			break;
 		case 4:

@@ -63,6 +63,7 @@ ppt = {
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
+	winver: null,
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
 
@@ -165,9 +166,43 @@ function DeletePlaylist(){
 }
 
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
-	utils.ShowHtmlDialog(window.ID, `file://${fb.ProfilePath}foobox\\script\\html\\ConfirmDialog.html`, {
+	utils.ShowHtmlDialog(window.ID, htmlCode(fb.ProfilePath + "foobox\\script\\html","ConfirmDialog.html"), {
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],
 	});
+}
+
+function htmlCode(directory,filename) {
+    let htmlCode = utils.ReadTextFile(directory+"\\"+filename);
+    let cssPath = directory;
+	if(ppt.winver == null) ppt.winver = get_windows_version();
+    if ( ppt.winver === '6.1' ) {
+        cssPath += "\\styles7.css";
+    }
+    else {
+        cssPath += "\\styles10.css";
+    }
+    htmlCode = htmlCode.replace(/href="styles10.css"/i, `href="${cssPath}"`);
+    return htmlCode;
+}
+
+function get_windows_version() {
+    let version = '';
+	var WshShell = new ActiveXObject("WScript.Shell");
+    try {
+        version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
+        version += '.';
+        version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
+        return version;
+    }
+    catch (e) {
+    }
+    try {
+        version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
+        return version;
+    }
+    catch (e) {
+    }
+    return '6.1';
 }
 
 //==============Objects======================================================
@@ -1652,12 +1687,10 @@ function get_font() {
 function get_colors() {
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
 	g_color_selected_txt = g_color_normal_txt;
-	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
-	g_color_normal_bg = g_color_normal_bg_default;
+	g_color_normal_bg = window.GetColourDUI(ColorTypeDUI.background);
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
-	g_color_selected_bg = g_color_selected_bg_default;
+	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	if(isDarkMode(g_color_normal_bg)){
@@ -1667,7 +1700,7 @@ function get_colors() {
 		g_color_line_div = RGBA(0, 0, 0, 55);
 	}else{
 		dark_mode = 0;
-		g_color_topbar = RGBA(0, 0, 0, 15);
+		g_color_topbar = RGBA(0, 0, 0, 12);
 		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
@@ -1993,28 +2026,8 @@ function on_notify_data(name, info) {
 	case "color_scheme_updated":
 		var c_ol_tmp = g_color_highlight;
 		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
-		else {
-			g_color_highlight = c_default_hl;
-			g_color_normal_bg = g_color_normal_bg_default;
-			g_color_selected_bg = g_color_selected_bg_default;
-		}
+		else g_color_highlight = c_default_hl;
 		if(g_color_highlight != c_ol_tmp){
-			if(info){
-				if(dark_mode){
-					if(info.length == 3) {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.24);
-						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
-					} else {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[3], info[4], info[5]), 0.24);
-						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[3], info[4], info[5]), 0.2);
-					}
-				} else {
-					if(g_color_normal_bg_default != 4294967295) {
-						g_color_normal_bg = blendColors(g_color_normal_bg_default, RGB(info[0], info[1], info[2]), 0.24);
-						g_color_selected_bg = blendColors(g_color_selected_bg_default, RGB(info[0], info[1], info[2]), 0.2);
-					}
-				}
-			}
 			brw.repaint();
 		}
 		break;
