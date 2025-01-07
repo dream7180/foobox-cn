@@ -32,7 +32,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 				var _x = this.X + (this.sub_w + 1) * (i-1);
 				DrawThemedBox(gr, _x, this.Y, this.sub_w, this.Height, ImgBg);
 				var w_sum = i * this.sub_w + i - 1;
-				if(w_sum <= pos) {
+				if(w_sum < pos) {
 					DrawThemedBox(gr, _x, this.Y, this.sub_w, this.Height, ImgOverlay);
 				} else if(xf) {
 					DrawThemedBox(gr, _x, this.Y, this.sub_w - (w_sum - pos), this.Height, ImgOverlay);
