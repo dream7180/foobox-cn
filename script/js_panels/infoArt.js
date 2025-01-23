@@ -1937,11 +1937,46 @@ function Controller(imgArray, imgDisplay, prop) {
 		SetMenuButtonCaption();
 	}
 
-	function OnNewTrack_GetImageFinished(img) {
-		currentImage = img;
-		imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
-		if (imgArray.length > 1) _this.cycle.Active();
-		if (get_imgCol) getColorSchemeFromImage();
+	getColorSchemeFromImage = function() {
+		let imgColor = [];
+		if(!currentImage || currentImage == null){
+			window.NotifyOthers("color_scheme_updated", imgColor);
+			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
+			get_imgCol = false;
+		}
+		let tempColors = getTopNColorSchemeFromImage(10);
+		for(let i = 0; i < 10; i++){
+			imgColor[0] = tempColors[i][0];
+			imgColor[1] = tempColors[i][1];
+			imgColor[2] = tempColors[i][2];
+
+			let c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
+			let cv_max = Math.max(...imgColor);
+			let c_dev = cv_max - Math.min(...imgColor);
+			if(c_dev < 16 || c_aggr > 450 || (dark_mode && cv_max<90)) {
+				continue;
+			}
+			else{
+				break;
+			}
+		}
+		
+		window.NotifyOthers("color_scheme_updated", imgColor);
+		get_imgCol = true;
+		
+		on_colorscheme_update(imgColor);
+	}
+
+	getTopNColorSchemeFromImage= function(n) {
+			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(10));
+			let Colors = [];
+				
+			for(let i = 0; i < n; i++){
+				let rgbColor = toRGB(ColorData[i].col);
+				Colors.push(rgbColor);
+			}
+		
+		return Colors;
 	}
 	
 	getColorSchemeFromImage = function() {
