@@ -1937,6 +1937,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		SetMenuButtonCaption();
 	}
 
+	function OnNewTrack_GetImageFinished(img) {
+		currentImage = img;
+		imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
+		if (imgArray.length > 1) _this.cycle.Active();
+		if (get_imgCol) getColorSchemeFromImage();
+	}
+	
 	getColorSchemeFromImage = function() {
 		let imgColor = [];
 		if(!currentImage || currentImage == null){
