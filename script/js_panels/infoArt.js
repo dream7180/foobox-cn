@@ -1986,36 +1986,6 @@ function Controller(imgArray, imgDisplay, prop) {
 		return Colors;
 	}
 	
-	getColorSchemeFromImage = function() {
-		let imgColor = null;
-		if(!currentImage || currentImage == null){
-			window.NotifyOthers("color_scheme_updated", imgColor);
-			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
-			get_imgCol = false;
-		}else{
-			let imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
-			imgColor = toRGB(imgColorData[0].col);
-			let c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
-			let cv_max = Math.max(...imgColor);
-			let c_dev = cv_max - Math.min(...imgColor);
-			if(c_dev < 16) imgColor = false;
-			else if(c_aggr > 450){
-				let reduction = Math.round((c_aggr - 450) / 3);
-				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-			}else if(dark_mode && cv_max<90){
-				let reduction = Math.round((270-c_aggr) / 3);
-				imgColor[0] = imgColor[0]+reduction;
-				imgColor[1] = imgColor[1]+reduction;
-				imgColor[2] = imgColor[2]+reduction;
-			}
-			window.NotifyOthers("color_scheme_updated", imgColor);
-			get_imgCol = false;
-		}
-		on_colorscheme_update(imgColor);
-	}
-	
 	on_colorscheme_update = function(imgColor){
 		var c_hl_tmp = c_highlight;
 		if(imgColor) c_highlight = RGB(imgColor[0], imgColor[1], imgColor[2]);
