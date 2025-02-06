@@ -1945,33 +1945,45 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 	
 	getColorSchemeFromImage = function() {
-		let imgColor = null;
+		let imgColor = [];
 		if(!currentImage || currentImage == null){
 			window.NotifyOthers("color_scheme_updated", imgColor);
 			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			get_imgCol = false;
-		}else{
-			let imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
-			imgColor = toRGB(imgColorData[0].col);
+		}
+		let tempColors = getTopNColorSchemeFromImage(10);
+		for(let i = 0; i < 10; i++){
+			imgColor[0] = tempColors[i][0];
+			imgColor[1] = tempColors[i][1];
+			imgColor[2] = tempColors[i][2];
+
 			let c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
 			let cv_max = Math.max(...imgColor);
 			let c_dev = cv_max - Math.min(...imgColor);
-			if(c_dev < 16) imgColor = false;
-			else if(c_aggr > 450){
-				let reduction = Math.round((c_aggr - 450) / 3);
-				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-			}else if(dark_mode && cv_max<90){
-				let reduction = Math.round((270-c_aggr) / 3);
-				imgColor[0] = imgColor[0]+reduction;
-				imgColor[1] = imgColor[1]+reduction;
-				imgColor[2] = imgColor[2]+reduction;
+			if(c_dev < 16 || c_aggr > 450 || (dark_mode && cv_max<90)) {
+				continue;
 			}
-			window.NotifyOthers("color_scheme_updated", imgColor);
-			get_imgCol = false;
+			else{
+				break;
+			}
 		}
+		
+		window.NotifyOthers("color_scheme_updated", imgColor);
+		get_imgCol = true;
+		
 		on_colorscheme_update(imgColor);
+	}
+
+	getTopNColorSchemeFromImage= function(n) {
+			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(n));
+			let Colors = [];
+				
+			for(let i = 0; i < n; i++){
+				let rgbColor = toRGB(ColorData[i].col);
+				Colors.push(rgbColor);
+			}
+		
+		return Colors;
 	}
 	
 	on_colorscheme_update = function(imgColor){
