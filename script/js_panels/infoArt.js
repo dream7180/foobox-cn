@@ -1975,7 +1975,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	getTopNColorSchemeFromImage= function(n) {
-			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(10));
+			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(n));
 			let Colors = [];
 				
 			for(let i = 0; i < n; i++){
