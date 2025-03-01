@@ -61,6 +61,18 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 4:
 			if (status) {
+				albcov_lt = true;
+			}
+			else {
+				albcov_lt = false;
+			}
+			get_covercahe_config();
+			window.NotifyOthers("alb_ignoring_art", albcov_lt);
+			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 5:
+			if (status) {
 				color_bycover = true;
 			}
 			else {
@@ -78,7 +90,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("foobox.color.by.cover", color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 5:
+		case 6:
 			if (status) {
 				color_noesl = true;
 			}
@@ -89,19 +101,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("foobox.color.by.cover.except.ESL", color_noesl);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 6:
-			if (status) {
-				albcov_lt = true;
-			}
-			else {
-				albcov_lt = false;
-			}
-			get_covercahe_config();
-			window.NotifyOthers("alb_ignoring_art", albcov_lt);
-			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 8:
+		case 9:
 			if (status) {
 				show_extrabtn = true;
 			}
@@ -222,16 +222,16 @@ function settings_radioboxes_action(id, status, parentId) {
 				resize_panels();
 			//}
 			break;
-		case 9:
-			p.settings.pages[pid].elements[9].status = true;
-			p.settings.pages[pid].elements[10].status = false;
+		case 10:
+			p.settings.pages[pid].elements[10].status = true;
+			p.settings.pages[pid].elements[11].status = false;
 			libbtn_fuc = true;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
 			break;
-		case 10:
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = true;
+		case 11:
+			p.settings.pages[pid].elements[10].status = false;
+			p.settings.pages[pid].elements[11].status = true;
 			libbtn_fuc = false;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
@@ -768,6 +768,15 @@ function settings_textboxes_action(pageId, elementId) {
 	case 3:
 		switch (elementId) {
 		case 7:
+			var org_threshold = color_threshold;
+			color_threshold = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!color_threshold) color_threshold = org_threshold;
+			else if(color_threshold < 1) color_threshold = 1;
+			else if(color_threshold > 10) color_threshold = 10;
+			window.SetProperty("foobox.color.threshold", color_threshold);
+			window.NotifyOthers("set_corlor_threshold", color_threshold);
+			break;
+		case 8:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -777,7 +786,7 @@ function settings_textboxes_action(pageId, elementId) {
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
 			break;
-		case 11:
+		case 12:
 			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_m3u != radiom3u){
 				radiom3u = new_m3u;
@@ -785,7 +794,7 @@ function settings_textboxes_action(pageId, elementId) {
 				window.NotifyOthers("Radio_list", radiom3u);
 			}
 			break;
-		case 12:
+		case 13:
 			var new_titleadd = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_titleadd != title_add){
 				title_add = new_titleadd;
@@ -840,8 +849,8 @@ oTextBtn = function(text){
 			break;
 		case "up":
 			if (this.ishover){
-				p.settings.pages[3].elements[12].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
-				var new_titleadd = p.settings.pages[3].elements[12].inputbox.text;
+				p.settings.pages[3].elements[13].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
+				var new_titleadd = p.settings.pages[3].elements[13].inputbox.text;
 				if (new_titleadd != title_add){
 					full_repaint();
 					title_add = new_titleadd;
@@ -1590,6 +1599,7 @@ oPage = function(id, objectName, label, nbrows) {
 		var oTextBox_1 = 600*zdpi;
 		var oTextBox_2 = 340*zdpi;
 		var oTextBox_3 = 250*zdpi;
+		var oTextBox_4 = 50*zdpi;
 		switch (this.id) {
 		case 0:
 			// General
@@ -1598,13 +1608,13 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "平滑滚动", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "触屏滚动控制 (禁用拖放)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
 			
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "滚轮滚动步长（全局）", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(3, txtbox_x + 180*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "滚轮滚动步长（全局）", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x + 180*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = z(70);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), 50*zdpi, cHeaderBar.height, "列表行高（全局）", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), oTextBox_4, cHeaderBar.height, "列表行高（全局）", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "顺序播放时自动播放下一个播放列表", "repeat_pls", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 13.5, "播放队列非空时, 自动为其创建播放列表", "queue_pl_on", "settings_checkboxes_action", this.id));
@@ -1680,15 +1690,16 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "右栏封面信息及属性面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "高亮色跟随较鲜艳的封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, z(240), cSettings.topBarHeight + rh * 7.25, "歌词高亮色除外", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 8.25, "性能优先，缓存专辑封面的依据不区分专辑艺术家", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，含扩展名，以分号 ';' 来分隔 (封面在该文件夹内)", dir_cover_name, "settings_textboxes_action", this.id));			
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息 |", title_add, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "性能优先，缓存专辑封面的依据不区分专辑艺术家", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "高亮色跟随较鲜艳的封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(6, z(240), cSettings.topBarHeight + rh * 8.25, "歌词高亮色除外", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_4, cHeaderBar.height, "配色跟随封面时的取色阈值，1-10 (1-最佳速度，10-最佳精确度)", color_threshold.toString(), "settings_textboxes_action", this.id));	
+			this.elements.push(new oTextBox(8, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.25), oTextBox_3, cHeaderBar.height, "以文件夹分组时的封面文件名，含扩展名，以分号 ';' 来分隔 (封面在该文件夹内)", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 14.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(10, 20, cSettings.topBarHeight + rh * 16.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(11, z(120), cSettings.topBarHeight + rh * 16.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 17.55), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(13, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 20.05), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息 |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1825,12 +1836,12 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("滚动条宽度", g_font_b, p.settings.color1, txtbox_x, dy + rh * 1.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("评级数据", g_font_b, p.settings.color1, txtbox_x, dy + rh * 3.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("封面相关", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("底部工具栏", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("媒体库按钮功能 (仅 foobar2000 v2+ 有效)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("底部工具栏", g_font_b, p.settings.color1, txtbox_x, dy + rh * 13.75, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("媒体库按钮功能 (仅 foobar2000 v2+ 有效)", g_font, p.settings.color1, txtbox_x, dy + rh * 15.5, txt_width, p.settings.lineHeight, lc_txt);
 			if(g_version == "6") {
-				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 18.15);
-				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
-			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 20.15);
+				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 22.75);
+			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.25);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -2447,7 +2458,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 18));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "编辑列", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "编辑分组", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", g_version == "6" ? 21 : 19));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", g_version == "6" ? 23 : 21));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "播放列表布局", 15));
 		};
 		var fin = this.pages.length;
@@ -2593,7 +2604,8 @@ oSettings = function() {
 				break;
 			case 3:
 				this.pages[this.currentPageId].elements[7].inputbox.on_focus(is_focused, true);
-				this.pages[this.currentPageId].elements[11].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[8].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[12].inputbox.on_focus(is_focused, true);
 				break;
 		}
 	};

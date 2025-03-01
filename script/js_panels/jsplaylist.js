@@ -19,6 +19,7 @@ var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var track_edit_app = "";
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var color_noesl = window.GetProperty("foobox.color.by.cover.except.ESL", false);
+var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
@@ -29,7 +30,7 @@ var miscfg3 = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.40";
+var g_script_version = "7.41";
 var g_version = g_script_version.substr(0, 1);
 var g_textbox_tabbed = false;
 var g_init_window = true;
