@@ -17,7 +17,11 @@ foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.co
 
 * 从 7.26 版开始增加 foobox 6 重制版 (仅 32 位)，其实是在 foobox 7 的基础上添加 UI Hacks 并整合了两个版本的特点，适合喜欢隐藏菜单栏状态栏 UI 的朋友。  
 
-* 额外的视频面板可选 (不推荐用 fb2k 播放视频)，它基于 [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) 和 [foo-mpv](https://github.com/sammoth/foo_mpv) 及其 [x64](https://github.com/intrigit/foo_mpv) 组件。  
+* 从 7.42 版由于 JSplitter 的更新，不再支持 Win7，因此用旧版 JSplitter 打包了最后一个支持 Win7 的 7.4.2 版可在 [github](https://github.com/dream7180/foobox-cn/releases/tag/7.42) 或 [gitee](https://gitee.com/dream7180/foobox-cn/releases/tag/7.42) 下载。  
+
+* 额外的视频面板可选 (不推荐用 fb2k 播放视频)，foobox-video 可以在 [github](https://github.com/dream7180/foobox-cn/releases/tag/video76) 或 [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video76) 下载。  
+
+* 视频面板基于 [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) 和 [foo-mpv](https://github.com/sammoth/foo_mpv) 及其 [x64](https://github.com/intrigit/foo_mpv) 组件。  
 
 * 完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。  
 

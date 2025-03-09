@@ -949,8 +949,8 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
-		_radiolist.AppendMenuItem(MF_STRING, 30, "live.m3u (github 镜像加速)");
-		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github)");
+		_radiolist.AppendMenuItem(MF_STRING, 30, "Radio (gitee)");
+		_radiolist.AppendMenuItem(MF_STRING, 31, "Radio (github)");
 		if(radiom3u.length > 0){
 			for(var urlcount = 0; urlcount < radiom3u.length; urlcount++){
 				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
@@ -1032,10 +1032,10 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("网络电台", "https://raw.kkgithub.com/dream7180/Resource/main/radio/live.m3u");
+			LoadRadio("网络电台", "https://gitee.com/dream7180/Resource/raw/main/radio/radio.fpl");
 			break
 		case (idx == 31):
-			LoadRadio("网络电台", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
+			LoadRadio("网络电台", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
 			break;
 		case (idx >= 300 && idx < 300 + radiom3u.length):
 			LoadRadio("网络电台", radiom3u[idx - 300]);
