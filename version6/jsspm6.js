@@ -161,7 +161,7 @@ function DeletePlaylist(){
 		if(i == 0) parsed_tabname += plman.GetPlaylistName(brw.rows[brw.actionRows[i]].idx);
 		else parsed_tabname += ", " + plman.GetPlaylistName(brw.rows[brw.actionRows[i]].idx);
 	}
-	HtmlDialog("删除播放列表", "确实要删除下列 " + brw.actionRows.length + " 个播放列表吗?<p class=line_name>" + parsed_tabname + "</p>", "是", "否", delete_confirmation);
+	HtmlDialog("删除播放列表", "确定要删除下列 " + brw.actionRows.length + " 个播放列表吗?<p class=line_name>" + parsed_tabname + "</p>", "是", "否", delete_confirmation);
 }
 
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){

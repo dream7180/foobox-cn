@@ -191,7 +191,8 @@ SetShellVarContext current
 ${If} $initDestination != ""
 	StrCpy $InstDir $initDestination
 ${Else}
-	ReadRegStr $INSTDIR HKLM Software\foobar2000 InstallDir
+	SetRegView 64
+	ReadRegStr $INSTDIR HKLM "Software\foobar2000" "InstallDir"
 ${EndIf}
 FunctionEnd
 

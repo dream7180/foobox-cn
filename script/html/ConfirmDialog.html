@@ -7,14 +7,14 @@
 			html,body{padding:0;margin:0}		
             .container {
 				font:caption;
-				padding: 10px 25px;
+				padding: 10px 10px;
 				word-wrap: break-word;
 				white-space: pre-wrap; 
 			} 
 			.line_name {
 				font-weight: bold;
 				text-align: center;
-				padding: 10px 15px;
+				padding: 10px 10px;
 				word-wrap: break-word;
 				white-space: pre-wrap; 
 			} 
@@ -25,7 +25,7 @@
 				text-align:center;
 			}
 			#div_text{ 
-				padding-top:10px; padding-bottom:20px; 
+				padding-top:10px; padding-bottom:10px; 
 				background:THREEDFACE;
 			}			
             .button_ok { display:inline-block; } 
@@ -39,9 +39,18 @@
 			<button id="btn_ok" class="button">Yes</button>	
 			<button id="btn_cancel" class="button">No</button>
 		</div>		
-        <script>   
-
-            // helpers
+        <script>
+			function getDPI() {
+				var div = document.createElement('div');
+				div.style.width = '1in';
+				div.style.height = '1in';
+				div.style.position = 'absolute';
+				div.style.left = '-100%'; // 避免元素影响页面布局
+				document.body.appendChild(div);
+				var dpi = div.offsetWidth;
+				document.body.removeChild(div);
+				return dpi/96;
+			}
             function close_window() {
                 window.open('', '_self', '');
                 window.close();
@@ -66,13 +75,11 @@
             }
 
             // main script
-			function resize(){			
-				var window_w = 475;
-				window_h = window.div_text.offsetHeight + window.btn_container.offsetHeight;
-				window_h = window_h*1.15;
-				if (window_w < window_h + 50) window_w += 50;
+			function resize(){	
+				var dpi = Math.sqrt(getDPI()) * 1.15;
+				var window_w = 400 * dpi;
+				window_h = window.div_text.offsetHeight * dpi + window.btn_container.offsetHeight;
 				window.resizeTo(window_w, window_h);
-				//alert(window.div_text.offsetHeight+' - '+window.btn_container.offsetHeight+' - '+window_h);
             }
 			resize();
 			document.onkeydown = function () {

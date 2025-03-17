@@ -9,6 +9,8 @@
 	"摇滚": "Rock",
 	"经典": "Classical",
 	"古典": "Classical",
+	"Classic": "Classical",
+	"Classik": "Classical",
 	"动漫": "ACG",
 	"Anime": "ACG",
 	"Comic": "ACG",

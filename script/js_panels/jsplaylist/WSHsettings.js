@@ -812,7 +812,7 @@ function settings_textboxes_action(pageId, elementId) {
 oTextBtn = function(text){
 	this.x = 0;
 	this.y = 0;
-	this.h = p.settings.lineHeight;
+	this.h = cHeaderBar.height;
 	this.text = text;
 	this.link_hover = 0;
 	var pic = gdi.CreateImage(100, 20);
@@ -1839,7 +1839,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("底部工具栏", g_font_b, p.settings.color1, txtbox_x, dy + rh * 13.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("媒体库按钮功能 (仅 foobar2000 v2+ 有效)", g_font, p.settings.color1, txtbox_x, dy + rh * 15.5, txt_width, p.settings.lineHeight, lc_txt);
 			if(g_version == "6") {
-				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 20.15);
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, Math.ceil(dy + rh * 20.05));
 				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 22.75);
 			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.25);
 			break;

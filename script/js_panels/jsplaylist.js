@@ -30,7 +30,7 @@ var miscfg3 = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "7.42";
+var g_script_version = "7.43";
 var g_version = g_script_version.substr(0, 1);
 var g_textbox_tabbed = false;
 var g_init_window = true;
@@ -381,9 +381,9 @@ image_cache = function() {
 					try{
 						if (layout.pattern_idx == 4) {
 							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(p.list.groups[albumIndex].metadb));
-							var genre_img = gdi.Image( _path + ".jpg") || gdi.Image( _path + ".png");
+							var genre_img = gdi.Image( _path + ".jpg");
 							p.list.groups[albumIndex].load_requested = 1;
-							img = g_image_cache.getit(genre_img, albumIndex);
+							p.list.groups[albumIndex].cover_img = g_image_cache.getit(genre_img, albumIndex);
 							full_repaint();
 						} else if (layout.pattern_idx == 5) {
 							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(p.list.groups[albumIndex].metadb);
@@ -391,10 +391,10 @@ image_cache = function() {
 							for (var i = 0; i <= dc_arr.length; i++) {
 								var dir_img = gdi.Image( _path + dc_arr[i]);
 								p.list.groups[albumIndex].load_requested = 1;
-								img = g_image_cache.getit(dir_img, albumIndex);
-								if(img != null) break;
+								p.list.groups[albumIndex].cover_img = g_image_cache.getit(dir_img, albumIndex);
+								if(p.list.groups[albumIndex].cover_img != null) break;
 							}
-								full_repaint();
+							full_repaint();
 						}
 						else {
 							p.list.groups[albumIndex].load_requested = 1;

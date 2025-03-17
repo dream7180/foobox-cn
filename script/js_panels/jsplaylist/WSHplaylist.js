@@ -1907,20 +1907,22 @@ oList = function(object_name, playlist) {
 		}
 		else {
 			var fin = this.items.length;
-			for (var i = 0; i < fin; i++) {
-				if (this.items[i].group_index >= 0) {
-					if ((this.items[i].type == 0 && this.items[i].empty_row_index == 0) || this.groups[this.items[i].group_index].collapsed) {
-						if (this.groups[this.items[i].group_index].collapsed) {
-							if (this.focusedTrackId >= this.groups[this.items[i].group_index].start && this.focusedTrackId < this.groups[this.items[i].group_index].start + this.groups[this.items[i].group_index].count) {
+			if(fin){
+				for (var i = 0; i < fin; i++) {
+					if (this.items[i].group_index >= 0) {
+						if ((this.items[i].type == 0 && this.items[i].empty_row_index == 0) || this.groups[this.items[i].group_index].collapsed) {
+							if (this.groups[this.items[i].group_index].collapsed) {
+								if (this.focusedTrackId >= this.groups[this.items[i].group_index].start && this.focusedTrackId < this.groups[this.items[i].group_index].start + this.groups[this.items[i].group_index].count) {
+									return true;
+								};
+							}
+							else if (this.focusedTrackId == this.items[i].track_index && this.items[i].row_index < this.totalRowVisible) {
 								return true;
 							};
-						}
-						else if (this.focusedTrackId == this.items[i].track_index && this.items[i].row_index < this.totalRowVisible) {
-							return true;
 						};
 					};
 				};
-			};
+			}
 		};
 		return false;
 	};
@@ -1946,24 +1948,26 @@ oList = function(object_name, playlist) {
 
 		// Draw items (tracks and group headers)
 		var fin = this.items.length;
-		for (var i = 0; i < fin; i++) {
-			item_h = this.items[i].heightInRow * cTrack.height;
-			width = this.w - cScrollBar.width;
-			this.items[i].draw(gr, this.x, row_top_y, width, item_h);
-			row_top_y += item_h - (this.items[i].groupRowDelta * cTrack.height);
-		};
+		if(fin){
+			for (var i = 0; i < fin; i++) {
+				item_h = this.items[i].heightInRow * cTrack.height;
+				width = this.w - cScrollBar.width;
+				this.items[i].draw(gr, this.x, row_top_y, width, item_h);
+				row_top_y += item_h - (this.items[i].groupRowDelta * cTrack.height);
+			};
 
-		if (g_dragndrop_status && g_dragndrop_bottom) {
-			var rowId = fin - 1;
-			var item_height_row = (this.items[rowId].type == 0 ? 1 : this.items[rowId].heightInRow);
-			var item_height = item_height_row * cTrack.height;
-			var limit = this.items[rowId].y + item_height;
-			var rx = this.items[rowId].x;
-			var ry = this.items[rowId].y;
-			var rw = this.items[rowId].w;
+			if (g_dragndrop_status && g_dragndrop_bottom) {
+				var rowId = fin - 1;
+				var item_height_row = (this.items[rowId].type == 0 ? 1 : this.items[rowId].heightInRow);
+				var item_height = item_height_row * cTrack.height;
+				var limit = this.items[rowId].y + item_height;
+				var rx = this.items[rowId].x;
+				var ry = this.items[rowId].y;
+				var rw = this.items[rowId].w;
 
-			gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half * 2, rw, cList.borderWidth, g_color_normal_txt);
-		};
+				gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half * 2, rw, cList.borderWidth, g_color_normal_txt);
+			};
+		}
 
 		// Draw rect selection
 		if (this.drawRectSel) {
@@ -2009,9 +2013,11 @@ oList = function(object_name, playlist) {
 			if (this.ishover) {
 				this.item_clicked = false;
 				var fin = this.items.length;
-				for (var i = 0; i < fin; i++) {
-					this.items[i].check(event, x, y);
-				};
+				if(fin){
+					for (var i = 0; i < fin; i++) {
+						this.items[i].check(event, x, y);
+					};
+				}
 				if (!cTouch.down) {
 					if (!p.scrollbar.isHoverObject(x, y) && x < p.scrollbar.x) { // if not hover the scrollbar
 						if (this.items.length > 0 && !this.item_clicked) { // and if click on an empty area of the playlist (after the last item)
@@ -2039,9 +2045,11 @@ oList = function(object_name, playlist) {
 		case "up":
 			if (this.ishover) {
 				var fin = this.items.length;
-				for (var i = 0; i < fin; i++) {
-					this.items[i].check(event, x, y);
-				};
+				if(fin){
+					for (var i = 0; i < fin; i++) {
+						this.items[i].check(event, x, y);
+					};
+				}
 			};
 			p.list.drawRectSel_click = false;
 			p.list.drawRectSel = false;
@@ -2053,8 +2061,8 @@ oList = function(object_name, playlist) {
 			break;
 		case "drag_over":
 			g_dragndrop_bottom = false;
-			if (this.count > 0) {
-				var fin = this.items.length;
+			var fin = this.items.length;
+			if (fin) {
 				for (var i = 0; i < fin; i++) {
 					this.items[i].dragndrop_check(x, y, i);
 				};
@@ -2072,9 +2080,12 @@ oList = function(object_name, playlist) {
 		case "move":
 			InfoPane.mouse = [x, y];
 			InfoPane.ItemReset = false;
-			for (var i = 0; i < this.items.length; i++) {
-				this.items[i].check(event, x, y);
-			};
+			var fin = this.items.length;
+			if (fin) {
+				for (var i = 0; i < fin; i++) {
+					this.items[i].check(event, x, y);
+				};
+			}
 			if (!this.drawRectSel) {
 				this.drawRectSel = this.drawRectSel_click;
 			};
@@ -2085,7 +2096,7 @@ oList = function(object_name, playlist) {
 			};
 			break;
 		default:
-			if (this.ishover) {
+			if (this.ishover && this.items.length) {
 				for (var i = 0; i < this.items.length; i++) {
 					this.items[i].check(event, x, y);
 				};

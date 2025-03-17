@@ -14,7 +14,7 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "7.42"
+!define FBOX_VER "7.43"
 !define BUILD_NUM "1"
 
 # Setup
@@ -192,7 +192,8 @@ SetShellVarContext current
 ${If} $initDestination != ""
 	StrCpy $InstDir $initDestination
 ${Else}
-	ReadRegStr $INSTDIR HKLM Software\foobar2000 InstallDir
+	SetRegView 64
+	ReadRegStr $INSTDIR HKLM "Software\foobar2000" "InstallDir"
 ${EndIf}
 FunctionEnd
 
