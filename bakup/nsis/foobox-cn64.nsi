@@ -62,7 +62,8 @@ ReserveFile ".\common\installer\foobox7.bmp"
 
 !define MUI_WELCOMEPAGE_TEXT "\
 foobox 是音频播放器 foobar2000 的定制主题，基于默认用户界面 (DUI) 及 JSplitter (Spider Monkey Panel 版) 组件，符合主流软件的审美，扩展功能丰富并保持软件的流畅运行.$\n$\n\
-安装 foobox 7 到 foobar2000 前您应该已安装有 foobar2000 播放器 (64 位版)."
+安装 foobox 7 到 foobar2000 前您应该已安装有 foobar2000 播放器 (64 位版).$\n$\n\
+注意: 需要 Windows 8 或更高版本的操作系统."
 
 !define MUI_WELCOMEPAGE_LINK "下载 foobar2000 汉化版 by Asion"
 !define MUI_WELCOMEPAGE_LINK_LOCATION "https://www.cnblogs.com/asionwu"
@@ -95,13 +96,13 @@ Section "foobox 主题和所需组件" fooboxCore
 	File ".\cn\x64\themes\*.*"
 	
 	SetOutPath "$ProfileDir\foobox"
-	File /r ".\cn\xcommon\profile\foobox\*.*"
+	File /r ".\cn\xcommon\foobox\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64"
 	File /r ".\cn\x64\profile\user-components-x64\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
-	File /r ".\cn\xcommon\profile\foo_uie_eslyric\*.*"
+	File /r ".\cn\xcommon\foo_uie_eslyric\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
