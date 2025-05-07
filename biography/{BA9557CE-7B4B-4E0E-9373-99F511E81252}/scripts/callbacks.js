@@ -431,24 +431,17 @@ function on_notify_data(name, info) {
 			} else sync.get = true;
 			break;
 		case "color_scheme_updated":
-			let c_ol_tmp = ui.col.txt_h;
-			let c_h, c_bg;
-			if(info) c_h = RGB(info[0], info[1], info[2]);
-			if(c_h != c_ol_tmp){
-				if(info && switchbgcolour > 0){
-					let c_bg_default = window.GetColourDUI(1);
-					if(switchbgcolour == 2){
-						if(info.length == 3) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.76);
-						else c_bg = ui.getBlend(c_bg_default, RGB(info[3], info[4], info[5]), 0.76);
-					} else if(c_bg_default != 4294967295) c_bg = ui.getBlend(c_bg_default, RGB(info[0], info[1], info[2]), 0.76);
-				}
-				ui.getColours(c_h, c_bg);
-				txt.rev.cur = '';
-				txt.bio.cur = '';
-				txt.albCalc();
-				txt.artCalc();
-				txt.paint();
+			let c_h = window.GetColourDUI(2), c_bg = window.GetColourDUI(1);
+			if(info) {
+				c_h = RGB(info[0], info[1], info[2]);
+				if(info.length > 3) c_bg = RGB(info[3], info[4], info[5]);
 			}
+			ui.getColours(c_h, c_bg);
+			txt.rev.cur = '';
+			txt.bio.cur = '';
+			txt.albCalc();
+			txt.artCalc();
+			txt.paint();
 			break;
 		case "bgcolour_to_change":
 			switchbgcolour = info;
@@ -507,7 +500,6 @@ function on_playback_seek() {
 	if (panel.block()) return;
 	const n = ppt.artistView ? 'bio' : 'rev';
 	if ((txt[n].loaded.txt && txt.reader[n].nowplaying || ppt.sourceAll) && txt.reader[n].perSec) {
-		txt.logScrollPos();
 		txt.getText();
 		txt.paint();
 	}
@@ -517,7 +509,6 @@ function on_playback_time() {
 	if (panel.block()) return;
 	const n = ppt.artistView ? 'bio' : 'rev';
 	if ((txt[n].loaded.txt && txt.reader[n].nowplaying || ppt.sourceAll) && txt.reader[n].perSec) {
-		txt.logScrollPos();
 		txt.getText('', '', 'playbackTime');
 		txt.paint();
 	}
@@ -572,8 +563,6 @@ function on_size() {
 	}
 	ui.pss.checkOnSize = false;
 	if (!panel.w || !panel.h) return;
-	txt.logScrollPos('bio');
-	txt.logScrollPos('rev');
 	ui.getParams();
 
 	if (!ppt.panelActive) return;

@@ -13,11 +13,11 @@ foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.co
 * [简介面板](https://github.com/Wil-B/Biography)作者 Wil-B;  
 * 网络电台列表收集自 [范明明](https://github.com/fanmingming)、[Kimentanm](https://github.com/Kimentanm).  
 
-**到最新 Releases (发行版) 页面下载安装包，从 7.24 起，安装包不再集成 foobar2000 汉化版，仅包含 foobox 主题及所需组件，绿色安装，自由便捷。**  
+**到最新 Releases (发行版) 页面下载安装包，安装包不包含 foobar2000 汉化版，仅包含 foobox 主题及所需组件，绿色安装，自由便捷。**  
 
-* 从 7.26 版开始增加 foobox 6 重制版 (仅 32 位)，其实是在 foobox 7 的基础上添加 UI Hacks 并整合了两个版本的特点，适合喜欢隐藏菜单栏状态栏 UI 的朋友。  
+* 支持 32 位及 64 位 foobar2000，其中 32 位版本加入 UI Hacks 组件，适合喜欢隐藏菜单栏状态栏 UI 的朋友，并拥有完整的界面变色效果。  
 
-* 额外的视频面板可选 (不推荐用 fb2k 播放视频)，foobox-video 可以在 [github](https://github.com/dream7180/foobox-cn/releases/tag/video76) 或 [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video76) 下载，包含 [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) 和 [foo-mpv](https://github.com/sammoth/foo_mpv) 及其 [x64](https://github.com/intrigit/foo_mpv) 组件。  
+* 额外的视频面板可选 (不推荐用 fb2k 播放视频)，foobox-video 可以在 [github](https://github.com/dream7180/foobox-cn/releases/tag/video8) 或 [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video8) 下载。    
 
 * 完成后可以在 “主菜单--视图--布局--快速设置”里切换各种 foobox 布局组合。  
 

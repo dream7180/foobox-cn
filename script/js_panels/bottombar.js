@@ -269,10 +269,10 @@ function get_color() {
 	c_seek_bg =  c_normal & 0x35ffffff;
 	if (light_mode){
 		c_tip_bg = RGBA(255, 255, 255, 200);
-		c_seeker_core = RGB(255, 255, 255);
+		c_seeker_core = c_white;
 	} else {
 		c_tip_bg = RGBA(0, 0, 0, 200);
-		c_seeker_core = RGB(0, 0, 0);
+		c_seeker_core = c_black;
 	}
 }
 
@@ -348,8 +348,8 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seekbar = new UISlider(seek_frame, seek_time, seeker);
 	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, true);
 	
-	let c_pb_ov = blendColors(RGB(255,255,255), c_seekoverlay, 0.85);
-	let c_pb_down = blendColors(RGB(0,0,0), c_seekoverlay, 0.85);
+	let c_pb_ov = blendColors(c_white, c_seekoverlay, 0.85);
+	let c_pb_down = blendColors(c_black, c_seekoverlay, 0.85);
 	imgh = z(34);
 	let imgh2 = imgh * 2;
 	let point_arr = new Array(_x12, 9*zdpi, _x12, 23*zdpi,22*zdpi, 16*zdpi);
@@ -378,15 +378,15 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	let im_playico = gdi.CreateImage(imgh, imgh);
 	gb = im_playico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(RGB(255,255,255), 0, point_arr);
+	gb.FillPolygon(c_white, 0, point_arr);
 	gb.SetSmoothingMode(0);
 	im_playico.ReleaseGraphics(gb);
 		
 	let im_pauseico = gdi.CreateImage(imgh, imgh);
 	gb = im_pauseico.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x12, 10*zdpi, _x12, Math.floor(22*zdpi)+1, Math.floor(3*zdpi), RGB(255,255,255));
-	gb.DrawLine(22*zdpi-2, 10*zdpi, 22*zdpi-2, Math.floor(22*zdpi)+1,  Math.floor(3*zdpi), RGB(255,255,255));
+	gb.DrawLine(_x12, 10*zdpi, _x12, Math.floor(22*zdpi)+1, Math.floor(3*zdpi), c_white);
+	gb.DrawLine(22*zdpi-2, 10*zdpi, 22*zdpi-2, Math.floor(22*zdpi)+1,  Math.floor(3*zdpi), c_white);
 	im_pauseico.ReleaseGraphics(gb);
 		
 	img_play = gdi.CreateImage(imgh, imgh * 3);
@@ -793,7 +793,7 @@ function on_mouse_move(x, y) {
 		fb.Volume = pos2vol(VolumeBar.Value);
 		VolumeTip.Text = (fb.Volume | 0).toString() + " dB  ";
 		VolumeTip.Repaint();
-	}
+	} else if(VolumeTip.Visible) VolumeTip.Deactivate();
 	if(y < win_y) return;
 	var _x = 0;
 	if(show_extrabtn){
@@ -855,9 +855,7 @@ function on_mouse_lbtn_up(x, y) {
 		TimeTip.Repaint();
 		TimeTip.Deactivate();
 	}
-	if (VolumeBar.MouseUp()) {
-		VolumeTip.Deactivate();
-	}
+	VolumeBar.MouseUp();
 	if(y < win_y) return;
 	if(show_extrabtn){
 		if (PBOpen.MouseUp()) fb.RunMainMenuCommand("打开...");
@@ -878,6 +876,7 @@ function on_mouse_lbtn_up(x, y) {
 function on_mouse_leave() {
 	seekbar.MouseLeave();
 	VolumeBar.MouseLeave();
+	if(VolumeTip.Visible) VolumeTip.Deactivate();
 	g_switchbar.on_mouse("leave");
 	RTips_switch("");
 	if (!hbtn) return;
@@ -901,7 +900,9 @@ function on_mouse_wheel(step) {
 		fb.PlaybackTime = seekbar.Value;
 	}
 	if (VolumeBar.MouseWheel(step, 2)) {
-		fb.Volume = pos2vol(VolumeBar.Value)
+		fb.Volume = pos2vol(VolumeBar.Value);
+		VolumeTip.Text = (fb.Volume | 0).toString() + " dB  ";
+		VolumeTip.Activate();
 	}
 }
 

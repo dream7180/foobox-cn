@@ -65,7 +65,7 @@ class Text {
 			cur_ix: -1,
 			died: 'Died: |Gestorben: |Fallecido: |D\\u00e9c\\u00e9d\\u00e9(e) le: |Data di morte: |\\u6ca1\\u5e74: |Zmar\\u0142: |Data de falecimento: |\\u0414\\u0430\\u0442\\u0430 \\u0441\\u043c\\u0435\\u0440\\u0442\\u0438: |D\\u00f6d: |\\u00d6l\\u00fcm tarihi: |\\u901d\\u4e16:',
 			drawn: 0,
-			fallbackText: ppt.bioFallbackText.split('|'),
+			fallbackText: ['未找到任何内容', '没有要显示的简介'],
 			flag: null,
 			flagCode: '',
 			flagCountry: '',
@@ -159,7 +159,7 @@ class Text {
 		}
 		
 		this.logo = {
-			fonts: ['Arial Black', 'Bauhaus 93', 'Blackadder ITC', 'Brush Script MT', 'Castellar', 'Colonna MT', 'Comic Sans MS', 'DomCasual BT', 'Forte', 'Freestyle Script', 'Harrington', 'Imprint MT Shadow', 'Informal Roman', 'Ink Free', 'Jokerman', 'Lucida Calligraphy', 'Lucida Handwriting', 'Magneto', 'Matura MT Script Capitals', 'Mistral', 'Monotype Corsiva', 'MV Boli', 'Old English Text MT', 'Pristina', 'Ravie', 'Script MT Bold', 'Segoe Print', 'Segoe Script', 'Segoe UI Black', 'Showcard Gothic', 'Snap ITC', 'Tango BT', 'Tempus Sans ITC', 'Viner Hand ITC', 'Vivaldi', 'Vladimir Script'],
+			fonts: ['Arial Black', 'Comic Sans MS', 'Ink Free', 'MV Boli', 'Segoe Print', 'Segoe Script', 'Segoe UI Black'],
 			id: '',
 			img: null,
 			show: false,
@@ -249,7 +249,7 @@ class Text {
 			cur: '',
 			cur_ix: -1,
 			drawn: 0,
-			fallbackText: ppt.revFallbackText.split('|'),
+			fallbackText: ['未找到任何内容', '没有要显示的评论'],
 			flag: null,
 			flagCode: '',
 			flagCountry: '',
@@ -500,7 +500,6 @@ class Text {
 			const new_track = this.id.tr != this.id.curTr;
 			if (new_track) {
 				this.rev.checkedTrackSubHead = this.done.amRev = this.done.lfmRev = this.done.wikiRev = false;
-				if (panel.style.inclTrackRev == 1 && !new_album) this.logScrollPos('rev');
 			}
 		}
 	}
@@ -1641,19 +1640,12 @@ class Text {
 	}
 
 	getScrollPos() {
-		let scrollPos, v;
 		switch (ppt.artistView) {
 			case true:
-				v = this.artist + '-' + this.bio.loaded.ix + '-' + (!this.bio.loaded.txt ? '' : this.bio.readerItem);
-				scrollPos = $.jsonParse(ppt.bioScrollPos, {});
-				if (!scrollPos[v]) return art_scrollbar.setScroll(0);
-				art_scrollbar.setScroll(scrollPos[v] || 0);
+				return art_scrollbar.setScroll(0);
 				break;
 			case false: {
-				v = (panel.style.inclTrackRev != 2 ? this.albumartist + this.album + this.composition + '-' : '') + '-' + this.rev.loaded.ix + '-' + ppt.inclTrackRev + (!this.rev.loaded.txt ? '' : this.rev.readerItem);
-				scrollPos = $.jsonParse(ppt.revScrollPos, {});
-				if (!scrollPos[v]) return alb_scrollbar.setScroll(0);
-				alb_scrollbar.setScroll(scrollPos[v] || 0);
+				return alb_scrollbar.setScroll(0);
 				break;
 			}
 		}
@@ -2129,30 +2121,6 @@ class Text {
 		}
 	}
 
-	logScrollPos(n) {
-		let keys = [];
-		let scrollPos, v;
-		n = n == 'rev' ? false : n == 'bio' ? true : ppt.artistView;
-		switch (n) {
-			case true:
-				scrollPos = $.jsonParse(ppt.bioScrollPos, {});
-				keys = Object.keys(scrollPos);
-				if (keys.length > 70) delete scrollPos[keys[0]];
-				v = this.artist + '-' + this.bio.loaded.ix + '-' + (!this.bio.loaded.txt ? '' : this.bio.readerItem);
-				scrollPos[v] = art_scrollbar.scroll;
-				ppt.bioScrollPos = JSON.stringify(scrollPos);
-				break;
-			case false:
-				scrollPos = $.jsonParse(ppt.revScrollPos, {});
-				keys = Object.keys(scrollPos);
-				if (keys.length > 70) delete scrollPos[keys[0]];
-				v = (panel.style.inclTrackRev != 2 ? this.albumartist + this.album + this.composition + '-' : '') + '-' + this.rev.loaded.ix + '-' + ppt.inclTrackRev + (!this.rev.loaded.txt ? '' : this.rev.readerItem);
-				scrollPos[v] = alb_scrollbar.scroll;
-				ppt.revScrollPos = JSON.stringify(scrollPos);
-				break;
-		}
-	}
-
 	lyricExists() {
 		return this.reader.items.some(v => {
 			if (v.lyrics) {
@@ -2224,11 +2192,9 @@ class Text {
 		if (panel.block()) {
 			this.get = 1;
 			if (!panel.lock) panel.getList(true);
-			this.logScrollPos();
 			this.albumReset();
 			this.artistReset();
 		} else {
-			this.logScrollPos();
 			this.albumReset();
 			this.artistReset();
 			this.na = '';
@@ -2239,7 +2205,6 @@ class Text {
 	}
 
 	on_size() {
-		this.logScrollPos();
 		this.albumFlush();
 		this.artistFlush();
 		this.bio.cur = '';
@@ -2289,7 +2254,6 @@ class Text {
 				img.getImages();
 				break;
 			case 2: // reset zoom
-				if (panel.style.inclTrackRev == 1) this.logScrollPos();
 				ui.getColours();
 				ui.getFont();
 				panel.setStyle();
@@ -2306,7 +2270,6 @@ class Text {
 				break;
 			case 3: // wheel setZoom & resetStyle
 				filmStrip.logScrollPos();
-				this.logScrollPos();
 				panel.setStyle();
 				this.albumFlush();
 				this.artistFlush();

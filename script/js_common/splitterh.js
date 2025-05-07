@@ -7,14 +7,15 @@ var leftratio = 0;
 PLeft.ShowCaption = PRight.ShowCaption = false;
 
 function get_colors() {
-	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
-	let dark_mode = isDarkMode(g_color_background);
+	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_background = g_color_background_default;
+	dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
 		c_line = RGBA(0,0,0,100);
 		g_color_topbar = RGBA(0,0,0,30);
 	}else{
-		c_line = RGBA(0,0,0,60);
-		g_color_topbar = RGBA(0,0,0,12);
+		c_line = RGBA(0,0,0,75);
+		g_color_topbar = RGBA(0,0,0,15);
 	}
 }
 
@@ -87,4 +88,18 @@ function on_colours_changed() {
 function on_font_changed() {
 	get_font();
 	window.Repaint();
+}
+
+function on_notify_data(name, info) {
+	switch (name) {
+	case "color_scheme_updated":
+		if(!info) {
+			g_color_background = g_color_background_default;
+			window.Repaint();
+		}else if(info.length > 3){
+			g_color_background = RGB(info[3], info[4], info[5]);
+			window.Repaint();
+		}
+		break;
+	}
 }

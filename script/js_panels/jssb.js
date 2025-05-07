@@ -496,8 +496,8 @@ oPlaylistManager = function() {
 			var bg_margin_top = 2;
 			var bg_margin_left = 6;
 			var txt_margin = 10;
-			var bg_color = RGB(0, 0, 0);
-			var txt_color = RGB(255, 255, 255);
+			var bg_color = c_black;
+			var txt_color = c_white;
 
 			// scrollbar metrics
 			if (this.rowTotal > this.totalRows) {
@@ -1584,7 +1584,7 @@ oBrowser = function() {
 				gr.FillRoundRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, 5, 5, RGBA(0, 0, 0, 150));
 				gr.DrawRoundRect(brw.tt_x-1, brw.tt_y-1, brw.tt_w+2, brw.tt_h+2, 5, 5, 1.0, RGBA(0, 0, 0, 180));
 				try {
-					gr.GdiDrawText(cList.search_string, cList.incsearch_font, RGB(0, 0, 0), brw.tt_x + 1, brw.tt_y + 1, brw.tt_w, brw.tt_h, ccf_txt);
+					gr.GdiDrawText(cList.search_string, cList.incsearch_font, c_black, brw.tt_x + 1, brw.tt_y + 1, brw.tt_w, brw.tt_h, ccf_txt);
 					gr.GdiDrawText(cList.search_string, cList.incsearch_font, cList.inc_search_noresult ? RGB(255, 70, 70) : RGB(250, 250, 250), brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, ccf_txt);
 				}
 				catch (e) {};
@@ -2682,7 +2682,8 @@ function get_font() {
 };
 
 function get_colors() {
-	g_color_normal_bg = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_btn_color1 = g_color_normal_txt & 0x35ffffff;
@@ -2696,9 +2697,10 @@ function get_colors() {
 	}
 	else {
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0,0,0,15);
 	}
-	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg = g_color_selected_bg_default;
 };
 
 function on_script_unload() {
@@ -3150,12 +3152,19 @@ function on_colours_changed() {
 function on_notify_data(name, info) {
 	switch (name) {
 	case "color_scheme_updated":
-		var c_ol_tmp = g_color_highlight;
-		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
-		else g_color_highlight = c_default_hl;
-		if(g_color_highlight != c_ol_tmp){
-			repaint_main1 = repaint_main2;
+		if(!info) {
+			g_color_highlight = c_default_hl;
+			g_color_normal_bg = g_color_normal_bg_default;
+			g_color_selected_bg = g_color_selected_bg_default;
+		} else {
+			g_color_highlight = RGB(info[0], info[1], info[2]);
+			if(info.length > 3) {
+				g_color_normal_bg = RGB(info[3], info[4], info[5]);
+				g_color_selected_bg = RGB(info[6], info[7], info[8]);
+				g_color_grid_bg = g_color_normal_bg & 0x60ffffff;
+			}
 		}
+		repaint_main1 = repaint_main2;
 		get_images_loading();
 		break;
 	case "show_Now_Playing":

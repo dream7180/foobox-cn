@@ -407,7 +407,6 @@ class Panel {
 		this.clicked = this.changeView(x, y, menu);
 		if (!this.clicked) return;
 		this.id.loadTimestamp = 0;
-		txt.logScrollPos();
 		filmStrip.logScrollPos();
 		ppt.toggle('artistView');
 		img.resetTimestamps();

@@ -723,7 +723,6 @@ class MenuItems {
 		switch (true) {
 			case i < panel.alb.list.length: {
 				if (origArr != JSON.stringify(panel.alb.list) || !i && !panel.alb.ix || panel.alb.ix == i) break;
-				txt.logScrollPos();
 				filmStrip.logScrollPos();
 				panel.alb.ix = i;
 				img.get = false;
@@ -784,8 +783,6 @@ class MenuItems {
 			}
 		}
 		if (i < 2) {
-			txt.logScrollPos();
-			filmStrip.logScrollPos();
 			img.get = false;
 			txt.get = 0;
 			if (ppt.sourcerev == 3) {
@@ -809,7 +806,6 @@ class MenuItems {
 		switch (true) {
 			case i < panel.art.list.length:
 				if (origArr != JSON.stringify(panel.art.list) || !i && !panel.art.ix || panel.art.ix == i) break;
-				txt.logScrollPos();
 				filmStrip.logScrollPos();
 				panel.art.ix = i;
 				img.get = false;
@@ -863,7 +859,6 @@ class MenuItems {
 			}
 		}
 		if (i < 3) {
-			txt.logScrollPos();
 			filmStrip.logScrollPos();
 			if (ppt.sourcebio == 3) {
 				ppt.sourcebio = 1;
@@ -1082,7 +1077,6 @@ class MenuItems {
 				txt.bio.scrollPos = {}; txt.rev.scrollPos = {};
 				ppt.heading = !ppt.heading ? 1 : 0;
 				panel.style.fullWidthHeading = ppt.heading && ppt.fullWidthHeading;
-				if (panel.style.inclTrackRev == 1) txt.logScrollPos();
 				txt.refresh(1);
 				break;
 			case 5:
@@ -1241,7 +1235,6 @@ class MenuItems {
 	}
 
 	setReviewType(i) {
-		txt.logScrollPos();
 		panel.style.inclTrackRev = ppt.inclTrackRev = [0, 2, 1][i];
 		if (ppt.inclTrackRev) server.checkTrack({
 			focus: panel.id.focus,
@@ -1297,7 +1290,6 @@ class MenuItems {
 			case 2: txt.bio.scrollPos = {}; txt.rev.scrollPos = {}; ppt.toggle('sourceAll'); txt.refresh(1); break;
 			case 3:
 				ppt.toggle('showTrackRevOptions');
-				txt.logScrollPos();
 				panel.style.inclTrackRev = ppt.inclTrackRev = 0;
 				if (ppt.showTrackRevOptions) server.checkTrack({
 					focus: panel.id.focus,
@@ -1327,7 +1319,6 @@ class MenuItems {
 	}
 
 	toggle(i, b, fix, direction) {
-		txt.logScrollPos();
 		const n = b.toLowerCase();
 		if (i === ppt[`source${n}`]) return;
 		if (i == 4) {
@@ -1375,7 +1366,6 @@ class MenuItems {
 				i += step;
 				if (i < 0) i = panel.art.uniq.length - 1;
 				else if (i >= panel.art.uniq.length) i = 0;
-				txt.logScrollPos();
 				filmStrip.logScrollPos();
 				if (ppt.sourcebio == 3) {
 					ppt.sourcebio = 1;
@@ -1391,7 +1381,6 @@ class MenuItems {
 				i += step;
 				if (i < 0) i = panel.alb.uniq.length - 1;
 				else if (i >= panel.alb.uniq.length) i = 0;
-				txt.logScrollPos();
 				filmStrip.logScrollPos();
 				if (ppt.sourcerev == 3) {
 					ppt.sourcerev = 0;

@@ -2,14 +2,11 @@
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
-include(fb.ProfilePath + 'foobox\\version6\\uihacks.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\uihacks.js');
 
 var time_length = 0;
 var zdpi, dark_mode;
-var c_tip_bg = RGBA(0, 0, 0, 200), c_seeker_core = RGB(0, 0, 0), c_seek_bg = RGBA(255, 255, 255, 35);
-var c_font = RGB(255,255,255);
-var c_shadow = RGBA(255, 255, 255, 50); c_shadow_h = RGBA(255, 255, 255, 30);
-var c_background, c_btmbg, c_seekoverlay, c_default_hl, c_pb_ov, c_pb_down;
+var c_background, c_btmbg, c_font, c_seekoverlay, c_default_hl, c_pb_ov, c_pb_down, c_shadow, c_shadow_h, c_tip_bg, c_seeker_core, c_seek_bg;
 var img_play, img_pause, img_next, img_previous, img_vol, img_pbo = [], img_list, img_cover, img_lib, img_bio, img_vis, img_video;
 
 //play back order
@@ -21,7 +18,7 @@ var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, re
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn;
-var img_ico = gdi.Image(fb.ProfilePath + "foobox\\version6\\foobar2000.png");
+var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
@@ -267,23 +264,39 @@ function get_font() {
 function get_color() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	dark_mode = isDarkMode(c_background_default);
+	c_font= window.GetColourDUI(ColorTypeDUI.text);
+	var light_mode = isDarkMode(c_font);
+	if(!dark_mode && !light_mode){
+		c_background = RGB(32, 32, 32);
+	}
 	if(!dark_mode) {
-		c_background = blendColors(RGB(0, 0, 0), c_background_default, 0.85);
-		c_btmbg = blendColors(RGB(0, 0, 0), c_background_default, 0.125);
+		c_background = blendColors(c_black, c_background_default, 0.85);
+		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
 	} else {
-		c_background = blendColors(RGB(0, 0, 0), c_background_default, 0.8);
+		c_background = blendColors(c_black, c_background_default, 0.8);
 		c_btmbg = c_background;
 	}
 	c_background_default = c_background;
 	c_btmbg_default = c_btmbg;
 	c_toptxt = window.GetColourDUI(ColorTypeDUI.text);
 	c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
+	c_toptxt2_default = c_toptxt2;
 	c_topbtnhover = c_toptxt & 0x18ffffff;
 	c_topbtndown= c_toptxt & 0x30ffffff;
 	c_normal = blendColors(c_btmbg, c_font, 0.8);
+	c_normal_default = c_normal;
+	c_shadow_h =  c_normal & 0x25ffffff;
+	c_shadow = c_normal & 0x45ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	c_seek_bg =  c_normal & 0x35ffffff;
 	c_seekoverlay = c_default_hl;
-	window.NotifyOthers("bgcolour_to_change", dark_mode + 1);
+	if (light_mode){
+		c_tip_bg = RGBA(255, 255, 255, 200);
+		c_seeker_core = c_white;
+	} else {
+		c_tip_bg = RGBA(0, 0, 0, 200);
+		c_seeker_core = c_black;
+	}
 }
 
 PBO_Menu = function(x, y) {
@@ -365,7 +378,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, true);
 	
 	let c_pb_ov = blendColors(c_font, c_seekoverlay, 0.85);
-	let c_pb_down = blendColors(RGB(0,0,0), c_seekoverlay, 0.85);
+	let c_pb_down = blendColors(c_black, c_seekoverlay, 0.85);
 	imgh = z(34);
 	let imgh2 = imgh * 2;
 	let point_arr = new Array(_x12, 9*zdpi, _x12, 23*zdpi,22*zdpi, 16*zdpi);
@@ -394,15 +407,15 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	let im_playico = gdi.CreateImage(imgh, imgh);
 	gb = im_playico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(c_font, 0, point_arr);
+	gb.FillPolygon(c_white, 0, point_arr);
 	gb.SetSmoothingMode(0);
 	im_playico.ReleaseGraphics(gb);
 		
 	let im_pauseico = gdi.CreateImage(imgh, imgh);
 	gb = im_pauseico.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x12, 10*zdpi, _x12, Math.floor(22*zdpi)+1, Math.floor(3*zdpi), c_font);
-	gb.DrawLine(22*zdpi-2, 10*zdpi, 22*zdpi-2, Math.floor(22*zdpi)+1,  Math.floor(3*zdpi), c_font);
+	gb.DrawLine(_x12, 10*zdpi, _x12, Math.floor(22*zdpi)+1, Math.floor(3*zdpi), c_white);
+	gb.DrawLine(22*zdpi-2, 10*zdpi, 22*zdpi-2, Math.floor(22*zdpi)+1,  Math.floor(3*zdpi), c_white);
 	im_pauseico.ReleaseGraphics(gb);
 		
 	img_play = gdi.CreateImage(imgh, imgh * 3);
@@ -852,13 +865,13 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(0, imgh, topbtnw, imgh, RGB(232, 17, 35));
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9 + imgh, 27*zdpi, _x18 + imgh, 1, c_font);
-	gb.DrawLine(_x18, _x18 + imgh, 27*zdpi, _x9 + imgh, 1,  c_font);
+	gb.DrawLine(_x18, _x9 + imgh, 27*zdpi, _x18 + imgh, 1, c_white);
+	gb.DrawLine(_x18, _x18 + imgh, 27*zdpi, _x9 + imgh, 1,  c_white);
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(0, imgh2, topbtnw, imgh, RGB(241, 112, 122));
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9 + imgh2, 27*zdpi, _x18 + imgh2, 1,  c_font);
-	gb.DrawLine(_x18, _x18 + imgh2, 27*zdpi, _x9 + imgh2, 1,  c_font);
+	gb.DrawLine(_x18, _x9 + imgh2, 27*zdpi, _x18 + imgh2, 1,  c_white);
+	gb.DrawLine(_x18, _x18 + imgh2, 27*zdpi, _x9 + imgh2, 1,  c_white);
 	gb.SetSmoothingMode(0);
 	img_close.ReleaseGraphics(gb);
 	
@@ -972,7 +985,7 @@ function on_mouse_move(x, y) {
 		fb.Volume = pos2vol(VolumeBar.Value);
 		VolumeTip.Text = (fb.Volume | 0).toString() + " dB  ";
 		VolumeTip.Repaint();
-	}
+	} else if(VolumeTip.Visible) VolumeTip.Deactivate();
 	if(y < topbarh + 1) {
 		if (CloseBtn.MouseMove(x, y)) hbtn = true;
 		if (MaxBtn.MouseMove(x, y)) hbtn = true;
@@ -1049,9 +1062,7 @@ function on_mouse_lbtn_up(x, y) {
 		TimeTip.Repaint();
 		TimeTip.Deactivate();
 	}
-	if (VolumeBar.MouseUp()) {
-		VolumeTip.Deactivate();
-	}
+	VolumeBar.MouseUp();
 	if(y < topbarh + 1) {
 		if (CloseBtn.MouseUp()) fb.Exit();
 		if (MaxBtn.MouseUp()) {
@@ -1083,6 +1094,7 @@ function on_mouse_lbtn_up(x, y) {
 function on_mouse_leave() {
 	seekbar.MouseLeave();
 	VolumeBar.MouseLeave();
+	if(VolumeTip.Visible) VolumeTip.Deactivate();
 	g_switchbar.on_mouse("leave");
 	RTips_switch("");
 	if (!hbtn) return;
@@ -1110,7 +1122,9 @@ function on_mouse_wheel(step) {
 		fb.PlaybackTime = seekbar.Value;
 	}
 	if (VolumeBar.MouseWheel(step, 2)) {
-		fb.Volume = pos2vol(VolumeBar.Value)
+		fb.Volume = pos2vol(VolumeBar.Value);
+		VolumeTip.Text = (fb.Volume | 0).toString() + " dB  ";
+		VolumeTip.Activate();
 	}
 }
 
@@ -1192,35 +1206,29 @@ function on_mouse_rbtn_up() {
 
 function on_notify_data(name, info) {
 	switch (name) {
-	case "color_scheme_updated":
-		var c_ol_tmp = c_seekoverlay;
-		var add_c = !dark_mode*0.12;
+	case "color_scheme_updatebase":
+		let btm_only = false
 		if(!info) {
 			c_seekoverlay = c_default_hl;
 			c_btmbg = c_btmbg_default;
 			c_background = c_background_default;
-		}
-		else if(info.length == 3){
-			c_btmbg = blendColors(c_btmbg_default, RGB(info[0], info[1], info[2]), 0.12);
+			c_toptxt2 = c_toptxt2_default;
+			c_normal = c_normal_default;
+		}else{
+			//if(dark_mode){
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
-			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12+add_c);
-		} else if(dark_mode){
-			c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.12+add_c);
-			c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.12);
-			c_seekoverlay = RGB(info[0], info[1], info[2]);
-		} else{
-			c_btmbg = blendColors(c_btmbg_default, RGB(info[0], info[1], info[2]), 0.12);
-			c_seekoverlay = RGB(info[3], info[4], info[5]);
-			c_background = blendColors(c_background_default, RGB(info[0], info[1], info[2]), 0.12+add_c);
+			if(info.length > 3){
+				c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.18);
+				c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.18);
+				c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
+				c_normal = blendColors(c_btmbg, c_font, 0.8);
+			} else btm_only = true;
 		}
-		if(c_seekoverlay != c_ol_tmp){
-			c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
-			c_normal = blendColors(c_btmbg, c_font, 0.8);
-			init_overlay_obj(c_seek_bg, c_seekoverlay);
-			PBPlay.img = (fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play;
-			setSize();
-			repaintWin("G");
-		}
+		init_overlay_obj(c_seek_bg, c_seekoverlay);
+		PBPlay.img = (fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play;
+		setSize();
+		if(btm_only) repaintWin("B");
+		else repaintWin("G");
 		break;
 	case "Show_open_stop_buttons":
 		show_extrabtn = info;

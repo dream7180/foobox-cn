@@ -3,11 +3,12 @@ window.DefinePanel('simple js playlist viewer', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\uihacks.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;
 var g_font, g_font_b, g_font_track;
-var g_color_line, g_color_line_div, g_color_playing_txt = RGB(255, 255, 255);
+var g_color_line, g_color_line_div, g_color_playing_txt = c_white;
 
 var brw = null;
 var isScrolling = false;
@@ -594,11 +595,13 @@ function on_mouse_lbtn_down(x, y) {
 	else {
 		brw.on_mouse("down", x, y);
 	};
+	if(brw.scrollbar.cursorDrag && uiHacks) UIHacks.DisableSizing = true;
 	btn_sw.checkstate("down", x, y);
 };
 
 function on_mouse_lbtn_up(x, y) {
 	brw.on_mouse("up", x, y);
+	if(uiHacks && UIHacks.MainWindowState != 2 && UIHacks.DisableSizing) UIHacks.DisableSizing = false;
 	if (timers.mouseDown) {
 		window.ClearTimeout(timers.mouseDown);
 		timers.mouseDown = false;
@@ -733,7 +736,7 @@ function get_images() {
 	gb = playing_ico.GetGraphics();
 	gb.SetSmoothingMode(2);
 	var ponit_arr = new Array(3 * zdpi, 2 * zdpi, 3 * zdpi, 12 * zdpi, 13 * zdpi, 7 * zdpi);
-	gb.FillPolygon(RGB(255, 255, 255), 0, ponit_arr);
+	gb.FillPolygon(c_white, 0, ponit_arr);
 	gb.SetSmoothingMode(0);
 	playing_ico.ReleaseGraphics(gb);
 };
@@ -751,10 +754,12 @@ function get_font() {
 function get_colors() {
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
 	g_color_selected_txt = g_color_normal_txt;
-	g_color_normal_bg = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	g_color_selected_bg = g_color_selected_bg_default;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	g_color_tracknum = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
@@ -766,7 +771,7 @@ function get_colors() {
 	}
 	else {
 		dark_mode = 0;
-		g_color_topbar = RGBA(0,0,0,12);
+		g_color_topbar = RGBA(0,0,0,15);
 		g_color_line = RGBA(0, 0, 0, 18);
 		g_color_line_div = RGBA(0, 0, 0, 45);
 	}
@@ -963,12 +968,18 @@ function on_colours_changed() {
 function on_notify_data(name, info) {
 	switch (name) {
 	case "color_scheme_updated":
-		var c_ol_tmp = g_color_highlight;
-		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
-		else g_color_highlight = c_default_hl;
-		if(g_color_highlight != c_ol_tmp){
-			brw.repaint();
+		if(!info) {
+			g_color_highlight = c_default_hl;
+			g_color_normal_bg = g_color_normal_bg_default;
+			g_color_selected_bg = g_color_selected_bg_default;
+		} else {
+			g_color_highlight = RGB(info[0], info[1], info[2]);
+			if(info.length > 3) {
+				g_color_normal_bg = RGB(info[3], info[4], info[5]);
+				g_color_selected_bg = RGB(info[6], info[7], info[8]);
+			}
 		}
+		brw.repaint();
 		break;
 	case "lib_cover_type":
 		ppt.title_type = info;

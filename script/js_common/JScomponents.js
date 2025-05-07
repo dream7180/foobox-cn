@@ -158,7 +158,7 @@ oScrollbar = function() {
 	this.setButtons = function() {
 		this.upImage_normal = gdi.CreateImage(70, 70);
 		var gb = this.upImage_normal.GetGraphics();
-		DrawPolyStar(gb, 11, 16, 44, 1, 3, 0, RGB(0, 0, 0), blendColors(this.color_txt, this.color_bg, 0.5), 0, 200);
+		DrawPolyStar(gb, 11, 16, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.5), 0, 200);
 		this.upImage_normal.ReleaseGraphics(gb);
 
 		this.upImage_hover = gdi.CreateImage(70, 70);
@@ -167,12 +167,12 @@ oScrollbar = function() {
 		this.upImage_hover.ReleaseGraphics(gb);
 		this.upImage_down = gdi.CreateImage(70, 70);
 		gb = this.upImage_down.GetGraphics();
-		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, RGB(0, 0, 0), blendColors(this.color_txt, this.color_bg, 0.05), 0, 160);
+		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.05), 0, 160);
 		this.upImage_down.ReleaseGraphics(gb);
 
 		this.downImage_normal = gdi.CreateImage(70, 70);
 		gb = this.downImage_normal.GetGraphics();
-		DrawPolyStar(gb, 11, 10, 44, 1, 3, 0, RGB(0, 0, 0), blendColors(this.color_txt, this.color_bg, 0.5), 180, 200);
+		DrawPolyStar(gb, 11, 10, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.5), 180, 200);
 		this.downImage_normal.ReleaseGraphics(gb);
 
 		this.downImage_hover = gdi.CreateImage(70, 70);
@@ -182,7 +182,7 @@ oScrollbar = function() {
 
 		this.downImage_down = gdi.CreateImage(70, 70);
 		gb = this.downImage_down.GetGraphics();
-		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, RGB(0, 0, 0), blendColors(this.color_txt, this.color_bg, 0.05), 180, 160);
+		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.05), 180, 160);
 
 		this.downImage_down.ReleaseGraphics(gb);
 

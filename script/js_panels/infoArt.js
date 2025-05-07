@@ -21,6 +21,7 @@ var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
@@ -31,7 +32,6 @@ try{
 	console.log("ESLyric 接口创建失败，请把工具->ESLyric->高级选项: pref.script.expose 设置为 1");
 }
 var sw_eslcolor = window.GetProperty("ESLyric.hightlight.follow.cover", true);
-var setEslHL = eslPanels && sw_eslcolor;
 function GetCaption(name) {
 	var str = Caption_Pack[name];
 	if (!str) str = name;
@@ -135,13 +135,16 @@ function get_var() {
 var ww = 0, wh = 0;
 
 function get_colors() {
-	c_background = window.GetColourDUI(ColorTypeDUI.background);
+	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	c_background = c_background_default;
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	fontcolor = window.GetColourDUI(ColorTypeDUI.text);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_highlight = c_default_hl;
 	c_rating_h = c_highlight;
 	icocolor = fontcolor & 0x2dffffff;
 	fontcolor2 = blendColors(c_background, fontcolor, 0.75);
+	fontcolor2_default = fontcolor2;
 	dark_mode = isDarkMode(c_background);
 }
 function get_font() {
@@ -232,6 +235,19 @@ function initMetadb(){
 		MainController.Refresh(true, currentMetadb);
 		tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
 	}
+}
+
+//---------------------------------------
+function reset_esl_color(reset_hl) {
+	if(!eslPanels) return;
+	if(reset_hl) eslPanels.SetTextHighlightColor(c_default_hl);
+	eslPanels.SetBackgroundColor(c_background_default);
+}
+
+function set_esl_color() {
+	if(!eslPanels) return;
+	if(sw_eslcolor) eslPanels.SetTextHighlightColor(c_highlight);
+	if(cbkg_bycover) eslPanels.SetBackgroundColor(c_background);
 }
 
 // Some functions =======================================
@@ -1337,7 +1353,7 @@ function Display(x, y, w, h, prop) {
 					imgCache.img = gdi.CreateImage(this.w, this.h);
 					var g2 = imgCache.img.GetGraphics();
 					g2.SetTextRenderingHint(4);
-					g2.DrawString(this.caption, g_font, RGB(255, 255, 255), 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
+					g2.DrawString(this.caption, g_font, c_white, 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
 					g2.SetTextRenderingHint(0);
 					//}
 					imgCache.img.ReleaseGraphics(g2);
@@ -1931,8 +1947,6 @@ function Controller(imgArray, imgDisplay, prop) {
 			imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
 			if(get_imgCol) {
 				getColorSchemeFromImage();
-				window.NotifyOthers("color_scheme_updated", null);
-				if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			}
 		}
 		SetMenuButtonCaption();
@@ -1946,64 +1960,83 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 	
 	getColorSchemeFromImage = function() {
-		let imgColor = null;
-		if(!currentImage || currentImage == null){
-			window.NotifyOthers("color_scheme_updated", false);
-			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
-			get_imgCol = false;
-		}else{
-			let c_dev, c_aggr, cv_max;
-			let calibrate = true;
-			let dark_nocali;
+		let c_blend = null;
+		if(currentImage){
+			let c_dev = -1, cv_max;
 			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(color_threshold));
 			for(let i = 0; i < color_threshold; i++){
-				imgColor = toRGB(ColorData[i].col);
-				c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
-				cv_max = Math.max(...imgColor);
-				c_dev = cv_max - Math.min(...imgColor);
-				dark_nocali = dark_mode && (cv_max >= 90);
-				if(c_dev >= 16 && c_aggr <= 450 && dark_nocali){
-					calibrate = false;
-					break;
+				let c_img = toRGB(ColorData[i].col);
+				let cv_max_tmp = Math.max(...c_img);
+				let c_dev_tmp = cv_max_tmp - Math.min(...c_img);
+				if(c_dev_tmp > c_dev){
+					c_dev = c_dev_tmp;
+					c_blend = c_img;
+					cv_max = cv_max_tmp;
 				}
 			}
-			if(calibrate) {
-				if(c_dev < 16) imgColor = false;
-				else if(c_aggr > 450){
-					let reduction = Math.round((c_aggr - 450) / 3);
-					imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-					imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-					imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-				}else if(dark_mode && cv_max < 90){
-					let reduction = Math.round((270-c_aggr) / 3);
-					imgColor[0] = imgColor[0]+reduction;
-					imgColor[1] = imgColor[1]+reduction;
-					imgColor[2] = imgColor[2]+reduction;
-				}
+			if(cbkg_bycover){
+				c_blend[3] = c_blend[0];
+				c_blend[4] = c_blend[1];
+				c_blend[5] = c_blend[2];
 			}
-			window.NotifyOthers("color_scheme_updated", imgColor);
-			get_imgCol = false;
+			let c_aggr = c_blend[0] + c_blend[1] + c_blend[2];
+			if(c_dev < 16) {
+				c_blend = false;
+			} else if(c_aggr > 450){
+				let reduction = Math.round((c_aggr - 450) / 3);
+				c_blend[0] = Math.max(c_blend[0]-reduction, 0);
+				c_blend[1] = Math.max(c_blend[1]-reduction, 0);
+				c_blend[2] = Math.max(c_blend[2]-reduction, 0);
+			}else if(cv_max < 90){
+				let reduction = Math.round((270-c_aggr) / 3);
+				c_blend[0] = c_blend[0]+reduction;
+				c_blend[1] = c_blend[1]+reduction;
+				c_blend[2] = c_blend[2]+reduction;
+			}
 		}
-		on_colorscheme_update(imgColor);
+		get_imgCol = false;
+		on_colorscheme_update(c_blend);
 	}
 	
-	on_colorscheme_update = function(imgColor){
+	on_colorscheme_update = function(c_blend){
+		var c_arr = null;
 		var c_hl_tmp = c_highlight;
-		if(imgColor) c_highlight = RGB(imgColor[0], imgColor[1], imgColor[2]);
-		else c_highlight = c_default_hl;
+		if(c_blend) {
+			c_highlight = RGB(c_blend[0], c_blend[1], c_blend[2]);
+			c_arr = [c_blend[0], c_blend[1], c_blend[2]];
+		}else{
+			c_highlight = c_default_hl;
+			c_background = c_background_default;
+			fontcolor2 = fontcolor2_default;
+		}
 		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
-			if(imgColor && dark_mode){
-				var r = getRed(c_background) + 27;
-				var g = getGreen(c_background) + 27;
-				var b = getBlue(c_background) + 27;
-				if(Math.abs(imgColor[0]-r)<25 && Math.abs(imgColor[1]-g)<25 && Math.abs(imgColor[2]-b)<25) c_rating_h = fontcolor;
+			window.NotifyOthers("color_scheme_updatebase", c_blend);
+			if(cbkg_bycover && c_blend){
+				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.24);
+				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.2);
+				var c_bkg = toRGB(c_background).concat(toRGB(c_selected_bg));
+				c_arr = c_arr.concat(c_bkg);
+				fontcolor2 = blendColors(c_background, fontcolor, 0.75);
 			}
+			window.NotifyOthers("color_scheme_updated", c_arr);
 			get_imgs();
 			if (is_mood && show_infobar) btn_mood.resetImg();
-			if(setEslHL) eslPanels.SetTextHighlightColor(c_highlight);
-			window.RepaintRect(0, infobar_y, ww, infobar_h);
+			set_esl_color();
+			
+			if(cbkg_bycover) window.Repaint();
+			else window.RepaintRect(0, infobar_y, ww, infobar_h);
 		}
+	}
+	
+	reset_background = function(){
+		c_background = c_background_default;
+		reset_esl_color(false);
+		let carr_hl = toRGB(c_highlight);
+		let c_infobase = carr_hl.concat(toRGB(c_background_default));
+		window.NotifyOthers("color_scheme_updatebase", c_infobase);
+		window.NotifyOthers("color_scheme_updated", c_infobase.concat(toRGB(g_color_selected_bg_default)));
+		 window.Repaint();
 	}
 	
 	//------------------------------------------
@@ -2200,6 +2233,7 @@ var MainController = new Controller(Covers, CoverDisplay, Properties.Controller)
 // START ==============================================
 initMetadb();
 if(show_infobar && info_cycle) activate_infotimer();
+reset_esl_color(sw_eslcolor);
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
@@ -2400,6 +2434,7 @@ function on_colours_changed() {
 	if(show_infobar){
 		get_imgs();
 	}
+	reset_esl_color(true);
 	window.Repaint();
 };
 
@@ -2417,26 +2452,28 @@ function on_notify_data(name, info) {
 		color_bycover = info;
 		window.SetProperty("foobox.color.by.cover", color_bycover);
 		if(color_bycover){
-			if (!MainController.Properties.FollowCursor) {
+			if(!MainController.Properties.FollowCursor) {
 				get_imgCol = true;
 				getColorSchemeFromImage();
 			}
 		} else{
 			get_imgCol = false;
-			window.NotifyOthers("color_scheme_updated", null);
-			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			on_colorscheme_update(false);
 		}
 		break;
 	case "foobox_color_noesl":
 		sw_eslcolor = !info;
 		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
-		setEslHL = eslPanels && sw_eslcolor;
 		if(eslPanels) eslPanels.SetTextHighlightColor(sw_eslcolor ? c_highlight : c_default_hl);
 		break;
 	case "set_corlor_threshold":
 		color_threshold = info;
 		window.SetProperty("foobox.color.threshold", color_threshold);
+		break;
+	case "foobox_bgcolor_bycover":
+		cbkg_bycover = info;
+		window.SetProperty("foobox.background.color.by.cover", cbkg_bycover);
+		if(!cbkg_bycover) reset_background();
 		break;
 	}
 }

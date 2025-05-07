@@ -7,7 +7,8 @@ var upperratio = 0;
 PUpper.ShowCaption = PLower.ShowCaption = false;
 
 function get_colors() {
-	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_background = g_color_background_default;
 }
 
 //////////////
@@ -64,4 +65,18 @@ function on_mouse_rbtn_up() {
 function on_colours_changed() {
 	get_colors();
 	window.Repaint();
+}
+
+function on_notify_data(name, info) {
+	switch (name) {
+	case "color_scheme_updated":
+		if(!info) {
+			g_color_background = g_color_background_default;
+			window.Repaint();
+		}else if(info.length > 3){
+			g_color_background = RGB(info[3], info[4], info[5]);
+			window.Repaint();
+		}
+		break;
+	}
 }

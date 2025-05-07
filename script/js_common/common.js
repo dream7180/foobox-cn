@@ -5,6 +5,8 @@ function RGBA(r, g, b, a) {
 function RGB(r, g, b) {
 	return (0xff000000 | (r << 16) | (g << 8) | (b))
 }
+var c_black = RGB(0, 0, 0);
+var c_white = RGB(255, 255, 255);
 // Textformat
 var DT_LEFT = 0x00000000;
 var DT_CENTER = 0x00000001;
@@ -131,13 +133,6 @@ function getGreen(color) {
 
 function getBlue(color) {
 	return (color & 0xff);
-};
-
-function negative(colour) {
-	var R = getRed(colour);
-	var G = getGreen(colour);	
-	var B = getBlue(colour);
-	return RGB(Math.abs(R-255), Math.abs(G-255), Math.abs(B-255));
 };
 
 function toRGB(d){ // convert back to RGB values

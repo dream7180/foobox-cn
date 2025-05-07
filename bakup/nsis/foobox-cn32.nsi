@@ -18,7 +18,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "7.43"
+!define FBOX_VER "8.0"
 !define BUILD_NUM "1"
 
 # Setup
@@ -47,17 +47,17 @@ DirText "安装程序会自动检测 foobar2000 的安装路径，如果检测�
 BrandingText "NSIS v3"
 
 # --- MUI Settings Start ---
-ReserveFile ".\common\installer\install7.ico"
-ReserveFile ".\common\installer\foobox7.bmp"
+ReserveFile ".\common\installer\install8.ico"
+ReserveFile ".\common\installer\foobox8.bmp"
 
 # MUI
 !define MUI_UI_COMPONENTSPAGE_SMALLDESC "${NSISDIR}\Contrib\UIs\modern_smalldesc.exe"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 # Icon
-!define MUI_ICON ".\common\installer\install7.ico"
+!define MUI_ICON ".\common\installer\install8.ico"
 # Bitmap
-!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox7.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox8.bmp"
 
 # - InstallPage -
 !define MUI_ABORTWARNING
@@ -92,6 +92,9 @@ Page Custom OptionsPageCreate OptionsPageLeave
 # --- Install Section ---
 Section "foobox 主题和所需组件" fooboxCore
     SectionIn RO
+	
+	Delete "$INSTDIR\themes\foobox*.fth"
+	RmDir /r "$ProfileDir\foobox\version6"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\cn\xcommon\themes\*.*"
@@ -155,13 +158,6 @@ Section "foobox 主题和所需组件" fooboxCore
 			System::Call "gdi32::RemoveFontResource(t '$FontDir\fontawesome-webfont.ttf')"
 		${EndIf} 
 	${EndIf}
-SectionEnd
-
-Section "foobox 6 重制版界面 (含 uihacks)" foobox6
-	SetOutPath "$INSTDIR\themes"
-	File ".\cn\x86_v6\themes\*.*"
-	SetOutPath "$ProfileDir"
-	File /r ".\cn\x86_v6\profile\*.*"
 SectionEnd
 
 Section "文件格式图标" Icons
@@ -241,11 +237,12 @@ Pop $CfgCheckbox
 ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
-${NSD_CreateLabel} 20u 75u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选! 7.29 版以下升级勿勾选!"
+${NSD_CreateLabel} 20u 75u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选! 8.0 强制安装!"
 ${If} $winLegacy = 0
 	${NSD_CreateCheckbox} 10u 100u 90% 10u "安装旧版的 ESLyric (0.5.4.1028) 而不是新版"
 	Pop $ESLCheckbox
 ${EndIf}
+EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 
@@ -355,7 +352,6 @@ FunctionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${fooboxCore} "foobox DUI 主题的文件和所需组件."
-	!insertmacro MUI_DESCRIPTION_TEXT ${foobox6} "基于 foobox 7 的 foobox 6 风格重制版，以及所需的 uihacks 组件."
 	!insertmacro MUI_DESCRIPTION_TEXT ${Icons} "替换文件格式关联图标为 foobox 主题的图标."
 	!insertmacro MUI_DESCRIPTION_TEXT ${LastfmHosts} "把 Last.fm 地址写入 hosts, 让简介面板能下载图片 (可用性不确定)."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

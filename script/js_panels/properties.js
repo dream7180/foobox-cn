@@ -137,6 +137,15 @@ function on_notify_data(name, info) {
 		panel.selection.value = info * 1;
 		panel.item_focus_change();
 		break;
+	case "color_scheme_updated":
+		if(!info) {
+			panel.colours.background = panel.colours.background_default;
+			window.Repaint();
+		}else if(info.length > 3){
+			panel.colours.background = RGB(info[3], info[4], info[5]);
+			window.Repaint();
+		}
+		break;
 	}
 }
 
@@ -268,11 +277,17 @@ function _panel() {
 	}
 	
 	this.colours_changed = () => {
-		this.colours.background = window.GetColourDUI(1);
+		this.colours.background_default = window.GetColourDUI(ColorTypeDUI.background);
+		this.colours.background = this.colours.background_default;
+		this.dark_mode = isDarkMode(this.colours.background);
 		this.colours.text = window.GetColourDUI(0);
-		let dark_mode = isDarkMode(this.colours.background);
-		this.colours.line = blendColors(this.colours.background, RGB(0,0,0), dark_mode ? 0.45 : 0.25);
-		this.colours.tagtext = blendColors(this.colours.background, this.colours.text, 0.65);
+		if(this.dark_mode){
+			this.colours.line = RGBA(0, 0, 0, 120);
+			this.colours.tagtext = blendColors(c_black, this.colours.text, 0.65);
+		}else{
+			this.colours.line = RGBA(0, 0, 0, 75);
+			this.colours.tagtext = blendColors(c_white, this.colours.text, 0.65);
+		}
 	}
 	
 	this.font_changed = () => {

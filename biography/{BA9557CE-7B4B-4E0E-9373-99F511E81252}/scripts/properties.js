@@ -152,8 +152,6 @@ let properties = [
 
 	['Double-Click Toggle', true, 'dblClickToggle'],
 	['Expand Lists', true, 'expandLists'],
-	['Fallback Text Biography: Heading|No Heading', '未找到任何内容|没有要显示的简介', 'bioFallbackText'],
-	['Fallback Text Review: Heading|No Heading', '未找到任何内容|没有要显示的评论', 'revFallbackText'],
 
 	['Filmstrip Autofit', true, 'filmStripAutofit'],
 	['Filmstrip Cover Regular-0 Auto-Fill-1 Circular-2', 1, 'filmCoverStyle'],
@@ -304,8 +302,6 @@ let properties = [
 	['Reflection Size (%)', 100, 'reflSize'],
 	['Reflection Strength (%)', 14.5, 'reflStrength'],
 
-	['Scroll Position Bio', JSON.stringify({}), 'bioScrollPos'],
-	['Scroll Position Rev', JSON.stringify({}), 'revScrollPos'],
 	['Scroll Step 0-10 (0 = Page)', 3, 'scrollStep'],
 	['Scroll Smooth Duration 0-5000 msec (Max)', 500, 'durationScroll'],
 	['Scroll Touch Flick Duration 0-5000 msec (Max)', 3000, 'durationTouchFlick'],

@@ -234,8 +234,6 @@
 				<div id="layout"></div>
 				<div class="div_text6">查找按钮</div>
 				<div id="look_up"></div>
-				<div class="div_text1" style="padding:1.25em 0 0.15em;">后备文本：标题|无标题</div>
-				<div id="fall_back"></div>	
 				<div class="div_text12">滚动</div>
 				<span class="info3">滚动条：</span>
 				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarShow_dropdown" class="dropbtn" href="#" onclick="toggle('sbarShow');"></a>
@@ -1133,7 +1131,6 @@ info is an object:
 				var cusTextLabels = ['文本、歌词和项目属性：支持标签或完整路径。每个视图显示检索到的第一个结果。', '预览', '同步最新下载', '滚动同步歌词', '滚动非同步歌词'];
 				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
 				var dropShadowLevelLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-				var fallbackLabels = ['简介', '评论'];
 				var filmStripLabels = ['齐平', '对齐图像', '应用图像边距','对齐文本', '应用文本边距', ]
 				var filterLabels = ['KB 最大尺寸', 'KB 最小尺寸', 'PX 最小分辨率', '最少数量（最高优先级）'];
 				var flaglabels = ['艺术家视图', '专辑视图'];
@@ -1183,8 +1180,8 @@ info is an object:
 
 				var input = {
 					behaviour: {
-						name: ['cycTimeItem', 'bioFallbackText', 'revFallbackText', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
-						type: ['float', 'text', 'text', 'float', 'float', 'float']
+						name: ['cycTimeItem', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
+						type: ['float', 'float', 'float', 'float']
 					},
 					display: {
 						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'amRatingName', 'lfmRatingName'],
@@ -1534,7 +1531,6 @@ info is an object:
 					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
 					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
 					for (i = 0; i < 4; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
-					for (i = 0; i < 2; i++) {window.fall_back.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="fallback_container'+i+'" name="behaviour_input" class="input54" /><label for="fallback_container'+i+'" class="inp_label2">'+fallbackLabels[i]+'</label></div>');}
 
 					window.overlay_dropdown.innerHTML = overlayLabels[ppt['typeOverlay_internal'].value];
 					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}

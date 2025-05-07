@@ -524,8 +524,6 @@ class UserInterface {
 	}
 
 	refreshProp() {
-		if (panel.style.inclTrackRev == 1) txt.logScrollPos();
-
 		this.heading.pad = ppt.hdPad;
 		this.heading.linePad = ppt.hdLinePad;
 		panel.style.fullWidthHeading = ppt.heading && ppt.fullWidthHeading;
@@ -646,8 +644,8 @@ class UserInterface {
 			ix: -1
 		}
 
-		txt.bio.fallback = ppt.bioFallbackText.split('|');
-		txt.rev.fallback = ppt.revFallbackText.split('|');
+		txt.bio.fallback = ['未找到任何内容', '没有要显示的简介'];
+		txt.rev.fallback = ['未找到任何内容', '没有要显示的评论'];
 		txt.loadReader();
 		txt.getText(true);
 		but.refresh(true);
@@ -814,7 +812,6 @@ class Vkeys {
 	}
 }
 
-let switchbgcolour = 0;
 let colourSelector = {}
 let sync = {image: () => {}}
 const syncer = fb.ProfilePath + 'settings\\themed\\bioSyncTheme.js';

@@ -397,7 +397,6 @@ class Scrollbar {
 		if (!this.draw_timer) return;
 		this.delta = this.scroll;
 		this.scrollTo();
-		txt.logScrollPos();
 		filmStrip.logScrollPos();
 		clearTimeout(this.draw_timer);
 		this.draw_timer = null;

@@ -7,21 +7,23 @@ let ww = 0, wh = 0;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
 var upperratio = 0;
-var linecolor, divcolor;
+var divcolor;
 var draw_splitter = window.GetProperty("Splitter.on", true);
 var splitter_hover = false;
 PUpper.ShowCaption = PLower.ShowCaption = false;
+var c_default_hl = 0, g_color_highlight = 0;
 
 function get_colors() {
-	g_color_background = window.GetColourDUI(ColorTypeDUI.background);
-	let dark_mode = isDarkMode(g_color_background);
+	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_background = g_color_background_default;
+	dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.45);
 		divcolor = RGBA(0, 0, 0, 120);
 	}else{
-		linecolor = blendColors(g_color_background, RGB(0,0,0), 0.25);
-		divcolor = RGBA(0, 0, 0, 65);
+		divcolor = RGBA(0, 0, 0, 75);
 	}
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	g_color_highlight = c_default_hl;
 }
 
 //////////////
@@ -45,7 +47,7 @@ function on_paint(gr) {
 	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
 	if(draw_splitter){
-		gr.FillGradRect(0, PUpper.Height, ww, 1, 0, g_color_background, linecolor, 0.5);
+		gr.FillGradRect(0, PUpper.Height, ww, 1, 0, g_color_background, /*linecolor*/divcolor, 0.5);
 	} else if(splitter_hover) gr.DrawLine(0, PUpper.Height, ww, PUpper.Height, 1, divcolor);
 	
 }
@@ -96,6 +98,15 @@ function on_notify_data(name, info) {
 		draw_splitter = info;
 		window.SetProperty("Splitter.on", draw_splitter);
 		window.Repaint();
+		break;
+	case "color_scheme_updated":
+		if(!info) {
+			g_color_background = g_color_background_default;
+			window.Repaint();
+		}else if(info.length > 3){
+			g_color_background = RGB(info[3], info[4], info[5]);
+			window.Repaint();
+		}
 		break;
 	}
 }

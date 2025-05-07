@@ -386,7 +386,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						else {
 							tf2 = "";
 						};
-						gr.GdiDrawText(tf2, g_font_2, _playing_idx ? g_color_playing_txt : p.list.lcolor_40, cx, tf2_y, cw, tf2_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+						gr.GdiDrawText(tf2, g_font_2, _playing_idx ? g_color_playing_txt : p.list.fontgrey, cx, tf2_y, cw, tf2_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 					};
 					//}; catch (e) {};
 				};
@@ -597,7 +597,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_group_header_div);
 				} else gr.FillSolidRect(this.x, (this.y + this.h - groupDelta)-1, line_width, 1, g_color_line);
 				this.l1_color = g_color_normal_txt;
-				this.l2_color = p.list.lcolor_30;
+				this.l2_color = p.list.fontgrey;
 			}
 			// Draw Header content
 			// ===================
@@ -646,8 +646,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				}
 				var lg3_right_field = (this.group_index + 1) + " / " + p.list.groups.length;
 				var r3_w = gr.CalcTextWidth(lg3_right_field, g_font) + g_z10;
-				gr.GdiDrawText(lg3_left_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - r3_w, cTrack.height, lcs_txt);
-				gr.GdiDrawText(lg3_right_field, g_font, p.list.lcolor_30, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8, cTrack.height, rcs_txt);
+				gr.GdiDrawText(lg3_left_field, g_font, p.list.fontgrey, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - r3_w, cTrack.height, lcs_txt);
+				gr.GdiDrawText(lg3_right_field, g_font, p.list.fontgrey, line_x, l1_y + cTrack.height * 2 - vpadding, this.w - cover.w - g_z8, cTrack.height, rcs_txt);
 				break;
 			};
 
@@ -1192,10 +1192,15 @@ oList = function(object_name, playlist) {
 
 	// items variables used in Item object (optimization)
 	this.setItemColors = function() {
-		this.lcolor_40 = blendColors(g_color_normal_txt, g_color_normal_bg, 0.4);
 		this.lcolor_85 = blendColors(g_color_normal_txt, g_color_highlight, 0.85);
-		this.lcolor_75 = blendColors(g_color_normal_bg, this.lcolor_85, 0.75);
-		this.lcolor_30 = blendColors(g_color_normal_txt, g_color_normal_bg, 0.3);
+		if(dark_mode){
+			this.fontgrey = blendColors(c_black, g_color_normal_txt, 0.7);
+			this.lcolor_75 = blendColors(c_black, this.lcolor_85, 0.75);
+		}
+		else{
+			this.fontgrey = blendColors(c_white, g_color_normal_txt, 0.7);
+			this.lcolor_75 = blendColors(c_white, this.lcolor_85, 0.75);
+		}
 	};
 	this.setItemColors();
 
