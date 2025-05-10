@@ -21,6 +21,7 @@ var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn;
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
+var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
@@ -270,7 +271,7 @@ function get_color() {
 		c_background = RGB(32, 32, 32);
 	}
 	if(!dark_mode) {
-		c_background = blendColors(c_black, c_background_default, 0.85);
+		c_background = blendColors(c_black, c_background_default, 0.875);
 		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
 	} else {
 		c_background = blendColors(c_black, c_background_default, 0.8);
@@ -1218,8 +1219,8 @@ function on_notify_data(name, info) {
 			//if(dark_mode){
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
 			if(info.length > 3){
-				c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.18);
-				c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.18);
+				c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);
+				c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);
 				c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
 				c_normal = blendColors(c_btmbg, c_font, 0.8);
 			} else btm_only = true;
@@ -1244,6 +1245,10 @@ function on_notify_data(name, info) {
 		break;
 	case "titlebar_addinfo":
 		top_addtext = info;
+		break;
+	case "set_bgcolor_chroma":
+		cbkg_chroma = info;
+		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
 	}
 }

@@ -23,6 +23,7 @@ var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
+var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
 try{
@@ -2013,8 +2014,8 @@ function Controller(imgArray, imgDisplay, prop) {
 		if(c_highlight != c_hl_tmp){
 			window.NotifyOthers("color_scheme_updatebase", c_blend);
 			if(cbkg_bycover && c_blend){
-				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.24);
-				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.2);
+				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
+				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.05 * cbkg_chroma);
 				var c_bkg = toRGB(c_background).concat(toRGB(c_selected_bg));
 				c_arr = c_arr.concat(c_bkg);
 				fontcolor2 = blendColors(c_background, fontcolor, 0.75);
@@ -2274,6 +2275,10 @@ function on_playlist_switch() {
 	}
 }
 
+function on_playback_starting(cmd, is_paused){
+	if(cmd == 6) set_esl_color();
+}
+
 function on_playback_new_track(metadb) {
 	if (!MainController.Properties.FollowCursor && color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
@@ -2469,6 +2474,10 @@ function on_notify_data(name, info) {
 	case "set_corlor_threshold":
 		color_threshold = info;
 		window.SetProperty("foobox.color.threshold", color_threshold);
+		break;
+	case "set_bgcolor_chroma":
+		cbkg_chroma = info;
+		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
 	case "foobox_bgcolor_bycover":
 		cbkg_bycover = info;

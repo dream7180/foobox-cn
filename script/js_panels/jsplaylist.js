@@ -21,6 +21,7 @@ var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_noesl = window.GetProperty("foobox.color.by.cover.except.ESL", false);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
+var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
@@ -30,7 +31,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.0";
+var g_script_version = "8.1";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
