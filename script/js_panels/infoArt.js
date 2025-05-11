@@ -17,10 +17,12 @@ var Caption_Pack = {
 }
 var currentMetadb = null, l_mood;
 var get_imgCol = false;
+var get_col_forced = false;
 var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var color_bycover_default = color_bycover;
 var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
@@ -235,6 +237,20 @@ function initMetadb(){
 	if (currentMetadb) {
 		MainController.Refresh(true, currentMetadb);
 		tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
+	}
+}
+
+function set_getcolor_state(){
+	if(color_bycover_default){
+		if(MainController.Properties.FollowCursor) color_bycover = false;
+		else color_bycover = true;
+	}
+	if(color_bycover){
+		get_imgCol = true;
+		getColorSchemeFromImage();
+	} else{
+		get_imgCol = false;
+		on_colorscheme_update(false);
 	}
 }
 
@@ -1920,7 +1936,8 @@ function Controller(imgArray, imgDisplay, prop) {
 	function OnNewTrack(metadb) {
 		if (metadb && currentMetadb && currentMetadb.Compare(metadb)) {
 			_this.SwitchCover(0);
-			if (get_imgCol) getColorSchemeFromImage();
+			if(get_col_forced) imgArray.Update(currentMetadb, OnNewTrack_UpdateFinished);
+			else getColorSchemeFromImage();
 		}
 		else {
 			isNewgroup = false;
@@ -1938,6 +1955,10 @@ function Controller(imgArray, imgDisplay, prop) {
 				currentPathItem = imgArray.pathArray[0];
 				if (isNewgroup) imgDisplay.ChangeImage(1, currentImage, 2);
 				if (imgArray.length > 1) _this.cycle.Active();
+				if(get_col_forced) {
+					imgArray.GetImage(currentIndex, OnNewTrack_GetImageFinished);
+					get_col_forced = false;
+				}
 			} else {
 				currentPathItem = imgArray.pathArray[0];
 				imgArray.GetImage(currentIndex, OnNewTrack_GetImageFinished);
@@ -1946,9 +1967,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			currentPathItem = null;
 			currentImage = null;
 			imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
-			if(get_imgCol) {
-				getColorSchemeFromImage();
-			}
+			getColorSchemeFromImage();
 		}
 		SetMenuButtonCaption();
 	}
@@ -1957,10 +1976,11 @@ function Controller(imgArray, imgDisplay, prop) {
 		currentImage = img;
 		imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
 		if (imgArray.length > 1) _this.cycle.Active();
-		if (get_imgCol) getColorSchemeFromImage();
+		getColorSchemeFromImage();
 	}
 	
 	getColorSchemeFromImage = function() {
+		if(!get_imgCol) return;
 		let c_blend = null;
 		if(currentImage){
 			let c_dev = -1, cv_max;
@@ -2231,6 +2251,7 @@ get_imgs();
 var Covers = new ImagesArray(Properties.Image);
 var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
+if(MainController.Properties.FollowCursor && color_bycover_default) color_bycover = false;
 // START ==============================================
 initMetadb();
 if(show_infobar && info_cycle) activate_infotimer();
@@ -2276,11 +2297,11 @@ function on_playlist_switch() {
 }
 
 function on_playback_starting(cmd, is_paused){
-	if(cmd == 6) set_esl_color();
+	if(color_bycover) get_imgCol = true;
+	if(cmd == 6) get_col_forced = true;
 }
 
 function on_playback_new_track(metadb) {
-	if (!MainController.Properties.FollowCursor && color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
 	OnMetadbChanged();
 }
@@ -2447,6 +2468,7 @@ function on_notify_data(name, info) {
 	switch (name) {
 	case "foobox_infoArt_followcursor":
 		MainController.SetFollowCursorProperties(info);
+		set_getcolor_state();
 		OnMetadbChanged();
 		break;
 	case "set_rating_2_tag":
@@ -2456,15 +2478,8 @@ function on_notify_data(name, info) {
 	case "foobox_color_bycover":
 		color_bycover = info;
 		window.SetProperty("foobox.color.by.cover", color_bycover);
-		if(color_bycover){
-			if(!MainController.Properties.FollowCursor) {
-				get_imgCol = true;
-				getColorSchemeFromImage();
-			}
-		} else{
-			get_imgCol = false;
-			on_colorscheme_update(false);
-		}
+		color_bycover_default = color_bycover;
+		set_getcolor_state();
 		break;
 	case "foobox_color_noesl":
 		sw_eslcolor = !info;

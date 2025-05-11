@@ -1702,7 +1702,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "右栏封面信息及属性面板总是跟随光标而非播放", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "右栏封面信息及属性面板总是跟随光标而非播放 (会使界面颜色跟随封面无效)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "性能优先，缓存专辑封面的依据不区分专辑艺术家", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "界面跟随较鲜艳的封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(6, z(240), cSettings.topBarHeight + rh * 8.25, "背景色除外", "cbkg_bycover ? false : true", "settings_checkboxes_action", this.id));
