@@ -2035,7 +2035,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			window.NotifyOthers("color_scheme_updatebase", c_blend);
 			if(cbkg_bycover && c_blend){
 				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
-				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.05 * cbkg_chroma);
+				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
 				var c_bkg = toRGB(c_background).concat(toRGB(c_selected_bg));
 				c_arr = c_arr.concat(c_bkg);
 				fontcolor2 = blendColors(c_background, fontcolor, 0.75);
