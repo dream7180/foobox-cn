@@ -31,7 +31,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.1";
+var g_script_version = "8.2";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -350,7 +350,7 @@ const get_album_art_async = async (albumIndex) =>
 					if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
 					clearInterval(cover.repaint_timer);
 					cover.repaint_timer = null;
-				}, 8);
+				}, 10);
 			};
 		}
 	} catch(e) {}
@@ -372,7 +372,7 @@ image_cache = function() {
 						} catch(e) {};
 						cover.load_timer && window.ClearTimeout(cover.load_timer);
 						cover.load_timer = false;
-					}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 2 : 10));
+					}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 2 : 6));
 				};
 			}
 			else if (!cover.load_timer) {
@@ -447,7 +447,7 @@ image_cache = function() {
 	
 	this.preload = function(albumIndex) {
 		var img = this._cachelist[p.list.groups[albumIndex].cachekey];
-		if (typeof(img) == "undefined" || img == null) {
+		if (typeof(img) == "undefined") {
 			var crc_exist = check_cache(albumIndex);
 			if (crc_exist) {
 				p.list.groups[albumIndex].load_requested = 1;
@@ -455,8 +455,8 @@ image_cache = function() {
 			}
 		} else {
 			p.list.groups[albumIndex].load_requested = 1;
+			p.list.groups[albumIndex].cover_img = img;
 		}
-		return img;
 	}
 };
 var g_image_cache = new image_cache;

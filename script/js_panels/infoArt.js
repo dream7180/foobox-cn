@@ -2297,11 +2297,14 @@ function on_playlist_switch() {
 }
 
 function on_playback_starting(cmd, is_paused){
-	if(color_bycover) get_imgCol = true;
-	if(cmd == 6) get_col_forced = true;
+	if(cmd == 6){
+		get_col_forced = true;
+		if(color_bycover) get_imgCol = true;
+	}
 }
 
 function on_playback_new_track(metadb) {
+	if(color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
 	OnMetadbChanged();
 }

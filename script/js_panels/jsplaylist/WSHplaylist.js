@@ -1559,7 +1559,7 @@ oList = function(object_name, playlist) {
 					if(j < end){
 						try{
 							if (this.groups[j].load_requested == 0) {
-								this.groups[j].cover_img = g_image_cache.preload(j);
+								g_image_cache.preload(j);
 							};
 						}catch(e){
 							clearInterval(cover.preload_timer);
