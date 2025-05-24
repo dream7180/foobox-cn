@@ -1481,8 +1481,6 @@ oList = function(object_name, playlist) {
 		cover.show = (layout.showCover == "1" ? true : false);
 		cGroup.collapsed_height = layout.collapsedHeight;
 		cGroup.expanded_height = layout.expandedHeight;
-		// update max_w for cover loading and repaint in cache image handle functions
-		cover.max_w = layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height;
 	};
 
 	this.init_groups = function(iscollapsed) {

@@ -22,6 +22,7 @@ var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_noesl = window.GetProperty("foobox.color.by.cover.except.ESL", false);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
+var cache_size = window.GetProperty("foobox.cover.cache.size", 250);
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
@@ -31,7 +32,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.2";
+var g_script_version = "8.3";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -246,7 +247,6 @@ cover = {
 	repaint_timer: false,
 	margin: 2,
 	w: 0,
-	max_w: layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height,
 	h: 0,
 	previous_max_size: -1,
 	preload_timer: false,
@@ -343,14 +343,19 @@ const get_album_art_async = async (albumIndex) =>
 {
 	try{
 		let result = await utils.GetAlbumArtAsyncV2(0, p.list.groups[albumIndex].metadb, albumart_id, false);
-		p.list.groups[albumIndex].cover_img = g_image_cache.getit(result.image, albumIndex);
+		var img = result.image;
+		if(img){
+			let dimensions = getdimension(img.Width, img.Height);
+			img = img.Resize(dimensions[0], dimensions[1], 2);
+		}
+		p.list.groups[albumIndex].cover_img = g_image_cache.getit(img, albumIndex);
 		if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
 			if (!cover.repaint_timer) {
 				cover.repaint_timer = setInterval(() => {
 					if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
 					clearInterval(cover.repaint_timer);
 					cover.repaint_timer = null;
-				}, 10);
+				}, 8);
 			};
 		}
 	} catch(e) {}
@@ -381,19 +386,28 @@ image_cache = function() {
 						if (layout.pattern_idx == 4) {
 							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(p.list.groups[albumIndex].metadb));
 							var genre_img = gdi.Image( _path + ".jpg");
+							if(genre_img){
+								let dimensions = getdimension(genre_img.Width, genre_img.Height);
+								genre_img = genre_img.Resize(dimensions[0], dimensions[1], 2);
+							}
 							p.list.groups[albumIndex].load_requested = 1;
 							p.list.groups[albumIndex].cover_img = g_image_cache.getit(genre_img, albumIndex);
-							full_repaint();
+							cover_repaint();
 						} else if (layout.pattern_idx == 5) {
 							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(p.list.groups[albumIndex].metadb);
 							var dc_arr = dir_cover_name.split(";");
+							var dir_img;
 							for (var i = 0; i <= dc_arr.length; i++) {
-								var dir_img = gdi.Image( _path + dc_arr[i]);
-								p.list.groups[albumIndex].load_requested = 1;
-								p.list.groups[albumIndex].cover_img = g_image_cache.getit(dir_img, albumIndex);
-								if(p.list.groups[albumIndex].cover_img != null) break;
+								dir_img = gdi.Image( _path + dc_arr[i]);
+								if(dir_img) {
+									let dimensions = getdimension(dir_img.Width, dir_img.Height);
+									dir_img = dir_img.Resize(dimensions[0], dimensions[1], 2);
+									break;
+								}
 							}
-							full_repaint();
+							p.list.groups[albumIndex].load_requested = 1;
+							p.list.groups[albumIndex].cover_img = g_image_cache.getit(dir_img, albumIndex);
+							cover_repaint();
 						}
 						else {
 							p.list.groups[albumIndex].load_requested = 1;
@@ -409,40 +423,12 @@ image_cache = function() {
 	};
 	
 	this.getit = function(image, albumIndex) {
-		var cw = (p.headerBar.columns[0].w >0) ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
-		var ch = cw;
-		var img;
-		if (cover.keepaspectratio) {
-			if (!image) {
-				var pw = cw + cover.margin * 2;
-				var ph = ch + cover.margin * 2;
-			}
-			else {
-				if (image.Height >= image.Width) {
-					var ratio = image.Width / image.Height;
-					var pw = (cw + cover.margin * 2) * ratio;
-					var ph = ch + cover.margin * 2;
-				}
-				else {
-					var ratio = image.Height / image.Width;
-					var pw = cw + cover.margin * 2;
-					var ph = (ch + cover.margin * 2) * ratio;
-				};
-			};
-		}
-		else {
-			var pw = cw + cover.margin * 2;
-			var ph = ch + cover.margin * 2;
-		};
-		// cover.type : 0 = nocover, 1 = external cover, 2 = embedded cover, 3 = stream
-		if (p.list.groups[albumIndex].metadb) {
-			img = FormatCover(image, pw, ph, false);
-			if (!img) img = null;
-		};
-		try{
-			this._cachelist[p.list.groups[albumIndex].cachekey] = img;
-		} catch(e){}
-		return img;
+		if(image){
+			try{
+				this._cachelist[p.list.groups[albumIndex].cachekey] = image;
+			} catch(e){}
+		} else image = null;
+		return image;
 	};
 	
 	this.preload = function(albumIndex) {
@@ -462,16 +448,25 @@ image_cache = function() {
 var g_image_cache = new image_cache;
 
 //=================================================// Cover tools
-
-function FormatCover(image, w, h, rawBitmap) {
-	if (!image || w <= 0 || h <= 0) return image;
-	if (rawBitmap) {
-		return image.Resize(w, h, 2).CreateRawBitmap();
+function getdimension(imgw, imgh){
+	let cw = cache_size;
+	let ch = cw;
+	if (cover.keepaspectratio) {
+		if (imgh >= imgw) {
+			let ratio = imgw / imgh;
+			imgw = cw * ratio;
+			imgh = ch;
+		}else{
+			let ratio = imgh / imgw;
+			imgw = cw;
+			imgh = ch * ratio;
+		};
+	}else{
+		imgw = cw;
+		imgh = ch;
 	}
-	else {
-		return image.Resize(w, h, 2);
-	};
-};
+	return [imgw, imgh];
+}
 
 function reset_cover_timers() {
 	cover.load_timer && window.ClearTimeout(cover.load_timer);
@@ -601,7 +596,7 @@ function on_init() {
 			};
 			if (repaint_2) {
 				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
-					var bigger_grp_height = (layout.expandedHeight > layout.collapsedHeight ? layout.expandedHeight : layout.collapsedHeight);
+					var bigger_grp_height = Math.max(layout.expandedHeight, layout.collapsedHeight);
 					if (p.headerBar.columns[0].percent > 0) {
 						var cw = cover.margin + p.headerBar.columns[0].w;
 					}
@@ -872,9 +867,7 @@ function on_mouse_lbtn_up(x, y) {
 		// after a cover column resize, update cover image cache
 		if (cover.resized == true) {
 			cover.resized = false;
-			cover.max_w = (layout.collapsedHeight > layout.expandedHeight ? layout.collapsedHeight * cTrack.height : layout.expandedHeight * cTrack.height);
 			cover.previous_max_size = p.headerBar.columns[0].w;
-			//g_image_cache = new image_cache;// reset cache
 			update_playlist(layout.collapseGroupsByDefault, 2);
 		};
 
@@ -1124,8 +1117,6 @@ function on_mouse_wheel(delta) {
 				};
 					//
 				g_mouse_wheel_timer = window.SetTimeout(function() {
-					var cw = (p.headerBar.columns[0].w > 0) ? ((p.headerBar.columns[0].w <= cover.max_w) ? cover.max_w : p.headerBar.columns[0].w) : cover.max_w;
-					var ch = cw;
 					p.list.scrollItems(delta, properties.enableTouchControl ? cList.touchstep : cList.scrollstep);
 					g_mouse_wheel_timer && window.ClearTimeout(g_mouse_wheel_timer);
 					g_mouse_wheel_timer = false;

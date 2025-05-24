@@ -16,7 +16,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.0"
+!define FBOX_VER "8.3"
 !define BUILD_NUM "1"
 
 # Setup
@@ -228,12 +228,12 @@ Pop $CfgCheckbox
 ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
-${NSD_CreateLabel} 20u 40u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选! 8.0 强制安装!"
+${NSD_CreateLabel} 20u 40u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选!"
 ${If} $winLegacy = 0
 	${NSD_CreateCheckbox} 10u 65u 90% 10u "安装旧版的 ESLyric (0.5.4.1028) 而不是新版"
 	Pop $ESLCheckbox
 ${EndIf}
-EnableWindow $CfgCheckbox 0
+;EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 

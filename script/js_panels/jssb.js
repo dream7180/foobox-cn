@@ -179,10 +179,10 @@ image_cache = function() {
 					catch (e) {};
 					clearInterval(timers.coverLoad);
 					timers.coverLoad = null;
-				}, (!isScrolling && !cScrollBar.timerID ? 2 : 10));
+				}, (!isScrolling && !cScrollBar.timerID ? 2 : 6));
 			}
 		} else {//no cache
-			var _delay = (ppt.albumArtId == 5 ? 5 : 15);
+			var _delay = (ppt.albumArtId == 5 ? 4 : 8);
 			if (!timers.coverLoad) {
 				timers.coverLoad = setInterval(() => {
 					if (ppt.albumArtId == 5) { // genre or dir
@@ -196,23 +196,26 @@ image_cache = function() {
 									_path = folder_path + dc_arr[i];
 									if(path_img(_path)) {
 										var genre_img = gdi.Image(_path);
-										try {
-											brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, _path);
-											brw.groups[albumIndex].load_requested = 1;
-										}catch(e) {}
-										if(brw.groups[albumIndex].cover_img != null) break;
+										if(genre_img != null) break;
 									}
 								}
-								brw.repaint();
 							} else {
 								var _path = fb.ProfilePath + "foobox\\genre\\" + GetGenre(arr[0]) + ".jpg";
 								var genre_img = gdi.Image(_path);
-								try {
-									brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, _path);
-									brw.groups[albumIndex].load_requested = 1;
-									brw.repaint();
-								} catch(e) {}
 							}
+							if(genre_img){
+								let s = Math.min(ppt.cache_size / genre_img.Width, ppt.cache_size / genre_img.Height);
+								if(s < 1){
+									let w = Math.floor(genre_img.Width * s);
+									let h = Math.floor(genre_img.Height * s);
+									genre_img = genre_img.Resize(w, h, 2);
+								}
+							}
+							try {
+								brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, true);
+								brw.groups[albumIndex].load_requested = 1;
+								brw.repaint();
+							}catch(e) {}
 						} catch (e) {};
 					} else {
 						try {
@@ -222,7 +225,7 @@ image_cache = function() {
 					};
 					clearInterval(timers.coverLoad);
 					timers.coverLoad = null;
-				}, (!isScrolling && !cScrollBar.timerID ? _delay : _delay * 20));
+				}, (!isScrolling && !cScrollBar.timerID ? _delay : _delay * 3));
 			};
 		};
 	};
@@ -245,7 +248,7 @@ image_cache = function() {
 		this._cachelist[key] = null;
 	};
 
-	this.getit = function(albumId, image, image_path) {
+	this.getit = function(albumId, image, savecache) {
 		if (image) {
 			let crc = brw.groups[albumId].cachekey;
 			this._cachelist[crc] = image;
@@ -253,18 +256,11 @@ image_cache = function() {
 				crclist[crcidx].push(crc);
 				crcmod[crcidx] = true;
 			}
-			if (image_path) { // save cache
+			if (savecache) { // save cache
 				if (!timers.saveCover) {
 					timers.saveCover = window.SetInterval(function() {
 						try{
-							let s = Math.min(ppt.cache_size / image.Width, ppt.cache_size / image.Height);
-							if(s > 1){
-								image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-							} else {
-								let w = Math.floor(image.Width * s);
-								let h = Math.floor(image.Height * s);
-								image.Resize(w, h, 2).SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-							}
+							image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
 						}catch(e){}
 						window.ClearInterval(timers.saveCover);
 						timers.saveCover = false;
@@ -1359,8 +1355,8 @@ oBrowser = function() {
 						if (this.groups[i].cover_img == null) {
 							if (this.groups[i].load_requested == 0) {
 								this.groups[i].cover_img = g_image_cache._cachelist[brw.groups[i].cachekey];
-								if (typeof(this.groups[i].cover_img) != "undefined") brw.groups[i].load_requested = 1;
-								else g_image_cache.hit(i);
+								if(typeof(this.groups[i].cover_img) == "undefined" || this.groups[i].cover_img == null) g_image_cache.hit(i);
+								else brw.groups[i].load_requested = 1;
 									
 							};
 						}
@@ -1588,7 +1584,7 @@ oBrowser = function() {
 				};
 			};
 
-			// draw top header bar 
+			// draw top header bar
 			var item_txt = ["张专辑", "位专辑艺术家", "位艺术家", "个文件夹", "个目录", "个流派"];
 			var nb_groups = ((ppt.showAllItem && total > 0) ? total - 1 : total);
 			var boxText;
@@ -1956,6 +1952,7 @@ oBrowser = function() {
 		_menu2.AppendMenuItem(MF_STRING, 912, "重置磁盘缓存");
 		_menu2.AppendTo(_menu, MF_STRING, "显示");
 		_menu.AppendMenuItem(MF_STRING, 200, "刷新封面 (F5)");
+		_menu.AppendMenuItem(MF_STRING, 202, "刷新封面及缓存");
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 201, "加载时动画效果");
 		_menu.CheckMenuItem(201, ppt.showloading);
@@ -2022,6 +2019,9 @@ oBrowser = function() {
 		case (idx == 201):
 			ppt.showloading = !ppt.showloading;
 			window.SetProperty("_PROPERTY: Show loading animation", ppt.showloading);
+			break;
+		case (idx == 202):
+			refresh_cover(true);
 			break;
 		case (idx >= 900 && idx <= 903):
 			ppt.panelMode = idx - 900;
@@ -3191,6 +3191,10 @@ function on_notify_data(name, info) {
 			brw.populate();
 		}
 		break;
+	case "set_cache_size":
+		ppt.cache_size = info;
+		window.SetProperty("Cover image cache dimension (100-1000)", ppt.cache_size);
+		break;
 	};
 };
 
@@ -3232,19 +3236,23 @@ const get_album_art_async = async (albumIndex) =>
 {
 	try{
 		let result = await utils.GetAlbumArtAsyncV2(0, brw.groups[albumIndex].metadb, ppt.albumArtId, false);
-		let image_path = result.path;
-		if(path_img(image_path)){
-			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, image_path);
-		} else{
-			brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, result.image, 1);
+		let img = result.image;
+		if(img){
+			let s = Math.min(ppt.cache_size / img.Width, ppt.cache_size / img.Height);
+			if(s < 1){
+				let w = Math.floor(img.Width * s);
+				let h = Math.floor(img.Height * s);
+				img = img.Resize(w, h, 2);
+			}
 		}
+		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, img, true);
 		if (albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
 					brw.cover_repaint();
 					clearInterval(timers.coverDone);
 					timers.coverDone = false;
-				}, 15);
+				}, 10);
 			};
 		}
     } catch(e){}
@@ -3351,8 +3359,8 @@ function reset_this_cache(idx, crc){
 	}
 }
 
-function refresh_cover() {
-	g_image_cache = new image_cache;
+function refresh_cover(resetcache) {
+	if(resetcache) g_image_cache = new image_cache;
 	var total = brw.groups.length;
 	for (var i = 0; i < total; i++) {
 		brw.groups[i].load_requested = 0;

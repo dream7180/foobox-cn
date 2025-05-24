@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.0"
+!define FBOX_VER "8.3"
 !define BUILD_NUM "1"
 
 # Setup
@@ -234,8 +234,8 @@ Pop $CfgCheckbox
 ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
-${NSD_CreateLabel} 20u 75u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选! 8.0 强制安装!"
-EnableWindow $CfgCheckbox 0
+${NSD_CreateLabel} 20u 75u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选!"
+;EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 
