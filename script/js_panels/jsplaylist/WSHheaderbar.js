@@ -781,6 +781,8 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
 
 		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 17, "封面保持图像比例");
+		_menu.CheckMenuItem(17, cover.keepaspectratio);
 		_menu.AppendMenuItem(MF_STRING, 16, "刷新封面 (F5)");
 		_menu.AppendMenuItem(MF_STRING, 14, "面板属性");
 		
@@ -817,6 +819,11 @@ oHeaderBar = function() {
 			}
 			break;
 		case (idx == 16):
+			refresh_cover();
+			break;
+		case (idx == 17):
+			cover.keepaspectratio = !cover.keepaspectratio;
+			window.SetProperty("CUSTOM.Cover keep ration aspect", cover.keepaspectratio);
 			refresh_cover();
 			break;
 		case (idx == 18):

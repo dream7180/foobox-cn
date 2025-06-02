@@ -29,7 +29,6 @@ images = {
 	noart: null,
 	sw_btn_n0: null,
 	sw_btn_n1: null,
-	stream: null,
 	img_loading: null
 };
 
@@ -63,7 +62,6 @@ ppt = {
 	rowScrollStep: 1,
 	scrollSmoothness: 2.5,
 	refreshRate: 25,
-	refreshRateCover: 2,
 	headerBarHeight: 28,
 	enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", true),
 	botStampHeight: 48,
@@ -116,7 +114,6 @@ cPlaylistManager = {
 };
 
 cScrollBar = {
-	visible: true,
 	width: 12,
 	ButtonType: {
 		cursor: 0,
@@ -130,7 +127,7 @@ cScrollBar = {
 };
 
 cover = {
-	//keepaspectratio: true,
+	keepaspectratio:  window.GetProperty("Cover keep aspect ratio", true),
 	max_w: 1
 };
 
@@ -510,7 +507,7 @@ oPlaylistManager = function() {
 				if (cPlaylistManager.showTotalItems) {
 					t = plman.PlaylistItemCount(this.playlists[i].idx);
 					tw = gr.CalcTextWidth(t + "  ", g_font_s);
-					gr.GdiDrawText(t, g_font_s, blendColors(txt_color, bg_color, 0.2), cx + bg_margin_left + txt_margin, cy, cw - bg_margin_left * 2 - txt_margin * 2 - this.scr_w, ch, rc_txt);
+					gr.GdiDrawText(t, g_font_s, txt_color, cx + bg_margin_left + txt_margin, cy, cw - bg_margin_left * 2 - txt_margin * 2 - this.scr_w, ch, rc_txt);
 				} else {
 					tw = 0;
 				};
@@ -518,7 +515,7 @@ oPlaylistManager = function() {
 				if ((this.activeIndex == i + 1 && cPlaylistManager.blink_counter < 0) || (cPlaylistManager.blink_id == i + 1 && cPlaylistManager.blink_row != 0)) {
 					gr.GdiDrawText("+ " + this.playlists[i].name, g_font_bb, txt_color, cx + bg_margin_left + txt_margin, cy, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				} else {
-					gr.GdiDrawText(this.playlists[i].name, g_font, blendColors(txt_color, bg_color, 0.2), cx + bg_margin_left + txt_margin, cy, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+					gr.GdiDrawText(this.playlists[i].name, g_font, txt_color, cx + bg_margin_left + txt_margin, cy, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
 
 				// draw flashing item on lbtn_up after a drag'n drop
@@ -784,10 +781,6 @@ oBrowser = function() {
 
 	this.repaint = function() {
 		repaint_main1 = repaint_main2;
-	};
-
-	this.cover_repaint = function() {
-		repaint_cover1 = repaint_cover2;
 	};
 
 	this.update = function() {
@@ -1318,7 +1311,7 @@ oBrowser = function() {
 		var aw = this.thumbnailWidth - (this.marginSide * 2);
 		var ah = this.rowHeight - this.marginTop - this.marginBot;
 		var coverWidth = cover.max_w;
-		var txt_color = g_color_normal_txt;//1, txt_color2;
+		var txt_color = g_color_normal_txt;
 		var total = this.groups.length;
 		var all_x = -1,
 			all_y = -1,
@@ -1329,301 +1322,283 @@ oBrowser = function() {
 
 		this.getlimits();
 
-		if (repaint_main || !repaintforced) {
-			repaint_main = false;
-			repaintforced = false;
+		// draw visible stamps (loop)
+		for (var i = g_start_; i < g_end_; i++) {
+			row = Math.floor(i / this.totalColumns);
+			ax = this.x + (cx * this.thumbnailWidth) + this.marginSide + this.marginLR;
+			ay = Math.floor(this.y + (row * this.rowHeight) + this.marginTop - scroll_);
+			this.groups[i].x = ax;
+			this.groups[i].y = ay;
 
-			// draw visible stamps (loop)
-			for (var i = g_start_; i < g_end_; i++) {
-				row = Math.floor(i / this.totalColumns);
-				ax = this.x + (cx * this.thumbnailWidth) + this.marginSide + this.marginLR;
-				ay = Math.floor(this.y + (row * this.rowHeight) + this.marginTop - scroll_);
-				this.groups[i].x = ax;
-				this.groups[i].y = ay;
-
-				if (ay >= (0 - this.rowHeight) && ay < this.y + this.h) { // if stamp visible, we have to draw it
-					// parse stored tags
-					if (!(ppt.showAllItem && i == 0)) {// && total > 1)) {
-						if (this.groups[i].groupkey.length > 0) {
-							arr = this.groups[i].groupkey.split(" ^^ ");
-						};
-					};
-					// get cover
-					if (ppt.showAllItem && i == 0) {
-						this.groups[i].cover_img = images.all;
-					} else {
-						if (this.groups[i].cover_img == null) {
-							if (this.groups[i].load_requested == 0) {
-								this.groups[i].cover_img = g_image_cache._cachelist[brw.groups[i].cachekey];
-								if(typeof(this.groups[i].cover_img) == "undefined" || this.groups[i].cover_img == null) g_image_cache.hit(i);
-								else brw.groups[i].load_requested = 1;
-									
-							};
-						}
-						if (typeof(this.groups[i].cover_img) != "undefined") {
-							if (this.groups[i].cover_img == null) {
-								if(this.groups[i].tracktype != 3) this.groups[i].cover_img = images.noart;
-								else this.groups[i].cover_img = images.stream;
-							}
-						};
-					};
-					
-					if (i == this.playingIndex) {
-						txt_color = ppt.panelMode <= 1 ? RGBA(255, 255, 255) : g_color_highlight;
-						//txt_color2 = txt_color1;
-						if (this.stampDrawMode) {
-							gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
-						}
-					} else if (this.stampDrawMode) {
-						if (i == this.selectedIndex) {
-							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
-						};
-						txt_color = g_color_normal_txt;
-					} else { // panelMode = 3 (Grid)
-						txt_color = g_color_normal_txt;
-					};
-					coverTop = ppt.panelMode == 1 ? ay + 10 : ay;
-					// draw cover
-					if (this.groups[i].cover_img) {
-						//if (cover.keepaspectratio) {
-							var max = Math.max(this.groups[i].cover_img.Width, this.groups[i].cover_img.Height);
-							var rw = this.groups[i].cover_img.Width / max;
-							var rh = this.groups[i].cover_img.Height / max;
-							var im_w = (rw * coverWidth) - 2;
-							var im_h = (rh * coverWidth) - 2;
-						//}
-						//else {
-						//	var im_w = coverWidth;
-						//	var im_h = coverWidth;
-						//};
-						// save coords ALL cover image:
-						if (ppt.showAllItem && i == 0) {
-							all_x = ax + Math.round((aw - im_w) / 2);
-							all_y = coverTop + coverWidth - im_h;
-							all_w = im_w;
-							all_h = im_h;
-						} else {
-							let this_x = ax + Math.round((aw - im_w) / 2);
-							let this_y = coverTop + coverWidth - im_h;
-							gr.DrawImage(this.groups[i].cover_img, this_x, this_y, im_w, im_h, 1, 1, this.groups[i].cover_img.Width - 2, this.groups[i].cover_img.Height - 2);
-							// grid text background rect
-							if (ppt.panelMode == 3) {
-								if (i == this.playingIndex) {
-									gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
-								} else if (i == this.selectedIndex) {
-									//gr.FillSolidRect(ax + 2, coverTop, aw - 4, im_h, g_color_selected_bg);
-									gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_selected_bg);
-								} else gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_grid_bg);
-							} else if (ppt.panelMode == 2 && i == this.playingIndex){
-								gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
-							};
-						};
-					} else if(ppt.showloading) {
-						gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 255);
-					} else gr.DrawImage(images.noart, ax + Math.round((aw - coverWidth) / 2), ay + Math.round((aw - coverWidth) / 2), coverWidth, coverWidth, 1, 1, images.noart.Width - 2, images.noart.Height - 2);
-
-					// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
-					if (ppt.panelMode == 3 && im_h > im_w) {
-						var frame_w = coverWidth;
-						var frame_h = im_h;
-					} else {
-						var frame_w = im_w;
-						var frame_h = im_h;
-					};
-					var _cx = ax + Math.round((aw - frame_w) / 2);
-					if (g_rightClickedIndex > -1) {
-						if (g_rightClickedIndex == i) {
-							if (this.stampDrawMode) {
-								gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
-							} else {
-								gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
-							};
-						};
-					} else {
-						if (i == this.activeIndex) {
-							if (this.stampDrawMode) {
-								gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
-							} else {
-								gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
-							};
-						};
-					};
-					if(i == this.playingIndex && ppt.panelMode > 1){
-						gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_highlight);
-					}
-
-					if (ppt.panelMode <= 1) { //(Art + bottom labels)
-						// draw text
-						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
-							try {
-								if (ppt.tagMode == 1) {
-									gr.GdiDrawText("所有项目", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-								} else {
-									gr.GdiDrawText("所有项目", (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-								};
-							} catch (e) {}
-						} else {
-							if (arr[1] == "?") {
-								if (this.groups[i].count > 1) {
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
-								} else {
-									var arr_t = this.groups[i].tra[0].split(" ^^ ");
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
-								};
-							} else {
-								var album_name = arr[1];
-							};
-							try {
-								if (ppt.tagMode == 1 && ppt.albumMode == 0) {
-									gr.GdiDrawText(album_name, g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-									gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + ppt.botTextRowHeight), coverWidth, ppt.botTextRowHeight, lt_txt);
-								} else gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-							} catch (e) {}
-						};
-					} else if (this.groups[i].cover_img) { // panelMode = 3 (Grid)
-						// draw text
-						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
-							// nothing
-						} else if(ppt.panelMode == 3 || (ppt.panelMode == 2 && i ==this.playingIndex)) {
-							if (arr[1] == "?") {
-								if (this.groups[i].count > 1) {
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
-								} else {
-									var arr_t = this.groups[i].tra[0].split(" ^^ ");
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
-								};
-							} else {
-								var album_name = arr[1];
-							};
-							try {
-								if (ppt.tagMode == 1 && ppt.albumMode == 0) {
-									gr.GdiDrawText(album_name, g_font_b, txt_color, ax + 10, (coverTop + 5 + coverWidth) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
-									if (this.groups[i].tracktype != 3) {
-										gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + 10, (coverTop + 5 + coverWidth + ppt.botTextRowHeight) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
-									}
-								}
-								else
-									gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
-							} catch (e) {}
-						};
-					};
+			if (ay >= (0 - this.rowHeight) && ay < this.y + this.h) { // if stamp visible, we have to draw it
+				// parse stored tags
+				if (!(ppt.showAllItem && i == 0)) {// && total > 1)) {
+					if (this.groups[i].groupkey.length > 0) arr = this.groups[i].groupkey.split(" ^^ ");
 				};
-
-				// set next column index
-				if (cx == this.totalColumns - 1) {
-					cx = 0;
+				// get cover
+				if (ppt.showAllItem && i == 0) {
+					this.groups[i].cover_img = images.all;
 				} else {
-					cx++;
+					if (this.groups[i].cover_img == null) {
+						if (this.groups[i].load_requested == 0) {
+							this.groups[i].cover_img = g_image_cache._cachelist[brw.groups[i].cachekey];
+							if(typeof(this.groups[i].cover_img) == "undefined" || this.groups[i].cover_img == null) g_image_cache.hit(i);
+							else brw.groups[i].load_requested = 1;
+						};
+					}
+					if (typeof(this.groups[i].cover_img) != "undefined") {
+						if (this.groups[i].cover_img == null) this.groups[i].cover_img = images.noart;
+					};
 				};
-			};
+					
+				if (i == this.playingIndex) {
+					txt_color = ppt.panelMode <= 1 ? RGBA(255, 255, 255) : g_color_highlight;
+					if (this.stampDrawMode) gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
+				} else if (this.stampDrawMode) {
+					if (i == this.selectedIndex) gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
+					txt_color = g_color_normal_txt;
+				} else txt_color = g_color_normal_txt; // panelMode = 3 (Grid)
+				coverTop = ppt.panelMode == 1 ? ay + 10 : ay;
+					
+				if (this.groups[i].cover_img) {
+					// draw cover
+					if (cover.keepaspectratio) {
+						var max = Math.max(this.groups[i].cover_img.Width, this.groups[i].cover_img.Height);
+						var rw = this.groups[i].cover_img.Width / max;
+						var rh = this.groups[i].cover_img.Height / max;
+						var im_w = rw * coverWidth;
+						var im_h = rh * coverWidth;
+					}
+					else {
+						var im_w = coverWidth;
+						var im_h = coverWidth;
+					};
+					// save coords ALL cover image:
+					if (ppt.showAllItem && i == 0) {
+						all_x = ax + Math.round((aw - im_w) / 2);
+						all_y = coverTop + coverWidth - im_h;
+						all_w = im_w;
+						all_h = im_h;
+					}
+					let this_x = ax + Math.round((aw - im_w) / 2);
+					let this_y = coverTop + coverWidth - im_h;
+					gr.DrawImage(this.groups[i].cover_img, this_x, this_y, im_w, im_h, 1, 1, this.groups[i].cover_img.Width - 2, this.groups[i].cover_img.Height - 2);
+				} else if(ppt.showloading) {
+					gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 255);
+				} else gr.DrawImage(images.noart, ax + Math.round((aw - coverWidth) / 2), ay + Math.round((aw - coverWidth) / 2), coverWidth, coverWidth, 1, 1, images.noart.Width - 2, images.noart.Height - 2);
 
-			// draw scrollbar
-			try{
-				brw.scrollbar && brw.scrollbar.draw(gr);
-			}catch(e){
-				brw.scrollbar.updateScrollbar();
-				brw.scrollbar.draw(gr);
-			}
-			// Incremental Search Display
-			if (cList.search_string.length > 0) {
-				var string_w = gr.CalcTextWidth(cList.search_string, cList.incsearch_font);
-				var string_h = gr.CalcTextHeight(cList.search_string, cList.incsearch_font);
-				gr.SetSmoothingMode(2);
-				brw.tt_w = Math.round(string_w + cSwitchBtn.w);
-				brw.tt_h = Math.round(string_h + 16 * zdpi);
-				brw.tt_x = Math.floor((brw.w - brw.tt_w) / 2);
-				brw.tt_y = brw.y + ((brw.h - brw.tt_h) / 2);
-				gr.FillRoundRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, 5, 5, RGBA(0, 0, 0, 150));
-				gr.DrawRoundRect(brw.tt_x-1, brw.tt_y-1, brw.tt_w+2, brw.tt_h+2, 5, 5, 1.0, RGBA(0, 0, 0, 180));
-				try {
-					gr.GdiDrawText(cList.search_string, cList.incsearch_font, c_black, brw.tt_x + 1, brw.tt_y + 1, brw.tt_w, brw.tt_h, ccf_txt);
-					gr.GdiDrawText(cList.search_string, cList.incsearch_font, cList.inc_search_noresult ? RGB(255, 70, 70) : RGB(250, 250, 250), brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, ccf_txt);
-				}
-				catch (e) {};
-			};
+				// grid text background rect
+				if (ppt.panelMode == 3) {
+					if (i == this.playingIndex) {
+						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
+					} else if (i == this.selectedIndex) {
+						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_selected_bg);
+					} else gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_grid_bg);
+				} else if (ppt.panelMode == 2 && i == this.playingIndex){
+					gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
+				};
 
-			// fill ALL cover image with the 1st four cover art found
-			// get cover
-			if (all_x > -1 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
-				var ii_w = Math.floor(all_w / 2);
-				var ii_h = Math.floor(all_h / 2);
-				var ii_x1 = all_x;
-				var ii_x2 = ii_x1 + ii_w;
-				var ii_y1 = all_y;
-				var ii_y2 = ii_y1 + ii_h;
-				var lim = this.groups.length;
-				if (lim > 5) lim = 5;
-				for (var ii = 1; ii < lim; ii++) {
-					if (this.groups[ii].cover_img) {
-						switch (ii) {
-						case 1:
-							gr.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y1, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
-							break;
-						case 2:
-							gr.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y1, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
-							break;
-						case 3:
-							gr.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y2, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
-							break;
-						case 4:
-							gr.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y2, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
-							break;
+				// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
+				if (ppt.panelMode == 3 && im_h > im_w) {
+					var frame_w = coverWidth;
+					var frame_h = im_h;
+				} else {
+					var frame_w = im_w;
+					var frame_h = im_h;
+				};
+				var _cx = ax + Math.round((aw - frame_w) / 2);
+				if (g_rightClickedIndex > -1) {
+					if (g_rightClickedIndex == i) {
+						if (this.stampDrawMode) {
+							gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
+						} else {
+							gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
+						};
+					};
+				} else {
+					if (i == this.activeIndex) {
+						if (this.stampDrawMode) {
+							gr.DrawRect(ax + 1, ay + 1, aw - 2, ah - 2, 2.0, g_color_selected_bg);
+						} else {
+							gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_selected_bg);
 						};
 					};
 				};
-				var frame_col = g_color_normal_txt & 0x25ffffff;//“所有项目”的边框
-				gr.DrawRect(ii_x1, ii_y1, all_w - 2, all_h - 2, 1.0, frame_col);
-				gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(all_h / 2) - 1, all_w - 3, 1, frame_col);
-				gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, frame_col);
+				if(i == this.playingIndex && ppt.panelMode > 1){
+					gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_highlight);
+				}
 
-				// redraw hover frame selection on ALL item for Grid view
-				if (ppt.panelMode > 1) { // grid
-					if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
-						gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg & 0xddffffff);
+				if (ppt.panelMode <= 1) { //(Art + bottom labels)
+					// draw text
+					if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
+						try {
+							if (ppt.tagMode == 1) {
+								gr.GdiDrawText("所有项目", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+							} else {
+								gr.GdiDrawText("所有项目", (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+							};
+						} catch (e) {}
+					} else {
+						if (arr[1] == "?") {
+							if (this.groups[i].count > 1) {
+								var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
+							} else {
+								var arr_t = this.groups[i].tra[0].split(" ^^ ");
+								var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
+							};
+						} else {
+							var album_name = arr[1];
+						};
+						try {
+							if (ppt.tagMode == 1 && ppt.albumMode == 0) {
+								gr.GdiDrawText(album_name, g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+								gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + ppt.botTextRowHeight), coverWidth, ppt.botTextRowHeight, lt_txt);
+							} else gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+						} catch (e) {}
+					};
+				} else { // panelMode = 3 (Grid)
+					// draw text
+					if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
+						// nothing
+					} else if(ppt.panelMode == 3 || (ppt.panelMode == 2 && i ==this.playingIndex)) {
+						if (arr[1] == "?") {
+							if (this.groups[i].count > 1) {
+								var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
+							} else {
+								var arr_t = this.groups[i].tra[0].split(" ^^ ");
+								var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
+							};
+						} else {
+							var album_name = arr[1];
+						};
+						try {
+							if (ppt.tagMode == 1 && ppt.albumMode == 0) {
+								gr.GdiDrawText(album_name, g_font_b, txt_color, ax + 10, (coverTop + 5 + coverWidth) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+								if (this.groups[i].tracktype != 3) {
+									gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + 10, (coverTop + 5 + coverWidth + ppt.botTextRowHeight) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+								}
+							}
+							else
+								gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+						} catch (e) {}
 					};
 				};
 			};
 
-			// draw top header bar
-			var item_txt = ["张专辑", "位专辑艺术家", "位艺术家", "个文件夹", "个目录", "个流派"];
-			var nb_groups = ((ppt.showAllItem && total > 0) ? total - 1 : total);
-			var boxText;
-			switch (ppt.tagMode){
-			case 1:
-				boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1] + "  ";
-				break;
-			case 2:
-				boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1 + ppt.artistMode] + "  ";
-				break;
-			case 3:
-				boxText = nb_groups + " " +  item_txt[ppt.tagMode + ppt.dirMode] + "  ";
-				break;
-			default:
-				boxText = nb_groups + " " +  item_txt[ppt.tagMode + 1] + "  ";
-				break;
-			}
-			try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)}
-			catch (e) {boxText_len = 0;}
-			if (ppt.sourceMode == 0) {
-				var source_name = "媒体库"
+			// set next column index
+			if (cx == this.totalColumns - 1) {
+				cx = 0;
 			} else {
-				var source_name = "当前列表：" + (ppt.locklibpl ? "媒体库" : plman.GetPlaylistName(plman.ActivePlaylist));
+				cx++;
 			};
-			var source_width = gr.CalcTextWidth(source_name, g_font_b);
-			gr.FillSolidRect(0, 0, ww, brw.y + 1, g_color_normal_bg);
-			gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + cScrollBar.width, 1, g_color_line);
-			var tx = cFilterBox.x + cFilterBox.w + z(22) + 10;
-			var tw = (this.w - tx - cSwitchBtn.w - 2 + cScrollBar.width)*2/3;
-			var source_w = Math.min(tw, source_width);
-			gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
+		};
+
+		// draw scrollbar
+		try{
+			brw.scrollbar && brw.scrollbar.draw(gr);
+		}catch(e){
+			brw.scrollbar.updateScrollbar();
+			brw.scrollbar.draw(gr);
+		}
+		// Incremental Search Display
+		if (cList.search_string.length > 0) {
+			var string_w = gr.CalcTextWidth(cList.search_string, cList.incsearch_font);
+			var string_h = gr.CalcTextHeight(cList.search_string, cList.incsearch_font);
+			gr.SetSmoothingMode(2);
+			brw.tt_w = Math.round(string_w + cSwitchBtn.w);
+			brw.tt_h = Math.round(string_h + 16 * zdpi);
+			brw.tt_x = Math.floor((brw.w - brw.tt_w) / 2);
+			brw.tt_y = brw.y + ((brw.h - brw.tt_h) / 2);
+			gr.FillRoundRect(brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, 5, 5, RGBA(0, 0, 0, 150));
+			gr.DrawRoundRect(brw.tt_x-1, brw.tt_y-1, brw.tt_w+2, brw.tt_h+2, 5, 5, 1.0, RGBA(0, 0, 0, 180));
 			try {
-				gr.GdiDrawText(source_name, g_font_b, g_color_normal_txt, tx, 0, source_w, ppt.headerBarHeight, lc_txt);
-				if(fb.IsPlaying && playing_title) gr.GdiDrawText("  |  "+ playing_title + " [播放中] ", g_font, g_color_highlight, tx + source_width, 0, tw - source_width, ppt.headerBarHeight, lc_txt);
-				gr.GdiDrawText(boxText, g_font_b, g_color_normal_txt, tx + tw, 0, tw/2, ppt.headerBarHeight, rc_txt);
+				gr.GdiDrawText(cList.search_string, cList.incsearch_font, c_black, brw.tt_x + 1, brw.tt_y + 1, brw.tt_w, brw.tt_h, ccf_txt);
+				gr.GdiDrawText(cList.search_string, cList.incsearch_font, cList.inc_search_noresult ? RGB(255, 70, 70) : RGB(250, 250, 250), brw.tt_x, brw.tt_y, brw.tt_w, brw.tt_h, ccf_txt);
 			}
 			catch (e) {};
-			if(ppt.tagMode < 4) this.switch_btn.draw(gr, cSwitchBtn.x, cSwitchBtn.y, 255);
 		};
+
+		// fill ALL cover image with the 1st four cover art found
+		// get cover
+		if (all_x > -1 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
+			var ii_w = Math.floor(all_w / 2);
+			var ii_h = Math.floor(all_h / 2);
+			var ii_x1 = all_x;
+			var ii_x2 = ii_x1 + ii_w;
+			var ii_y1 = all_y;
+			var ii_y2 = ii_y1 + ii_h;
+			var lim = this.groups.length;
+			if (lim > 5) lim = 5;
+			for (var ii = 1; ii < lim; ii++) {
+				if (this.groups[ii].cover_img) {
+					switch (ii) {
+					case 1:
+						gr.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y1, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
+						break;
+					case 2:
+						gr.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y1, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
+						break;
+					case 3:
+						gr.DrawImage(this.groups[ii].cover_img, ii_x1, ii_y2, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
+						break;
+					case 4:
+						gr.DrawImage(this.groups[ii].cover_img, ii_x2, ii_y2, ii_w, ii_h, 1, 1, this.groups[ii].cover_img.Width - 2, this.groups[ii].cover_img.Height - 2);
+						break;
+					};
+				};
+			};
+			var frame_col = g_color_normal_txt & 0x25ffffff;//“所有项目”的边框
+			gr.DrawRect(ii_x1, ii_y1, all_w - 2, all_h - 2, 1.0, frame_col);
+			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(all_h / 2) - 1, all_w - 3, 1, frame_col);
+			gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, frame_col);
+
+			// redraw hover frame selection on ALL item for Grid view
+			if (ppt.panelMode > 1) { // grid
+				if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
+					gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg & 0xddffffff);
+				};
+			};
+		};
+
+		// draw top header bar
+		var item_txt = ["张专辑", "位专辑艺术家", "位艺术家", "个文件夹", "个目录", "个流派"];
+		var nb_groups = ((ppt.showAllItem && total > 0) ? total - 1 : total);
+		var boxText;
+		switch (ppt.tagMode){
+		case 1:
+			boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1] + "  ";
+			break;
+		case 2:
+			boxText = nb_groups + " " +  item_txt[ppt.tagMode - 1 + ppt.artistMode] + "  ";
+			break;
+		case 3:
+			boxText = nb_groups + " " +  item_txt[ppt.tagMode + ppt.dirMode] + "  ";
+			break;
+		default:
+			boxText = nb_groups + " " +  item_txt[ppt.tagMode + 1] + "  ";
+			break;
+		}
+		try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)}
+		catch (e) {boxText_len = 0;}
+		if (ppt.sourceMode == 0) {
+			var source_name = "媒体库"
+		} else {
+			var source_name = "当前列表：" + (ppt.locklibpl ? "媒体库" : plman.GetPlaylistName(plman.ActivePlaylist));
+		};
+		var source_width = gr.CalcTextWidth(source_name, g_font_b);
+		gr.FillSolidRect(0, 0, ww, brw.y + 1, g_color_normal_bg);
+		gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + cScrollBar.width, 1, g_color_line);
+		var tx = cFilterBox.x + cFilterBox.w + z(22) + 10;
+		var tw = (this.w - tx - cSwitchBtn.w - 2 + cScrollBar.width)*2/3;
+		var source_w = Math.min(tw, source_width);
+		gr.FillSolidRect(tx - 8, 0, tw * 2 + 8 + ppt.headerBarHeight , ppt.headerBarHeight - 2, g_color_topbar);
+		try {
+			gr.GdiDrawText(source_name, g_font_b, g_color_normal_txt, tx, 0, source_w, ppt.headerBarHeight, lc_txt);
+			if(fb.IsPlaying && playing_title) gr.GdiDrawText("  |  "+ playing_title + " [播放中] ", g_font, g_color_highlight, tx + source_width, 0, tw - source_width, ppt.headerBarHeight, lc_txt);
+			gr.GdiDrawText(boxText, g_font_b, g_color_normal_txt, tx + tw, 0, tw/2, ppt.headerBarHeight, rc_txt);
+		}
+		catch (e) {};
+		if(ppt.tagMode < 4) this.switch_btn.draw(gr, cSwitchBtn.x, cSwitchBtn.y, 255);
 	};
 
 	this._isHover = function(x, y) {
@@ -1663,16 +1638,12 @@ oBrowser = function() {
 				};
 				if(ppt.sourceMode == 0) this.repaint();
 			} else {
-				if (cScrollBar.visible) {
-					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-				};
+				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
 		case "up":
 			this.drag_clicked = false;
-			if (cScrollBar.visible) {
-				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-			};
+			this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			break;
 		case "dblclk":
 			if (this.ishover) {
@@ -1685,9 +1656,7 @@ oBrowser = function() {
 					};
 				};
 			} else {
-				if (cScrollBar.visible) {
-					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-				};
+				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
 		case "right":
@@ -1701,9 +1670,7 @@ oBrowser = function() {
 			};
 			g_rightClickedIndex = -1;
 			if (!this.ishover) {
-				if (cScrollBar.visible) {
-					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-				};
+				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			};
 			break;
 		case "move":
@@ -1724,78 +1691,28 @@ oBrowser = function() {
 			if (this.drag_moving && !timers.hidePlaylistManager && !timers.showPlaylistManager) {
 				pman.on_mouse("move", x, y);
 			};
-			if (cScrollBar.visible) {
-				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-			};
+			this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			break;
 		case "wheel":
-			if (cScrollBar.visible) {
-				this.scrollbar.updateScrollbar();
-			};
+			this.scrollbar.updateScrollbar();
 			break;
 		case "leave":
-			if (cScrollBar.visible) {
-				this.scrollbar && this.scrollbar.on_mouse(event, x, y);
-			};
+			this.scrollbar && this.scrollbar.on_mouse(event, x, y);
 			break;
 		};
 	};
-
-	if (this.g_timeCover) {
-		window.ClearInterval(this.g_timeCover);
-		this.g_timeCover = false;
-	};
-	this.g_timeCover = window.SetInterval(function() {
-		if (!window.IsVisible) {
-			window_visible = false;
-			return;
-		};
-
-		var repaint_1 = false;
-
-		if (repaint_cover1 == repaint_cover2) {
-			repaint_cover2 = !repaint_cover1;
-			repaint_1 = true;
-		};
-
-		if (repaint_1) {
-			repaintforced = true;
-			repaint_main = true;
-			images.loading_angle = (images.loading_angle + 15) % 360;
-			window.Repaint();
-		};
-
-	}, ppt.refreshRateCover);
 
 	if (this.g_time) {
 		window.ClearInterval(this.g_time);
 		this.g_time = false;
 	};
 	this.g_time = window.SetInterval(function() {
-		if (!window.IsVisible) {
-			window_visible = false;
-			return;
-		};
-
+		if (!window.IsVisible) return;
 		var repaint_1 = false;
-
-		if (!window_visible) {
-			window_visible = true;
-		};
-
-		if (!g_first_populate_launched) {
-			if (isNaN(scroll) || isNaN(scroll_)) {
-				scroll = scroll_ = 0;
-			};
-			g_first_populate_launched = true;
-			brw.launch_populate();
-		};
-
 		if (repaint_main1 == repaint_main2) {
 			repaint_main2 = !repaint_main1;
 			repaint_1 = true;
 		};
-
 		scroll = check_scroll(scroll);
 		if (Math.abs(scroll - scroll_) >= 1) {
 			scroll_ += (scroll - scroll_) / ppt.scrollSmoothness;
@@ -1813,15 +1730,12 @@ oBrowser = function() {
 				repaint_1 = true;
 			};
 		};
+		scroll_prev = scroll;
 
 		if (repaint_1) {
-			repaintforced = true;
-			repaint_main = true;
 			images.loading_angle = (images.loading_angle + 15) % 360;
 			window.Repaint();
 		};
-
-		scroll_prev = scroll;
 	}, ppt.refreshRate);
 
 	this.item_context_menu = function(x, y, albumIndex) {
@@ -1944,6 +1858,8 @@ oBrowser = function() {
 		_menu2.AppendMenuItem(MF_STRING, 903, "网格排列模式");
 		_menu2.CheckMenuRadioItem(900, 903, 900 + ppt.panelMode);
 		_menu2.AppendMenuSeparator();
+		_menu2.AppendMenuItem(MF_STRING, 910, "保持图像比例");
+		_menu2.CheckMenuItem(910, cover.keepaspectratio);
 		_menu2.AppendMenuItem(MF_STRING, 911, "合计项目");
 		_menu2.CheckMenuItem(911, ppt.showAllItem);
 		_menu2.AppendMenuSeparator();
@@ -2030,6 +1946,11 @@ oBrowser = function() {
 			brw.setList();
 			brw.update();
 			break;
+		case (idx == 910):
+			cover.keepaspectratio = !cover.keepaspectratio;
+			window.SetProperty("Cover keep aspect ratio", cover.keepaspectratio);
+			brw.repaint();
+			break;
 		case (idx == 911):
 			ppt.showAllItem = !ppt.showAllItem;
 			window.SetProperty("_PROPERTY: Show ALL item", ppt.showAllItem);
@@ -2055,7 +1976,7 @@ oBrowser = function() {
 				g_image_cache.reset(crc);
 				brw.groups[k].cover_img = null;
 			}
-			brw.cover_repaint();
+			brw.repaint();
 			break;
 		case (idx == 913):
 			if (utils.IsDirectory(CACHE_FOLDER)){
@@ -2200,18 +2121,10 @@ var g_lbtn_click = false;
 var g_rbtn_click = false;
 //
 var g_total_duration_text = "";
-var g_first_populate_launched = false;
-
-var repaintforced = false;
 var launch_time = fb.CreateProfiler("launch_time");
 var form_text = "";
-var repaint_main = true,
-	repaint_main1 = true,
+var	repaint_main1 = true,
 	repaint_main2 = true;
-var repaint_cover = true,
-	repaint_cover1 = true,
-	repaint_cover2 = true;
-var window_visible = false;
 var scroll_ = 0,
 	scroll = 0,
 	scroll_prev = 0;
@@ -2267,6 +2180,11 @@ function on_init() {
 	g_filterbox.inputbox.visible = true;
 	if(ppt.cache_size < 100) ppt.cache_size = 100;
 	if(ppt.cache_size > 1000) ppt.cache_size = 1000;
+	
+	if (isNaN(scroll) || isNaN(scroll_)) {
+		scroll = scroll_ = 0;
+	};
+	brw.launch_populate();
 };
 on_init();
 // START
@@ -2552,38 +2470,21 @@ function get_metrics() {
 
 function get_images_static() {
 	let gb;
-	let color_ico_bg = RGBA(130,130,130,30);
-	let color_ico = RGBA(130,130,130,60);
+	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
 	let nw = 250, nh = 250;
 	
 	images.all = gdi.CreateImage(150, 150);
 	gb = images.all.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, color_ico_bg);
+	gb.FillSolidRect(0, 0, 150, 150, color_ico);
 	images.all.ReleaseGraphics(gb);
 	
 	images.noart = gdi.CreateImage(nw, nh);
 	gb = images.noart.GetGraphics();
+	gb.FillSolidRect(0, 0, nw, nh, color_ico);
 	gb.SetSmoothingMode(2);
-	gb.FillSolidRect(0, 0, nw, nh, color_ico_bg);
-	gb.DrawEllipse(30,30,nw-60,nh-60,4,color_ico);
-	gb.DrawEllipse(90,90,nw-180,nh-180,4,color_ico);
+	gb.DrawEllipse(70,70,100,100,50,color_ico);
 	gb.SetSmoothingMode(0);
 	images.noart.ReleaseGraphics(gb);
-
-	var stream_1 = gdi.CreateImage(100, 100);
-	gb = stream_1.GetGraphics();
-	// draw no cover art image
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(44,44,nw-80,nh-80,3,color_ico)
-	gb.DrawEllipse(62,62,nw-130,nh-130,3,color_ico)
-	gb.SetSmoothingMode(0);
-	stream_1.ReleaseGraphics(gb);
-	
-	images.stream = gdi.CreateImage(nw, nh);
-	gb = images.stream.GetGraphics();
-	gb.DrawImage(images.noart, 0, 0, nw, nh, 0, 0, nw, nh);
-	gb.DrawImage(stream_1, 0, 0, stream_1.Width, stream_1.Height, 0, 0, stream_1.Width, stream_1.Height);
-	images.stream.ReleaseGraphics(gb);
 }
 
 function get_images() {
@@ -2702,8 +2603,6 @@ function on_script_unload() {
 	if(crcmod[3]) utils.WriteTextFile(CACHE_FOLDER + "\\genre_dir\\" + "crc", crclist[3]);
 	brw.g_time && window.ClearInterval(brw.g_time);
 	brw.g_time = false;
-	brw.g_timeCover && window.ClearInterval(brw.g_timeCover);
-	brw.g_timeCover = false;
 };
 
 //=================================================// Keyboard Callbacks
@@ -2976,7 +2875,7 @@ function on_playback_new_track(metadb) {
 	try{
 		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
 	} catch (e) {};
-	window.Repaint();
+	brw.repaint();
 };
 
 //================// Playlist Callbacks
@@ -3061,12 +2960,23 @@ function on_item_focus_change(playlist_idx, from, to) {
 
 function on_metadb_changed(handles, fromhook) {
 	if(!fromhook) {
-		var total = brw.groups.length;
-		for (var i = 0; i < total; i++) {
-			brw.groups[i].load_requested = 0;
-			brw.groups[i].cover_img = null;
-		};
-		brw.repaint();
+		var _repaint = false; 
+		for (var i = 0; i < handles.Count; i++) {
+			var found = -1;
+			for (var j = 1; j < brw.groups.length; j++) {
+				var _same = brw.groups[j].metadb.Compare(handles[i]);
+				if (_same) {
+					found = j;
+					if(j >= g_start_ && j <= g_end_) _repaint = true;
+					break;
+				}
+			}
+			if(found > -1){
+				brw.groups[found].load_requested = 0;
+				brw.groups[found].cover_img = null;
+			}
+		}
+		if(_repaint) brw.repaint();
 	}
 };
 
@@ -3136,13 +3046,14 @@ function on_font_changed() {
 function on_colours_changed() {
 	get_colors();
 	get_images();
+	get_images_static();
 	get_images_loading();
 	if (brw)
 		brw.scrollbar.setNewColors();
 	g_filterbox.getImages();
 	g_filterbox.reset_colors();
 	brw.reset_swbtn();
-	brw.repaint();
+	refresh_cover();
 };
 
 function on_notify_data(name, info) {
@@ -3223,7 +3134,7 @@ const load_image_from_cache = async (albumIndex, preload) =>
 		if (!preload && albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
-					brw.cover_repaint();
+					brw.repaint();
 					clearInterval(timers.coverDone);
 					timers.coverDone = false;
 				}, 2);
@@ -3249,7 +3160,7 @@ const get_album_art_async = async (albumIndex) =>
 		if (albumIndex >= g_start_ && albumIndex <= g_end_) {
 			if (!timers.coverDone) {
 				timers.coverDone = setInterval(() => {
-					brw.cover_repaint();
+					brw.repaint();
 					clearInterval(timers.coverDone);
 					timers.coverDone = false;
 				}, 10);

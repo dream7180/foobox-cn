@@ -257,22 +257,20 @@ function get_font() {
 function get_color() {
 	c_background = utils.GetSysColour(COLOR_3DFACE);
 	c_font= window.GetColourDUI(ColorTypeDUI.text);
-	var light_mode = isDarkMode(c_font);
-	if(!isDarkMode(c_background) && !light_mode){
-		c_background = RGB(32, 32, 32);//window.GetColourDUI(ColorTypeDUI.background);
-	}
+	var dark_mode = window.IsDark;
+	if(dark_mode) c_background = RGB(32, 32, 32);
 	c_normal = blendColors(c_background, c_font, 0.8);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_seekoverlay = c_default_hl;
 	c_shadow_h =  c_normal & 0x25ffffff;
 	c_shadow = c_normal & 0x45ffffff;
 	c_seek_bg =  c_normal & 0x35ffffff;
-	if (light_mode){
-		c_tip_bg = RGBA(255, 255, 255, 200);
-		c_seeker_core = c_white;
-	} else {
+	if (dark_mode){
 		c_tip_bg = RGBA(0, 0, 0, 200);
 		c_seeker_core = c_black;
+	} else {
+		c_tip_bg = RGBA(255, 255, 255, 200);
+		c_seeker_core = c_white;
 	}
 }
 

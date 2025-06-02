@@ -32,7 +32,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.3";
+var g_script_version = "8.4";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -40,11 +40,9 @@ var g_selHolder = null;
 var g_seconds = 0;
 var	repaint_main1 = true,
 	repaint_main2 = true,
-	g_timer1 = false,
-	g_timer2 = false;
+	g_timer = false;
 var repaint_cover1 = true,
 	repaint_cover2 = false;
-var window_visible = false;
 var g_mouse_wheel_timer = false;
 //
 var setting_init = false;
@@ -106,8 +104,7 @@ properties = {
 	selectionmenu: window.GetProperty("CUSTOM Enable Selection Menu", true),
 	cursor_min: 25,
 	cursor_max: 110,
-	repaint_rate1: 20,
-	repaint_rate2: 30,
+	repaint_rate: 25,
 	max_columns: 24,
 	max_patterns: 25
 };
@@ -149,6 +146,7 @@ function system_init() {
 	get_colors();
 	get_metrics();
 	get_images_static();
+	get_img_nocover();
 	get_images_color();
 };
 
@@ -447,24 +445,13 @@ image_cache = function() {
 };
 var g_image_cache = new image_cache;
 
-//=================================================// Cover tools
+//==================Cover tools
 function getdimension(imgw, imgh){
-	let cw = cache_size;
-	let ch = cw;
-	if (cover.keepaspectratio) {
-		if (imgh >= imgw) {
-			let ratio = imgw / imgh;
-			imgw = cw * ratio;
-			imgh = ch;
-		}else{
-			let ratio = imgh / imgw;
-			imgw = cw;
-			imgh = ch * ratio;
-		};
-	}else{
-		imgw = cw;
-		imgh = ch;
-	}
+	let s = Math.min(cache_size / imgw, cache_size / imgh);
+		if(s < 1){
+			imgw = Math.floor(imgw * s);
+			imgh = Math.floor(imgh * s);
+		}
 	return [imgw, imgh];
 }
 
@@ -472,7 +459,6 @@ function reset_cover_timers() {
 	cover.load_timer && window.ClearTimeout(cover.load_timer);
 	cover.load_timer = false;
 };
-// ================================================================================================== //
 
 function full_repaint() {
 	repaint_main1 = repaint_main2;
@@ -561,52 +547,26 @@ function on_init() {
 	p.scrollbar = new oScrollbar( /*cScrollBar.themed*/ );
 	p.settings = new oSettings();
 
-	if (!g_timer1) {
-		g_timer1 = window.SetInterval(function() {
-			if (!window.IsVisible) {
-				window_visible = false;
-				return;
-			};
-			if (!window_visible) {
-				window_visible = true;
-			};
+	if (!g_timer) {
+		g_timer = window.SetInterval(function() {
+			if (!window.IsVisible) return;
 			if (repaint_main1 == repaint_main2) {
 				repaint_main2 = !repaint_main1;
-				window.Repaint();
-			};
-		}, properties.repaint_rate1);
-	}
-
-	if (!g_timer2) {
-		g_timer2 = window.SetInterval(function() {
-			if (repaint_main1 == repaint_main2) {
-				return;
-			};
-			if (!window.IsVisible) {
-				window_visible = false;
-				return;
-			};
-			var repaint_2 = false;
-			if (!window_visible) {
-				window_visible = true;
-			};
-			if (repaint_cover1 == repaint_cover2) {
 				repaint_cover2 = !repaint_cover1;
-				if (!cScrollBar.timerID2 && !g_mouse_wheel_timer) repaint_2 = true;
-			};
-			if (repaint_2) {
+				window.Repaint();
+			} else if(repaint_cover1 == repaint_cover2){
+				repaint_cover2 = !repaint_cover1;
 				if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
 					var bigger_grp_height = Math.max(layout.expandedHeight, layout.collapsedHeight);
 					if (p.headerBar.columns[0].percent > 0) {
 						var cw = cover.margin + p.headerBar.columns[0].w;
-					}
-					else if (cover.show) {
+					} else if (cover.show) {
 						var cw = cover.margin + (cTrack.height * bigger_grp_height);
-					};
+					}
 					window.RepaintRect(p.list.x, p.list.y, cw, p.list.h);
-				};
-			};
-		}, properties.repaint_rate2);
+				}
+			}
+		}, properties.repaint_rate);
 	}
 };
 on_init();
@@ -1290,10 +1250,20 @@ function on_item_focus_change(playlist, from, to) {
 
 function on_metadb_changed(handles, fromhook) {
 	p.list.setItems(false);
-	if(!fromhook && p.headerBar.columns[0].w >0) {
-		var fin = p.list.groups.length;
-    	for(var i = 0; i < fin; i++) {
-			p.list.groups[i].load_requested = 0;
+	if(!fromhook) {
+		for (var i = 0; i < handles.Count; i++) {
+			var found = -1;
+			for (var j = 1; j < p.list.groups.length; j++) {
+				var _same = p.list.groups[j].metadb.Compare(handles[i]);
+				if (_same) {
+					found = j;
+					break;
+				}
+			}
+			if(found > -1){
+				p.list.groups[found].load_requested = 0;
+				g_image_cache._cachelist[p.list.groups[found].cachekey] = null;
+			}
 		}
 	}
 	full_repaint();
@@ -1350,7 +1320,7 @@ function on_key_down(vkey) {
 				p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 				break;
 			case VK_F5:
-				refresh_cover();
+				refresh_cover(true);
 				break;
 			case VK_TAB:
 				tab_collapse = !tab_collapse;
@@ -1888,6 +1858,7 @@ function on_font_changed() {
 
 function on_colours_changed() {
 	get_colors();
+	get_img_nocover();
 	get_images_color();
 	p.headerBar.setButtons();
 	if(p.list) {
@@ -1901,7 +1872,7 @@ function on_colours_changed() {
 	p.settings.refreshColors();
 	p.settings.setButtons();
 	//};
-	full_repaint();
+	refresh_cover();
 };
 
 function on_notify_data(name, info) {
@@ -2055,18 +2026,14 @@ function get_images_color() {
 	images.selected_ico.ReleaseGraphics(gb);
 }
 
-function get_images_static() {
-	let gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0), color_playing_alpha = g_color_playing_txt & 0x2dffffff;
-	let imgh = z(14);
-	let color_ico_bg = RGBA(130,130,130,30);
-	let color_ico = RGBA(130,130,130,60);
+function get_img_nocover() {
+	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
 	
-	images.nocover = gdi.CreateImage(300, 300);
+	images.nocover = gdi.CreateImage(250, 250);
 	gb = images.nocover.GetGraphics();
-	gb.FillSolidRect(0, 0, 300, 300, color_ico_bg);
+	gb.FillSolidRect(0, 0, 250, 250, color_ico);
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(40, 40, 220, 220, 6, color_ico);
-	gb.DrawEllipse(110, 110, 80, 80, 6, color_ico);
+	gb.DrawEllipse(70,70,100,100,50,color_ico);
 	gb.SetSmoothingMode(0);
 	images.nocover.ReleaseGraphics(gb);
 	
@@ -2086,7 +2053,7 @@ function get_images_static() {
 
 	images.stream = gdi.CreateImage(300, 300);
 	gb = images.stream.GetGraphics();
-	gb.FillSolidRect(0, 0, 300, 300, color_ico_bg);
+	gb.FillSolidRect(0, 0, 300, 300, color_ico);
 	gb.DrawImage(stream_1, 0, 0, 100, 300, 0, 0, 100, 300, 0, 255);
 	gb.DrawImage(stream_2, 200, 0, 100, 300, 0, 0, 100, 300, 0, 255);
 	gb.SetSmoothingMode(2);
@@ -2094,6 +2061,11 @@ function get_images_static() {
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(145, 165, 10, 55, color_ico);
 	images.stream.ReleaseGraphics(gb);
+}
+
+function get_images_static() {
+	let gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.5), 0), color_playing_alpha = g_color_playing_txt & 0x2dffffff;
+	let imgh = z(14);
 	
 	images.playing_ico = gdi.CreateImage(g_z16, imgh*2);
 	gb = images.playing_ico.GetGraphics();
@@ -2473,12 +2445,12 @@ function check_cache(albumIndex) {
 	return false;
 };
 
-function refresh_cover(){
+function refresh_cover(recache){
 	var fin = p.list.groups.length;
     for(var i = 0; i < fin; i++) {
 		p.list.groups[i].load_requested = 0;
 	}
-	g_image_cache = new image_cache;
+	if(recache) g_image_cache = new image_cache;
 	//CollectGarbage();
 	full_repaint();
 }
@@ -2638,7 +2610,6 @@ function get_grprow_minimum(column_w){
 	if (column_w > 0) {
 		cGroup.count_minimum = Math.ceil(column_w / cTrack.height);
 		if (cGroup.count_minimum < cGroup.default_count_minimum) cGroup.count_minimum = cGroup.default_count_minimum;
-		//if(reimgcache) g_image_cache = new image_cache;
 	} else {
 		cGroup.count_minimum = cGroup.default_count_minimum;
 	}
@@ -2681,9 +2652,7 @@ function get_covercahe_config(){
 }
 
 function on_script_unload() {
-	g_timer1 && window.ClearInterval(g_timer1);
-	g_timer1 = false;
-	g_timer2 && window.ClearInterval(g_timer2);
-	g_timer2 = false;
+	g_timer && window.ClearInterval(g_timer);
+	g_timer = false;
 	ClearQueuePlaylist();
 };

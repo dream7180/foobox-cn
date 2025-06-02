@@ -526,13 +526,9 @@ class Images {
 		const sz = 600;
 		for (let i = 0; i < 3; i++) {
 			this.stub.default[i] = $.gr(sz, sz, true, g => {
+				if (bg) g.FillSolidRect(0, 0, sz, sz, tcol & 0x06ffffff);
 				g.SetSmoothingMode(2);
-				if (bg) {
-					g.FillSolidRect(0, 0, sz, sz, tcol & 0x08ffffff);
-				}
-				g.SetSmoothingMode(2);
-				g.DrawEllipse(100, 100, 400, 400, 2, tcol & 0x16ffffff);
-				g.DrawEllipse(220, 220, 160, 160, 2, tcol & 0x16ffffff);
+				g.DrawEllipse(180, 180, 240, 240, 120, tcol & 0x09ffffff);
 				g.SetSmoothingMode(0);
 			});
 			this.mask.circular = $.gr(500, 500, true, g => {
