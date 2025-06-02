@@ -143,7 +143,7 @@ function settings_checkboxes_action(id, status, parentId) {
 		case 2:
 			if (status) {
 				layout.config[selectedLayoutId][2] = "1";
-				if(selectedLayoutId == layout.index) layout.autocollapse = 1;
+				if(selectedLayoutId == layout.index && layout.showgroupheaders) layout.autocollapse = 1;
 			}
 			else {
 				layout.config[selectedLayoutId][2] = "0";
@@ -402,7 +402,7 @@ function settings_radioboxes_action(id, status, parentId) {
 				p.settings.pages[pid].elements[11].status = true;
 				p.settings.pages[pid].elements[12].status = false;
 				layout.config[selectedLayoutId][5] = "1";
-				if(selectedLayoutId == layout.index) layout.collapseGroupsByDefault = 1;
+				if(selectedLayoutId == layout.index && layout.showgroupheaders) layout.collapseGroupsByDefault = 1;
 				save_config("config");
 			}
 			break;

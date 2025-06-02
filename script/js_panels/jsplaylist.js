@@ -2164,7 +2164,7 @@ function showhide_groupheader(){
 		cGroup.collapsed_height = 0;
 		cGroup.expanded_height = 0;
 		// disable autocollapse when there is no group!
-		layout.autocollapse = false;
+		layout.autocollapse = 0;
 	} else {
 		cGroup.collapsed_height = layout.collapsedHeight;
 		cGroup.expanded_height = layout.expandedHeight;
@@ -2583,6 +2583,10 @@ function assign_gopts(){
 		layout.collapseGroupsByDefault = Number(layout.gopts[5]);
 		layout.showgroupheaders = Number(layout.gopts[6]);
 		layout.enableExtraLine = Number(layout.gopts[7]);
+		if(!layout.showgroupheaders){
+			layout.autocollapse = 0;
+			layout.collapseGroupsByDefault = 0;
+		}
 	}
 	get_covercahe_config();
 }

@@ -897,8 +897,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		case "dblclk":
 			if (this.ishover) {
 				if (this.type == 1) { // group header
-					if (layout.autocollapse) {}
-					else {
+					if (!layout.autocollapse) {
 						if (this.obj) {
 							if (this.obj.collapsed) {
 								p.list.updateGroupsOnExpand(this.group_index);
