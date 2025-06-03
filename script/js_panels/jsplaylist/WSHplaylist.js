@@ -493,9 +493,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
 					//
 					if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
-						if (p.list.groups[this.group_index].cover_img == null) {
-							p.list.groups[this.group_index].cover_img = (this.tracktype == 3) ? images.stream : images.nocover;
-						};
+						if (p.list.groups[this.group_index].cover_img == null) p.list.groups[this.group_index].cover_img = images.nocover;
 						if (p.list.groups[this.group_index].cover_img) {
 							if (cover.keepaspectratio) {
 								// *** check aspect ratio *** //
@@ -688,9 +686,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
 						//
 						if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
-							if (p.list.groups[this.group_index].cover_img == null) {
-								p.list.groups[this.group_index].cover_img = (this.tracktype == 3) ? images.stream : images.nocover;
-							};
+							if (p.list.groups[this.group_index].cover_img == null) p.list.groups[this.group_index].cover_img = images.nocover;
 							if (p.list.groups[this.group_index].cover_img) {
 								if (cover.keepaspectratio) {
 									// *** check aspect ratio *** //

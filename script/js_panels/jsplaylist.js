@@ -135,7 +135,6 @@ images = {
 	mood_ico: null,
 	sortdirection: null,
 	nocover: null,
-	stream: null,
 	beam: null
 };
 
@@ -2007,7 +2006,19 @@ function get_images_color() {
 	images.mood_ico.ReleaseGraphics(gb);
 	
 	images.beam = draw_beam_image();
+}
 
+function get_img_nocover() {
+	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
+	
+	images.nocover = gdi.CreateImage(250, 250);
+	gb = images.nocover.GetGraphics();
+	gb.FillSolidRect(0, 0, 250, 250, color_ico);
+	gb.SetSmoothingMode(2);
+	gb.DrawEllipse(70,70,100,100,50,color_ico);
+	gb.SetSmoothingMode(0);
+	images.nocover.ReleaseGraphics(gb);
+	
 	images.sortdirection = gdi.CreateImage(g_z7, g_z5);
 	gb = images.sortdirection.GetGraphics();
 	gb.SetSmoothingMode(2);
@@ -2024,43 +2035,6 @@ function get_images_color() {
 	gb.DrawLine(g_z7, g_z12, z(13), g_z3, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.selected_ico.ReleaseGraphics(gb);
-}
-
-function get_img_nocover() {
-	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
-	
-	images.nocover = gdi.CreateImage(250, 250);
-	gb = images.nocover.GetGraphics();
-	gb.FillSolidRect(0, 0, 250, 250, color_ico);
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(70,70,100,100,50,color_ico);
-	gb.SetSmoothingMode(0);
-	images.nocover.ReleaseGraphics(gb);
-	
-	stream_1 = gdi.CreateImage(100, 300);
-	gb = stream_1.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(70, 80, 100, 100, 10, color_ico);
-	gb.SetSmoothingMode(0);
-	stream_1.ReleaseGraphics(gb);
-
-	stream_2 = gdi.CreateImage(100, 300);
-	gb = stream_2.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(-70, 80, 100, 100, 10, color_ico);
-	gb.SetSmoothingMode(0);
-	stream_2.ReleaseGraphics(gb);
-
-	images.stream = gdi.CreateImage(300, 300);
-	gb = images.stream.GetGraphics();
-	gb.FillSolidRect(0, 0, 300, 300, color_ico);
-	gb.DrawImage(stream_1, 0, 0, 100, 300, 0, 0, 100, 300, 0, 255);
-	gb.DrawImage(stream_2, 200, 0, 100, 300, 0, 0, 100, 300, 0, 255);
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(125, 105, 50, 50, 10, color_ico);
-	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(145, 165, 10, 55, color_ico);
-	images.stream.ReleaseGraphics(gb);
 }
 
 function get_images_static() {
