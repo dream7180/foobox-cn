@@ -18,7 +18,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.5"
+!define FBOX_VER "8.5.1"
 !define BUILD_NUM "1"
 
 # Setup

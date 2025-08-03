@@ -14,7 +14,7 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "8.5"
+!define FBOX_VER "8.5.1"
 !define BUILD_NUM "1"
 
 # Setup
@@ -104,6 +104,9 @@ Section "foobox 主题和所需组件" fooboxCore
 	SetOutPath "$ProfileDir\user-components-x64\foo_playcount"
 	File ".\cn\x64\profile\user-components-x64\foo_playcount\foo_playcount.dll"
 	
+	SetOutPath "$ProfileDir\user-components-x64\foo_openhacks"
+	File ".\cn\x64\profile\user-components-x64\foo_openhacks\foo_openhacks.dll"
+	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File ".\cn\win7\jsplitter-x64\*.*"
 	
@@ -115,9 +118,6 @@ Section "foobox 主题和所需组件" fooboxCore
 
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
 	File ".\common\eslyric\x64\legacy\foo_uie_eslyric.dll"
-	
-	SetOutPath "$ProfileDir\user-components-x64\foo_openhacks"
-	File ".\common\foo_openhacks\x64\foo_openhacks.dll"
 	
 	SetOutPath "$ProfileDir\configuration"
 	File ".\common\foo_openhacks\x64\foo_openhacks.dll.cfg"
