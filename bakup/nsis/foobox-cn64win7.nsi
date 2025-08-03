@@ -61,7 +61,7 @@ ReserveFile ".\common\installer\foobox8.bmp"
 !define MUI_WELCOMEPAGE_TEXT "\
 foobox 是音频播放器 foobar2000 的定制主题，基于默认用户界面 (DUI) 及 JSplitter (Spider Monkey Panel 版) 组件，符合主流软件的审美，扩展功能丰富并保持软件的流畅运行.$\n$\n\
 安装 foobox 到 foobar2000 前您应该已安装有 foobar2000 播放器 (64 位版). $\n$\n\
-本安装包使用旧版的 JSPlitter(3.6.1.10)，为 Windows 7 专用."
+本安装包使用旧版的 JSPlitter(3.7.x)，为 Windows 7 专用."
 
 !define MUI_WELCOMEPAGE_LINK "下载 foobar2000 汉化版 by Asion"
 !define MUI_WELCOMEPAGE_LINK_LOCATION "https://www.cnblogs.com/asionwu"
