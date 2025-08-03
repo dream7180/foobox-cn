@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.3"
+!define FBOX_VER "8.5"
 !define BUILD_NUM "1"
 
 # Setup
@@ -191,6 +191,9 @@ Function .onVerifyInstDir
 	IfFileExists $INSTDIR\foobar2000.exe PathGood
     Abort
 	PathGood:
+	IfFileExists $INSTDIR\vcruntime140_1.dll 0 +3
+	MessageBox MB_OK|MB_ICONEXCLAMATION "检测到该版本的 foobar2000 为 64 位程序，不适合本安装!"
+	Abort
 FunctionEnd
 
 Function Check_Dir

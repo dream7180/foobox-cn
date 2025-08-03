@@ -32,7 +32,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.4";
+var g_script_version = "8.5";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;

@@ -266,16 +266,12 @@ function get_color() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	dark_mode = isDarkMode(c_background_default);
 	c_font= window.GetColourDUI(ColorTypeDUI.text);
-	var light_mode = isDarkMode(c_font);
-	if(!dark_mode && !light_mode){
-		c_background = RGB(32, 32, 32);
-	}
-	if(!dark_mode) {
-		c_background = blendColors(c_black, c_background_default, 0.875);
-		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
-	} else {
+	if(dark_mode) {
 		c_background = blendColors(c_black, c_background_default, 0.8);
 		c_btmbg = c_background;
+	} else {
+		c_background = blendColors(c_black, c_background_default, 0.875);
+		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
 	}
 	c_background_default = c_background;
 	c_btmbg_default = c_btmbg;
@@ -291,12 +287,12 @@ function get_color() {
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_seek_bg =  c_normal & 0x35ffffff;
 	c_seekoverlay = c_default_hl;
-	if (light_mode){
-		c_tip_bg = RGBA(255, 255, 255, 200);
-		c_seeker_core = c_white;
-	} else {
+	if (dark_mode){
 		c_tip_bg = RGBA(0, 0, 0, 200);
 		c_seeker_core = c_black;
+	} else {
+		c_tip_bg = RGBA(255, 255, 255, 200);
+		c_seeker_core = c_white;
 	}
 }
 
@@ -1216,7 +1212,6 @@ function on_notify_data(name, info) {
 			c_toptxt2 = c_toptxt2_default;
 			c_normal = c_normal_default;
 		}else{
-			//if(dark_mode){
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
 			if(info.length > 3){
 				c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);

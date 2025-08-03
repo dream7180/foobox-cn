@@ -22,6 +22,8 @@ var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
 var p_tips = ['播放列表', '封面浏览器'];
+var show_status = utils.CheckComponent("foo_openhacks") && fb.IsMainMenuCommandChecked("视图/Show status bar");
+var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 
 //=====================================================
 oSwitchbar = function() {
@@ -255,12 +257,21 @@ function get_font() {
 }
 
 function get_color() {
-	c_background = utils.GetSysColour(COLOR_3DFACE);
+	if(show_status){
+		c_background = utils.GetSysColour(COLOR_3DFACE);
+		var dark_mode = window.IsDark;
+		if(dark_mode) c_background = RGB(32, 32, 32);
+	}else{
+		c_background_default = window.GetColourDUI(ColorTypeDUI.background);
+		var dark_mode = isDarkMode(c_background_default);
+		if(dark_mode) c_background = blendColors(c_black, c_background_default, 0.8);
+		else c_background = utils.GetSysColour(COLOR_3DFACE);
+	}
 	c_font= window.GetColourDUI(ColorTypeDUI.text);
-	var dark_mode = window.IsDark;
-	if(dark_mode) c_background = RGB(32, 32, 32);
 	c_normal = blendColors(c_background, c_font, 0.8);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	c_background_default = c_background;
+	c_normal_default = c_normal;
 	c_seekoverlay = c_default_hl;
 	c_shadow_h =  c_normal & 0x25ffffff;
 	c_shadow = c_normal & 0x45ffffff;
@@ -411,10 +422,15 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 function init_obj() {
 	vol_len = Math.round((z(70) - 9)/10) * 10 + 9;
 	seek_h = z(20);
-	win_y = wh - z(58);
+	if(show_status){
+		win_y = wh - z(58);
+		btn_y = win_y + z(23);
+	} else {
+		win_y = wh - z(65);
+		btn_y = win_y + z(23);
+	}
 	let btn_space = z(12) + 3;
 	let imgh = img_stop.Width, imgh_b = img_play.Width;
-	btn_y = win_y + z(23);
 	var btn_y2 = Math.round(btn_y - z(3));
 	var btn_y3 = Math.round(btn_y - z(1));
 	var btn_x = Math.round((ww-imgh*4-imgh_b-btn_space*4)/2);
@@ -464,6 +480,11 @@ function RTips_switch(tiptext){
 			RTips_timer = false;
 		}, 750);
 	}
+}
+
+function repaintWin(){
+	var ph = win_y - z(2);
+	window.RepaintRect(0, ph, ww, wh - ph);
 }
 
 function get_images() {
@@ -954,7 +975,7 @@ function on_font_changed() {
 	init_obj();
 	setSize();
 	set_panel();
-	window.Repaint();
+	repaintWin();
 };
 
 function on_colours_changed() {
@@ -964,7 +985,7 @@ function on_colours_changed() {
 	initbuttons();
 	init_obj();
 	setSize();
-	window.Repaint();
+	repaintWin();
 };
 
 function on_mouse_rbtn_up() {
@@ -973,21 +994,32 @@ function on_mouse_rbtn_up() {
 
 function on_notify_data(name, info) {
 	switch (name) {
-	case "color_scheme_updated":
-		var c_ol_tmp = c_seekoverlay;
-		if(info) c_seekoverlay = RGB(info[0], info[1], info[2]);
-		else c_seekoverlay = c_default_hl;
-		if(c_seekoverlay != c_ol_tmp){
+	case "color_scheme_updatebase":
+		if(show_status){
+			if(info) c_seekoverlay = RGB(info[0], info[1], info[2]);
+			else c_seekoverlay = c_default_hl;
+		} else {
+			if(!info) {
+				c_seekoverlay = c_default_hl;
+				c_background = c_background_default;
+				c_normal = c_normal_default;
+			}else{
+				c_seekoverlay = RGB(info[0], info[1], info[2]);
+				if(info.length > 3){
+					c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);
+					c_normal = blendColors(c_background, c_font, 0.8);
+				}
+			}
+		}
 			init_overlay_obj(c_seek_bg, c_seekoverlay);
 			PBPlay.img = (fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play;
 			setSize();
-			window.Repaint();
-		}
+			repaintWin();
 		break;
 	case "Show_open_stop_buttons":
 		show_extrabtn = info;
 		window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
-		window.Repaint();
+		repaintWin();
 		break;
 	case "Lib_button_function":
 		if(Number(fb.Version.substr(0, 1)) > 1){
@@ -995,6 +1027,10 @@ function on_notify_data(name, info) {
 			window.SetProperty("Library.button: Show.Albumlist", lib_albumlist);
 			lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 		}
+		break;
+	case "set_bgcolor_chroma":
+		cbkg_chroma = info;
+		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
 	}
 }

@@ -1802,7 +1802,7 @@ function on_key_down(vkey) {
 			case VK_DELETE:
 				if(ppt.showFilter && g_filterbox.inputbox.edit) return;
 				if (brw.rowsCount > 0) {
-					if(!brw.actionRows.length && brw.activeRow > -1) brw.actionRows.push(brw.activeRow);
+					if(!brw.actionRows.length && brw.activeRow > -1 && brw.activeRow < brw.rowsCount) brw.actionRows.push(brw.activeRow);
 					if(ppt.confirmRemove){
 						DeletePlaylist();
 					} else {
