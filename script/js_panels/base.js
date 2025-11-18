@@ -202,9 +202,7 @@ function set_panel() {
     if (UIHacks?.FrameStyle == 3) {
         ph -= topbarh;
         y_offset = topbarh;
-    } else if (UIHacks?.MainMenuState != 0) {
-        setTimeout(function() {UIHacks.MainMenuState = 0;}, 100);
-    }
+    } 
 	try{
 		if(active_p.Width != ww || active_p.Height != ph)
 		active_p.Move(0, y_offset, ww, ph);
