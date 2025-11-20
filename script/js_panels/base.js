@@ -198,10 +198,14 @@ function detect_video() {
 }
 
 function set_panel() {
-	var ph = win_y - topbarh;
+    var ph = win_y, y_offset = 0;
+    if (UIHacks?.FrameStyle == 3) {
+        ph -= topbarh;
+        y_offset = topbarh;
+    } 
 	try{
 		if(active_p.Width != ww || active_p.Height != ph)
-		active_p.Move(0, topbarh, ww, ph);
+		active_p.Move(0, y_offset, ww, ph);
 	}catch(e){}
 }
 

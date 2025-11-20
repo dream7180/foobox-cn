@@ -7,7 +7,8 @@ var mouseInControl = false;
 
 function uiHacksInit() {
 	if (!uiHacks) return;
-	UIHacks.FrameStyle = 3;//noboarder
+	if (UIHacks.FrameStyle != 3) return;
+	//UIHacks.FrameStyle = 3;//noboarder
 	UIHacks.MainMenuState = 1;//hide
 	UIHacks.StatusBarState = 0;//hide
 	UIHacks.MoveStyle = 0;//caption only
@@ -20,6 +21,7 @@ function uiHacksInit() {
 
 function uiHacksResetCaption(){
 	if (!uiHacks) return;
+	if (UIHacks.FrameStyle != 3) return;
 	UIHacks.SetPseudoCaption(menubtnw, 0, ww - 3*topbtnw - menubtnw, topbarh);
 	if(UIHacks.MainWindowState == 2) UIHacks.DisableSizing = true; //maximized
 	else UIHacks.DisableSizing = false;
