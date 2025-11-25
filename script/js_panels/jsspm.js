@@ -158,6 +158,10 @@ function DeletePlaylist(){
 	}
 	var parsed_tabname = "";
 	for(var i = 0; i < brw.actionRows.length; i++){
+		if(i > 20) {
+			parsed_tabname += "......";
+			break;
+		}
 		if(i == 0) parsed_tabname += plman.GetPlaylistName(brw.rows[brw.actionRows[i]].idx);
 		else parsed_tabname += ", " + plman.GetPlaylistName(brw.rows[brw.actionRows[i]].idx);
 	}
@@ -475,8 +479,7 @@ oBrowser = function() {
 			this.new_menu.draw(gr, Math.round(ww - 2*brw.images.topbar_btn.Width), Math.round(bt_y - zdpi), 255);
 			this.new_bt.draw(gr, Math.round(ww - brw.images.topbar_btn.Width),  Math.round(bt_y - zdpi), 255);
 			gr.DrawImage(images.add_menu, Math.round(ww - 1.5*brw.images.topbar_btn.Width - images.add_menu.Height/2), Math.round((ppt.SearchBarHeight - images.add_menu.Height)/2-2), images.add_menu.Width, images.add_menu.Height, 0, 0, images.add_menu.Width, images.add_menu.Height, 0, 255);
-			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), 0, 1, ppt.SearchBarHeight/2, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), ppt.SearchBarHeight/2, 1, ppt.SearchBarHeight/2, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), 0, 1, ppt.SearchBarHeight, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 			gr.FillSolidRect(Math.round(ww - brw.images.topbar_btn.Width), 0, 1, ppt.SearchBarHeight - 2, g_color_normal_bg);
 			gr.DrawImage(images.newplaylist_img, Math.round(ww - 0.5*brw.images.topbar_btn.Width - images.newplaylist_img.Height/2), Math.round((ppt.SearchBarHeight - images.newplaylist_img.Height)/2-2), images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 0, images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 255);
 			brw.scrollbar && brw.scrollbar.draw(gr);

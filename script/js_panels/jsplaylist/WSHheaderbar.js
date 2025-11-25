@@ -182,7 +182,6 @@ oHeaderBar = function() {
 				cx = tmp;
 				cy = this.y;
 				cw = (bx - cx);
-				var chh = cy + this.h/2;
 				if (j != this.columnDraggedId || (this.columnDragged == 1)) {
 					// draw column header bg
 					if (this.columnDragged == 1 && j == this.columnDraggedId) {
@@ -190,8 +189,7 @@ oHeaderBar = function() {
 					} else {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 					};
-					gr.FillGradRect(cx + cw - 1, cy, 1, chh, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-					gr.FillGradRect(cx + cw - 1, chh, 1, chh, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+					gr.FillGradRect(cx + cw - 1, cy, 1, cy*2 + this.h, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 					// draw column header infos
 					if (this.columns[j].tf != "null" || this.columns[j].sortOrder != "null") {
 						// draw sort indicator (direction)
@@ -217,7 +215,6 @@ oHeaderBar = function() {
 				cx = tmp;
 				cy = this.y;
 				cw = (this.w - this.borderWidth - cx);
-				var chh = cy + this.h/2;
 				if (j != this.columnDraggedId || (this.columnDragged == 1)) {
 					// draw last column bg
 					if (this.columnDragged == 1 && j == this.columnDraggedId) {
@@ -225,8 +222,7 @@ oHeaderBar = function() {
 					} else {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 					};
-					gr.FillGradRect(cx + cw - 1, cy, 1, chh, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-					gr.FillGradRect(cx + cw - 1, chh, 1, chh, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+					gr.FillGradRect(cx + cw - 1, cy, 1, cy*2 + this.h, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 					// draw last column header info
 					if (this.columns[j].tf != "null" || this.columns[j].sortOrder != "null") {
 						// draw sort indicator (direction)

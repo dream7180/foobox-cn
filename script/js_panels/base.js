@@ -14,14 +14,16 @@ var PBOTips = new Array("默认", "重复(列表)", "重复(音轨)", "随机", 
 var hbtn = false;
 var ww = 0, wh = 0;
 var m_x = 0, m_y = 0;
-var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r, topbarh, topbtnw, menubtnw, title_w;
+var g_seconds = 0;
+var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r, topbarh, topbtnw, menuicow, menulibw, menubtnw,leftbarw, title_w, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
-var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn;
+var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn, MenubarBtn = [];
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
+var show_menu = window.GetProperty("foobox.show.menubar", true);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
@@ -137,17 +139,17 @@ oSwitchbar = function() {
 		var ico_y = this.y + Math.floor(6*zdpi) + 1, hoverbg_offset = z(1), imgw = img_list.Width, imgh = img_list.Height;
 		gr.SetSmoothingMode(4);
 		gr.FillRoundRect(this.x + active_pid*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_seek_bg);
-		if(this.hover_tab && this.tip_show) gr.GdiDrawText(p_tips[this.hover_tab-1], g_font, c_font, this.x+this.w+z(8), this.y+hoverbg_offset, this.tipw, this.bth, lc_txt);
+		if(this.hover_tab && this.tip_show) gr.GdiDrawText(p_tips[this.hover_tab-1], g_font, c_font, this.x+this.w+z8, this.y+hoverbg_offset, this.tipw, this.bth, lc_txt);
 		if(this.hover_tab && this.hover_tab-1 != active_pid){
 			if(this.down) gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow);
 			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow_h);
 		}
 		gr.SetSmoothingMode(0);
-		gr.DrawImage(img_list, this.x + z(5), ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		gr.DrawImage(img_cover, this.x + this.h_space + z(5), ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		if(bio_panel) gr.DrawImage(img_bio, this.x + this.h_space*2 + z(5), ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		gr.DrawImage(img_vis, this.x + this.h_space*(2+bio_panel) + z(5), ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		if(video_panel) gr.DrawImage(img_video, this.x + this.h_space*(3+bio_panel) + z(5), ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		gr.DrawImage(img_list, this.x + z5, ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		gr.DrawImage(img_cover, this.x + this.h_space + z5, ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		if(bio_panel) gr.DrawImage(img_bio, this.x + this.h_space*2 + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		gr.DrawImage(img_vis, this.x + this.h_space*(2+bio_panel) + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		if(video_panel) gr.DrawImage(img_video, this.x + this.h_space*(3+bio_panel) + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
 	}
 	this.repaint = function () {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
@@ -259,7 +261,11 @@ function get_font() {
 	img_ico = img_ico.Resize(18*zdpi, 18*zdpi, 2);
 	topbarh = z(26) + 2;
 	topbtnw = z(46);
-	menubtnw = z(38);
+	menuicow = z(28);
+	menulibw = z(46);
+	menubtnw = z(36);
+	z5 = z(5);
+	z8 = z(8);
 }
 
 function get_color() {
@@ -269,14 +275,23 @@ function get_color() {
 	if(dark_mode) {
 		c_background = blendColors(c_black, c_background_default, 0.8);
 		c_btmbg = c_background;
+		c_tip_bg = RGBA(0, 0, 0, 200);
+		c_seeker_core = c_black;
+		c_menubar = RGBA(0, 0, 0, 20);
+		c_gradline = RGBA(255, 255, 255, 50);
 	} else {
 		c_background = blendColors(c_black, c_background_default, 0.875);
 		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
+		c_tip_bg = RGBA(255, 255, 255, 200);
+		c_seeker_core = c_white;
+		c_menubar = RGBA(0, 0, 0, 12);
+		c_gradline = RGBA(255, 255, 255, 150); 
 	}
 	c_background_default = c_background;
 	c_btmbg_default = c_btmbg;
 	c_toptxt = window.GetColourDUI(ColorTypeDUI.text);
 	c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
+	c_tag = blendColors(c_background, c_toptxt, 0.32);
 	c_toptxt2_default = c_toptxt2;
 	c_topbtnhover = c_toptxt & 0x18ffffff;
 	c_topbtndown= c_toptxt & 0x30ffffff;
@@ -287,13 +302,6 @@ function get_color() {
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_seek_bg =  c_normal & 0x35ffffff;
 	c_seekoverlay = c_default_hl;
-	if (dark_mode){
-		c_tip_bg = RGBA(0, 0, 0, 200);
-		c_seeker_core = c_black;
-	} else {
-		c_tip_bg = RGBA(255, 255, 255, 200);
-		c_seeker_core = c_white;
-	}
 }
 
 PBO_Menu = function(x, y) {
@@ -340,7 +348,13 @@ function initbuttons(){
 	CloseBtn = new ButtonUI(img_close);
 	MaxBtn = new ButtonUI(img_winbtn);
 	MinBtn = new ButtonUI(img_winbtn);
-	MenuBtn = new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2));
+	if(show_menu) {
+		MenubarBtn = [];
+		for(var i = 0; i < 6; i++){
+			if(i == 4) MenubarBtn.push(new ButtonUI(img_winbtn.Resize(menulibw,img_winbtn.Height,2)));
+			else MenubarBtn.push(new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2)));
+		}
+	} else MenuBtn = new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2));
 }
 
 function init_overlay_obj(overlay_frame, overlay_seek) {
@@ -349,12 +363,12 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seek_frame = gdi.CreateImage(100, z(20));
 	gb = seek_frame.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, z(8), 100, z(4), overlay_frame);
+	gb.FillSolidRect(0, z8, 100, z(4), overlay_frame);
 	seek_frame.ReleaseGraphics(gb);
 	seek_time = gdi.CreateImage(100, z(20));
 	gb = seek_time.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, z(8), 100, z(4), overlay_seek);
+	gb.FillSolidRect(0, z8, 100, z(4), overlay_seek);
 	seek_time.ReleaseGraphics(gb);
 	vol_frame = gdi.CreateImage(100, z(18));
 	gb = vol_frame.GetGraphics();
@@ -460,18 +474,29 @@ function init_obj() {
 	PlaybackTimeText.SetSize(btn_space*2, win_y2, time_length, seek_h);
 	PlaybackLengthText.SetSize(seek_len + seek_start + btn_space, win_y2, time_length, seek_h);
 	TimeTip = new UITooltip(seek_start + z(12), win_y2, "", g_font, c_font, tip_bg);
-	VolumeTip = new UITooltip(ww - seek_start + z(5) - 1, btn_y + z(2), "", g_font, c_font, false);
+	VolumeTip = new UITooltip(ww - seek_start + z5 - 1, btn_y + z(2), "", g_font, c_font, false);
 	var btn_y2 = btn_y + z(1) - 1;
 	MuteBtn.SetXY(volbtn_x, btn_y2);
-	pbo_start = volbtn_x - btn_img.Width - z(5);
+	pbo_start = volbtn_x - btn_img.Width - z5;
 	PBOBtn.SetXY(pbo_start - z(2), btn_y2);
 	LibBtn.SetXY(pbo_start - btn_img.Width - z(10) + 1, btn_y2);
-	RBtnTips.SetSize(pbo_start - btn_img.Width*5 - z(5), btn_y2, z(100), btn_img.Height/3);
-	g_switchbar.setSize(seek_start -z(5), btn_y, g_switchbar.w, g_switchbar.h);
+	RBtnTips.SetSize(pbo_start - btn_img.Width*5 - z5, btn_y2, z(100), btn_img.Height/3);
+	g_switchbar.setSize(seek_start -z5, btn_y, g_switchbar.w, g_switchbar.h);
 	CloseBtn.SetXY(ww - topbtnw, 0);
 	MaxBtn.SetXY(ww - 2*topbtnw, 0);
 	MinBtn.SetXY(ww - 3*topbtnw, 0);
-	MenuBtn.SetXY(0, 0);
+	if(show_menu) {
+		var _btnx = menuicow;
+		for(var i = 0; i < MenubarBtn.length; i++){
+			MenubarBtn[i].SetXY(_btnx, 0);
+			if(i == 4) _btnx += menulibw;
+			else _btnx += menubtnw;
+		}
+		leftbarw = _btnx
+	} else {
+		MenuBtn.SetXY(0, 0);
+		leftbarw = menubtnw;
+	}
 }
 
 function setSize(){
@@ -588,6 +613,63 @@ function main_Menu(x, y) {
 	MenuBtn.Reset();
 }
 
+function menu_bar(i) {
+	var _menu = window.CreatePopupMenu();
+	var menuman1 = fb.CreateMainMenuManager();
+	var x = menuicow;
+	switch (i) {
+		case 0:
+			menuman1.Init("file");
+			menuman1.BuildMenu(_menu, 1, 200);
+			break;
+		case 1:
+			menuman1.Init("edit");
+			menuman1.BuildMenu(_menu, 1, 200);
+			x = x + menubtnw;
+			break;
+		case 2:
+			menuman1.Init("view");
+			menuman1.BuildMenu(_menu, 1, 200);
+			x = x + menubtnw * 2;
+			break;
+		case 3:
+			menuman1.Init("playback");
+			menuman1.BuildMenu(_menu, 1, 200);
+			x = x + menubtnw * 3;
+			break;
+		case 4:
+			menuman1.Init("library");
+			menuman1.BuildMenu(_menu, 1, 200);
+			x = x + menubtnw * 4;
+			break;
+		case 5:
+			menuman1.Init("help");
+			menuman1.BuildMenu(_menu, 1, 200);
+			x = x + menubtnw * 4 + menulibw;
+			break;
+	}
+	if(i == 0){
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 201, "foobox 设置");
+	}
+
+	var ret = _menu.TrackPopupMenu(x, topbarh);//, 0x0008);
+
+	switch (true) {
+	case (ret >= 1 && ret < 201):
+		menuman1.ExecuteByID(ret - 1);
+		break;
+	case (ret == 201):
+		window.NotifyOthers("foobox_setting", 1);
+		if(active_pid != 0) {
+			g_switchbar.switch_panel(1);
+			g_switchbar.repaint();
+		}
+		break;
+	}
+	MenubarBtn[i].Reset();
+}
+
 function get_images() {
 	//creat static images
 	var gb;
@@ -652,14 +734,14 @@ function get_images() {
 	img_vol = gdi.CreateImage(imgw, imgh);
 	gb = img_vol.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(zdpi, z(8)+1, _x4+1, z(8)+1, 2, c_normal);
-	gb.DrawLine(_x10, z(5)+1, _x10, z(18), 2, c_normal);
-	gb.DrawLine(zdpi, z(8), zdpi, z(15)+1, 2, c_normal);
+	gb.DrawLine(zdpi, z8+1, _x4+1, z8+1, 2, c_normal);
+	gb.DrawLine(_x10, z5+1, _x10, z(18), 2, c_normal);
+	gb.DrawLine(zdpi, z8, zdpi, z(15)+1, 2, c_normal);
 	gb.DrawLine(zdpi, z(15), _x4+1, z(15), 2, c_normal);
 	gb.DrawLine(_x10+2+z(2), _x9+1, _x10+2+z(2), _x13+1, 2, c_normal);
 	gb.DrawLine(_x10+4+z(2)*2, _x7+1, _x10+4+z(2)*2, _x15+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x4, z(8)+1, _x10, z(5)+1, 2, c_normal);
+	gb.DrawLine(_x4, z8+1, _x10, z5+1, 2, c_normal);
 	gb.DrawLine(_x4, z(15)-1, _x10, z(18)-1, 2, c_normal);
 	gb.SetSmoothingMode(0);
 	img_vol.ReleaseGraphics(gb);
@@ -892,6 +974,17 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	gb.DrawLine(_x8, _x13, _x18, _x13, 1, c_toptxt);
 	img_min.ReleaseGraphics(gb);
+	
+	imgh = z(9);
+	playing_ico = gdi.CreateImage(imgh, imgh*2);
+	gb = playing_ico.GetGraphics();
+	gb.SetSmoothingMode(2);
+	var ponit_arr = new Array(1, 1, 1, imgh - 2, imgh - 2, (imgh - 2)/2);
+	gb.FillPolygon(c_normal, 0, ponit_arr);
+	ponit_arr = new Array(1, imgh + 1, 1, imgh + imgh - 2, imgh - 2, (imgh - 2)/2 + imgh);
+	gb.FillPolygon(c_shadow, 0, ponit_arr);
+	gb.SetSmoothingMode(0);
+	playing_ico.ReleaseGraphics(gb);
 }
 
 function on_init(){
@@ -927,20 +1020,48 @@ function on_size() {
 }
 
 function on_paint(gr) {
+	let grey_1 = RGBA(0, 0, 0, 45);
 	gr.FillSolidRect(0, 0, ww, topbarh, c_background);
-	gr.DrawLine(0,topbarh-1,ww,topbarh-1,1,RGBA(0,0,0,45));
+	gr.DrawLine(0, topbarh-1, ww, topbarh-1, 1, grey_1);
 	gr.FillSolidRect(0, win_y, ww, wh-win_y, c_btmbg);
 	gr.FillGradRect(0, wh-3, ww, 3, 0, c_btmbg, c_btmbg, 1);//bug of uihacks
-	gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
 	CloseBtn.Paint(gr);
 	MaxBtn.Paint(gr);
 	MinBtn.Paint(gr);
-	MenuBtn.Paint(gr);
+	title_w = gr.CalcTextWidth(TopTitle.Text, g_font);
+	if(show_menu) {
+		gr.FillSolidRect(0, 0, leftbarw, topbarh - 1, c_menubar);
+		gr.DrawImage(img_ico, Math.round((menuicow - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
+		for(var i = 0; i < MenubarBtn.length; i++){
+			MenubarBtn[i].Paint(gr);
+		}
+		gr.GdiDrawText("文件", g_font, c_font, menuicow, 0, menubtnw, topbarh, cc_txt);
+		gr.GdiDrawText("编辑", g_font, c_font, menuicow +  menubtnw, 0, menubtnw, topbarh, cc_txt);
+		gr.GdiDrawText("视图", g_font, c_font, menuicow +  menubtnw*2, 0, menubtnw, topbarh, cc_txt);
+		gr.GdiDrawText("播放", g_font, c_font, menuicow +  menubtnw*3, 0, menubtnw, topbarh, cc_txt);
+		gr.GdiDrawText("媒体库", g_font, c_font, menuicow +  menubtnw*4, 0, menulibw, topbarh, cc_txt);
+		gr.GdiDrawText("帮助", g_font, c_font, menuicow +  menubtnw*4 + menulibw, 0, menubtnw, topbarh, cc_txt);
+		gr.FillGradRect(leftbarw, 0, 1,topbarh - 1, 90, RGBA(0, 0, 0, 3), grey_1, 0.5);
+		gr.FillGradRect(leftbarw + 1, 0, 1,topbarh - 1, 90, c_background, c_gradline, 0.5);
+		let space_1 = z8;
+		let space_2 = 0;
+		let _icow = playing_ico.Width;
+		if(fb.IsPlaying) {
+			space_2 = z(15);
+			if (g_seconds / 2 == Math.floor(g_seconds / 2)) gr.DrawImage(playing_ico, leftbarw + space_1, Math.floor((topbarh - _icow)/2), _icow, _icow, 0, _icow, _icow, _icow,0,255);
+			else gr.DrawImage(playing_ico, leftbarw + space_1, Math.floor((topbarh - _icow)/2), _icow, _icow, 0, 0, _icow, _icow,0,255);
+		}
+		TopTitle.SetSize(leftbarw + space_1 + space_2, 0, title_w, topbarh);
+		TopSubTitle.SetSize(leftbarw + title_w + space_1 + space_2, 0, ww - menubtnw - title_w - 3*topbtnw - g_fsize, topbarh);
+	} else {
+		gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
+		MenuBtn.Paint(gr);
+		TopTitle.SetSize(leftbarw, 0, title_w, topbarh);
+		TopSubTitle.SetSize(leftbarw + title_w, 0, ww - leftbarw - title_w - 3*topbtnw - g_fsize, topbarh);
+	}
 	gr.DrawImage(img_max, Math.round(ww - topbtnw*1.5 - img_max.Width/2), 1, img_max.Width, img_max.Height, 0, 0, img_max.Width, img_max.Height);
 	gr.DrawImage(img_min, Math.round(ww - topbtnw*2.5 - img_min.Width/2), 1, img_min.Width, img_min.Height, 0, 0, img_min.Width, img_min.Height);
-	title_w = gr.CalcTextWidth(TopTitle.Text, g_font);
-	TopTitle.SetSize(menubtnw, 0, title_w, topbarh);
-	TopSubTitle.SetSize(menubtnw + title_w, 0, ww - menubtnw - title_w - 3*topbtnw - g_fsize, topbarh);
+	
 	TopTitle.Paint(gr);
 	TopSubTitle.Paint(gr);
 	PBPrevious.Paint(gr);
@@ -961,7 +1082,7 @@ function on_paint(gr) {
 		MuteBtn.Paint(gr);
 		PBOBtn.Paint(gr);
 		RBtnTips.Paint(gr);
-		gr.DrawImage(img_vol, vol_start - img_vol.Width - z(5), Math.round(btn_y + Math.floor(2*zdpi)), img_vol.Width, img_vol.Width, 0, 0, img_vol.Width, img_vol.Width, 0);
+		gr.DrawImage(img_vol, vol_start - img_vol.Width - z5, Math.round(btn_y + Math.floor(2*zdpi)), img_vol.Width, img_vol.Width, 0, 0, img_vol.Width, img_vol.Width, 0);
 		gr.DrawImage(img_pbo[plman.PlaybackOrder], pbo_start, btn_y + Math.floor(2*zdpi)+1, img_pbo[0].Width, img_pbo[0].Width, 0, 0, img_pbo[0].Width, img_pbo[0].Width, 0);
 		gr.DrawImage(img_lib, vol_start - img_vol.Width*4 - z(15), Math.round(btn_y + Math.floor(6*zdpi)), img_lib.Width, img_lib.Width, 0, 0, img_lib.Width, img_lib.Width, 0);
 		g_switchbar.draw(gr);
@@ -987,7 +1108,13 @@ function on_mouse_move(x, y) {
 		if (CloseBtn.MouseMove(x, y)) hbtn = true;
 		if (MaxBtn.MouseMove(x, y)) hbtn = true;
 		if (MinBtn.MouseMove(x, y)) hbtn = true;
-		if (MenuBtn.MouseMove(x, y)) hbtn = true;
+		if(show_menu) {
+			for(var i = 0; i < MenubarBtn.length; i++){
+				if (MenubarBtn[i].MouseMove(x, y)) hbtn = true;
+			}
+		} else {
+			if (MenuBtn.MouseMove(x, y)) hbtn = true;
+		}
 	} else if(y > win_y - 1){
 		var _x = 0;
 		if(show_extrabtn){
@@ -1016,9 +1143,18 @@ function on_mouse_lbtn_down(x, y) {
 		CloseBtn.MouseDown(x, y);
 		MaxBtn.MouseDown(x, y);
 		MinBtn.MouseDown(x, y);
-		if(MenuBtn.MouseDown(x, y)){
-			hbtn = false;
-			main_Menu(0, topbarh);
+		if(show_menu){
+			for(var i = 0; i < MenubarBtn.length; i++){
+				if(MenubarBtn[i].MouseDown(x, y)){
+					hbtn = false;
+					menu_bar(i);
+				}
+			}
+		}else{
+			if(MenuBtn.MouseDown(x, y)){
+				hbtn = false;
+				main_Menu(0, topbarh);
+			}
 		}
 	} else if(y > win_y - 1){
 		var _x = 0;
@@ -1069,7 +1205,11 @@ function on_mouse_lbtn_up(x, y) {
 		if (MinBtn.MouseUp()) {
 			UIHacks.MainWindowState = 1;// minimized
 		}
-		MenuBtn.MouseUp();
+		if(show_menu){
+			for(var i = 0; i < MenubarBtn.length; i++){
+				MenubarBtn[i].MouseUp();
+			}
+		} else MenuBtn.MouseUp();
 	} else if(y > win_y - 1){
 		if(show_extrabtn){
 			if (PBOpen.MouseUp()) fb.RunMainMenuCommand("打开...");
@@ -1109,7 +1249,11 @@ function on_mouse_leave() {
 		CloseBtn.Reset();
 		MaxBtn.Reset();
 		MinBtn.Reset();
-		MenuBtn.Reset();
+		if(show_menu){
+			for(var i = 0; i < MenubarBtn.length; i++){
+				MenubarBtn[i].Reset();
+			}
+		} else MenuBtn.Reset();
 	}
 }
 
@@ -1166,6 +1310,10 @@ function on_playback_stop(reason) {
 function on_playback_time(time) {
 	PlaybackTimeText.ChangeText(TimeFmt(time));
 	if (seekbar.State != 2) seekbar.ChangeValue(time);
+	if (show_menu) {
+		g_seconds = time;
+		window.RepaintRect(leftbarw, 0, menuicow, topbarh);
+	}
 }
 
 function on_volume_change(v) {
@@ -1245,6 +1393,30 @@ function on_notify_data(name, info) {
 		cbkg_chroma = info;
 		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
+	case "Show_menubar":
+		show_menu = info;
+		window.SetProperty("foobox.show.menubar", show_menu);
+		if(show_menu) {
+			MenubarBtn = [];
+			for(var i = 0; i < 6; i++){
+				if(i == 4) MenubarBtn.push(new ButtonUI(img_winbtn.Resize(menulibw,img_winbtn.Height,2)));
+				else MenubarBtn.push(new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2)));
+			}
+			var _btnx = menuicow;
+			for(var i = 0; i < MenubarBtn.length; i++){
+				MenubarBtn[i].SetXY(_btnx, 0);
+				if(i == 4) _btnx += menulibw;
+				else _btnx += menubtnw;
+			}
+			leftbarw = _btnx;
+		} else {
+			MenuBtn = new ButtonUI(img_winbtn.Resize(menubtnw,img_winbtn.Height,2));
+			MenuBtn.SetXY(0, 0);
+			leftbarw = menubtnw;
+		}
+		uiHacksResetCaption();
+		repaintWin("T");
+		break;
 	}
 }
 
@@ -1253,6 +1425,28 @@ function on_key_down(vkey) {
 	switch (mask) {
 	case KMask.alt:
 		if(vkey == 115) fb.RunMainMenuCommand("文件/退出");
+		else if(show_menu){
+			switch (vkey) {
+			case 70:
+				menu_bar(0);
+				break;
+			case 69:
+				menu_bar(1);
+				break;
+			case 86:
+				menu_bar(2);
+				break;
+			case 80:
+				menu_bar(3);
+				break;
+			case 76:
+				menu_bar(4);
+				break;
+			case 72:
+				menu_bar(5);
+				break;
+			}
+		}
 		break;
 	}
 }

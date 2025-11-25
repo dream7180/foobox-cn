@@ -27,12 +27,16 @@ var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
+var openhacks = utils.CheckComponent("foo_openhacks");
+var show_menu;
+if(openhacks) show_menu = fb.IsMainMenuCommandChecked("视图/显示主菜单");
+else show_menu =  window.GetProperty("foobox.Show.menu.bar", false);
 var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.5.1";
+var g_script_version = "8.6";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -2047,7 +2051,7 @@ function get_images_static() {
 	var ponit_arr = new Array(g_z3,g_z2,g_z3,g_z12,z(13),g_z7);
 	gb.FillPolygon(RGBA(255, 255, 255,100), 0, ponit_arr);
 	ponit_arr = new Array(g_z3,g_z2+imgh,g_z3,g_z12+imgh,z(13),g_z7+imgh);
-	gb.FillPolygon(RGBA(255, 255, 255,255), 0, ponit_arr);
+	gb.FillPolygon(c_white, 0, ponit_arr);
 	gb.SetSmoothingMode(0);
 	images.playing_ico.ReleaseGraphics(gb);
 

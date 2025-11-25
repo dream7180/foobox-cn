@@ -20,7 +20,7 @@ function uiHacksInit() {
 
 function uiHacksResetCaption(){
 	if (!uiHacks) return;
-	UIHacks.SetPseudoCaption(menubtnw, 0, ww - 3*topbtnw - menubtnw, topbarh);
+	UIHacks.SetPseudoCaption(leftbarw, 0, ww - 3*topbtnw - leftbarw, topbarh);
 	if(UIHacks.MainWindowState == 2) UIHacks.DisableSizing = true; //maximized
 	else UIHacks.DisableSizing = false;
 }

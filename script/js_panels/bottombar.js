@@ -1032,6 +1032,14 @@ function on_notify_data(name, info) {
 		cbkg_chroma = info;
 		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
+	case "Show_statusbar":
+		show_status = info;
+		get_color();
+		init_obj();
+		setSize();
+		set_panel();
+		repaintWin();
+		break;
 	}
 }
 

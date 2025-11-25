@@ -70,13 +70,9 @@
 			gr.FillSolidRect(cFilterBox.h + cFilterBox.x, by + this.inputbox.h + 2, cFilterBox.w, 1, g_color_normal_txt & 0x75ffffff);
 		}else{
 			var bx3 = bx2 + cFilterBox.w;
-			var bys = Math.round((ppt.headerBarHeight - 2) / 2);
 			gr.FillSolidRect(0, 0, bx3, ppt.headerBarHeight - 2, g_color_topbar);
-			gr.FillGradRect(bx3 - 1, 0, 1, bys, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-			gr.FillGradRect(bx3 - 1, bys, 1, bys, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+			gr.FillGradRect(bx3 - 1, 0, 1, ppt.headerBarHeight - 2, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 		}
-		//if (this.inputbox.edit) {
-		//};
 
 		if (this.inputbox.text.length > 0) {
 			this.reset_bt.draw(gr, bx - 1, by + 1, 255);

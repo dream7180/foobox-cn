@@ -116,8 +116,8 @@ Section "视频面板 foo-youtube" VideoYoutube
 	#RMDir /r "$INSTDIR\encoders"
 	#RMDir /r "$ProfileDir\foo_youtube"
 	;install new file
-	;SetOutPath "$ProfileDir\user-components\foo_youtube"
-	;File ".\common\vx86\profile\user-components\foo_youtube\*.*"
+	SetOutPath "$ProfileDir\user-components\foo_youtube"
+	File ".\common\vx86\profile\user-components\foo_youtube\*.*"
 	;File ".\common\vxcommon\foo_youtube\*.*"
 	${If} $noConfig = 0
 		SetOutPath "$ProfileDir"
@@ -135,7 +135,7 @@ Section "视频面板 foo-youtube" VideoYoutube
 	SetOutPath "$ProfileDir\foo_youtube"
 	File /r ".\common\vx86\profile\foo_youtube\*.*"
 	File /r ".\cn\vx86\profile\foo_youtube\*.*"
-	File ".\common\vx86\youtube-dlp.exe"
+	File ".\common\vx86\yt-dlp.exe"
 	${If} $noAdmin = 0
 		ExecWait '"$SYSDIR\regsvr32.exe" /s "$ProfileDir\foo_youtube\LAVFilters\LAVSplitter.ax"'
 		ExecWait '"$SYSDIR\regsvr32.exe" /s "$ProfileDir\foo_youtube\LAVFilters\LAVVideo.ax"'

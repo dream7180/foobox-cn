@@ -184,7 +184,7 @@ image_cache = function() {
 				timers.coverLoad = setInterval(() => {
 					if (ppt.albumArtId == 5) { // genre or dir
 						try {
-							var arr = brw.groups[albumIndex].groupkey.split(" ^^ ");
+							var arr = brw.groups[albumIndex].groupkey.split(", ");
 							if(ppt.tagMode == 3){
 								var dc_arr = dir_cover_name.split(";");
 								var folder_path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(brw.groups[albumIndex].metadb);
@@ -324,9 +324,7 @@ oSwitchbar = function() {
 	
 	this.draw = function(gr){
 		var _linex = z(39);
-		var bys = Math.round((ppt.headerBarHeight - 2) / 2);
-		gr.FillGradRect(this.x + this.w -1, 0, 1, bys, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-		gr.FillGradRect(this.x + this.w -1, bys, 1, bys, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+		gr.FillGradRect(this.x + this.w -1, 0, 1, ppt.headerBarHeight - 2, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 		gr.FillSolidRect(this.x + this.w, 0, 1, ppt.headerBarHeight - 2, g_color_normal_bg);
 		gr.FillSolidRect((ppt.tagMode - 1) * _linex, 0, _linex, ppt.headerBarHeight, g_color_normal_bg);
 		gr.FillSolidRect((ppt.tagMode - 1) * _linex - 1, 0, _linex + 2, 2, g_color_highlight);
@@ -537,14 +535,14 @@ oPlaylistManager = function() {
 			if (cPlaylistManager.blink_counter > -1) {
 				if (cPlaylistManager.blink_row == 0) {
 					if (cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {
-						gr.GdiDrawText("+ 发送到新播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+						gr.GdiDrawText("+ 发送到新建播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 					};
 				} else {
 					gr.GdiDrawText("发送到 ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
 			} else {
 				if (this.activeRow == 0) {
-					gr.GdiDrawText("+ 发送到新播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+					gr.GdiDrawText("+ 发送到新建播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				} else {
 					gr.GdiDrawText("发送到 ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
@@ -1756,21 +1754,24 @@ oBrowser = function() {
 				_menu.AppendMenuSeparator();
 			}
 		}
+		var pl_count = plman.PlaylistCount;
 		Context.BuildMenu(_menu, 2, -1);
 		_menu.AppendMenuItem(MF_STRING, 1010, "刷新所选图像 (重置缓存)");
-		_child01.AppendTo(_menu, MF_STRING, "选择添加到...");
-		_child01.AppendMenuItem(MF_STRING, 2000, "新播放列表");
-
-		var pl_count = plman.PlaylistCount;
-		if (pl_count > 1) {
-			_child01.AppendMenuItem(MF_SEPARATOR, 0, "");
-		};
-		for (var i = 0; i < pl_count; i++) {
-			if (i != this.playlist && !plman.IsAutoPlaylist(i)) {
-				_child01.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
-			};
-		};
-
+		if(pl_count > 1 && pl_count < 51){
+			let addSep = true;
+			for (var i = 0; i < pl_count; i++) {
+				if (!plman.IsAutoPlaylist(i) && i != pidx) {
+					if(addSep) {
+						_child01.AppendTo(_menu, MF_STRING, "选择添加到...");
+						_child01.AppendMenuItem(MF_STRING, 2000, "新建播放列表");
+						_child01.AppendMenuItem(MF_SEPARATOR, 0, "");
+						addSep = false;
+					}
+					_child01.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
+				}
+			}
+			if(addSep) _menu.AppendMenuItem(MF_STRING, 2000, "发送到新建播放列表");
+		} else _menu.AppendMenuItem(MF_STRING, 2000, "发送到新建播放列表");
 		var ret = _menu.TrackPopupMenu(x, y);
 		if (ret > 1 && ret < 800) {
 			Context.ExecuteByID(ret - 2);

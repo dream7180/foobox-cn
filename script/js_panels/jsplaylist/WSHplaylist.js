@@ -2262,29 +2262,31 @@ oList = function(object_name, playlist) {
 			}
 		}
 		if(properties.selectionmenu){
+			var pl_count = plman.PlaylistCount;
 			_child01.AppendTo(_menu, MF_STRING, "选择...");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "从播放列表移除");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "移除列表其他项");
-			_child02.AppendTo(_child01, MF_STRING, "添加到...");
-			_child03.AppendTo(_child01, MF_STRING, "发送到...");
-			_child03.AppendMenuItem(MF_STRING, 4000, "新建播放列表");
+			if(pl_count > 1 && pl_count < 51){
+				let addSep = true;
+				for (var i = 0; i < pl_count; i++) {
+					if (i != this.playlist && !plman.IsAutoPlaylist(i)) {
+						if(addSep) {
+							_child02.AppendTo(_child01, MF_STRING, "添加到...");
+							_child03.AppendTo(_child01, MF_STRING, "发送到...");
+							_child03.AppendMenuItem(MF_STRING, 4000, "新建播放列表");
+							_child03.AppendMenuItem(MF_SEPARATOR, 0, "");
+							addSep = false;
+						}
+						_child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
+						_child03.AppendMenuItem(MF_STRING, 4001 + i, plman.GetPlaylistName(i));
+					}
+				}
+				if(addSep) _child01.AppendMenuItem(MF_STRING, 4000, "发送到新建播放列表");
+			} else _child01.AppendMenuItem(MF_STRING, 4000, "发送到新建播放列表");
 			_child01.AppendMenuSeparator();
 			_child01.AppendMenuItem(MF_STRING, 7000, "标签繁转简");
 			_child01.AppendMenuItem(MF_STRING, 7001, "标签简转繁");
-
-			var pl_count = plman.PlaylistCount;
-
-			if (plman.PlaylistCount > 1) {
-				_child03.AppendMenuItem(MF_SEPARATOR, 0, "");
-			}
-			for (var i = 0; i < pl_count; i++) {
-				if (i != this.playlist && !plman.IsAutoPlaylist(i)) {
-					_child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
-					_child03.AppendMenuItem(MF_STRING, 4001 + i, plman.GetPlaylistName(i));
-				}
-			}
 		}
-
 		var ret = _menu.TrackPopupMenu(x, y);
 		if (ret > 2 && ret < 800) {
 			Context.ExecuteByID(ret - 3);

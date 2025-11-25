@@ -413,18 +413,21 @@ oBrowser = function(name) {
 			_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "播放队列")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "移除");
 			Context.InitContext(metadblist_selection);
 			Context.BuildMenu(_menu, 3, -1);
-			_child01.AppendTo(_menu, MF_STRING, "选择添加到...");
-			_child01.AppendMenuItem(MF_STRING, 801, "新播放列表");
-			var addline = true;
-			for (var i = 0; i < plman.PlaylistCount; i++) {
-				if (i != pidx && !plman.IsAutoPlaylist(i)) {
-					if (addline) {
-						_child01.AppendMenuSeparator();
-						addline = false;
+			if(plman.PlaylistCount > 1 && plman.PlaylistCount < 51){
+				var addline = true;
+				for (var i = 0; i < plman.PlaylistCount; i++) {
+					if (i != pidx && !plman.IsAutoPlaylist(i)) {
+						if (addline) {
+							_child01.AppendTo(_menu, MF_STRING, "添加到...");
+							_child01.AppendMenuItem(MF_STRING, 801, "新建播放列表");
+							_child01.AppendMenuSeparator();
+							addline = false;
+						}
+						_child01.AppendMenuItem(MF_STRING, 1000 + i, plman.GetPlaylistName(i));
 					}
-					_child01.AppendMenuItem(MF_STRING, 1000 + i, plman.GetPlaylistName(i));
 				}
-			}
+				if(addline) _menu.AppendMenuItem(MF_STRING, 801, "发送到新建播放列表");
+			} else _menu.AppendMenuItem(MF_STRING, 801, "发送到新建播放列表");
 		}
 		var ret = _menu.TrackPopupMenu(x, y);
 		if (ret > 2 && ret < 800) {
@@ -619,7 +622,8 @@ function on_mouse_lbtn_up(x, y) {
 		};
 	};
 	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		if(plman.PlaylistCount < 51) PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		else fb.RunMainMenuCommand("视图/播放列表管理器");
 		btn_sw.state = ButtonStates.normal;
 		btn_sw.repaint();
 	}
