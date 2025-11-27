@@ -29,8 +29,10 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
 var openhacks = utils.CheckComponent("foo_openhacks");
 var show_menu;
-if(openhacks) show_menu = fb.IsMainMenuCommandChecked("视图/显示主菜单");
-else show_menu =  window.GetProperty("foobox.Show.menu.bar", false);
+if(openhacks) {
+	show_menu = fb.IsMainMenuCommandChecked("视图/显示主菜单");
+	var show_status = fb.IsMainMenuCommandChecked("视图/显示状态栏");
+} else show_menu =  window.GetProperty("foobox.Show.menu.bar", false);
 var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;
