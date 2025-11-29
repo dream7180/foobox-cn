@@ -51,7 +51,7 @@ class Settings {
 		this.nowplaying = `${this.storageFolder}nowplaying.txt`;
 
 		this.cacheTime = 0;
-		this.cfg = $.jsonParse(this.bio, {}, 'file');
+		this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.lfmSim = true;
 
 		this.lang = {
@@ -179,11 +179,10 @@ class Settings {
 		if (!$.file(this.nowplaying)) $.save(this.nowplaying, nowplaying, true);
 		if ($.file(this.bio)) return;
 		const orig_cfg = `${fb.ProfilePath}yttm\\biography.cfg`;
-		const orig_cfg_copied = $.file(`${cfg.storageFolder}foo_lastfm_img.vbs`);
-		if ($.file(orig_cfg) && !orig_cfg_copied) {
+		if ($.file(orig_cfg)) {
 			try {
 				fso.CopyFile(orig_cfg, this.bio);
-				this.cfg = $.jsonParse(this.bio, {}, 'file');
+				this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 				const blacklist_image = `${fb.ProfilePath}yttm\\blacklist_image.json`;
 				if ($.file(blacklist_image)) {
 					fso.CopyFile(blacklist_image, `${cfg.storageFolder}blacklist_image.json`);
@@ -453,7 +452,11 @@ class Settings {
 		if (!this.lang.ok) this.language = 'EN';
 		this.menuSimilarNum = $.clamp(this.menuSimilarNum, 0, 10);
 		this.lfmSim = this.dlLfmSim;
-		if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled10 || this.tagEnabled13 < 7)) this.lfmSim = false;
+		// Regorxxx <- Save similar artist data
+		if (!ppt.exportSimArtists) {
+			if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled10 || this.tagEnabled13 < 7)) this.lfmSim = false;
+		}
+		// Regorxxx ->
 		if (this.local) {
 			this.pth.foLfmSim = this.pth.foLfmSim.replace('{BA9557CE-7B4B-4E0E-9373-99F511E81252}', '{F5E9D9EB-42AD-4A47-B8EE-C9877A8E7851}').replace('biography-cache', 'find-&-play-cache');
 			this.lfmSim = false;

@@ -94,10 +94,10 @@ class Lyrics {
 		});
 		if (this.showOffset) {
 			const offsetW = gr.CalcTextWidth(`偏移: ${this.userOffset / 1000}s`, ui.font.main) + this.lineHeight;
+			gr.SetSmoothingMode(4);
 			gr.FillRoundRect(this.x + this.w - offsetW, this.top, offsetW, this.lineHeight + 1, this.arc1, this.arc1, 0x96000000);
-			gr.DrawRoundRect(this.x + this.w - offsetW, this.top, offsetW, this.lineHeight + 1, this.arc1, this.arc1, 1, 0x64000000);
-			gr.DrawRoundRect(this.x + this.w - offsetW, this.top + 1, offsetW - 2, this.lineHeight + 1 - 2, this.arc2, this.arc2, 1, 0x28ffffff);
-			gr.DrawString(`偏移: ${this.userOffset / 1000}s`, ui.font.main, ui.col.accent, this.x - this.lineHeight / 2, this.top, this.w, this.lineHeight + 1, this.alignRight);
+			gr.SetSmoothingMode(0);
+			gr.DrawString(`偏移: ${this.userOffset / 1000}s`, ui.font.main, RGB(255,255,255), this.x - this.lineHeight / 2, this.top, this.w, this.lineHeight + 1, this.alignRight);
 		}
 	}
 
@@ -189,7 +189,6 @@ class Lyrics {
 		this.init = true;
 		this.lineHeight = !ppt.largerSyncLyricLine ? ui.font.lyrics_h + 4 * $.scale : ui.font.lyrics_h * 1.33;
 		this.arc1 = Math.max(1, Math.floor((this.lineHeight + 1) / 2));
-		this.arc2 = Math.max(1, Math.floor((this.lineHeight + 1 - 2) / 2));
 		ppt.lyricsScrollTimeMax = $.clamp(Math.round(ppt.lyricsScrollTimeMax), 0, 3000);
 		ppt.lyricsScrollTimeAvg = $.clamp(Math.round(ppt.lyricsScrollTimeAvg), 0, 3000);
 		this.durationScroll = ppt.lyricsScrollMaxMethod ? ppt.lyricsScrollTimeMax : Math.round(ppt.lyricsScrollTimeAvg * 2 / 3);
@@ -315,7 +314,7 @@ class Lyrics {
 
 	repaintRect() {
 		window.RepaintRect(this.x + (this.w - this.maxLyrWidth) / 2, this.y, this.maxLyrWidth, this.h + this.lineHeight);
-		if (this.showOffset) window.RepaintRect(this.x, this.top, this.w + 5, this.lineHeight + 2);
+		if (this.showOffset) window.RepaintRect(this.x, this.top, this.w + 5, this.lineHeight + 3);
 	}
 
 	scrollUpdateNeeded() {

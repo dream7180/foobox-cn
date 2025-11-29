@@ -16,6 +16,7 @@ class Text {
 		this.artist = '';
 		this.composition = '';
 		this.countryCodes = `${cfg.storageFolder}country_codes.json`;
+		this.countryCodesDic = $.jsonParse(this.countryCodes, {}, 'file-utf8');// Regorxxx
 		this.cur = [];
 		this.cur_artist = '';
 		this.calc = true;
@@ -545,7 +546,7 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foAmRev', true).pth, false, 'file');
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foAmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.avail.amtrk = this.isTrackRevAvail('am', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) am_tr_mod = trackRev[trk].update;
 
@@ -1012,7 +1013,19 @@ class Text {
 			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_albumartist%/gi, aa ? '$&#@!%path%#@!' : '$&').replace(/%bio_albumartist%/gi, aa)
 			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_album%/gi, l ? '$&#@!%path%#@!' : '$&').replace(/%bio_album%/gi, l)
 			.replace(/((\$if|\$and|\$or|\$not|\$xor)(|\d)\(|\[)[^$%]*%bio_title%/gi, tr ? '$&#@!%path%#@!' : '$&').replace(/%bio_title%/gi, tr);
-
+			
+		// Regorxxx <- Fixed findFile method issue when file names have reserved chars, By TT-ReBORN
+		const cleanFileName = (path) => { // WilB, move this helper to helpers.js for common usage!?
+			const stripReservedChars = (filename) => filename.replace(/[<>:"/\\|?*]+/g, '_');
+			const lastSlash = path.lastIndexOf('\\');
+			const dirPath = path.substring(0, lastSlash + 1);
+			const fileName = path.substring(lastSlash + 1);
+			const safeFileName = stripReservedChars(fileName);
+			return dirPath + safeFileName;
+		};
+		item = cleanFileName(item);
+		// Regorxxx ->
+		
 		switch (type) {
 			case 0: pth = item.replace(/_\.(lrc|txt)$/, '.$1'); break;
 			case 1: pth = item.replace(/\.(lrc|txt)$/, '_.$1'); break;
@@ -1256,7 +1269,7 @@ class Text {
 
 	getFlag(artist, n) {
 		if (ppt[`${n}FlagShow`] && !ppt.hdPos) {
-			let codes = $.jsonParse(this.countryCodes, {}, 'file');
+			let codes = $.jsonParse(this.countryCodes, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			let handle = null;
 			let code = (codes[artist.toLowerCase()] || '').slice(0, 2);
 			let country = '';
@@ -1971,7 +1984,7 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file');
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.avail.lfmtrk = this.isTrackRevAvail('lfm', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) lfm_tr_mod = trackRev[trk].update;
 
@@ -2242,7 +2255,7 @@ class Text {
 				ui.getFont();
 				ui.calcText();
 				panel.setStyle();
-				ui.getColours();
+				//ui.getColours();
 				but.createStars();
 				this.albumFlush();
 				this.artistFlush();
@@ -2254,7 +2267,7 @@ class Text {
 				img.getImages();
 				break;
 			case 2: // reset zoom
-				ui.getColours();
+				//ui.getColours();
 				ui.getFont();
 				panel.setStyle();
 				if (!ppt.img_only) img.clearCache();
@@ -2387,7 +2400,7 @@ class Text {
 		this.reader.items.some((v, i) => {
 			if (v.view == n) {
 				if (v.tag) {
-					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', false);
+					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', !v.nowPlaying); // Regorxxx <- Fixed text reader not working for selection while playing ->
 					if (this[n].readerItem.length) {
 						found = i;
 						return true;
@@ -2577,7 +2590,7 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foWikiRev', true).pth, false, 'file');
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foWikiRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.avail.wikitrk = this.isTrackRevAvail('wiki', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) wiki_tr_mod = trackRev[trk].update;
 
@@ -2661,7 +2674,7 @@ class Text {
 					if (en) {
 						length = $.getProp(o, 'length', '');
 					} else if (panel.summary.other) { // static read
-						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file');
+						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 						if (trackLfmRev && trackLfmRev[trk]) {
 							length = $.getProp(trackLfmRev[trk], 'length', '');
 							if (length) {

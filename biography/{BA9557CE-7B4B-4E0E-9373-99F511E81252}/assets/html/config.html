@@ -630,7 +630,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div class="info8">
 这些变量用于搜索，并应在保存文件夹路径和标题中使用，以确保功能正确。
 
-包含非标准格式的艺术家姓名和歌曲标题的高级电台解析器位于 foo_spider_monkey_panel\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}。它是用户可配置的（在文本编辑器中打开）。
+包含非标准格式的艺术家姓名和歌曲标题的高级电台解析器位于 foo_uie_jsplitter\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}。它是用户可配置的（在文本编辑器中打开）。
 </div>
 			<div style="clear:both;"></div>
 			<div class="div_text11">古典音乐扩展</div>
@@ -779,7 +779,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div id="lfmGenreTag"></div>
 			<div class="div_text3">通知标签</div>
 			<div id="notifyTags"></div>
-			<div class="div_text3">在写入文件标签之前显示确认弹出窗口</div>
+			<div class="div_text3">文件标签</div>
 			<div id="taggerConfirm"></div>
 			<div style="display:inline-block; padding-top:1.25em; padding-bottom:0.7em; width:18%"><a id="setSize" href="#" onclick="showTaggerHelp();return false;">标签帮助</a></div>
 			<div id="tagger_help" style="display: none;">
@@ -799,7 +799,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 <div class="input_cnt2"><input class="input99" value="$replace($meta(Artist Statistics Last.fm,1[playcount]),',',,.,, ,)"/></div>
 <br>
 			<div class="info4"><b>通知标签</b></div>
-			<div class="info4">如果选中，则当前音轨的已启用标签将通知其它蜘蛛猴面板 (Spider Monkey Panels)。这包括电台的艺术家数据。在音轨变化和收到新的或更新的数据时，会发出通知。
+			<div class="info4">如果选中，则当前音轨的已启用标签将通知其它 JSplitter 面板。这包括电台的艺术家数据。在音轨变化和收到新的或更新的数据时，会发出通知。
 
 当前音轨是正在播放音轨或选定音轨，具体取决于面板显示模式。使用默认标签名称而不是任何自定义名称，因此第三方脚本知道会接收什么。
 
@@ -1162,7 +1162,7 @@ info is an object:
 				var seekerLabels = ['计数', '导航条', '长条', '圆点'];
 				var siteNameLabels = ['AllMusic', 'Last.fm', '维基百科'];
 				var summaryLabels = ['流派', '发行日期', '区域*', '现在热门 (Last.fm)', '最新发布（维基百科）', '其它'];
-				var tagLabel = ['专辑流派', '专辑喜爱', '专辑等级', '专辑主题', '艺术家流派', '专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '当前音轨'];
+				var tagLabel = ['专辑流派', '专辑喜爱', '专辑等级', '专辑主题', '艺术家流派', '专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '当前音轨', '在写入文件标签之前显示确认弹出窗口'];
 				var textStyleLabels = ['顶部对齐', '展开列表', '如果显示多个项目，自动优化'];
 				var tfLabels = ['简介', '评论', '标题', '歌词', '标题'];
 				var tfServLabels = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%', '作品标签'];
@@ -1747,7 +1747,7 @@ info is an object:
 					}
 					i = 13; window.similarArtists.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tag_checkbox'+i+'" class="inp_label3">相似艺术家数量 1-6</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
 					i = 14; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
-					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /></div>');
+					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
 					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
 					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
 					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">转化：</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');

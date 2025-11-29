@@ -393,11 +393,19 @@ class Panel {
 		if (!pth.endsWith('\\')) pth += '\\';
 
 		const c_pos = pth.indexOf(':');
+		// Regorxxx <- Dots on paths not working (.local, .cache, .foobar2000* or .fb2k* work now)
+		const dotPathRegEx = /([/\\]).((?:foobar2000|fb2k)[^/\\]*|cache|local)([/\\])/g;
+		const bDotPath = dotPathRegEx.test(pth);
+		// Regorxxx ->
 		pth = type != 'lyr' ? 
 			pth.replace(/[/|:]/g, '-').replace(/\*/g, 'x').replace(/"/g, "''").replace(/[<>]/g, '_').replace(/\?/g, '').replace(/\\\./g, '\\_').replace(/\.+\\/, '\\').replace(/\s*\\\s*/g, '\\') :
 			pth.replace(/[/|:*"<>?]/g, '_');
 		if (c_pos < 3 && c_pos != -1) pth = $.replaceAt(pth, c_pos, ':');
-
+		// Regorxxx <- Dots on paths not working (.local, .cache, .foobar2000* or .fb2k* work now)
+		if (bDotPath) { // Allow some special folders with dots
+			pth = pth.replace(dotPathRegEx, (_, p1, p2, p3) => p1 + '.' + p2 + p3);
+		}
+		// Regorxxx ->
 		while (pth.includes('\\\\')) pth = pth.replace(/\\\\/g, '\\_\\');
 		if (UNC) pth = `\\\\${pth}`;
 		return pth.trim();
@@ -684,7 +692,7 @@ class Panel {
 		});
 		if (ppt.showSimilarArtists) {
 			if ($.file(lfmSim)) {
-				const lSim = $.jsonParse(lfmSim, false, 'file');
+				const lSim = $.jsonParse(lfmSim, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 				let newStyle = false;
 				if (lSim) {
 					if ($.objHasOwnProperty(lSim[0], 'name')) newStyle = true;

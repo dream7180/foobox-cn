@@ -425,7 +425,13 @@ let properties = [
 	['Zoom Heading Font Size (%)', 115, 'zoomHead'],
 	['Zoom Button Heading Size (%)', 100, 'zoomHeadBtn'],
 	['Zoom Button LookUp Size (%)', 100, 'zoomLookUpBtn'],
-	['Zoom Tooltip (%)', 100, 'zoomTooltip']
+	['Zoom Tooltip (%)', 100, 'zoomTooltip'],
+	// Regorxxx <- Save similar artist data
+	['Server create last.fm similar artist database file', true, 'exportSimArtists'],
+	// Regorxxx ->
+	// Regorxxx <- Fix text reading for files without BOM
+	['Text Reader Default codepage (auto = 0)', 65001, 'fileCodePage']
+	// Regorxxx ->
 ];
 
 const ppt = new PanelProperties;

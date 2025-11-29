@@ -366,6 +366,7 @@ function on_notify_data(name, info) {
 			break;
 		case `bio_scriptUnload${ppt.serverName}`:
 			$.server = true;
+			timer.image(); // Regorxxx <- Fix image timers being reset on multiple panels usage ->
 			panel.notifyTimestamp = Date.now();
 			window.NotifyOthers(`bio_notServer${ppt.serverName}`, panel.notifyTimestamp);
 			break;
@@ -548,6 +549,8 @@ function on_script_unload() {
 		window.NotifyOthers(`bio_scriptUnload${ppt.serverName}`, 0);
 		timer.clear(timer.img);
 	}
+	allMusicReq.abortRequest(); // Regorxxx <- Prevented foobar crash when exiting during AllMusic fetching ->
+	[...XMLHttpRequests].forEach((request) => request.abort()); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 	but.on_script_unload();
 	txt.deactivateTooltip();
 }
@@ -580,10 +583,31 @@ function on_size() {
 	img.art.displayedOtherPanel = null;
 
 	if (!ppt.themed) return;
-	const windowMetrics = $.jsonParse(windowMetricsPath, {}, 'file');
+	const windowMetrics = $.jsonParse(windowMetricsPath, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 	windowMetrics[window.Name] = {
 		w: panel.w,
 		h: panel.h
 	}
 	$.save(windowMetricsPath, JSON.stringify(windowMetrics, null, 3), true);
 }
+
+// Regorxxx <- Http Requests when utils.HTTPRequestAsync is available
+function on_http_request_done(task_id, success, response_text, status, headers) {
+	let init = XMLHttpRequests.length;
+	XMLHttpRequests.forEach((request) => {
+		if (request.id === task_id) { 
+			request.readyState = 4;
+			request.status = status;
+			request.responseText = response_text;
+			request.onreadystatechange();
+			request.abort();
+		}
+	});
+}
+// Regorxxx ->
+
+// Regorxxx <- warn about errors downloading files
+function on_download_file_done(path, success, error_text) {
+	if (!success) { console.log('Biography - 保存图像出错:\n\t', error_text); }
+}
+// Regorxxx ->

@@ -106,7 +106,7 @@ class DldWikipedia {
 		}
 
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		
 		switch (this.searchItem) {
 			case 0:
@@ -242,7 +242,7 @@ class DldWikipedia {
 						const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'artists');
 						if (!data.length) {
 							if (this.doFallbackSearch()) return;
-							if (this.type || !$.file(this.pth)) return $.trace('维基百科：' + this.artist + '：在 musicbrainz 上名称不匹配', true);
+							if (this.type || !$.file(this.pth)) return $.trace('维基百科: ' + this.artist + ': 在 musicbrainz 上名称不匹配', true);
 						}
 						const artist = $.strip(this.artist);
 						const aliases = [];
@@ -267,7 +267,7 @@ class DldWikipedia {
 						}
 						if (!this.ar_mbid) {
 							if (this.doFallbackSearch()) return; // type 1-4
-							if (this.type || !$.file(this.pth)) return $.trace('维基百科：' + this.artist + (items.length > 1 || aliases.length > 1 ? '：无法消除多个同名艺术家的歧义：鉴别器' + (!this.lookUpArt ? '，专辑名称或音轨标题，不匹配' : ' 查找菜单不可用') : '：在 musicbrainz 上名称不匹配'), true); // type 0 only
+							if (this.type || !$.file(this.pth)) return $.trace('维基百科: ' + this.artist + (items.length > 1 || aliases.length > 1 ? ': 无法消除多个同名艺术家的歧义：鉴别器' + (!this.lookUpArt ? '，专辑名称或音轨标题，不匹配' : ' 查找菜单不可用') : '：在 musicbrainz 上名称不匹配'), true); // type 0 only
 						}
 						return this.search(1);
 					}
@@ -493,7 +493,7 @@ class DldWikipedia {
 						return this.search(6);
 					} else {
 						if (this.doFallbackSearch()) return;
-						return $.trace('维基百科：' + this.name + '：未找到', true);
+						return $.trace('维基百科: ' + this.name + ': 未找到', true);
 					}
 				}
 				this.rg_mbid = list[i].rg_mbid;
@@ -593,20 +593,18 @@ class DldWikipedia {
 	get(URL, force) {
 		this.func = this.analyse;
 		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.artist + this.title + this.type + this.pth + cfg.partialMatch + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
-			if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 60000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
+		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 60000);
+		}
+		this.xmlhttp.send();
 	}
 
 	getHeadings(text) {
@@ -653,7 +651,7 @@ class DldWikipedia {
 
 		if (this.type == 0) {
 			this.wiki = txt.add([this.info.active, this.info.start, this.info.bornIn, this.info.end, this.info.foundedIn], this.wiki);
-			const value = $.jsonParse(txt.countryCodes, {}, 'file')[this.artist.toLowerCase()];
+			const value = txt.countryCodesDic[this.artist.toLowerCase()]; // Regorxxx <- Force UTF-8. Cache country codes ->
 			if (!value) {
 				let countryCode = '';
 				let locale = this.info.bornIn || this.info.foundedIn;
@@ -682,7 +680,7 @@ class DldWikipedia {
 
 		if (this.type < 3) {
 			if (!this.wiki) {
-				if (this.type || !$.file(this.pth)) $.trace('维基百科：' + (this.title || this.artist) + '：未找到', true);
+				if (this.type || !$.file(this.pth)) $.trace('维基百科: ' + (this.title || this.artist) + ': 未找到', true);
 				return;
 			}
 			if (this.fo) {
@@ -693,7 +691,7 @@ class DldWikipedia {
 				server.res();
 			}
 		} else {
-			const text = $.jsonParse(this.pth, {}, 'file');
+			const text = $.jsonParse(this.pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			if (this.fo) {
 				$.buildPth(this.fo);
 				if (this.site == 'en') {
@@ -717,21 +715,20 @@ class DldWikipedia {
 				$.save(this.pth, JSON.stringify($.sortKeys(text), null, 3), true);
 			}
 			if (genres.length || this.info.composer.length || this.info.released || this.info.length || this.wiki) server.res();
-			else $.trace('维基百科：' + this.name + '：未找到', true);
+			else $.trace('维基百科: ' + this.name + ': 未找到', true);
 		}
 	}
-
+	// Regorxxx <- Cache country codes
 	saveCountryCode(code, force) {
 		if (!code) return;
 		const a = this.artist.toLowerCase();
-		const m = $.jsonParse(txt.countryCodes, {}, 'file');
-		const value = m[a];
+		const value = txt.countryCodesDic[a];
 		if (code == value && !force) return;
-			m[a] = code;
-			$.save(txt.countryCodes, JSON.stringify($.sortKeys(m), null, 3), true);
-			server.res();
+		txt.countryCodesDic[a] = code;
+		$.save(txt.countryCodes, JSON.stringify($.sortKeys(txt.countryCodesDic), null, 3), true);
+		server.res();
 	}
-
+	// Regorxxx ->
 	tidyWiki(n, en) {
 		n = en ? n.replace(/\.\n+/g, '.\r\n\r\n') : n.replace(/\n+/g, '\r\n\r\n');
 		n = n.replace(/\(\)/g, '').replace(/\(;\s/g, '(').replace(/^thumb\r\n\r\n/i, '').replace(/\."([^\s"])/g, '. "$1').replace(/[.,]:\s\d+/g, '.').replace(/Ph\.D\./g, 'PhD')
@@ -972,7 +969,7 @@ class Infobox {
 
 			if (m) {
 				const count = m[0].match(birthDateGlobalPattern);
-				if (count && count.length > 1) return {}; // N/A if > 1 artist
+				if (count && count.length > 1) return {}; // N/A if > 1 artist				
 				const origin = m[0].replace(birthDateGlobalPattern, '').split('{{')[0].replace(/[[\]]/g, '').replace(/^,/, '').trim();
 				m = m[0].match(/(\d+)\s*\|(\d+)\s*\|(\d+)\s*/);
 				if (m) {

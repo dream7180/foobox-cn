@@ -163,7 +163,7 @@ class Tagger {
 	}
 
 	setGenres() {
-		this.genres = $.jsonParse(`${cfg.storageFolder}lastfm_genre_whitelist.json`, [], 'file');
+		this.genres = $.jsonParse(`${cfg.storageFolder}lastfm_genre_whitelist.json`, [], 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		if (cfg.customGenres.length) {
 			this.customGenres = cfg.customGenres.split(',');
 			this.customGenres = this.customGenres.map(v => v.trim());
@@ -291,9 +291,19 @@ class Tagger {
 						if (localeTag.length && !/\s*in\s/.test(localeTag[0])) localeTag.shift();
 						if (localeTag.length && /\s*in\s/.test(localeTag[0])) localeTag[0] = localeTag[0].split(/\s*in\s/)[1].trim();
 						if (!locale[i] && notify) locale[i] = localeTag;
-						if (!locale[i].length) locale[i] = '';
+						if (!locale[i] || !locale[i].length) locale[i] = ''; // Regorxxx <- Fix tagging crash ->
 					}
 				}
+				// Regorxxx <- Fix country retrieval if flag is available with other methods
+				if (!locale[i] && (notify || cfg.tagEnabled9 || force)) {
+					let code = (txt.countryCodesDic[artist.toLowerCase()] || '').slice(0, 2);
+					let country = '';
+					if (code) { country = codeToCountry[code] || ''; }
+					else { country = FbTitleFormat('[$meta(artistcountry,0)]').EvalWithMetadb(handles[i]); }
+					if (country.length) { locale[i] = [country]; }
+					if (!locale[i] || !locale[i].length) { locale[i] = ''; }
+				}
+				// Regorxxx ->
 			} else {
 				artGenre_am[i] = artGenre_am[i - 1];
 				artGenre_w[i] = artGenre_w[i - 1];
@@ -398,7 +408,7 @@ class Tagger {
 				artist: artists[0],
 				album: albums[0],
 				handle: handles[0],
-				selectionMode: !notifyFocus ? '首选正在播放项' : '跟随所选音轨（播放列表）',
+				selectionMode: !panel.id.focus ? '首选正在播放项' : '跟随所选音轨（播放列表）',// Regorxxx <- Fix bugged notification of selection mode ->
 				tags: tags[0]
 			});
 		}

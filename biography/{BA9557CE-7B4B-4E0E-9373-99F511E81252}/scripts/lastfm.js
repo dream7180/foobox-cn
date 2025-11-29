@@ -44,23 +44,21 @@ class DldLastfmBio {
 		this.fo_bio = p_fo_bio;
 		this.pth_bio = p_pth_bio;
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = this.searchBio == 3 ? 'https://' + server.lfm.server + '/music/' + encodeURIComponent(this.artist) + '/' + encodeURIComponent(this.itemValue[0]) : this.searchBio == 2 ? 'https://www.last.fm/music/' + encodeURIComponent(this.artist) + '/+albums' : 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.artist) + (this.searchBio ? '/+wiki' : '');
 		this.func = this.analyse;
 		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.artist + this.pth_bio + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 30000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
+		this.xmlhttp.send();
 	}
 
 	analyse(saveOnly) {
@@ -68,7 +66,6 @@ class DldLastfmBio {
 		if (!saveOnly) {
 			doc.open();
 			const div = doc.createElement('div');
-		try{
 			div.innerHTML = this.xmlhttp.responseText;
 			const r1 = ['Popular this week', 'Beliebt diese Woche', 'Popular esta semana', 'Populaire cette semaine', 'Popolare questa settimana', '\u4eca\u9031\u306e\u4eba\u6c17\u97f3\u697d', 'Popularne w tym tygodniu', 'Mais ouvida na semana', '\u041f\u043e\u043f\u0443\u043b\u044f\u0440\u043d\u043e \u043d\u0430 \u044d\u0442\u043e\u0439 \u043d\u0435\u0434\u0435\u043b\u0435', 'Popul\u00e4rt denna vecka', 'Bu hafta pop\u00fcler olanlar', '\u672c\u5468\u70ed\u95e8'];
 			const r2 = ['Popular Now', 'Beliebt Jetzt', 'Popular Ahora', 'Populaire Maintenant', 'Popolare Ora', '\u4eca\u4eba\u6c17', 'Popularne Teraz', 'Popular Agora', '\u041f\u043e\u043f\u0443\u043b\u044f\u0440\u043d\u044b\u0435 \u0441\u0435\u0439\u0447\u0430\u0441', 'Popul\u00e4r Nu', '\u015eimdi Pop\u00fcler', '\u70ed\u95e8 \u73b0\u5728'];
@@ -186,7 +183,6 @@ class DldLastfmBio {
 					}
 					break;
 			}
-		} catch (e) {doc.close();}
 		}
 		if ((!this.con.length || this.con.length < 45 && noWiki(this.con)) && server.langFallback && !this.retry) {
 			this.retry = true;
@@ -200,7 +196,7 @@ class DldLastfmBio {
 		if (this.scrobbles[1].length && this.counts[1].length || this.scrobbles[0].length && this.counts[0].length) this.con += ('\r\n\r\nLast.fm: ' + (this.counts[1].length ? this.scrobbles[1] + ' ' + this.counts[1] + '; ' : '') + (this.counts[0].length ? this.scrobbles[0] + ' ' + this.counts[0] : ''));
 		this.con = this.con.trim();
 		if (!this.con.length) {
-			$.trace('Last.fm 简介：' + this.artist + '：未找到', true);
+			$.trace('last.fm 简介: ' + this.artist + ': 未找到', true);
 			return;
 		}
 		if (!this.fo_bio) return;
@@ -251,7 +247,6 @@ class DldArtImages {
 	}
 
 	run(dl_ar, force, art, p_stndBio, p_supCache) {
-		if (!$.file(`${cfg.storageFolder}foo_lastfm_img.vbs`)) return;
 		let img_folder = p_stndBio && !panel.isRadio(art.focus) ? panel.cleanPth(cfg.pth.foImgArt, art.focus, 'server') : panel.cleanPth(cfg.remap.foImgArt, art.focus, 'remap', dl_ar, '', 1);
 		if (p_supCache && !$.folder(img_folder)) img_folder = panel.cleanPth(cfg.sup.foImgArt, art.focus, 'remap', dl_ar, '', 1);
 		const getNo = this.img_exp(dl_ar, img_folder, !force ? server.exp : 0);
@@ -282,7 +277,7 @@ class LfmArtImg {
 				clearTimeout(this.timer);
 				this.timer = null;
 				if (this.xmlhttp.status == 200) this.func();
-				else $.trace('Last.fm 艺术家照片：' + this.dl_ar + '：未找到' + ' 错误状态：' + this.xmlhttp.status, true);
+				else $.trace('last.fm 艺术家照片: ' + this.dl_ar + ': 未找到' + ' 错误状态: ' + this.xmlhttp.status, true);
 			}
 	}
 
@@ -294,30 +289,27 @@ class LfmArtImg {
 		this.allFiles = p_allFiles;
 		this.imgExisting = p_imgExisting;
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.dl_ar) + '/+images';
 		this.func = this.analyse;
 		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.dl_ar + this.getNo + this.autoAdd + this.img_folder + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 30000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
+		this.xmlhttp.send();
 	}
 
 	analyse() {
 		const a = $.clean(this.dl_ar);
 		doc.open();
 		const div = doc.createElement('div');
-		try{
 		div.innerHTML = this.xmlhttp.responseText;
 		const list = div.getElementsByTagName('img');
 		let links = [];
@@ -328,7 +320,7 @@ class LfmArtImg {
 				return this.search(this.dl_ar, this.img_folder);
 			}
 			doc.close();
-			return $.trace('Last.fm 艺术家照片：' + this.dl_ar + '：未找到', true);
+			return $.trace('last.fm 艺术家照片: ' + this.dl_ar + ': 未找到', true);
 		}
 		$.htmlParse(list, false, false, v => {
 			const attr = v.src || '';
@@ -361,13 +353,20 @@ class LfmArtImg {
 				$.save(this.img_folder + 'update.txt', '', true);
 				timer.decelerating();
 				if (this.autoAdd) {
-					$.take(links, this.getNo).forEach(v => $.run(`cscript //nologo "${cfg.storageFolder}foo_lastfm_img.vbs" "${v}" "${this.img_folder + a}_${v.substring(v.lastIndexOf('/') + 1)}.jpg"`, 0));
+					$.take(links, this.getNo).forEach(v => {
+						// Regorxxx <- Use utils.DownloadFileAsync if available
+						const imPth = `${this.img_folder + a}_${v.substring(v.lastIndexOf('/') + 1)}.jpg`;
+						utils.DownloadFileAsync(v, imPth);
+						// Regorxxx ->
+					});
 				} else {
 					let c = 0;
 					$.take(links, cfg.photoNum).some(v => {
 						const imPth = `${this.img_folder + a}_${v.substring(v.lastIndexOf('/') + 1)}.jpg`;
 						if (!this.allFiles.includes(imPth)) {
-							$.run(`cscript //nologo "${cfg.storageFolder}foo_lastfm_img.vbs" "${v}" "${imPth}"`, 0);
+							// Regorxxx <- Use utils.DownloadFileAsync if available
+							utils.DownloadFileAsync(v, imPth);
+							// Regorxxx ->
 							c++;
 							return c == this.getNo;
 						}
@@ -375,7 +374,6 @@ class LfmArtImg {
 				}
 			}
 		}
-		} catch (e) {doc.close();}
 	}
 }
 
@@ -409,7 +407,7 @@ class LfmAlbum {
 						this.getStats = false;
 						return this.search(this.albumArtist, this.album, this.rev, this.fo, this.pth);
 					}
-					$.trace('Last.fm 专辑' + (this.rev ? '评论：' : '封面：') + this.album + ' / ' + this.albumArtist + '：未找到' + ' 错误状态：' + this.xmlhttp.status, true);
+					$.trace('last.fm 专辑 ' + (this.rev ? '评论: ' : '封面: ') + this.album + ' / ' + this.albumArtist + ': 未找到' + ' 错误状态: ' + this.xmlhttp.status, true);
 				}
 			}
 	}
@@ -429,23 +427,21 @@ class LfmAlbum {
 			URL += '&method=album.getInfo&artist=' + encodeURIComponent(this.albumArtist) + '&album=' + encodeURIComponent(this.rev || this.retry ? this.album : this.albm) + '&autocorrect=' + server.auto_corr;
 		} else URL = 'https://' + server.lfm.server + '/music/' + encodeURIComponent(this.albumArtist) + '/' + encodeURIComponent(this.album.replace(/\+/g, '%2B'));
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
 		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.albumArtist + this.album + this.albm + this.rev + this.rev_img + (cfg.imgRevHQ || !this.rev_img) + this.pth + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			if (!this.getStats && this.rev || !this.rev) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
-			if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 30000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (!this.getStats && this.rev || !this.rev) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
+		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
+		this.xmlhttp.send();
 	}
 
 	analyse() {
@@ -456,7 +452,7 @@ class LfmAlbum {
 					this.retry = true;
 					return this.search(this.albumArtist, this.album, this.rev, this.fo, this.pth);
 				}
-				if (!this.stats.length) return $.trace('Last.fm 专辑评论：' + this.album + ' / ' + this.albumArtist + '：未找到', true);
+				if (!this.stats.length) return $.trace('last.fm 专辑评论: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
 			} else {
 				wiki = wiki.replace(/<[^>]+>/ig, '');
 				const f = wiki.indexOf(' Read more on Last.fm');
@@ -475,7 +471,6 @@ class LfmAlbum {
 			const counts = ['', '', ''];
 			const div = doc.createElement('div');
 			const scrobbles = ['', '', ''];
-			try{
 			div.innerHTML = this.xmlhttp.responseText;
 			let j = 0;
 			let length = '';
@@ -527,9 +522,7 @@ class LfmAlbum {
 
 			this.getStats = false;
 			return this.search(this.albumArtist, this.album, this.rev, this.fo, this.pth);
-			} catch (e) {doc.close();}
 		} else {
-			if (!$.file(`${cfg.storageFolder}foo_lastfm_img.vbs`)) return;
 			const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'album.image');
 			if (data.length < 5) {
 				server.updateNotFound(this.albumArtist + ' - ' + (this.retry ? this.album : this.albm) + ' ' + server.auto_corr + ' ' + this.pth);
@@ -537,7 +530,7 @@ class LfmAlbum {
 					this.retry = true;
 					return this.search(this.albumArtist, this.album, this.rev, this.fo, this.pth, this.albm);
 				}
-				return $.trace('Last.fm 专辑封面：' + this.album + ' / ' + this.albumArtist + '：未找到', true);
+				return $.trace('last.fm 专辑封面: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
 			}
 			let link = data[cfg.imgRevHQ || !this.rev_img ? 4 : 3]['#text'];
 			if (link && (cfg.imgRevHQ || !this.rev_img)) {
@@ -551,11 +544,13 @@ class LfmAlbum {
 					this.retry = true;
 					return this.search(this.albumArtist, this.album, this.rev, this.fo, this.pth, this.albm);
 				}
-				return $.trace('Last.fm 专辑封面：' + this.album + ' / ' + this.albumArtist + '：未找到', true);
+				return $.trace('last.fm 专辑封面: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
 			}
 			timer.decelerating(true);
 			$.buildPth(this.fo);
-			$.run(`cscript //nologo "${cfg.storageFolder}foo_lastfm_img.vbs" "${link}" "${this.pth + link.slice(-4)}"`, 0);
+			// Regorxxx <- Use utils.DownloadFileAsync if available
+			utils.DownloadFileAsync(link, this.pth + link.slice(-4));
+			// Regorxxx ->
 		}
 	}
 }
@@ -616,7 +611,7 @@ class LfmTrack {
 				if (!server.lfm.def_EN && !this.retry) URL += '&lang=' + cfg.language.toLowerCase();
 				URL += '&method=track.getInfo&artist=' + encodeURIComponent(this.artist) + '&track=' + encodeURIComponent(this.track) + '&autocorrect=' + server.auto_corr;
 			} else {
-				this.text = $.jsonParse(this.pth, false, 'file');
+				this.text = $.jsonParse(this.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 				if (!this.text) this.text = {
 					ids: {}
 				}
@@ -636,22 +631,20 @@ class LfmTrack {
 			} else return this.revSave();
 		}
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
 		if (ppt.multiServer && !this.force && server.urlDone(md5.hashStr(this.artist + this.track + this.pth + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			if (!this.getStats && !this.lfm_done) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
-			if (this.force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 30000);
-			}
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (!this.getStats && !this.lfm_done) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
+		if (this.force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
 		try {
 			this.xmlhttp.send();
 		} catch (e) {
@@ -690,7 +683,6 @@ class LfmTrack {
 				const counts = ['', ''];
 				const div = doc.createElement('div');
 				const scrobbles = ['', ''];
-				try{
 				div.innerHTML = this.xmlhttp.responseText;
 				let from = '';
 				let j = 0;
@@ -738,12 +730,10 @@ class LfmTrack {
 				if (scrobbles[1].length && counts[1].length || scrobbles[0].length && counts[0].length) this.stats += ('Last.fm: ' + (counts[1].length ? scrobbles[1] + ' ' + counts[1] + '; ' : '') + (counts[0].length ? scrobbles[0] + ' ' + counts[0] : ''));
 				this.getStats = false;
 				return this.search(this.artist, this.track, this.fo, this.pth, this.force);
-				} catch (e) {doc.close();}
 			}
 		} else {
 			doc.open();
 			const div = doc.createElement('div');
-			try{
 			div.innerHTML = this.xmlhttp.responseText;
 			if (!this.getIDs) {
 				let j = 0;
@@ -774,7 +764,6 @@ class LfmTrack {
 				this.getIDs = false;
 				this.search(this.artist, this.track, this.fo, this.pth, this.force);
 			}
-			} catch (e) {doc.close();}
 		}
 	}
 
@@ -812,7 +801,7 @@ class LfmTrack {
 			$.buildPth(this.fo);
 			$.save(this.pth, JSON.stringify($.sortKeys(this.text), null, 3), true);
 		}
-		if (ret) return $.trace('last.fm 音轨评论：' + $.titlecase(this.track) + ' / ' + this.artist + '：未找到', true);
+		if (ret) return $.trace('last.fm 音轨评论: ' + $.titlecase(this.track) + ' / ' + this.artist + ': 未找到', true);
 		server.res();
 	}
 }
@@ -849,16 +838,14 @@ class LfmSimilarArtists {
 		this.fn_sim = p_fn_sim;
 		if (this.retry) this.lmt = this.lmt == 249 ? 235 + Math.floor(Math.random() * 14) : this.lmt + 10;
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'http://ws.audioscrobbler.com/2.0/?format=json' + panel.lfm + '&method=artist.getSimilar&artist=' + encodeURIComponent(this.artist) + '&limit=' + this.lmt + '&autocorrect=1';
 		this.func = this.analyse;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
-			if (this.retry) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
+		if (this.retry) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		this.xmlhttp.send();
 	}
 
 	analyse() {
@@ -887,6 +874,24 @@ class LfmSimilarArtists {
 					if (!this.pth_sim) break;
 					$.buildPth(this.pth_sim);
 					$.save(this.fn_sim, JSON.stringify(list), true);
+					// Regorxxx <- Save similar artist data
+					if (ppt.exportSimArtists) {
+						const mbid = server.artistMbid[this.artist]
+							? server.artistMbid[this.artist]
+							: this.handles
+								? FbTitleFormat('[$trim($meta(MUSICBRAINZ_ALBUMARTISTID,0))]'.EvalWithMetadb(this.handles[0]))
+								: $.eval('[$trim($meta(MUSICBRAINZ_ALBUMARTISTID,0))]', panel.id.focus);
+						if (mbid && !server.artistMbid[this.artist]) { server.artistMbid[this.artist] = mbid; }
+						updateSimilarDataFile(
+							fb.ProfilePath + 'js_data\\lastfm_artists.json',
+							[{
+								artist: this.artist,
+								...(mbid ? { mbid } : {}),
+								val: list.slice(1, 10).map((v) => { return { artist: v.name, score: v.score }; })
+							}]
+						);
+					}
+					// Regorxxx ->
 					if (cfg.lfmSim) {
 						panel.getList();
 						window.NotifyOthers('bio_getLookUpList', 'bio_getLookUpList');
@@ -917,14 +922,12 @@ class LfmTopAlbums {
 	search(p_artist) {
 		this.artist = p_artist;
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'https://www.last.fm/music/' + encodeURIComponent(this.artist) + '/+albums';
 		this.func = this.analyse;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		this.xmlhttp.send();
 	}
 
 	analyse() {
@@ -933,7 +936,6 @@ class LfmTopAlbums {
 		const popAlbums = [];
 		let i = 0;
 		let topAlbums = [];
-		try{
 		div.innerHTML = this.xmlhttp.responseText;
 		$.htmlParse(div.getElementsByTagName('h3'), 'className', 'resource-list--release-list-item-name', v => {
 			i < 4 ? popAlbums.push($.titlecase(v.innerText.trim())) : topAlbums.push($.titlecase(v.innerText.trim()));
@@ -950,7 +952,6 @@ class LfmTopAlbums {
 		topAlbums = [...new Set(topAlbums)];
 		topAlbums.length = Math.min(6, topAlbums.length);
 		this.on_search_done_callback(this.artist, topAlbums);
-		} catch (e) {doc.close();}
 	}
 }
 
@@ -968,33 +969,30 @@ class DldLastfmGenresWhitelist {
 				clearTimeout(this.timer);
 				this.timer = null;
 				if (this.xmlhttp.status == 200) this.func();
-				else $.trace('无法更新 Last.fm 流派白名单' + ' 错误状态：' + this.xmlhttp.status, true);
+				else $.trace('无法更新 Last.fm 流派白名单' + ' 错误状态: ' + this.xmlhttp.status, true);
 			}
 	}
 
 	search() {
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'https://musicbrainz.org/genres';
 		this.func = this.analyse;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 30000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 30000);
+		}
+		this.xmlhttp.send();
 	}
 
 	analyse() {
 		doc.open();
 		const div = doc.createElement('div');
-		try{
 		div.innerHTML = this.xmlhttp.responseText;
 		const a = div.getElementsByTagName('a');
 		let genres = [];
@@ -1006,12 +1004,11 @@ class DldLastfmGenresWhitelist {
 
 		if (genres.length > 860) {
 			const pth = `${cfg.storageFolder}lastfm_genre_whitelist.json`;
-			const existingGenres = $.jsonParse(pth, [], 'file');
+			const existingGenres = $.jsonParse(pth, [], 'file-utf8'); // Regorxxx <-- Force UTF-8
 			if (genres.length > existingGenres.length) {
 				$.buildPth(pth);
 				$.save(pth, JSON.stringify(genres), true);
 			}
 		}
-		} catch (e) {doc.close();}
 	}
 }

@@ -290,7 +290,7 @@ class Images {
 	blacklist(clean_artist) {
 		let black_list = [];
 		if (!$.file(this.blackList.file)) return black_list;
-		const list = $.jsonParse(this.blackList.file, false, 'file');
+		const list = $.jsonParse(this.blackList.file, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		return list.blacklist[clean_artist] || black_list;
 	}
 

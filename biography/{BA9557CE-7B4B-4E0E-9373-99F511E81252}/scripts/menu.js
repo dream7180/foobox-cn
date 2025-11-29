@@ -652,7 +652,7 @@ class MenuItems {
 
 		if ($.file(this.path.blackList)) {
 			this.img.artistClean = $.clean(this.img.artist).toLowerCase();
-			this.img.list = $.jsonParse(this.path.blackList, false, 'file');
+			this.img.list = $.jsonParse(this.path.blackList, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			this.img.blacklist = this.img.list.blacklist[this.img.artistClean] || [];
 		}
 	

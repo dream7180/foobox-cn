@@ -278,14 +278,14 @@ function get_color() {
 		c_tip_bg = RGBA(0, 0, 0, 200);
 		c_seeker_core = c_black;
 		c_menubar = RGBA(0, 0, 0, 20);
-		c_gradline = RGBA(255, 255, 255, 50);
+		c_gradline = RGBA(255, 255, 255, 25);
 	} else {
 		c_background = blendColors(c_black, c_background_default, 0.875);
 		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
 		c_tip_bg = RGBA(255, 255, 255, 200);
 		c_seeker_core = c_white;
 		c_menubar = RGBA(0, 0, 0, 12);
-		c_gradline = RGBA(255, 255, 255, 150); 
+		c_gradline = RGBA(255, 255, 255, 50); 
 	}
 	c_background_default = c_background;
 	c_btmbg_default = c_btmbg;
@@ -492,7 +492,7 @@ function init_obj() {
 			if(i == 4) _btnx += menulibw;
 			else _btnx += menubtnw;
 		}
-		leftbarw = _btnx
+		leftbarw = _btnx;
 	} else {
 		MenuBtn.SetXY(0, 0);
 		leftbarw = menubtnw;

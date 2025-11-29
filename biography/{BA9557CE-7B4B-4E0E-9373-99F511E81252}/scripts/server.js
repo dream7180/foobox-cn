@@ -15,7 +15,7 @@ class Server {
 		this.exp = Math.max(panel.d * cfg.exp / 28, panel.d);
 		if (!this.exp || isNaN(this.exp)) this.exp = panel.d;
 		this.imgToRecycle = [];
-		if ($.file(this.bioCache)) this.imgToRecycle = $.jsonParse(this.bioCache, false, 'file');
+		if ($.file(this.bioCache)) this.imgToRecycle = $.jsonParse(this.bioCache, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.langFallback = false;
 		this.lastGetTrack = Date.now();
 		this.notFound = `${cfg.storageFolder}update_bio.json`;
@@ -66,7 +66,6 @@ class Server {
 			'trailing': true
 		});
 
-		this.createImgDlFile();
 		this.checkNotFound();
 		this.setImgRecycler();
 		this.setLanguage();
@@ -79,7 +78,7 @@ class Server {
 			'name': 'update',
 			'time': Date.now()
 		}], null, 3), true);
-		let m = $.jsonParse(this.notFound, false, 'file');
+		let m = $.jsonParse(this.notFound, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		if (!$.isArray(m)) {
 			m = [{
 				'name': 'update',
@@ -107,18 +106,9 @@ class Server {
 		}
 	}
 
-	createImgDlFile() {
-		const n = `${cfg.storageFolder}foo_lastfm_img.vbs`
-		
-		if (!$.file(n)) {
-			const dl_im = 'If (WScript.Arguments.Count <> 2) Then\r\nWScript.Quit\r\nEnd If\r\n\r\nurl = WScript.Arguments(0)\r\nfile = WScript.Arguments(1)\r\n\r\nSet objFSO = Createobject("Scripting.FileSystemObject")\r\nIf objFSO.Fileexists(file) Then\r\nSet objFSO = Nothing\r\nWScript.Quit\r\nEnd If\r\n\r\nSet objXMLHTTP = CreateObject("MSXML2.XMLHTTP")\r\nobjXMLHTTP.open "GET", url, false\r\nobjXMLHTTP.send()\r\n\r\nIf objXMLHTTP.Status = 200 Then\r\nSet objADOStream = CreateObject("ADODB.Stream")\r\nobjADOStream.Open\r\nobjADOStream.Type = 1\r\nobjADOStream.Write objXMLHTTP.ResponseBody\r\nobjADOStream.Position = 0\r\nobjADOStream.SaveToFile file\r\nobjADOStream.Close\r\nSet objADOStream = Nothing\r\nEnd If\r\n\r\nSet objFSO = Nothing\r\nSet objXMLHTTP = Nothing';
-			$.save(n, dl_im, false);
-		}
-	}
-
 	done(f, exp) {
 		if (!$.file(this.notFound)) return false;
-		const m = $.jsonParse(this.notFound, false, 'file');
+		const m = $.jsonParse(this.notFound, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		const n = Date.now();
 		const r = n - exp;
 		const u = n - panel.d / 28;
@@ -287,7 +277,7 @@ class Server {
 						let len = 0;
 						let valid = false;
 						if ($.file(pth_sim)) {
-							const list = $.jsonParse(pth_sim, false, 'file');
+							const list = $.jsonParse(pth_sim, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 							if (list) {
 								valid = $.objHasOwnProperty(list[0], 'name');
 								len = list.length;
@@ -333,11 +323,9 @@ class Server {
 				const am_bio = panel.getPth('bio', art.focus, this.artist, '', stndBio, supCache, $.clean(this.artist), '', '', 'foAmBio', true, true);
 
 				if (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + title, false) && !$.open(am_bio.pth).includes('Custom Biography')) {
-          setTimeout(() => {
-  					const dl_am_bio = new DldAllmusicBio;
-  					const url = title ? server.url.am + 'songs/' + encodeURIComponent(title + ' ' + this.artist) : server.url.am + 'artists/' + encodeURIComponent(this.artist);
-  					dl_am_bio.initbio(url, 'https://allmusic.com', title, this.artist, am_bio.fo, am_bio.pth, force);
-          }, 2000); // throttle
+					const dl_am_bio = new DldAllmusicBio;
+					const url = title ? server.url.am + 'songs/' + encodeURIComponent(title + ' ' + this.artist) : server.url.am + 'artists/' + encodeURIComponent(this.artist);
+					dl_am_bio.init(url, 'https://allmusic.com', title, this.artist, am_bio.fo, am_bio.pth, force);
 				}
 				break;
 			}
@@ -444,10 +432,8 @@ class Server {
 					if (rev_upd && art_upd) dn_type = 'review+biography';
 					else if (rev_upd) dn_type = 'review';
 					else if (art_upd) dn_type = 'biography';
-          setTimeout(() => {
-					const dl_am_rev = new DldAllmusicRev(() => dl_am_rev.onStateChange());
-					dl_am_rev.search(0, server.url.am + 'albums/' + encodeURIComponent(this.album + (!va ? ' ' + this.albumArtist : '')), this.album, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
-          }, 2000); // throttle
+					const dl_am_rev = new DldAllmusicRev;
+					dl_am_rev.init(server.url.am + 'albums/' + encodeURIComponent(this.album + (!va ? ' ' + this.albumArtist : '')), 'https://allmusic.com', this.album, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
 				}
 			}
 		} else this.getBio(force, art, 1);
@@ -463,8 +449,8 @@ class Server {
 				const amWork = this.composition;
 				setTimeout(() => {
 				const dl_am_comp = new DldAllmusicRev;
-					dl_am_comp.initrev(server.url.am + 'compositions/' + encodeURIComponent(amWork + (!va ? ' ' + amAlbumArtist : '')), 'https://allmusic.com', amWork, amAlbumArtist, artiste, va, dn_type, am_rev.fo, am_comp.pth, am_bio.fo, am_bio.pth, art, force);
-				}, 2000); // throttle
+					dl_am_comp.init(server.url.am + 'compositions/' + encodeURIComponent(amWork + (!va ? ' ' + amAlbumArtist : '')), 'https://allmusic.com', amWork, amAlbumArtist, artiste, va, dn_type, am_rev.fo, am_comp.pth, am_bio.fo, am_bio.pth, art, force);
+				}, 3200); // throttle
 			}
 		}
 
@@ -511,7 +497,7 @@ class Server {
 				setTimeout(() => {
 					const wk_comp = new DldWikipedia(() => wk_comp.onStateChange());
 					wk_comp.search(0, wikiAlbumArtist.toLowerCase() != cfg.va.toLowerCase() ? wikiAlbumArtist : 'Various Artists', wikiWork, wikiAlbum, wikiTitle, wikiStnd ? 2 : '!stndComp', wiki_comp.fo, wiki_comp.pth, alb.focus, force);
-				}, 2000); // wait for mbid & Qid & limit call frequency
+				}, 3600); // wait for mbid & Qid & limit call frequency
 			}
 		}
 	}
@@ -570,7 +556,7 @@ class Server {
 		if (cfg.dlAmRev) {
 			const amTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foAmRev', true, true);
 			const am_bio = panel.getPth('bio', tr.focus, tr.artist, '', true, cfg.supCache && !lib.inLibrary(0, tr.artist), $.clean(tr.artist), '', '', 'foAmBio', true, true);
-			const amText = $.jsonParse(amTracks.pth, false, 'file');
+			const amText = $.jsonParse(amTracks.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			const amArtist = tr.artist;
 			const amTrk = trk;
 
@@ -579,14 +565,14 @@ class Server {
 			if (track_upd) {
 				setTimeout(() => {
 					const dl_am_trk = new DldAllmusicRev;
-					dl_am_trk.initrev(server.url.am + 'songs/' + encodeURIComponent(amTrk + ' ' + amArtist), 'https://allmusic.com', amTrk, amArtist, amArtist, false, 'track', amTracks.fo, amTracks.pth, am_bio.fo, am_bio.pth, [], tr.force);
+					dl_am_trk.init(server.url.am + 'songs/' + encodeURIComponent(amTrk + ' ' + amArtist), 'https://allmusic.com', amTrk, amArtist, amArtist, false, 'track', amTracks.fo, amTracks.pth, am_bio.fo, am_bio.pth, [], tr.force);
 				}, 1600); // throttle
 			}
 		}
 
 		if (cfg.dlLfmRev) {
 			const lfmTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foLfmRev', true, true);
-			const lfmText = $.jsonParse(lfmTracks.pth, false, 'file');
+			const lfmText = $.jsonParse(lfmTracks.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 
 			if (!lfmText || !lfmText[trk] || lfmText[trk].update < Date.now() - this.exp || lfmText[trk].lang != cfg.language || tr.force) {
 				const dl_lfm_track = new LfmTrack(() => dl_lfm_track.onStateChange());
@@ -596,7 +582,7 @@ class Server {
 
 		if (cfg.dlWikiRev) {
 			const wikiTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foWikiRev', true, true);
-			const wikiText = $.jsonParse(wikiTracks.pth, false, 'file');
+			const wikiText = $.jsonParse(wikiTracks.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			const wikiAlbum = name.album(tr.focus, true);
 			const wikiArtist = tr.artist;
 			const wikiTrk = trk;
@@ -688,7 +674,7 @@ class Server {
 
 	updateNotFound(f) {
 		if (!$.file(this.notFound)) return;
-		const m = $.jsonParse(this.notFound, false, 'file');
+		const m = $.jsonParse(this.notFound, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		for (let k = 0; k < m.length; k++)
 			if (m[k].name == f) return;
 		m.push({

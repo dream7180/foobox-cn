@@ -121,6 +121,21 @@ class Helpers {
 	folder(fo) {
 		return typeof fo === 'string' && fso.FolderExists(fo);
 	}
+	
+	// Regorxxx <- Write similar artists data
+	deleteFile(f, bForce = true) {
+		if (this.file(f)) {
+			try {
+				fso.DeleteFile(f, bForce);
+			} catch (e) {
+				console.log('_deleteFile: ' + f + '\n\t ' + e.message);
+				return false;
+			}
+			return !(this.file(f));
+		}
+		return false;
+	}
+	// Regorxxx ->
 
 	getClipboardData() {
 		try {
@@ -196,32 +211,38 @@ class Helpers {
 		return null != t && ('object' == e || 'function' == e);
 	}
 
+	// Regorxxx <- Write similar artists data. Add codepage support
 	jsonParse(n, defaultVal, type, keys) {
 		switch (type) {
+			case 'file-utf8':
 			case 'file':
+				let t;
 				try {
-					return JSON.parse(this.open(n));
+					t = this.open(n, type === 'file-utf8' ? 65001 : void(0));
+					return JSON.parse(t);
+				} catch (e) {
+					if (t.length) { this.trace('file: ' + n + ': JSON parse error', true); } // Regorxxx <- Expand error checking ->
+					return defaultVal;
+				}
+			case 'get': {
+				let data;
+				try {
+					data = JSON.parse(n);
 				} catch (e) {
 					return defaultVal;
 				}
-				case 'get': {
-					let data;
-					try {
-						data = JSON.parse(n);
-					} catch (e) {
-						return defaultVal;
-					}
-					if (keys) return this.getProp(data, keys, defaultVal);
-					return data;
+				if (keys) return this.getProp(data, keys, defaultVal);
+				return data;
+			}
+			default:
+				try {
+					return JSON.parse(n);
+				} catch (e) {
+					return defaultVal;
 				}
-				default:
-					try {
-						return JSON.parse(n);
-					} catch (e) {
-						return defaultVal;
-					}
 		}
 	}
+	// Regorxxx ->
 
 	lastAccessed(file) {
 		try {
@@ -239,13 +260,16 @@ class Helpers {
 		return Object.prototype.hasOwnProperty.call(obj, key);
 	}
 
-	open(f) {
+	// Regorxxx <- Write similar artists data. Fix text reading for files without BOM
+	open(f, codepage = ppt.fileCodePage) {
 		try { // handle locked files
-			return this.file(f) ? utils.ReadTextFile(f) : '';
+			return this.file(f) ? utils.ReadTextFile(f, codepage) : '';
 		} catch (e) {
+			this.trace('file: ' + f + ': reading error', true); // Regorxxx <- Expand error checking ->
 			return '';
 		}
 	}
+	// Regorxxx ->
 
 	padNumber(num, len, base) {
 		if (!base) base = 10;
@@ -312,11 +336,16 @@ class Helpers {
 		}
 	}
 
-	save(fn, text, bom) {
+save(fn, text, bom) {
 		try {
-			utils.WriteTextFile(fn, text, bom);
+			// Regorxxx <- No file saved on long paths > 255 chars
+			const success = utils.WriteTextFile(fn, text, bom);
+			if (!success && fn.length >= 256) {
+				fb.ShowPopupMessage('脚本尝试保在多于 256 字符的路径上存文件导致 Windows 系统出错.\n\nPath:\n' + fn + '\n\n要避免问题，可便携模式安装 foobar2000 于简短的路径上或在此配置文件里修改缓存路径 \'biography.cfg\'.')
+			}
+			// Regorxxx ->
 		} catch (e) {
-			this.trace('保存时出错：' + fn);
+			this.trace('保存出错: ' + fn);
 		}
 	}
 
@@ -950,3 +979,117 @@ const countryToCode = {
 	zambia: 'ZM',
 	zimbabwe: 'ZW'
 }
+
+// Regorxxx <- utils.HTTPRequestAsync, it works as 1:1 replacement for XMLHttp and WinHttp.WinHttpRequest.5.1 ActiveX objects.
+const XMLHttpRequests = [];
+function XMLHttpRequest() {
+	return {
+		url: void(0), type: void(0), onreadystatechange: void(0), headers: void(0), 
+		id: null, readyState: 0, status: 0, responseText: null,
+		get Status() { return this.status; },
+		get ResponseText() { return this.responseText; },
+		get ReadyState() { return this.readyState; },
+		open: function (type, url) { 
+			this.url = url; 
+			this.type = type.toUpperCase() === 'GET' ? 0 : 1; 
+			this.readyState = 1;
+		},
+		get Open() { return this.open; },
+		setRequestHeader: function (key, value) {
+			if (!this.headers) { this.headers = {}; }
+			this.headers[key] = value;
+		},
+		get SetRequestHeader() { return this.setRequestHeader; },
+		abort: function () {
+			this.readyState = 0;
+			this.status = 0;
+			this.id = null;
+			this.responseText = null;
+			XMLHttpRequests.splice(XMLHttpRequests.indexOf(this), 1);
+		},
+		get Abort() { return this.abort; },
+		send: function (body) {
+			XMLHttpRequests.push(this);
+			this.id = utils.HTTPRequestAsync(
+				this.type, 
+				this.url, 
+				this.headers ? JSON.stringify(this.headers) : void(0), 
+				this.type === 1 ? body : void(0)
+			);
+			this.readyState = 2;
+		},
+		get Send() { return this.send; },
+		SetTimeouts: () => void(0),
+		WaitForResponse: () => void(0),
+	}
+}
+// Regorxxx ->
+
+// Regorxxx <- Write similar artists data
+function updateSimilarDataFile(file, newData) {
+	if (!$.file(file)) {
+		$.save(file, JSON.stringify(newData, null, '\t').replace(/\n/g, '\r\n'));
+	} else {
+		let data = $.jsonParse(file, null, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		if (!hasSimilarData(data, newData)) {
+			data = getSimilarDataFromFile(data, newData);
+			$.deleteFile(file);
+			$.save(file, JSON.stringify(data, null, '\t').replace(/\n/g, '\r\n'));
+		}
+	}
+}
+
+function hasSimilarData(fileOrData, newData) {
+	const data = typeof fileOrData === 'string'
+		? $.jsonParse(data, null, 'file-utf8') // Regorxxx <- Force UTF-8 ->
+		: fileOrData;
+	if (data) {
+		if (newData) {
+			const toVisit = new Set();
+			newData.forEach((obj) => {
+				toVisit.add(obj.artist).add(obj.artist + '|' + (obj.mbid || ''));
+			});
+			for (let obj of data) {
+				if (!toVisit.size) { break; }
+				if (toVisit.has(obj.artist + '|' + (obj.mbid || ''))) { 
+					toVisit.delete(obj.artist);
+					toVisit.delete(obj.artist + '|' + (obj.mbid || ''));
+				} else if (toVisit.has(obj.artist)) { 
+					toVisit.delete(obj.artist);
+					toVisit.delete(obj.artist + '|');
+				}
+			}
+			return toVisit.size === 0;
+		}
+
+	}
+	return false;
+}
+
+function getSimilarDataFromFile(fileOrData, newData = null) {
+	const data = typeof fileOrData === 'string'
+		? $.jsonParse(data, null, 'file-utf8') // Regorxxx <- Force UTF-8 ->
+		: fileOrData;
+	if (data) {
+		if (newData) {
+			const idxMap = new Map();
+			const idxMapFallback = new Map();
+			data.forEach((obj, idx) => {
+				idxMap.set(obj.artist + '|' + (obj.mbid || ''), idx);
+				idxMapFallback.set(obj.artist, idx);
+			});
+			newData.forEach((obj) => {
+				let idx = idxMap.get(obj.artist + '|' + (obj.mbid || ''));
+				if (typeof idx === 'undefined') { idx = idxMapFallback.get(obj.artist); }
+				if (idx >= 0) { data[idx] = obj; }
+				else { data.push(obj); }
+			});
+		}
+		data.forEach((obj) => {
+			obj.val.sort((a, b) => { return b.score - a.score; });
+		});
+
+	}
+	return data || newData;
+}
+// Regorxxx ->

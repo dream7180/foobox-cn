@@ -899,19 +899,12 @@ oBrowser = function() {
 	this.showItemFromItemHandle = function(metadb, isplaying) {
 		var total = this.groups.length;
 		if(total == 0 || metadb == null) return;
-		var total_tracks = 0;
-		var found = false;
+		var found = -1;
 		for (var a = (ppt.showAllItem ? 1 : 0); a < total; a++) {
-			total_tracks = this.groups[a].pl.Count;
-			for (var t = 0; t < total_tracks; t++) {
-				found = this.groups[a].pl[t].Compare(metadb);
-				if (found) {
-					break;
-				};
-			};
-			if (found) break;
+			found = this.groups[a].pl.Find(metadb);
+			if (found != -1) break;
 		};
-		if (found) { // scroll to album and open showlist
+		if (found != -1) { // scroll to album and open showlist
 			if (ppt.showAllItem && a == 0) a += 1;
 			if(ppt.sourceMode == 1) avoid_checkscroll =false;
 			if(!avoid_checkscroll){
@@ -984,19 +977,12 @@ oBrowser = function() {
 	
 	this.FindItemFromItemHandle = function(metadb, isplaying) {
 		var total = this.groups.length;
-		var total_tracks = 0;
 		var found = false;
 		for (var a = (ppt.showAllItem ? 1 : 0); a < total; a++) {
-			total_tracks = this.groups[a].pl.Count;
-			for (var t = 0; t < total_tracks; t++) {
-				found = this.groups[a].pl[t].Compare(metadb);
-				if (found) {
-					break;
-				};
-			};
-			if (found) break;
+			found = this.groups[a].pl.Find(metadb);
+			if (found != -1) break;
 		};
-		if (found) { // scroll to album and open showlist
+		if (found != -1) { // scroll to album and open showlist
 			if (ppt.showAllItem && a == 0) a += 1;
 			this.playingIndex = a;
 		} else {

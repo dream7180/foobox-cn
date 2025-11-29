@@ -1,69 +1,98 @@
 ﻿'use strict';
 
-function onStateChange(resolve, reject, func = null) { // credit regorxxx
-	if (this !== null) { // this is xmlhttp bound
-		if (this.Status === 200) {
-			if (func) {return func(this.ResponseText, this);}
-			else {return resolve(this.ResponseText);}
-		} else {
-			if (!func) {return reject(this.ResponseText);}
-		}
-	} else if (!func) {return reject({status: 408, responseText: this.ResponseText})}; // 408 Request Timeout
-	return null;
-}
+class RequestAllmusic {
+	constructor() {
+		this.request = null;
+		this.timer = null;
+		this.checkResponse = null;
+		this.lastRequestRetried = null; // Regorxxx <- Force last.fm img downloading for newest SMP methods or server errors. Retry only once per ID ->
+	}
 
-// May be used to async run a func for the response or as promise
-function send({method = 'GET', URL, body = void(0), func = null, requestHeader = [/*[header, type]*/], bypassCache = false, timeout = 5000}) { // credit regorxxx
-	return new Promise(async (resolve, reject) => {
-		const xmlhttp = new ActiveXObject('WinHttp.WinHttpRequest.5.1');
-		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache
-		// Add ('&' + new Date().getTime()) to URLS to avoid caching
-		try{
-			xmlhttp.Open(
-				method,
-				URL + (bypassCache
-					? (/\?/.test(URL) ? '&' : '?') + new Date().getTime()
-					: ''),
-				true
-			);
-			requestHeader.forEach((pair) => {
-				if (!pair[0] || !pair[1]) {console.log('HTTP Headers missing: ' + pair); return;}
-				xmlhttp.SetRequestHeader(...pair);
+	// Regorxxx <- Prevented foobar crash when exiting during AllMusic fetching 
+	abortRequest() {
+		if (!this.request) return;
+		clearTimeout(this.timer);
+		clearInterval(this.checkResponse);
+		this.request.Abort();
+		this.request = null;
+		this.timer = null;
+		this.checkResponse = null;
+	}
+	// Regorxxx ->
+
+	// Regorxxx <- Use WinHttp.WinHttpRequest.5.1 ActiveX objects or utils.HTTPRequestAsync, since Allmusic requires headers
+	onStateChange(resolve, reject, func = null) {
+		if (this.request !== null) {
+			if (this.request.Status === 200) {
+				return func ? func(this.request.ResponseText, this.request) : resolve(this.request.ResponseText);
+			} else if (!func) {
+				return reject({ status: this.request.Status, responseText: this.request.ResponseText }); 
+			}
+		} else if (!func) {
+			return reject({ status: 408, responseText: 'Request Timeout' });
+		}
+		return null;
+	}
+
+	send({ method = 'GET', URL, body = void (0), func = null, requestHeader = [], bypassCache = false, timeout = 5000 }) {
+		this.abortRequest();
+		const setRequest = (onreadystatechange) => {
+			// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#bypassing_the_cache
+			// Add ('&' + new Date().getTime()) to URLS to avoid caching
+			const fullUrl = URL + (bypassCache ? (/\?/.test(URL) ? '&' : '?') + new Date().getTime() : '');
+			this.request.Open(method, fullUrl, true);
+			requestHeader.forEach(pair => {
+				if (!pair[0] || !pair[1]) {
+					console.log(`HTTP Headers missing: ${pair}`);
+					return;
+				}
+				this.request.SetRequestHeader(...pair);
 			});
 			if (bypassCache) {
-				xmlhttp.SetRequestHeader('Cache-Control', 'private');
-				xmlhttp.SetRequestHeader('Pragma', 'no-cache');
-				xmlhttp.SetRequestHeader('cache', 'no-store');
-				xmlhttp.SetRequestHeader('If-Modified-Since','Sat, 1 Jan 2000 00:00:00 GMT');
+				this.request.SetRequestHeader('Cache-Control', 'private');
+				this.request.SetRequestHeader('Pragma', 'no-cache');
+				this.request.SetRequestHeader('Cache', 'no-store');
+				this.request.SetRequestHeader('If-Modified-Since', 'Sat, 1 Jan 2000 00:00:00 GMT');
 			}
-			xmlhttp.SetTimeouts(timeout, timeout, timeout, timeout);
-			xmlhttp.Send(method === 'POST' ? body : void(0));
-		}catch(e){}
-		// Add a timer for timeout
-		const timer = setTimeout(() => {
+			if (onreadystatechange) { this.request.onreadystatechange = onreadystatechange; }
+			this.request.SetTimeouts(timeout, timeout, timeout, timeout);
+			this.request.Send(method === 'POST' ? body : void (0));
+		};
+		const timeoutRequest = (resolve, reject) => {
 			try {
-				xmlhttp.WaitForResponse(-1);
-				onStateChange.call(xmlhttp, resolve, reject, func);
+				this.request.WaitForResponse(-1);
+				this.onStateChange(resolve, reject, func);
 			} catch (e) {
-				let status =	 400;
-				if (e.message.indexOf('0x80072ee7') !== -1) {status = 400;} // No network
-				else if (e.message.indexOf('0x80072ee2') !== -1) {status = 408;} // No response
-				else if (e.message.indexOf('0x8000000a') !== -1) {status = 408;} // Not finished response
-				xmlhttp.Abort(); return reject({status, responseText: e.message});
+				let status = 400;
+				if (e.message.indexOf('0x80072ee7') !== -1) {
+					status = 400;
+				} else if (e.message.indexOf('0x80072ee2') !== -1) {
+					status = 408;
+				} else if (e.message.indexOf('0x8000000a') !== -1) {
+					status = 408;
+				}
+				this.abortRequest();
+				reject({ status, responseText: e.message });
 			}
-		}, timeout);
-		// Check for response periodically to not block the UI
-		const checkResponse = setInterval(() => {
-			try {xmlhttp.Status && xmlhttp.ResponseText} catch(e) {return;}
-			clearTimeout(timer);
-			clearInterval(checkResponse);
-			onStateChange.call(xmlhttp, resolve, reject, func);
-		}, 30);
-	});
+		};
+		return new Promise((resolve, reject) => {
+			this.request = XMLHttpRequest();
+			setRequest(() => this.onStateChange(resolve, reject, func));
+			this.timer = setTimeout(() => timeoutRequest(resolve, reject), timeout);
+		});
+	}
+	// Regorxxx ->
 }
 
+/**
+ * The instance of `RequestAllmusic` class for biography AllMusic request operations.
+ * @typedef {RequestAllmusic}
+ * @global
+ */
+const allMusicReq = new RequestAllmusic();
+
 class DldAllmusicBio {
-	initbio(URL, referer, p_title, p_artist, p_fo_bio, p_pth_bio, p_force) {
+	init(URL, referer, p_title, p_artist, p_fo_bio, p_pth_bio, p_force) {
 		this.active = '';
 		this.artist = p_artist;
 		this.artistLink = '';
@@ -81,17 +110,17 @@ class DldAllmusicBio {
 
 		this.search(!this.title ? 'artist' : 'id', URL, referer);
 	}
-	
+
 	search(item, URL, referer) {
 		let i = 0;
 		let list = [];
 		switch (item) {
 			case 'id':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -120,13 +149,13 @@ class DldAllmusicBio {
 					if (!$.file(this.pth_bio)) $.trace('allmusic 简介: ' + this.artist + ': 未找到', true);
 				});
 				break;
-					
+
 			case 'artist':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -154,7 +183,7 @@ class DldAllmusicBio {
 						}
 						server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + this.title);
 						if (!$.file(this.pth_bio)) {
-							$.trace('allmusic 简介：' + this.artist + (artists.length > 1 ? '：无法区分同名的多个艺术家：鉴别器、专辑名称或音轨标题，要么不匹配，要么不存在（例如，菜单查找）' : '：未找到'), true);
+							$.trace('allmusic 简介: ' + this.artist + (artists.length > 1 ? ': 无法区分同名的多个艺术家：鉴别器、专辑名称或音轨标题，要么不匹配，要么不存在（例如，菜单查找）' : ': 未找到'), true);
 						}
 					},
 					(error) => {
@@ -162,16 +191,16 @@ class DldAllmusicBio {
 					}
 				).catch((error) => {
 					server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + this.title);
-					if (!$.file(this.pth_bio)) $.trace('allmusic biography: ' + this.artist + ': 未找到', true);
+					if (!$.file(this.pth_bio)) $.trace('allmusic 简介: ' + this.artist + ': 未找到', true);
 				});
 				break;
-	
+
 			case 'biography':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -187,11 +216,11 @@ class DldAllmusicBio {
 				break;
 
 			case 'artistPage':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -200,11 +229,11 @@ class DldAllmusicBio {
 						parse.amArtist(this, response, this.artist, '', this.title, this.fo_bio, this.pth_bio, '');
 			},
 			(error) => {
-				$.trace('allmusic review / biography: ' + this.album + ' / ' + this.albumArtist + ': not found' + ' Status error: ' + JSON.stringify(error), true)
+				$.trace('allmusic 评论 / 简介: ' + this.album + ' / ' + this.albumArtist + ': 未找到' + ' 错误状态: ' + JSON.stringify(error), true)
 			}
 			).catch((error) => {
 				this.album ? server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.pth_rev) : server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + this.title);
-				if (!$.file(this.pth_bio)) $.trace('allmusic biography: ' + this.artist + ': not found', true);
+				if (!$.file(this.pth_bio)) $.trace('allmusic 简介: ' + this.artist + ': 未找到', true);
 			});
 			break;
 			}
@@ -212,7 +241,7 @@ class DldAllmusicBio {
 	}
 
 class DldAllmusicRev {
-	initrev(URL, referer, p_album, p_alb_artist, p_artist, p_va, p_dn_type, p_fo_rev, p_pth_rev, p_fo_bio, p_pth_bio, p_art, p_force) {
+	init(URL, referer, p_album, p_alb_artist, p_artist, p_va, p_dn_type, p_fo_rev, p_pth_rev, p_fo_bio, p_pth_bio, p_art, p_force) {
 		this.album = p_album;
 		this.albumArtist = p_alb_artist;
 		this.art = p_art;
@@ -252,11 +281,11 @@ class DldAllmusicRev {
 		let list = [];
 		switch (item) {
 			case 'id':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -300,15 +329,30 @@ class DldAllmusicRev {
 					server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.pth_rev);
 					server.updateNotFound('Rev ' + cfg.partialMatch + ' ' + this.pth_rev + (this.dn_type != 'track' ? '' : ' ' + this.album + ' ' + this.albumArtist));
 					$.trace('allmusic 评论: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
+				})
+				// Regorxxx <- Force last.fm img downloading for newest SMP methods or server errors. Retry only once per ID
+				.finally(() => {
+					const urlId = item + ' -> ' + URL;
+					if (allMusicReq.lastRequestRetried !== urlId) {
+						const art = this.art;
+						setTimeout(() => {
+							if (img.art.allFilesLength === 0 && allMusicReq.lastRequestRetried !== urlId) {
+								allMusicReq.lastRequestRetried = urlId;
+								server.getBio(true, art, 0);
+								setTimeout(() => allMusicReq.lastRequestRetried = null, 30000);
+							}
+						}, 2000);
+					}
 				});
+				// Regorxxx ->
 				break;
-			
+
 			case 'review':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -336,11 +380,11 @@ class DldAllmusicRev {
 				break;
 
 			case 'moodsThemes':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -378,11 +422,11 @@ class DldAllmusicRev {
 				break;
 
 			case 'titlePage':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -433,18 +477,18 @@ class DldAllmusicRev {
 							this.saveTrackReview();
 						}
 						doc.close();
-			
+
 						if (this.dn_type.includes('+biography')) {
 							if (this.artistLink) {
 								return this.search('biography', this.artistLink + '/biographyAjax', this.artistLink);
-							}	
+							}
 						}
 					},
 					(error) => {
 						if (this.dn_type.includes('+biography')) {
 							if (this.artistLink) {
 								return this.search('biography', this.artistLink + '/biographyAjax', this.artistLink);
-							}	
+							}
 						}
 						$.trace('allmusic 评论 / 简介: ' + this.album + ' / ' + this.albumArtist + ': 未找到' + ' 错误状态: ' + JSON.stringify(error), true)
 					}
@@ -452,20 +496,20 @@ class DldAllmusicRev {
 					if (this.dn_type.includes('+biography')) {
 						if (this.artistLink) {
 							return this.search('biography', this.artistLink + '/biographyAjax', this.artistLink);
-						}	
+						}
 					}
 					server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.pth_rev);
 					server.updateNotFound('Rev ' + cfg.partialMatch + ' ' + this.pth_rev + (this.dn_type != 'track' ? '' : ' ' + this.album + ' ' + this.albumArtist));
-					$.trace('allmusic review: ' + this.album + ' / ' + this.albumArtist + ': not found', true);
+					$.trace('allmusic 评论: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
 				});
 				break;
 
 			case 'biography':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -473,17 +517,17 @@ class DldAllmusicRev {
 					(response) => {
 						parse.amBio(this, response);
 						if (this.artistLink) this.search('artistPage', this.artistLink, 'https://allmusic.com');
-					}, 
+					},
 					(error) => {}
 				).catch((error) => {});
 				break;
 
 			case 'artistPage':
-				send({
-					method: 'GET', 
+				allMusicReq.send({
+					method: 'GET',
 					bypassCache: this.force,
 					requestHeader: [
-						['referer', referer], 
+						['referer', referer],
 						['user-agent', this.userAgent]
 					],
 					URL: URL
@@ -496,7 +540,7 @@ class DldAllmusicRev {
 					}
 				).catch((error) => {
 					this.album ? server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.pth_rev) : server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + this.title);
-					if (!$.file(this.pth_bio)) $.trace('allmusic biography: ' + this.artist + ': 未找到', true);
+					if (!$.file(this.pth_bio)) $.trace('allmusic 简介: ' + this.artist + ': 未找到', true);
 				});
 				break;
 		}
@@ -515,10 +559,10 @@ class DldAllmusicRev {
 		} else {
 			server.updateNotFound('Rev ' + cfg.partialMatch + ' ' + this.pth_rev);
 			$.trace('allmusic this.review: ' + this.album + ' / ' + this.albumArtist + ': 未找到', true);
-		}	
+		}
 	}
 	saveTrackReview() {
-		const text = $.jsonParse(this.pth_rev, {}, 'file');
+		const text = $.jsonParse(this.pth_rev, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		text[this.album] = {
 			author: this.reviewAuthor,
 			composer: this.composer,
@@ -571,11 +615,11 @@ class Parse {
 
 		that.biographyGenre = that.biographyGenre.length ?  'Genre: ' + that.biographyGenre.join('\u200b, ') : '';
 		that.groupMembers = that.groupMembers.length ? 'Group Members: ' + that.groupMembers.join('\u200b, ') : '';
-		
+
 		this.saveBiography(that, artist, album, title, fo_bio, pth_bio, pth_rev);
 		doc.close();
 	}
-	
+
 	amBio(that, responseText) {
 		doc.open();
 		const div = doc.createElement('div');
@@ -623,7 +667,7 @@ class Parse {
 			}
 		} else {
 			album ? server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + pth_rev) : server.updateNotFound('Bio ' + cfg.partialMatch + ' ' + artist + ' - ' + title);
-			if (!$.file(pth_bio)) $.trace('allmusic biography: ' + artist + ': 未找到', true);
+			if (!$.file(pth_bio)) $.trace('allmusic 简介: ' + artist + ': 未找到', true);
 		}
 	}
 }
