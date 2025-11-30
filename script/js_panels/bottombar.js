@@ -22,7 +22,9 @@ var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
 var p_tips = ['播放列表', '封面浏览器'];
-var show_status = utils.CheckComponent("foo_openhacks") && fb.IsMainMenuCommandChecked("视图/显示状态栏");
+var show_status = true;
+var openhacks = utils.CheckComponent("foo_openhacks");
+if(openhacks) show_status = fb.IsMainMenuCommandChecked("视图/显示状态栏");
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 
 //=====================================================
