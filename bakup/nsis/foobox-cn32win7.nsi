@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.5.1"
+!define FBOX_VER "8.6"
 !define BUILD_NUM "1"
 
 # Setup
