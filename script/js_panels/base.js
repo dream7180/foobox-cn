@@ -23,7 +23,7 @@ var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
-var show_menu = window.GetProperty("foobox.show.menubar", true);
+var show_menu = window.GetProperty("foobox.show.menubar", false);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
