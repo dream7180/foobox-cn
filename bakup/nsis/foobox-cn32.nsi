@@ -18,7 +18,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.6"
+!define FBOX_VER "8.7"
 !define BUILD_NUM "1"
 
 # Setup
@@ -93,8 +93,8 @@ Page Custom OptionsPageCreate OptionsPageLeave
 Section "foobox 主题和所需组件" fooboxCore
     SectionIn RO
 	
-	Delete "$INSTDIR\themes\foobox*.fth"
-	RmDir /r "$ProfileDir\foobox\version6"
+	;Delete "$INSTDIR\themes\foobox*.fth"
+	;RmDir /r "$ProfileDir\foobox\version6"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\cn\xcommon\themes\*.*"
@@ -107,7 +107,7 @@ Section "foobox 主题和所需组件" fooboxCore
 	File /r ".\cn\x86\profile\user-components\*.*"
 	
 	SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
-	File /r ".\cn\xcommon\foo_uie_eslyric\*.*"
+	File ".\common\eslyric\enable_script_control"
 	
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
@@ -115,9 +115,15 @@ Section "foobox 主题和所需组件" fooboxCore
 	${If} $winLegacy = 0
 		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
 		File ".\common\eslyric\x86\foo_uie_eslyric.dll"
+		SetOutPath "$ProfileDir\eslyric-data\layout"
+		File /r ".\common\eslyric\layout\*.*"
+		SetOutPath "$ProfileDir\eslyric-data\skins"
+		File /r ".\cn\xcommon\eslyric_skins\*.*"
 	${Else}
 		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
 		File ".\common\eslyric\x86\legacy\foo_uie_eslyric.dll"
+		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric\skins"
+		File /r ".\cn\xcommon\eslyric_skins\*.*"
 	${EndIf}
 	
 	Delete "$ProfileDir\user-components\foo_uie_jsplitter\mozjs-lur-102.dll"

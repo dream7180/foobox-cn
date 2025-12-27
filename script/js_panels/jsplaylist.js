@@ -39,7 +39,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.6";
+var g_script_version = "8.7";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -105,7 +105,7 @@ var play_count = fb.TitleFormat("%play_count%");
 //=================================================// main properties / parameters
 properties = {
 	enableTouchControl: window.GetProperty("SYSTEM.Enable Touch Scrolling", false),
-	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", "播放"),
+	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", 1),
 	settingspanel: false,
 	smoothscrolling: window.GetProperty("CUSTOM Enable Smooth Scrolling", true),
 	selectionmenu: window.GetProperty("CUSTOM Enable Selection Menu", true),
@@ -1562,13 +1562,7 @@ function on_key_down(vkey) {
 			case VK_RETURN:
 				// play/enqueue focused item
 				if (!isQueuePlaylistActive()) {
-					var cmd = properties.defaultPlaylistItemAction;
-					if (cmd == "播放") {
-						plman.ExecutePlaylistDefaultAction(act_pls, p.list.focusedTrackId);
-					}
-					else {
-						fb.RunContextCommandWithMetadb(cmd, p.list.handleList[p.list.focusedTrackId], 0);
-					};
+					plman.ExecutePlaylistDefaultAction(act_pls, p.list.focusedTrackId);
 				};
 				break;
 			case VK_END:
@@ -1850,16 +1844,19 @@ function on_focus(is_focused) {
 };
 
 function on_font_changed() {
-	/*get_font();
+	get_font();
 	get_metrics();
 	get_images_static();
 	get_images_color();
-	p.headerBar.setButtons();	
-	//setting_init = false;
-	//p.settings.setFont();
-	//p.settings.setButtons();
-	full_repaint();*/
-	window.Reload();
+	p.headerBar.setButtons();
+	resize_panels();
+	p.scrollbar.setButtons();
+	p.scrollbar.setCursorButton();
+	var settingpageid = p.settings.currentPageId;
+	p.settings = new oSettings();
+	setting_init = false;
+	if(cSettings.visible) show_setting(settingpageid);
+	full_repaint();
 };
 
 function on_colours_changed() {

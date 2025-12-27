@@ -140,9 +140,22 @@ function on_load_image_done(task_id, image, image_path) {
 	filmStrip.on_load_image_done(image, image_path);
 }
 
-function on_metadb_changed() {
+function on_metadb_changed(handleList) {
 	if (!ppt.panelActive) return;
 	if (panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
+	// Regorxxx <- Tag changes affect panel focus
+	if (fb.IsPlaying && !panel.id.focus) {
+		const np = fb.GetNowPlaying();
+		if (np && handleList.BSearch(np) === -1) { return; }
+		else if (np && plman.PlayingPlaylist !== -1) { plman.SetPlaylistFocusItemByHandle(plman.PlayingPlaylist, np); }
+	} else {
+		const sel = fb.GetFocusItem(true);
+		if (sel) {
+			if (handleList.BSearch(sel) === -1) { return; }
+			if (plman.ActivePlaylist !== -1) { plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, sel); }
+		}
+	}
+	// Regorxxx ->
 	panel.getList(true, true);
 	panel.focusLoad();
 	panel.focusServer();

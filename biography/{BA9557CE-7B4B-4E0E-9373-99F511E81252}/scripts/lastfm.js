@@ -356,7 +356,7 @@ class LfmArtImg {
 					$.take(links, this.getNo).forEach(v => {
 						// Regorxxx <- Use utils.DownloadFileAsync if available
 						const imPth = `${this.img_folder + a}_${v.substring(v.lastIndexOf('/') + 1)}.jpg`;
-						utils.DownloadFileAsync(v, imPth);
+						if (!$.file(imPth)) utils.DownloadFileAsync(v, imPth);
 						// Regorxxx ->
 					});
 				} else {
@@ -365,7 +365,7 @@ class LfmArtImg {
 						const imPth = `${this.img_folder + a}_${v.substring(v.lastIndexOf('/') + 1)}.jpg`;
 						if (!this.allFiles.includes(imPth)) {
 							// Regorxxx <- Use utils.DownloadFileAsync if available
-							utils.DownloadFileAsync(v, imPth);
+							if (!$.file(imPth)) utils.DownloadFileAsync(v, imPth);
 							// Regorxxx ->
 							c++;
 							return c == this.getNo;
@@ -874,24 +874,6 @@ class LfmSimilarArtists {
 					if (!this.pth_sim) break;
 					$.buildPth(this.pth_sim);
 					$.save(this.fn_sim, JSON.stringify(list), true);
-					// Regorxxx <- Save similar artist data
-					if (ppt.exportSimArtists) {
-						const mbid = server.artistMbid[this.artist]
-							? server.artistMbid[this.artist]
-							: this.handles
-								? FbTitleFormat('[$trim($meta(MUSICBRAINZ_ALBUMARTISTID,0))]'.EvalWithMetadb(this.handles[0]))
-								: $.eval('[$trim($meta(MUSICBRAINZ_ALBUMARTISTID,0))]', panel.id.focus);
-						if (mbid && !server.artistMbid[this.artist]) { server.artistMbid[this.artist] = mbid; }
-						updateSimilarDataFile(
-							fb.ProfilePath + 'js_data\\lastfm_artists.json',
-							[{
-								artist: this.artist,
-								...(mbid ? { mbid } : {}),
-								val: list.slice(1, 10).map((v) => { return { artist: v.name, score: v.score }; })
-							}]
-						);
-					}
-					// Regorxxx ->
 					if (cfg.lfmSim) {
 						panel.getList();
 						window.NotifyOthers('bio_getLookUpList', 'bio_getLookUpList');

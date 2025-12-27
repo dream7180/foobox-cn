@@ -452,11 +452,7 @@ class Settings {
 		if (!this.lang.ok) this.language = 'EN';
 		this.menuSimilarNum = $.clamp(this.menuSimilarNum, 0, 10);
 		this.lfmSim = this.dlLfmSim;
-		// Regorxxx <- Save similar artist data
-		if (!ppt.exportSimArtists) {
-			if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled10 || this.tagEnabled13 < 7)) this.lfmSim = false;
-		}
-		// Regorxxx ->
+		if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled10 || this.tagEnabled13 < 7)) this.lfmSim = false;
 		if (this.local) {
 			this.pth.foLfmSim = this.pth.foLfmSim.replace('{BA9557CE-7B4B-4E0E-9373-99F511E81252}', '{F5E9D9EB-42AD-4A47-B8EE-C9877A8E7851}').replace('biography-cache', 'find-&-play-cache');
 			this.lfmSim = false;

@@ -27,14 +27,7 @@ var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
-var eslCtrl = null, eslPanels = null;
-try{
-	eslCtrl = new ActiveXObject("ESLyric");
-	eslPanels = eslCtrl.GetAll();
-} catch (e){
-	console.log("ESLyric 接口创建失败，请把工具->ESLyric->高级选项: pref.script.expose 设置为 1");
-}
-var sw_eslcolor = window.GetProperty("ESLyric.hightlight.follow.cover", true);
+
 function GetCaption(name) {
 	var str = Caption_Pack[name];
 	if (!str) str = name;
@@ -252,19 +245,6 @@ function set_getcolor_state(){
 		get_imgCol = false;
 		on_colorscheme_update(false);
 	}
-}
-
-//---------------------------------------
-function reset_esl_color(reset_hl) {
-	if(!eslPanels) return;
-	if(reset_hl) eslPanels.SetTextHighlightColor(c_default_hl);
-	eslPanels.SetBackgroundColor(c_background_default);
-}
-
-function set_esl_color() {
-	if(!eslPanels) return;
-	if(sw_eslcolor) eslPanels.SetTextHighlightColor(c_highlight);
-	if(cbkg_bycover) eslPanels.SetBackgroundColor(c_background);
 }
 
 // Some functions =======================================
@@ -2043,8 +2023,6 @@ function Controller(imgArray, imgDisplay, prop) {
 			window.NotifyOthers("color_scheme_updated", c_arr);
 			get_imgs();
 			if (is_mood && show_infobar) btn_mood.resetImg();
-			set_esl_color();
-			
 			if(cbkg_bycover) window.Repaint();
 			else window.RepaintRect(0, infobar_y, ww, infobar_h);
 		}
@@ -2052,7 +2030,6 @@ function Controller(imgArray, imgDisplay, prop) {
 	
 	reset_background = function(){
 		c_background = c_background_default;
-		reset_esl_color(false);
 		let carr_hl = toRGB(c_highlight);
 		let c_infobase = carr_hl.concat(toRGB(c_background_default));
 		window.NotifyOthers("color_scheme_updatebase", c_infobase);
@@ -2252,10 +2229,11 @@ var Covers = new ImagesArray(Properties.Image);
 var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
 if(MainController.Properties.FollowCursor && color_bycover_default) color_bycover = false;
+
 // START ==============================================
 initMetadb();
 if(show_infobar && info_cycle) activate_infotimer();
-reset_esl_color(sw_eslcolor);
+
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
@@ -2463,7 +2441,6 @@ function on_colours_changed() {
 	if(show_infobar){
 		get_imgs();
 	}
-	reset_esl_color(true);
 	window.Repaint();
 };
 
@@ -2483,11 +2460,6 @@ function on_notify_data(name, info) {
 		window.SetProperty("foobox.color.by.cover", color_bycover);
 		color_bycover_default = color_bycover;
 		set_getcolor_state();
-		break;
-	case "foobox_color_noesl":
-		sw_eslcolor = !info;
-		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
-		if(eslPanels) eslPanels.SetTextHighlightColor(sw_eslcolor ? c_highlight : c_default_hl);
 		break;
 	case "set_corlor_threshold":
 		color_threshold = info;

@@ -14,7 +14,7 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "8.6"
+!define FBOX_VER "8.7"
 !define BUILD_NUM "1"
 
 # Setup
@@ -89,7 +89,7 @@ Page Custom OptionsPageCreate OptionsPageLeave
 Section "foobox 主题和所需组件" fooboxCore
     SectionIn RO
 	
-	Delete "$INSTDIR\themes\foobox*.fth"
+	;Delete "$INSTDIR\themes\foobox*.fth"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\cn\xcommon\themes\*.*"
@@ -111,7 +111,9 @@ Section "foobox 主题和所需组件" fooboxCore
 	File ".\cn\win7\jsplitter-x64\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
-	File /r ".\cn\xcommon\foo_uie_eslyric\*.*"
+	File ".\common\eslyric\enable_script_control"
+	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric\skins"
+	File /r ".\cn\xcommon\eslyric_skins\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"

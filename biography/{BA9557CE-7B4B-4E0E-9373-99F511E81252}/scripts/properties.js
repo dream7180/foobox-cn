@@ -369,12 +369,12 @@ let properties = [
 	['Text Reader Nowplaying: Vertical Center', false, 'vCenter'],
 	['Text Reader Nowplaying: Horizontal Center', true, 'hCenter'],
 	['Text Reader 1 Use', true, 'useTxtReader0'],
-	['Text Reader 2 Use', true, 'useTxtReader1'],
-	['Text Reader 3 Use', true, 'useTxtReader2'],
+	['Text Reader 2 Use', false, 'useTxtReader1'],
+	['Text Reader 3 Use', false, 'useTxtReader2'],
 	['Text Reader 4 Use', true, 'useTxtReader3'],
 	['Text Reader 5 Use', true, 'useTxtReader4'],
-	['Text Reader 6 Use', true, 'useTxtReader5'],
-	['Text Reader 7 Use', true, 'useTxtReader6'],
+	['Text Reader 6 Use', false, 'useTxtReader5'],
+	['Text Reader 7 Use', false, 'useTxtReader6'],
 	['Text Reader 8 Use', true, 'useTxtReader7'],
 	['Text Reader Larger Sync Line', 0, 'largerSyncLyricLine'],
 	['Text Reader Lyrics Fade Height', 0, 'lyricsFadeHeight'],
@@ -426,12 +426,7 @@ let properties = [
 	['Zoom Button Heading Size (%)', 100, 'zoomHeadBtn'],
 	['Zoom Button LookUp Size (%)', 100, 'zoomLookUpBtn'],
 	['Zoom Tooltip (%)', 100, 'zoomTooltip'],
-	// Regorxxx <- Save similar artist data
-	['Server create last.fm similar artist database file', true, 'exportSimArtists'],
-	// Regorxxx ->
-	// Regorxxx <- Fix text reading for files without BOM
-	['Text Reader Default codepage (auto = 0)', 65001, 'fileCodePage']
-	// Regorxxx ->
+	['Text Reader Default codepage (auto = 0)', 65001, 'fileCodePage']// Regorxxx <- Fix text reading for files without BOM ->
 ];
 
 const ppt = new PanelProperties;

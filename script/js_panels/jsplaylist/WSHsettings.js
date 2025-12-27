@@ -195,13 +195,13 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 4:
 			p.settings.pages[pid].elements[4].status = true;
 			p.settings.pages[pid].elements[5].status = false;
-			properties.defaultPlaylistItemAction = "播放";
+			properties.defaultPlaylistItemAction = 1;
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		case 5:
 			p.settings.pages[pid].elements[4].status = false;
 			p.settings.pages[pid].elements[5].status = true;
-			properties.defaultPlaylistItemAction = "添加到播放队列";
+			properties.defaultPlaylistItemAction = 0;
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		};
@@ -1664,8 +1664,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(3, txtbox_x + 180*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "触屏滚动步长", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = z(70);
-			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction != 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == 0), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), oTextBox_4, cHeaderBar.height, "列表行高（全局）", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "右键菜单添加 \"选择\" 子菜单", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "顺序播放时自动播放下一个播放列表", "repeat_pls", "settings_checkboxes_action", this.id));

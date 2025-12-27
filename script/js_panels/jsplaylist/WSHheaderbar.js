@@ -774,7 +774,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 215, "播放次数");
 		_sorting.AppendMenuItem(MF_STRING, 216, "编码类型");
 		_sorting.AppendMenuItem(MF_STRING, 217, "随机");
-		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
+		_sorting.AppendMenuItem(MF_STRING, 218, "反向");
 
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 17, "封面保持图像比例");
@@ -968,7 +968,7 @@ oHeaderBar = function() {
 			plman.SortByFormat(plman.ActivePlaylist,"",false);
             break;
 		case (idx == 218):
-			fb.RunMainMenuCommand("编辑/排序/颠倒");
+			fb.RunMainMenuCommand("编辑/排序/反向");
             break;
 		};
 		this.columnRightClicked = -1;
