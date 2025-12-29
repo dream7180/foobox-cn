@@ -18,7 +18,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.7"
+!define FBOX_VER "8.8"
 !define BUILD_NUM "1"
 
 # Setup
@@ -95,6 +95,9 @@ Section "foobox 主题和所需组件" fooboxCore
 	
 	;Delete "$INSTDIR\themes\foobox*.fth"
 	;RmDir /r "$ProfileDir\foobox\version6"
+	Delete "$ProfileDir\user-components\foo_uie_jsplitter\mozjs-lur-102.dll"
+	Delete "$ProfileDir\foobox\script\html\styles10.css"
+	Delete "$ProfileDir\foobox\script\html\styles7.css"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\cn\xcommon\themes\*.*"
@@ -105,14 +108,12 @@ Section "foobox 主题和所需组件" fooboxCore
 	
 	SetOutPath "$ProfileDir\user-components"
 	File /r ".\cn\x86\profile\user-components\*.*"
-	
-	SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
-	File ".\common\eslyric\enable_script_control"
-	
+
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
 	
 	${If} $winLegacy = 0
+		Delete "$ProfileDir\user-components\foo_uie_eslyric\enable_script_control"
 		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
 		File ".\common\eslyric\x86\foo_uie_eslyric.dll"
 		SetOutPath "$ProfileDir\eslyric-data\layout"
@@ -122,13 +123,12 @@ Section "foobox 主题和所需组件" fooboxCore
 	${Else}
 		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric"
 		File ".\common\eslyric\x86\legacy\foo_uie_eslyric.dll"
+		File ".\common\eslyric\enable_script_control"
 		SetOutPath "$ProfileDir\user-components\foo_uie_eslyric\skins"
 		File /r ".\cn\xcommon\eslyric_skins\*.*"
+		SetOutPath "$ProfileDir\foobox\script\js_common"
+		File ".\common\scriptWin7\splitterve.js"
 	${EndIf}
-	
-	Delete "$ProfileDir\user-components\foo_uie_jsplitter\mozjs-lur-102.dll"
-	Delete "$ProfileDir\foobox\script\html\styles10.css"
-	Delete "$ProfileDir\foobox\script\html\styles7.css"
 	
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter\samples\packages"
 	File /r ".\cn\xcommon\biography-package\*.*"

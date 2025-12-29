@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.7"
+!define FBOX_VER "8.8"
 !define BUILD_NUM "1"
 
 # Setup
@@ -127,6 +127,9 @@ Section "foobox 主题和所需组件" fooboxCore
 
 	SetOutPath "$ProfileDir\foobox\script\html"
 	File ".\common\scriptWin7\styles.css"
+	
+	SetOutPath "$ProfileDir\foobox\script\js_common"
+	File ".\common\scriptWin7\splitterve.js"
 
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter\samples\packages"
 	File /r ".\cn\xcommon\biography-package\*.*"

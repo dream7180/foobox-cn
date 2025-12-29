@@ -136,7 +136,7 @@
 	.inp_label4 {display:inline-block; width:21%;}
 	.inp_label5 {vertical-align:middle; padding-left:0.46em;}
 	.inp_label6 {display:block; margin:0 0 0.31em 0;}
-	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;z-index: 2;}
+	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0; z-index:2;}
 	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right;}
 	#btn_cnt_left {text-align:left;}
 	#btn_cnt_center {text-align:center;}
@@ -150,7 +150,7 @@
 
 	.dropbtn {white-space:nowrap; width:100%; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
 	.dropbtn:after {font-family: FontAwesome; content: "\f107"; padding-left:0.5em; padding-right:0.19em;}
-	.dropdown {margin-top: 10px; position:relative; display:inline-block;}
+	.dropdown {margin-top: 10px; position:static; display:inline-block;}
 	.dropdown-content {display:none; position:absolute; background-color:#f9f9f9; min-width:10em; white-space:nowrap; box-shadow:0 8px 1.01em 0 rgba(0,0,0,0.2); z-index:1;}
  	.dropdown-content a {padding:0.13em 5px; color:black; text-decoration:none; display:block;}
 	.dropdown-content a:hover {background-color:#f1f1f1;}
@@ -816,7 +816,7 @@ info is an object:
 		}
 	}
 
-第三方脚本可以通过使用 window.NotifyOthers('bio_followSelectedTrack', boolean) 来设置简介选择模式*，其中 boolean 是 true [跟随所选音轨（播放列表）] 或 false [首选正在播放项]。*如果有启用的歌词或正在播放来源，则不适用，因为面板必须处于首选正在播放模式。
+<!--第三方脚本可以通过使用 window.NotifyOthers('bio_followSelectedTrack', boolean) 来设置简介选择模式*，其中 boolean 是 true [跟随所选音轨（播放列表）] 或 false [首选正在播放项]。*如果有启用的歌词或正在播放来源，则不适用，因为面板必须处于首选正在播放模式。-->
 
 </div>
 </div>
@@ -1128,7 +1128,7 @@ info is an object:
 				var cusScrollLabels = ['行数 (0 = 页面)', '最大平滑持续时间（毫秒）', '最大触摸持续时间（毫秒）', '触摸灵敏度 0-10'];
 				var cusTextLabels = ['文本、歌词和项目属性：支持标签或完整路径。每个视图显示检索到的第一个结果。', '预览', '同步最新下载', '滚动同步歌词', '滚动非同步歌词'];
 				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
-				var dropShadowLevelLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+				var dropShadowLevelLabels = [0, 1, 2, 3];
 				var filmStripLabels = ['齐平', '对齐图像', '应用图像边距','对齐文本', '应用文本边距', ]
 				var filterLabels = ['KB 最大尺寸', 'KB 最小尺寸', 'PX 最小分辨率', '最少数量（最高优先级）'];
 				var flaglabels = ['艺术家视图', '专辑视图'];
@@ -1145,7 +1145,7 @@ info is an object:
 				var lineLabels = ['无', '底部', '居中'];
 				var lyricsScrollMethodLabels = ['滚动时间平均值（毫秒）', '最大滚动时间（毫秒）'];
 				var mainImgLabels = ['悬停时放大', '平滑过渡', '自动循环时间（秒）'];
-				var metricsLabels = ['图像和文本之间的间距', '行填充'];
+				var metricsLabels = ['图像和文本之间的间距', 'x 字高 = 行高'];
 				var miscLabels = ['专辑名称自动清理', '专辑评论高品质', '显示控制台消息', '搜索：包括部分匹配项。匹配级别 (%)：', '自动更新间隔（天：最小 28）', '相似艺术家：菜单上的个数（0-10）', '群星'];
 				var overlayLabels = ['渐变', '平面', '带边框平面', '圆形', '带边框圆形', '强度 % [Shift + 滚轮]', '渐变级别 %', '边框宽度（像素）'];
 				var ratingLabels = ['AllMusic', 'Last.fm', '首选标题', '首选文本', 'AllMusic', 'Last.fm'];
@@ -1183,7 +1183,7 @@ info is an object:
 					},
 					display: {
 						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'amRatingName', 'lfmRatingName'],
-						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'text', 'text']
+						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'float', 'text', 'text']
 						
 					},
 					headings: {
@@ -1434,7 +1434,7 @@ info is an object:
 				
 				function setHeadingFont(n, type) {
 					var prop = ['headFontStyle', 'trackStyle', 'sourceStyle', 'wikiStyle', 'lyricsFontStyle', 'summaryStyle'][type];
-					window[prop + '_dropdown'].innerHTML = (type == 3 ? '维基百科章节标题：' : type == 4 ? '歌词 & 正在播放字体样式：' : type == 5 ? '摘要字体样式：' : '') + headingFontLabels[n];
+					window[prop + '_dropdown'].innerHTML = (type == 3 ? '维基百科章节标题：' : type == 4 ? '歌词字体样式：' : type == 5 ? '摘要字体样式：' : '') + headingFontLabels[n];
 					ppt[prop + '_internal'].value = n;
 					setHeadingFontStyle(n, type);
 					switch (type) {
@@ -1541,8 +1541,8 @@ info is an object:
 				function setDisplay() {
 					generateTable('imageMarginTable');
 					generateTable('textMarginTable');
-					i = 4; window.metrics.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[0]+'</b></label></div>');
-					i = 5; window.metrics2.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input2" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[1]+'</b></label></div>');
+					i = 4; window.metrics.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input3" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[0]+'</b></label></div>');
+					i = 5; window.metrics2.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="metrics_container'+i+'" name="display_input" class="input3" /><label for="metrics_container'+i+'" class="inp_label2"><b>'+metricsLabels[1]+'</b></label></div>');
 					for (i = 0; i < 3; i++) {window.textStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="textStyle_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="textStyle_checkbox'+i+'" class="checkbox_label">'+textStyleLabels[i]+'</label></div>');}
 
 					window.theme_dropdown.innerHTML = themeLabels[ppt['theme_internal'].value];
@@ -1651,11 +1651,11 @@ info is an object:
 					for (i = 4; i < 7; i++) {window.cusText3.insertAdjacentHTML('beforeend', '<div class="input_cnt1" ><input name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><input name="textreader_input" class="input18" /><input id="tf_cusText_container'+i+'" name="textreader_input" class="input65" /><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cboxMargin+'" type="checkbox" /></div>')}
 					{window.cusText3.insertAdjacentHTML('beforeend', '<div class="input_cnt1" ><input name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><input name="textreader_input" class="input18" /><input id="tf_cusText_container'+7+'" name="textreader_input" class="input65" /></div>')}
 
-					window.lyricsFontStyle_dropdown.innerHTML = '歌词 & 正在播放字体样式：' + headingFontLabels[ppt['lyricsFontStyle_internal'].value];
+					window.lyricsFontStyle_dropdown.innerHTML = '歌词字体样式：' + headingFontLabels[ppt['lyricsFontStyle_internal'].value];
 					window.shadowFontStyle_dropdown.innerHTML = '歌词和正在播放的阴影级别：' + dropShadowLevelLabels[ppt['dropShadowLevel_internal'].value];
 					setHeadingFontStyle(ppt['lyricsFontStyle_internal'].value, 4);			
 					for (i = 0; i < 6; i++) {window.lyricsFont.insertAdjacentHTML('beforeend', '<a onclick="setHeadingFont(' + i + ',' + 4 + ');">'+headingFontLabels[i]+'</a>');}
-					for (i = 0; i < 11; i++) {window.shadowLevel.insertAdjacentHTML('beforeend', '<a onclick="setDropShadowLevel(' + i + ');">'+dropShadowLevelLabels[i]+'</a>');}
+					for (i = 0; i < 4; i++) {window.shadowLevel.insertAdjacentHTML('beforeend', '<a onclick="setDropShadowLevel(' + i + ');">'+dropShadowLevelLabels[i]+'</a>');}
 					i = 0; window.largerHighlighted.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="larger_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="larger_checkbox'+i+'" class="checkbox_label">更大的同步歌词行</label></div>');
 					i = 1; window.cusTextPreview.insertAdjacentHTML('beforeend', '<div class="input_cnt3" id="input_cnt2"><label for="cusText_Preview" class="inp_label6"></label><input id="cusText_Preview" name="previewTf" class="input98" readonly/></div>');
 					i = 2; window.downloadLyrics.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="cusTxt_checkbox'+i+'" name="textreader_checkbox" style="'+cbox+'" type="checkbox" /><label for="cusTxt_checkbox'+i+'" class="checkbox_label">'+cusTextLabels[i]+'</label></div>');

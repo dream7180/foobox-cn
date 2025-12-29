@@ -16,7 +16,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.7"
+!define FBOX_VER "8.8"
 !define BUILD_NUM "1"
 
 # Setup
@@ -92,6 +92,9 @@ Section "foobox 主题和所需组件" fooboxCore
     SectionIn RO
 	
 	;Delete "$INSTDIR\themes\foobox*.fth"
+	Delete "$ProfileDir\user-components-x64\foo_uie_jsplitter\mozjs-lur-102.dll"
+	Delete "$ProfileDir\foobox\script\html\styles10.css"
+	Delete "$ProfileDir\foobox\script\html\styles7.css"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\cn\xcommon\themes\*.*"
@@ -102,14 +105,12 @@ Section "foobox 主题和所需组件" fooboxCore
 	
 	SetOutPath "$ProfileDir\user-components-x64"
 	File /r ".\cn\x64\profile\user-components-x64\*.*"
-	
-	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
-	File ".\common\eslyric\enable_script_control"
-	
+
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
 	
 	${If} $winLegacy = 0
+		Delete "$ProfileDir\user-components-x64\foo_uie_eslyric\enable_script_control"
 		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
 		File ".\common\eslyric\x64\foo_uie_eslyric.dll"
 		SetOutPath "$ProfileDir\eslyric-data\layout"
@@ -119,16 +120,15 @@ Section "foobox 主题和所需组件" fooboxCore
 	${Else}
 		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
 		File ".\common\eslyric\x64\legacy\foo_uie_eslyric.dll"
+		File ".\common\eslyric\enable_script_control"
 		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric\skins"
 		File /r ".\cn\xcommon\eslyric_skins\*.*"
+		SetOutPath "$ProfileDir\foobox\script\js_common"
+		File ".\common\scriptWin7\splitterve.js"
 	${EndIf}
 	
 	SetOutPath "$ProfileDir\configuration"
 	File ".\common\foo_openhacks\x64\foo_openhacks.dll.cfg"
-	
-	Delete "$ProfileDir\user-components-x64\foo_uie_jsplitter\mozjs-lur-102.dll"
-	Delete "$ProfileDir\foobox\script\html\styles10.css"
-	Delete "$ProfileDir\foobox\script\html\styles7.css"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter\samples\packages"
 	File /r ".\cn\xcommon\biography-package\*.*"

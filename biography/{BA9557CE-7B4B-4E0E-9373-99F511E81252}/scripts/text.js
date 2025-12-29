@@ -2400,7 +2400,8 @@ class Text {
 		this.reader.items.some((v, i) => {
 			if (v.view == n) {
 				if (v.tag) {
-					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', !v.nowPlaying); // Regorxxx <- Fixed text reader not working for selection while playing ->
+					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', false);
+					//this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', !v.nowPlaying); // Regorxxx <- Fixed text reader not working for selection while playing ->
 					if (this[n].readerItem.length) {
 						found = i;
 						return true;

@@ -73,7 +73,6 @@ class Lyrics {
 			this.transTop[transition_factor] = fadeTop;
 		}
 
-		gr.SetTextRenderingHint(5);
 		this.lyrics.forEach((lyric, i) => {
 			const lyric_y = this.lineHeight * i;
 			const line_y = Math.round(y - top + lyric_y);
@@ -82,14 +81,15 @@ class Lyrics {
 				const font = !lyric.highlight ? ui.font.lyrics : this.font.lyrics;
 				if (this.shadowEffect && line_y >= this.top && !bottomLine) {
 					if (this.dropNegativeShadowLevel) {
-						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x - this.dropNegativeShadowLevel, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
-						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x, line_y - this.dropNegativeShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
+						gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x - this.dropNegativeShadowLevel, line_y, this.w + 1, this.lineHeight + 1, txt.cc);
+						gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x, line_y - this.dropNegativeShadowLevel, this.w + 1, this.lineHeight + 1, txt.cc);
 					}
-					
-					gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x + this.dropShadowLevel, line_y + this.dropShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
+					gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x + this.dropShadowLevel, line_y + this.dropShadowLevel, this.w + 1, this.lineHeight + 1, txt.cc);
 				}
 				col = line_y >= this.top ? lyric.highlight ? blendIn : i == this.locus - 1 ? blendOut : bottomLine ? fadeBot : ui.col.text : fadeTop;
+				gr.SetTextRenderingHint(4);
 				gr.DrawString(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
+				gr.SetTextRenderingHint(0);
 			}
 		});
 		if (this.showOffset) {
@@ -97,7 +97,7 @@ class Lyrics {
 			gr.SetSmoothingMode(4);
 			gr.FillRoundRect(this.x + this.w - offsetW, this.top, offsetW, this.lineHeight + 1, this.arc1, this.arc1, 0x96000000);
 			gr.SetSmoothingMode(0);
-			gr.DrawString(`偏移: ${this.userOffset / 1000}s`, ui.font.main, RGB(255,255,255), this.x - this.lineHeight / 2, this.top, this.w, this.lineHeight + 1, this.alignRight);
+			gr.GdiDrawText(`偏移: ${this.userOffset / 1000}s`, ui.font.main, RGB(255,255,255), this.x - this.lineHeight / 2, this.top, this.w, this.lineHeight + 1, txt.c[1]);
 		}
 	}
 
@@ -181,7 +181,7 @@ class Lyrics {
 			this.userOffset = 0;
 		}
 		this.font = {
-			lyrics: !ppt.largerSyncLyricLine ? ui.font.lyrics : gdi.Font(ui.font.main.Name, ui.font.zoomSize * 1.33, ui.font.lyrics.Style)
+			lyrics: !ppt.largerSyncLyricLine ? gdi.Font(ui.font.main.Name, ui.font.zoomSize, 1) : gdi.Font(ui.font.main.Name, ui.font.zoomSize * 1.33, 1)
 		}
 		this.alignCenter = StringFormat(1, 1);
 		this.alignRight = StringFormat(2, 1);

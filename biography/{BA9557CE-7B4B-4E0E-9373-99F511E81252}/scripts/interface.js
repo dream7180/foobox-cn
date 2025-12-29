@@ -159,10 +159,11 @@ class UserInterface {
 	}
 
 	calcText() {
-		ppt.textPad = Math.max(ppt.textPad, -Math.round(this.font.main.Size / 2));
+		ppt.textPad = Math.max(ppt.textPad, 1);
+		ppt.textPad = Math.min(ppt.textPad, 2);
 		$.gr(1, 1, false, g => {
-			this.font.main_h = Math.round(g.CalcTextHeight('String', this.font.main) + ppt.textPad);
-			this.font.lyrics_h = Math.round(g.CalcTextHeight('STRING', this.font.lyrics) + ppt.textPad);
+			this.font.main_h = Math.round(g.CalcTextHeight('String', this.font.main) * ppt.textPad);
+			this.font.lyrics_h = Math.round(g.CalcTextHeight('STRING', this.font.lyrics) * ppt.textPad);
 			this.font.heading_h = g.CalcTextHeight('String', this.font.heading);
 			this.font.small_h = Math.max(g.CalcTextHeight('0', this.font.small), 8);
 		});
@@ -415,7 +416,7 @@ class UserInterface {
 		this.col.imgBor = this.col.text & 0x25ffffff;
 		const col_txt = this.col.txt == -1 ? RGB(240, 240, 240) : this.col.txt;
 		const col_txt_h = this.col.txt_h == -1 ? RGB(240, 240, 240) : this.col.txt_h;
-		this.col.dropShadow = RGB(18, 26, 46);
+		this.col.dropShadow = RGB(150, 150, 150);
 		this.col.source = this.blur.dark ? (ppt.highlightSubHd ? col_txt_h : col_txt) : !this.blur.light && (ppt.sourceStyle == 1 || ppt.sourceStyle == 3) && (ppt.headFontStyle != 1 && ppt.headFontStyle != 3) ? this.dim(ppt.highlightSubHd ? this.col.txt_h : this.col.txt, !window.IsTransparent ? this.col.bg : 0xff000000, 240) : ppt.highlightSubHd ? this.col.txt_h : this.col.txt;
 		this.col.track = this.blur.dark ? (ppt.highlightSubHd ? col_txt_h : col_txt) : !this.blur.light && (ppt.trackStyle == 1 || ppt.trackStyle == 3) && (ppt.headFontStyle != 1 && ppt.headFontStyle != 3) ? this.dim(ppt.highlightSubHd ? this.col.txt_h : this.col.txt, !window.IsTransparent ? this.col.bg : 0xff000000, 240) : ppt.highlightSubHd ? this.col.txt_h : this.col.txt;
 

@@ -39,7 +39,7 @@ var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.7";
+var g_script_version = "8.8";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -88,7 +88,6 @@ var ww = 0,
 	wh = 0;
 var mouse_x = 0,
 	mouse_y = 0;
-var g_metadb;
 clipboard = {
 	selection: null
 };
@@ -1219,8 +1218,8 @@ function on_playlist_items_selection_change() {
 
 function on_item_focus_change(playlist, from, to) {
 	if (!g_avoid_on_item_focus_change) {
-		g_metadb = (fb.IsPlaying || fb.IsPaused) ? fb.GetNowPlaying() : plman.PlaylistItemCount(plman.ActivePlaylist) > 0 ? fb.GetFocusItem() : false;
-		if (g_metadb) {
+		var mdb = (fb.IsPlaying || fb.IsPaused) ? fb.GetNowPlaying() : plman.PlaylistItemCount(plman.ActivePlaylist) > 0 ? fb.GetFocusItem() : false;
+		if (mdb) {
 			p.list.setItems(false);
 			full_repaint();
 		};

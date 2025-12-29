@@ -17,9 +17,11 @@ var sw_eslcolor = window.GetProperty("ESLyric.hightlight.follow.cover", true);
 var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
 var initial_load = true;
 
-if(fb.TitleFormat("%esl_expose_api%").Eval(true) === '1'){
-	eslCtrl = new ActiveXObject("eslyric");
+try{
+	eslCtrl = new ActiveXObject("ESLyric");
 	eslPanels = eslCtrl.GetAll();
+} catch (e){
+	console.log("ESLyric 接口创建失败，请把工具->ESLyric->高级选项: pref.script.expose 设置为 1");
 }
 
 function reset_esl_color(reset_hl) {

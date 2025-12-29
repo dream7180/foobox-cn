@@ -140,22 +140,9 @@ function on_load_image_done(task_id, image, image_path) {
 	filmStrip.on_load_image_done(image, image_path);
 }
 
-function on_metadb_changed(handleList) {
+function on_metadb_changed() {
 	if (!ppt.panelActive) return;
 	if (panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
-	// Regorxxx <- Tag changes affect panel focus
-	if (fb.IsPlaying && !panel.id.focus) {
-		const np = fb.GetNowPlaying();
-		if (np && handleList.BSearch(np) === -1) { return; }
-		else if (np && plman.PlayingPlaylist !== -1) { plman.SetPlaylistFocusItemByHandle(plman.PlayingPlaylist, np); }
-	} else {
-		const sel = fb.GetFocusItem(true);
-		if (sel) {
-			if (handleList.BSearch(sel) === -1) { return; }
-			if (plman.ActivePlaylist !== -1) { plman.SetPlaylistFocusItemByHandle(plman.ActivePlaylist, sel); }
-		}
-	}
-	// Regorxxx ->
 	panel.getList(true, true);
 	panel.focusLoad();
 	panel.focusServer();
@@ -395,7 +382,7 @@ function on_notify_data(name, info) {
 				if (ppt.text_only) txt.paint();
 			}
 			break;
-		case 'bio_followSelectedTrack':
+		/*case 'bio_followSelectedTrack':
 			if (!panel.id.lyricsSource && !panel.id.nowplayingSource) { // if enabled, panel has to be in prefer nowplaying mode
 				if (panel.id.focus !== info) {
 					panel.id.focus = ppt.focus = info;
@@ -404,7 +391,7 @@ function on_notify_data(name, info) {
 					img.on_playback_new_track();
 				}
 			}
-			break;
+			break;*/
 		case 'bio_status':
 			ppt.panelActive = info;
 			window.Reload();

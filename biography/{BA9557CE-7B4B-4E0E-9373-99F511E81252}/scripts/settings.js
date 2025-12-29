@@ -673,10 +673,10 @@ const cfg = new Settings(ppt.serverName);
 let settings = [
 	['Album Review [Allmusic] Auto-Download', false, 'boolean', 'dlAmRev'], // description (setting[0]) is for info only otherwise it's unused [update from orig_ini is no longer supported]
 	['Biography [Allmusic] Auto-Download', false, 'boolean', 'dlAmBio'],
-	['Album Review [Lastfm] Auto-Download', true, 'boolean', 'dlLfmRev'],
+	['Album Review [Lastfm] Auto-Download', false, 'boolean', 'dlLfmRev'],
 	['Biography [Lastfm] Auto-Download', true, 'boolean', 'dlLfmBio'],
 	['Album Review [Wikipedia] Auto-Download', false, 'boolean', 'dlWikiRev'],
-	['Biography [Wikipedia] Auto-Download', false, 'boolean', 'dlWikiBio'],
+	['Biography [Wikipedia] Auto-Download', true, 'boolean', 'dlWikiBio'],
 	['Image [Artist] Auto-Download', true, 'boolean', 'dlArtImg'],
 	['Image [Review] Auto-Download', true, 'boolean', 'dlRevImg'],
 	['Save List 0-Never 1-Auto', true, 'boolean', 'dlLfmSim'],
