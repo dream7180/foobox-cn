@@ -247,7 +247,7 @@ let properties = [
 	['Layout Rev Mode', 0, 'revMode'],
 	['Layout Rev', 3, 'revStyle'],
 
-	['Line Padding', 1.3, 'textPad'],
+	['Line Padding', 1.4, 'textPad'],
 	['Lock Bio', false, 'lockBio'],
 	['Lock Auto', false, 'autoLock'],
 

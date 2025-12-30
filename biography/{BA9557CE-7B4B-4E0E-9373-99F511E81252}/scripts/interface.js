@@ -160,7 +160,7 @@ class UserInterface {
 
 	calcText() {
 		ppt.textPad = Math.max(ppt.textPad, 1);
-		ppt.textPad = Math.min(ppt.textPad, 2);
+		ppt.textPad = Math.min(ppt.textPad, 4);
 		$.gr(1, 1, false, g => {
 			this.font.main_h = Math.round(g.CalcTextHeight('String', this.font.main) * ppt.textPad);
 			this.font.lyrics_h = Math.round(g.CalcTextHeight('STRING', this.font.lyrics) * ppt.textPad);
