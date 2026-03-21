@@ -60,7 +60,7 @@ ppt = {
 	TFsorting: null,
 	rowHeight: 22,
 	rowScrollStep: 1,
-	scrollSmoothness: 2.5,
+	scrollSmoothness: 1.0,
 	refreshRate: 25,
 	headerBarHeight: 28,
 	enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", true),
@@ -1961,12 +1961,10 @@ oBrowser = function() {
 				for (let i = 0; i < crcloaded.length; i++) {
 					crclist[i] = [];
 				}
-				try{
-					fso.DeleteFile(CACHE_FOLDER + "\\artist_album\\*");
-					fso.DeleteFile(CACHE_FOLDER + "\\album\\*");
-					fso.DeleteFile(CACHE_FOLDER + "\\artist\\*");
-					fso.DeleteFile(CACHE_FOLDER + "\\genre_dir\\*");
-				} catch(e){}
+				try{fso.DeleteFile(CACHE_FOLDER + "\\artist_album\\*");} catch(e){}
+				try{fso.DeleteFile(CACHE_FOLDER + "\\album\\*");} catch(e){}
+				try{fso.DeleteFile(CACHE_FOLDER + "\\artist\\*");} catch(e){}
+				try{fso.DeleteFile(CACHE_FOLDER + "\\genre_dir\\*");} catch(e){}
 			}
 			var tot = brw.groups.length;
 			var crc;

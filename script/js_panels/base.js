@@ -6,7 +6,7 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\uihacks.js');
 
 var time_length = 0;
 var zdpi, dark_mode;
-var c_background, c_btmbg, c_font, c_seekoverlay, c_default_hl, c_pb_ov, c_pb_down, c_shadow, c_shadow_h, c_tip_bg, c_seeker_core, c_seek_bg;
+var c_background, c_btmbg, c_font, c_seekoverlay, c_default_hl, c_shadow, c_shadow_h, c_tip_bg, c_seek_bg;
 var img_play, img_pause, img_next, img_previous, img_vol, img_pbo = [], img_list, img_cover, img_lib, img_bio, img_vis, img_video;
 
 //play back order
@@ -15,7 +15,7 @@ var hbtn = false;
 var ww = 0, wh = 0;
 var m_x = 0, m_y = 0;
 var g_seconds = 0;
-var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r, topbarh, topbtnw, menuicow, menulibw, menubtnw,leftbarw, title_w, z5, z8;
+var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw,leftbarw, title_w, z4, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn, MenubarBtn = [];
@@ -23,7 +23,7 @@ var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png
 var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
-var show_menu = window.GetProperty("foobox.show.menubar", false);
+var show_menu = window.GetProperty("foobox.show.menubar", true);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
@@ -138,11 +138,11 @@ oSwitchbar = function() {
 	this.draw = function(gr){
 		var ico_y = this.y + Math.floor(6*zdpi) + 1, hoverbg_offset = z(1), imgw = img_list.Width, imgh = img_list.Height;
 		gr.SetSmoothingMode(4);
-		gr.FillRoundRect(this.x + active_pid*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_seek_bg);
+		gr.FillRoundRect(this.x + active_pid*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, z4, z4, c_seek_bg);
 		if(this.hover_tab && this.tip_show) gr.GdiDrawText(p_tips[this.hover_tab-1], g_font, c_font, this.x+this.w+z8, this.y+hoverbg_offset, this.tipw, this.bth, lc_txt);
 		if(this.hover_tab && this.hover_tab-1 != active_pid){
-			if(this.down) gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow);
-			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow_h);
+			if(this.down) gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, z4, z4, c_shadow);
+			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, z4, z4, c_shadow_h);
 		}
 		gr.SetSmoothingMode(0);
 		gr.DrawImage(img_list, this.x + z5, ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
@@ -257,13 +257,13 @@ function get_font() {
 	zdpi = g_font.Size / 12;
 	g_fsize = g_font.Size;
 	g_font_b = GdiFont(g_font.Name, g_fsize, 1);
-	rec_r = z(4);
 	img_ico = img_ico.Resize(18*zdpi, 18*zdpi, 2);
 	topbarh = z(26) + 2;
 	topbtnw = z(46);
 	menuicow = z(28);
 	menulibw = z(46);
 	menubtnw = z(36);
+	z4 = z(4);
 	z5 = z(5);
 	z8 = z(8);
 }
@@ -271,35 +271,30 @@ function get_font() {
 function get_color() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	dark_mode = isDarkMode(c_background_default);
-	c_font= window.GetColourDUI(ColorTypeDUI.text);
+	c_font = window.GetColourDUI(ColorTypeDUI.text);
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	if(dark_mode) {
-		c_background = blendColors(c_black, c_background_default, 0.8);
-		c_btmbg = c_background;
+		c_topbg = RGBA(0, 0, 0, 50);
+		c_btmbg = RGBA(0, 0, 0, 50);
 		c_tip_bg = RGBA(0, 0, 0, 200);
-		c_seeker_core = c_black;
 		c_menubar = RGBA(0, 0, 0, 20);
 		c_gradline = RGBA(255, 255, 255, 25);
+		c_subtitle = blendColors(c_black, c_font, 0.65);
+		c_normal = blendColors(c_black, c_font, 0.8);
 	} else {
-		c_background = blendColors(c_black, c_background_default, 0.875);
-		c_btmbg = utils.GetSysColour(COLOR_3DFACE);
+		c_topbg = RGBA(0, 0, 0, 32);
+		c_btmbg = RGBA(0, 0, 0, 15);
 		c_tip_bg = RGBA(255, 255, 255, 200);
-		c_seeker_core = c_white;
 		c_menubar = RGBA(0, 0, 0, 12);
 		c_gradline = RGBA(255, 255, 255, 50); 
+		c_subtitle = blendColors(c_white, c_font, 0.65);
+		c_normal = blendColors(c_white, c_font, 0.8);
 	}
-	c_background_default = c_background;
-	c_btmbg_default = c_btmbg;
-	c_toptxt = window.GetColourDUI(ColorTypeDUI.text);
-	c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
-	c_tag = blendColors(c_background, c_toptxt, 0.32);
-	c_toptxt2_default = c_toptxt2;
-	c_topbtnhover = c_toptxt & 0x18ffffff;
-	c_topbtndown= c_toptxt & 0x30ffffff;
-	c_normal = blendColors(c_btmbg, c_font, 0.8);
-	c_normal_default = c_normal;
+	c_background = c_background_default;
+	c_topbtnhover = c_font & 0x18ffffff;
+	c_topbtndown= c_font & 0x30ffffff;
 	c_shadow_h =  c_normal & 0x25ffffff;
 	c_shadow = c_normal & 0x45ffffff;
-	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_seek_bg =  c_normal & 0x35ffffff;
 	c_seekoverlay = c_default_hl;
 }
@@ -331,8 +326,8 @@ function initbuttons(){
 		var track_time = "00:00:00";
 		track_len = "00:00:00";
 	}
-	TopTitle = new UITextView("foobar2000 v" + fb.Version, g_font, c_toptxt, lc_txt);
-	TopSubTitle = new UITextView("", g_font, c_toptxt2, lc_txt);
+	TopTitle = new UITextView("foobar2000 v" + fb.Version, g_font, c_font, lc_txt);
+	TopSubTitle = new UITextView("", g_font, c_subtitle, lc_txt);
 	RBtnTips = new UITextView("", g_font, c_font, rc_txt);
 	PlaybackTimeText = new UITextView(track_time, g_font, c_font, rc_txt);
 	PlaybackLengthText = new UITextView(track_len, g_font, c_font, lc_txt);
@@ -363,33 +358,31 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seek_frame = gdi.CreateImage(100, z(20));
 	gb = seek_frame.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, z8, 100, z(4), overlay_frame);
+	gb.FillSolidRect(0, z8, 100, z4, overlay_frame);
 	seek_frame.ReleaseGraphics(gb);
 	seek_time = gdi.CreateImage(100, z(20));
 	gb = seek_time.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, z8, 100, z(4), overlay_seek);
+	gb.FillSolidRect(0, z8, 100, z4, overlay_seek);
 	seek_time.ReleaseGraphics(gb);
 	vol_frame = gdi.CreateImage(100, z(18));
 	gb = vol_frame.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.FillSolidRect(0, z(7), 100, z(4), overlay_frame);
+	gb.FillSolidRect(0, z(7), 100, z4, overlay_frame);
 	vol_frame.ReleaseGraphics(gb);
 	
-	let imgh = Math.floor(18*zdpi);
+	let imgh = z(20);
 	seeker = gdi.CreateImage(imgh, imgh);
 	gb = seeker.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(3*zdpi, 3*zdpi, _x12, _x12, overlay_seek);
-	gb.FillEllipse(7*zdpi, 7*zdpi, 4*zdpi, 4*zdpi, c_seeker_core);
+	gb.FillEllipse(z4, z8/2, z4*3-1, z4*3-1, overlay_seek);
+	gb.FillEllipse(z4*2, z8, z4-1,z4-1, blendColors(c_normal, c_background, 0.88));
 	gb.SetSmoothingMode(0);
 	seeker.ReleaseGraphics(gb);
 	
 	seekbar = new UISlider(seek_frame, seek_time, seeker);
-	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, true);
+	VolumeBar = new UISlider(vol_frame, vol_active, false, true);
 	
-	let c_pb_ov = blendColors(c_font, c_seekoverlay, 0.85);
-	let c_pb_down = blendColors(c_black, c_seekoverlay, 0.85);
 	imgh = z(34);
 	let imgh2 = imgh * 2;
 	let point_arr = new Array(_x12, 9*zdpi, _x12, 23*zdpi,22*zdpi, 16*zdpi);
@@ -404,14 +397,14 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	let im_bgov = gdi.CreateImage(imgh, imgh);
 	gb = im_bgov.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(_x1, _x1, _x30, _x30, c_pb_ov);
+	gb.FillEllipse(_x1, _x1, _x30, _x30, c_shadow_h);
 	gb.SetSmoothingMode(0);
 	im_bgov.ReleaseGraphics(gb);
 		
 	let im_bgdown = gdi.CreateImage(imgh, imgh);
 	gb = im_bgdown.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(_x1, _x1, _x30, _x30, c_pb_down);
+	gb.FillEllipse(_x1, _x1, _x30, _x30, c_shadow);
 	gb.SetSmoothingMode(0);
 	im_bgdown.ReleaseGraphics(gb);
 		
@@ -453,7 +446,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 function init_obj() {
 	vol_len = Math.round((z(70) - 9)/10) * 10 + 9;
 	seek_h = z(20);
-	win_y = wh - z(67);//z(58);
+	win_y = wh - z(67);
 	let btn_space = z(12) + 3;
 	let imgh = img_stop.Width, imgh_b = img_play.Width;
 	btn_y = win_y + z(25);
@@ -827,7 +820,7 @@ function get_images() {
 	img_pbo[6] = gdi.CreateImage(imgw, imgh);
 	gb = img_pbo[6].GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawRoundRect(_x2, _x6, _x12, _x12, Math.round(rec_r/2), Math.round(rec_r/2), 2, c_normal);
+	gb.DrawRoundRect(_x2, _x6, _x12, _x12, Math.round(z4/2), Math.round(z4/2), 2, c_normal);
 	gb.DrawEllipse(_x6, _x10, _x4, _x4, 2, c_normal);
 	gb.DrawLine(_x15, _x4, _x10, _x14, 2, c_normal);
 	gb.DrawLine(_x15-1, _x4, 19*zdpi, _x10, 2, c_normal);
@@ -843,17 +836,14 @@ function get_images() {
 
 	vol_active = gdi.CreateImage(100, z(18));
 	gb = vol_active.GetGraphics();
-	gb.FillSolidRect(0, z(7), 100, z(4), c_normal);
+	gb.FillSolidRect(0, z(7), 100, z4, c_normal);
 	vol_active.ReleaseGraphics(gb);
-	vol_seeker = gdi.CreateImage(_x12, _x12);
-	gb = vol_seeker.GetGraphics();
-	vol_seeker.ReleaseGraphics(gb);
 
 	btn_img = gdi.CreateImage(z(28), z(78));
 	gb = btn_img.GetGraphics();
 	gb.SetSmoothingMode(4);
-	gb.FillRoundRect(0, z(26)+1, 26*zdpi, 24*zdpi, rec_r, rec_r, c_shadow_h);
-	gb.FillRoundRect(0, z(52)+1, 26*zdpi, 24*zdpi, rec_r, rec_r, c_shadow);
+	gb.FillRoundRect(0, z(26)+1, 26*zdpi, 24*zdpi, z4, z4, c_shadow_h);
+	gb.FillRoundRect(0, z(52)+1, 26*zdpi, 24*zdpi, z4, z4, c_shadow);
 	gb.SetSmoothingMode(0);
 	btn_img.ReleaseGraphics(gb);
 	
@@ -939,8 +929,8 @@ function get_images() {
 	img_close = gdi.CreateImage(topbtnw, imgh*3);
 	gb = img_close.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9, 27*zdpi, _x18, 1, c_toptxt);
-	gb.DrawLine(_x18, _x18, 27*zdpi, _x9, 1, c_toptxt);
+	gb.DrawLine(_x18, _x9, 27*zdpi, _x18, 1, c_font);
+	gb.DrawLine(_x18, _x18, 27*zdpi, _x9, 1, c_font);
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(0, imgh, topbtnw, imgh, RGB(232, 17, 35));
 	gb.SetSmoothingMode(2);
@@ -966,13 +956,13 @@ function get_images() {
 	img_max = gdi.CreateImage(imgh, imgh);
 	gb = img_max.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(_x8, _x8, _x10-1, _x10-1, 1, c_toptxt);
+	gb.DrawRect(_x8, _x8, _x10-1, _x10-1, 1, c_font);
 	img_max.ReleaseGraphics(gb);
 	
 	img_min = gdi.CreateImage(imgh, imgh);
 	gb = img_min.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x8, _x13, _x18, _x13, 1, c_toptxt);
+	gb.DrawLine(_x8, _x13, _x18, _x13, 1, c_font);
 	img_min.ReleaseGraphics(gb);
 	
 	imgh = z(9);
@@ -1021,10 +1011,11 @@ function on_size() {
 
 function on_paint(gr) {
 	let grey_1 = RGBA(0, 0, 0, 45);
-	gr.FillSolidRect(0, 0, ww, topbarh, c_background);
+	gr.FillSolidRect(0, 0, ww, wh, c_background);
+	gr.FillSolidRect(0, 0, ww, topbarh, c_topbg);
 	gr.DrawLine(0, topbarh-1, ww, topbarh-1, 1, grey_1);
 	gr.FillSolidRect(0, win_y, ww, wh-win_y, c_btmbg);
-	gr.FillGradRect(0, wh-3, ww, 3, 0, c_btmbg, c_btmbg, 1);//bug of uihacks
+	//gr.FillGradRect(0, wh-3, ww, 3, 0, c_btmbg, c_btmbg, 1);//bug of uihacks
 	CloseBtn.Paint(gr);
 	MaxBtn.Paint(gr);
 	MinBtn.Paint(gr);
@@ -1351,21 +1342,15 @@ function on_mouse_rbtn_up() {
 
 function on_notify_data(name, info) {
 	switch (name) {
-	case "color_scheme_updatebase":
+	case "color_scheme_updated":
 		let btm_only = false
 		if(!info) {
 			c_seekoverlay = c_default_hl;
-			c_btmbg = c_btmbg_default;
 			c_background = c_background_default;
-			c_toptxt2 = c_toptxt2_default;
-			c_normal = c_normal_default;
-		}else{
+		} else {
 			c_seekoverlay = RGB(info[0], info[1], info[2]);
-			if(info.length > 3){
-				c_background = blendColors(c_background_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);
-				c_btmbg = blendColors(c_btmbg_default, RGB(info[3], info[4], info[5]), 0.05 * cbkg_chroma);
-				c_toptxt2 = blendColors(c_background, c_toptxt, 0.65);
-				c_normal = blendColors(c_btmbg, c_font, 0.8);
+			if(info.length > 3) {
+				c_background = RGB(info[3], info[4], info[5]);
 			} else btm_only = true;
 		}
 		init_overlay_obj(c_seek_bg, c_seekoverlay);

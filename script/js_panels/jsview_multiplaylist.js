@@ -47,7 +47,7 @@ ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
 	rowHeight: 0,
 	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
-	scrollSmoothness: 3.0,
+	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),

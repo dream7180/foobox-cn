@@ -2012,7 +2012,6 @@ function Controller(imgArray, imgDisplay, prop) {
 		}
 		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
-			window.NotifyOthers("color_scheme_updatebase", c_blend);
 			if(cbkg_bycover && c_blend){
 				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
 				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
@@ -2032,7 +2031,6 @@ function Controller(imgArray, imgDisplay, prop) {
 		c_background = c_background_default;
 		let carr_hl = toRGB(c_highlight);
 		let c_infobase = carr_hl.concat(toRGB(c_background_default));
-		window.NotifyOthers("color_scheme_updatebase", c_infobase);
 		window.NotifyOthers("color_scheme_updated", c_infobase.concat(toRGB(g_color_selected_bg_default)));
 		 window.Repaint();
 	}

@@ -37,14 +37,14 @@ if(openhacks) {
 		var show_status = true;
 	}
 } else {
-	var show_menu =  window.GetProperty("foobox.Show.menu.bar", false);
+	var show_menu =  window.GetProperty("foobox.Show.menu.bar", true);
 }
 var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.9";
+var g_script_version = "8.10";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
