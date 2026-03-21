@@ -381,7 +381,7 @@ function init_overlay_obj(overlay_frame, overlay_seek) {
 	seeker.ReleaseGraphics(gb);
 	
 	seekbar = new UISlider(seek_frame, seek_time, seeker);
-	VolumeBar = new UISlider(vol_frame, vol_active, false, true);
+	VolumeBar = new UISlider(vol_frame, vol_active, vol_seeker, true);
 	
 	imgh = z(34);
 	let imgh2 = imgh * 2;
@@ -838,6 +838,9 @@ function get_images() {
 	gb = vol_active.GetGraphics();
 	gb.FillSolidRect(0, z(7), 100, z4, c_normal);
 	vol_active.ReleaseGraphics(gb);
+	vol_seeker = gdi.CreateImage(_x12, _x12);
+	gb = vol_seeker.GetGraphics();
+	vol_seeker.ReleaseGraphics(gb);
 
 	btn_img = gdi.CreateImage(z(28), z(78));
 	gb = btn_img.GetGraphics();

@@ -43,7 +43,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg);
 			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
 		}
-		if(ImgKnob) gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);
+		gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);
 	}
 
 	this.MouseDown = function(_x, _y) {
