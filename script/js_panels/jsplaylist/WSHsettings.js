@@ -45,12 +45,8 @@ function settings_checkboxes_action(id, status, parentId) {
 				show_menu = false;
 			}
 			if(show_menu != _showmenu){
-				if(openhacks) {
-					fb.RunMainMenuCommand("视图/显示主菜单");
-				} else {
-					window.NotifyOthers("Show_menubar", show_menu);
-					window.SetProperty("foobox.Show.menu.bar", show_menu);
-				}
+				window.NotifyOthers("Show_menubar", show_menu);
+				window.SetProperty("foobox.Show.menu.bar", show_menu);
 				p.settings.pages[parentId].elements[id].repaint();
 			}
 			break;
@@ -139,19 +135,6 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.NotifyOthers("foobox_infoArt_followcursor", follow_cursor);
 			window.SetProperty("foobox.infoArt.follow.cursor", follow_cursor);
 			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 18:
-			let _showstatus = show_status;
-			if (status) {
-				show_status = true;
-			} else {
-				show_status = false;
-			}
-			if(show_status != _showstatus){
-				fb.RunMainMenuCommand("视图/显示状态栏");
-				window.NotifyOthers("Show_statusbar", show_status);
-				p.settings.pages[parentId].elements[id].repaint();
-			}
 			break;
 		}
 		break;
@@ -1738,7 +1721,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case 3:
 			//foobox options
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "显示主菜单栏", "show_menu ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "显示仿真主菜单栏", "show_menu ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 4.5, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(2, z(120), cSettings.topBarHeight + rh * 4.5, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
@@ -1756,7 +1739,6 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "右栏封面信息及属性面板总是跟随光标而非播放 (会使界面颜色跟随封面无效)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "添加额外的网络电台列表地址到播放列表管理面板菜单 (若多个地址，以分号 ';' 来分隔)", radiom3u, "settings_textboxes_action", this.id));
 			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 28), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息 (仅对 32 位 foobox 主题有效) |", title_add, "settings_textboxes_action", this.id));
-			if(openhacks) this.elements.push(new oCheckBox(18, z(180), cSettings.topBarHeight + rh * 2.5, "显示状态栏", "show_status ? true : false", "settings_checkboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -2594,6 +2576,7 @@ oSettings = function() {
 				this.closebutton.state = ButtonStates.normal;
 				resize_panels();
 				update_playlist(layout.collapseGroupsByDefault);
+				window.NotifyOthers("panel_switch", false);
 				full_repaint();
 			};
 			break;

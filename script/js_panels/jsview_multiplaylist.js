@@ -3,7 +3,7 @@ window.DefinePanel('simple multi playlist viewer', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\uihacks.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\uicomposite.js');
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;
@@ -248,6 +248,7 @@ oBrowser = function(name) {
 				};
 			}
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight+1, g_color_normal_bg);
+			gr.FillGradRect(ww-1, 0, 1, wh, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight - 2, g_color_topbar);
 			gr.DrawLine(0, ppt.headerBarHeight, ww, ppt.headerBarHeight, 1, g_color_line_div);
 			gr.GdiDrawText(this.tag, g_font_tag, tag_color, this.paddingLeft, 0, this.paddingLeft*2, ppt.headerBarHeight, lc_txt);
@@ -587,7 +588,6 @@ function on_mouse_lbtn_down(x, y) {
 	else {
 		brw.on_mouse("down", x, y);
 	};
-	if(brw.scrollbar.cursorDrag && uiHacks) UIHacks.DisableSizing = true;
 	if(btn_sw.checkstate("down", x, y) == ButtonStates.down) {
 		btn_clicked = true;
 		btn_sw.state = ButtonStates.hover;
@@ -596,7 +596,6 @@ function on_mouse_lbtn_down(x, y) {
 
 function on_mouse_lbtn_up(x, y) {
 	brw.on_mouse("up", x, y);
-	if(uiHacks && UIHacks.MainWindowState != 2 && UIHacks.DisableSizing) UIHacks.DisableSizing = false;
 	if (timers.mouseDown) {
 		window.ClearTimeout(timers.mouseDown);
 		timers.mouseDown = false;
@@ -754,14 +753,14 @@ function get_font() {
 
 function get_colors() {
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
-	g_color_selected_txt = g_color_normal_txt;
 	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	g_color_selected_txt = g_color_normal_txt;
 	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	g_color_selected_bg = g_color_selected_bg_default;
-	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	g_color_tracknum = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 	if(isDarkMode(g_color_normal_bg)) {

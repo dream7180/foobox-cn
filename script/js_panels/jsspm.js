@@ -387,6 +387,7 @@ oBrowser = function() {
 		if (repaint_main || !repaintforced) {
 			repaint_main = false;
 			repaintforced = false;
+			gr.FillGradRect(0, 0, 1, wh, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 			if (this.rows.length > 0) {
 				var ax = this.marginLR;
 				var ay = 0;
@@ -404,16 +405,19 @@ oBrowser = function() {
 						if (this.rows[i].idx == plman.ActivePlaylist) {
 							track_color_txt = g_color_normal_txt;
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
+							gr.FillGradRect(ax, ay, 1, ah, 0, g_color_selected_bg, g_color_selected_bg, 1);//bug of win10 border
 						} else if(this.actionRows.indexOf(i) > -1){
 							track_color_txt = g_color_normal_txt;
-							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg &0x75ffffff)
+							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg &0x75ffffff);
 						}
 						if (this.rows[i].idx == plman.PlayingPlaylist && fb.IsPlaying) {
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
+							gr.FillGradRect(ax, ay, 1, ah, 0, g_color_highlight, g_color_highlight, 1);//bug of win10 border
 						}
 						// hover item
 						if (i == this.activeRow && !g_dragndrop_status && !cPlaylistManager.drag_clicked) {
 							gr.FillSolidRect(ax, ay, 4, ah, g_color_highlight);
+							gr.FillGradRect(ax, ay, 1, ah, 0, g_color_highlight, g_color_highlight, 1);//bug of win10 border
 						};
 						// target location mark
 						if (cPlaylistManager.drag_target_id == i && !this.rows[i].islocked) {
@@ -469,6 +473,7 @@ oBrowser = function() {
 			}
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight+1, g_color_normal_bg);
 			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
+			gr.FillGradRect(0, 0, 1, ppt.headerBarHeight+1, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 			if(ppt.showFilter){
 				var boxText = this.rows.length.toString();
 				var tw = gr.CalcTextWidth(boxText, g_font_track);
@@ -1258,7 +1263,6 @@ function on_size() {
 };
 
 function on_paint(gr) {
-
 	if (!ww) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
 	brw && brw.draw(gr);
@@ -1650,14 +1654,14 @@ function get_font() {
 
 function get_colors() {
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
-	g_color_selected_txt = g_color_normal_txt;
 	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	g_color_selected_txt = g_color_normal_txt;
 	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	g_color_selected_bg = g_color_selected_bg_default;
-	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	if(isDarkMode(g_color_normal_bg)){
 		dark_mode = 1;

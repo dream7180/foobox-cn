@@ -5,6 +5,7 @@ let m_x = 0, m_y = 0;
 let sp_drag = false;
 var upperratio = 0;
 PUpper.ShowCaption = PLower.ShowCaption = false;
+let splitter_vis = (PLower.Text == "spectrogram") ? 1 : 0;
 
 function get_colors() {
 	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
@@ -20,10 +21,10 @@ function on_size() {
 	if(upperratio && wh) {
 		var uh_calc = Math.round((wh-2)*upperratio);
 		PUpper.Move(0, 0, ww, uh_calc);
-		PLower.Move(0, uh_calc + 2, ww, wh - uh_calc - 2);
+		PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
 	} else{
 		PUpper.Move(0, 0, ww, PUpper.Height);
-		PLower.Move(0, PUpper.Height + 2, ww, wh - PUpper.Height - 2);
+		PLower.Move(splitter_vis, PUpper.Height + 2, ww - splitter_vis*2, wh - PUpper.Height - 2);
 	}
 	if(wh) upperratio = PUpper.Height/(wh-2);
 }
@@ -31,6 +32,10 @@ function on_size() {
 function on_paint(gr) {
 	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
+	if(splitter_vis){
+		gr.FillGradRect(ww-1, 0, 1, wh, 0, c_black, c_black, 1);//bug of win10 border
+		gr.FillGradRect(0, 0, 1, wh, 0, c_black, c_black, 1);//bug of win10 border
+	}
 	gr.FillSolidRect(0, PUpper.Height, ww, 1, RGBA(0, 0, 0, 80));
 	gr.FillSolidRect(0, PUpper.Height+1, ww, 1, RGBA(0, 0, 0, 160));
 }
@@ -41,7 +46,7 @@ function on_mouse_move(x, y) {
 		window.SetCursor(32645);//IDC_SIZE
 		if(sp_drag){
 			PUpper.Move(0, 0, ww, y);
-			PLower.Move(0, y + 2, ww, wh - y - 2);
+			PLower.Move(splitter_vis, y + 2, ww - splitter_vis*2, wh - y - 2);
 			window.Repaint();
 			upperratio = PUpper.Height/(wh-2);
 		}

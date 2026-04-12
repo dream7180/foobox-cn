@@ -9,7 +9,7 @@ PLeft.ShowCaption = PRight.ShowCaption = false;
 function get_colors() {
 	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
 	g_color_background = g_color_background_default;
-	dark_mode = isDarkMode(g_color_background);
+	let dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
 		c_line = RGBA(0,0,0,100);
 		g_color_topbar = RGBA(0,0,0,30);

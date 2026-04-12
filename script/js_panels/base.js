@@ -2,7 +2,7 @@
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\uihacks.js');
+include(fb.ProfilePath + 'foobox\\script\\js_common\\uicomposite.js');
 
 var time_length = 0;
 var zdpi, dark_mode;
@@ -15,7 +15,7 @@ var hbtn = false;
 var ww = 0, wh = 0;
 var m_x = 0, m_y = 0;
 var g_seconds = 0;
-var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw,leftbarw, title_w, z4, z5, z8;
+var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw,leftbarw, title_w, captionw, z4, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn, MenubarBtn = [];
@@ -25,18 +25,18 @@ var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProp
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 var show_menu = window.GetProperty("foobox.show.menubar", true);
 var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
-var bio_panel, video_panel;
-var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
-var p_tips = ['播放列表', '封面浏览器'];
+var custom_panel;
+var LIST, BRW, CUSTOM, BIO, active_p, active_pid;
+var p_tips = ['播放列表', '封面浏览器', '简介'];
 
 //=====================================================
 oSwitchbar = function() {
 	this.btw = z(28);
 	this.bth = z(24);
-	this.h_space = z(41) - (bio_panel + video_panel)*z(3);
+	this.h_space = z(38);
 	this.x = 5;
 	this.y = 5;
-	this.w = this.h_space*(2 + bio_panel + video_panel) + this.btw + 2;
+	this.w = this.h_space*3 + this.btw + 2;
 	this.h = this.bth + z(2);
 	this.hover_tab = 0;
 	this.tab_old = this.hover_tab;
@@ -50,9 +50,19 @@ oSwitchbar = function() {
 		this.w = w;
 		this.h = h;
 	}
+	this.get_customimg = function() {
+		if(!custom_panel) return img_settings;
+		else{
+			if(p_tips[3] == "可视化") return img_vis;
+			if(p_tips[3] == "视频") return img_video;
+			return img_settings;
+		}
+	}
+	this.custom_img = this.get_customimg();
+	
 	this._isHover = function(x, y) {
 		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
-	};
+	}
 	this.on_mouse = function(event, x, y) {
 		var down_old = this.down;
 		this.tab_old = this.hover_tab;
@@ -63,8 +73,7 @@ oSwitchbar = function() {
 				if(x > this.x && x < this.x + this.btw) this.hover_tab = 1;
 				else if (x > this.x + this.h_space && x < this.x + this.h_space + this.btw) this.hover_tab = 2;
 				else if (x > this.x + this.h_space*2 && x < this.x + this.h_space*2 + this.btw) this.hover_tab = 3;
-				else if ((bio_panel + video_panel) && x > this.x + this.h_space*3 && x < this.x + this.h_space*3 + this.btw) this.hover_tab = 4;
-				else if ((bio_panel + video_panel == 2) && x > this.x + this.h_space*4 && x < this.x + this.h_space*4 + this.btw) this.hover_tab = 5;
+				else if (x > this.x + this.h_space*3 && x < this.x + this.h_space*3 + this.btw) this.hover_tab = 4;
 				else this.hover_tab = 0;
 			}
 			else this.hover_tab = 0;
@@ -110,28 +119,40 @@ oSwitchbar = function() {
 		g_switchbar.tip_timer = false;
 	}
 	this.switch_panel = function(id) {
+		if(!custom_panel) {
+			if(active_pid == 3){
+				window.NotifyOthers("foobox_setting", 0);
+				if(id == 1) {
+					active_pid = 0;
+					return;
+				}
+			} else if(active_pid == 0 && id == 4){
+				window.NotifyOthers("foobox_setting", 1);
+				active_pid = 3;
+				return;
+			}				
+		}
 		active_p.Show(false);
-		active_pid = id - 1;
-		switch(active_pid){
+		switch(id){
 			default:
-			case 0:
+			case 1:
 				active_p = LIST;
 			break;
-			case 1:
+			case 2:
 				active_p = BRW;
 			break;
-			case 2:
-				if(bio_panel) active_p = BIO;
-				else active_p = VIS;
-			break;
 			case 3:
-				if(bio_panel) active_p = VIS;
-				else if(video_panel) active_p = VIDEO;
+				active_p = BIO;
 			break;
 			case 4:
-				if(bio_panel + video_panel) active_p = VIDEO;
+				if(custom_panel) active_p = CUSTOM;
+				else {
+					window.NotifyOthers("foobox_setting", 1);
+					active_p = LIST;
+				}
 			break;
 		}
+		active_pid = id - 1;
 		active_p.Show(true);
 		set_panel();
 	}
@@ -147,9 +168,8 @@ oSwitchbar = function() {
 		gr.SetSmoothingMode(0);
 		gr.DrawImage(img_list, this.x + z5, ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
 		gr.DrawImage(img_cover, this.x + this.h_space + z5, ico_y, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		if(bio_panel) gr.DrawImage(img_bio, this.x + this.h_space*2 + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		gr.DrawImage(img_vis, this.x + this.h_space*(2+bio_panel) + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
-		if(video_panel) gr.DrawImage(img_video, this.x + this.h_space*(3+bio_panel) + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		gr.DrawImage(img_bio, this.x + this.h_space*2 + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
+		gr.DrawImage(this.custom_img, this.x + this.h_space*3 + z5, ico_y-1, imgw, imgh, 0, 0, imgw, imgh,0,255);
 	}
 	this.repaint = function () {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
@@ -159,44 +179,27 @@ oSwitchbar = function() {
 function get_panel() {
 	LIST = window.GetPanel('list');
 	BRW = window.GetPanel('brw');
-	VIS = window.GetPanel('vis');
-	active_p = LIST;
-	active_pid = 0;
-	BIO = detect_bio();
-	p_tips.push("可视化");
-	VIDEO = detect_video();
-	LIST.ShowCaption = BRW.ShowCaption = VIS.ShowCaption = false;
+	BIO = window.GetPanel('bio');
+	detect_custom();
+	LIST.ShowCaption = BRW.ShowCaption = false;
 	if(!LIST.Hidden) {active_p = LIST; active_pid = 0;}
 	else if(!BRW.Hidden) {active_p = BRW; active_pid = 1;}
-	else if(bio_panel && !BIO.Hidden) {active_p = BIO; active_pid = 2;}
-	else if(!VIS.Hidden) {active_p = VIS; active_pid = 2 + bio_panel;}
-	else if(video_panel) {active_p = VIDEO; active_pid = 3 + bio_panel;}
+	else if(!BIO.Hidden) {active_p = BIO; active_pid = 2;}
+	else if(custom_panel && !CUSTOM.Hidden) {active_p = CUSTOM; active_pid = 3;}
+	else {active_p = LIST; active_pid = 0;}
 }
 
-function detect_bio() {
+function detect_custom() {
 	try{
-		var panel_ = window.GetPanel('bio');
-		p_tips.push("简介");
-		panel_.ShowCaption = false;
-		bio_panel = 1;
+		CUSTOM = window.GetPanel('custom');
+		//p_tips.push("简介");
+		CUSTOM.ShowCaption = false;
+		custom_panel = 1;
+		p_tips.push(window.GetProperty("custom.panel.tip", "可视化"));
 	} catch(e) {
-		bio_panel = 0;
-		panel_ = null;
+		custom_panel = 0;
+		p_tips.push("设置");
 	}
-	return panel_;
-}
-
-function detect_video() {
-	try{
-		var panel_ = window.GetPanel('video');
-		p_tips.push("视频");
-		panel_.ShowCaption = false;
-		video_panel = 1;
-	} catch(e) {
-		video_panel = 0;
-		panel_ = null;
-	}
-	return panel_;
 }
 
 function set_panel() {
@@ -270,9 +273,9 @@ function get_font() {
 
 function get_color() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
-	dark_mode = isDarkMode(c_background_default);
 	c_font = window.GetColourDUI(ColorTypeDUI.text);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	dark_mode = isDarkMode(c_background_default);
 	if(dark_mode) {
 		c_topbg = RGBA(0, 0, 0, 50);
 		c_btmbg = RGBA(0, 0, 0, 50);
@@ -490,6 +493,7 @@ function init_obj() {
 		MenuBtn.SetXY(0, 0);
 		leftbarw = menubtnw;
 	}
+	captionw = ww - 3*topbtnw - leftbarw;
 }
 
 function setSize(){
@@ -526,7 +530,7 @@ function repaintWin(section){
 			window.RepaintRect(0, 0, ww, topbarh);
 			break;
 		case "TX":
-			window.RepaintRect(menubtnw, 0, ww - menubtnw - 3*topbtnw, topbarh);
+			window.RepaintRect(leftbarw, 0, captionw, topbarh);
 			break;
 		case "G":
 			window.RepaintRect(0, 0, ww, topbarh);
@@ -557,8 +561,10 @@ function main_Menu(x, y) {
 	child4.AppendTo(basemenu, MF_STRING | MF_POPUP, "播放");
 	child5.AppendTo(basemenu, MF_STRING | MF_POPUP, "媒体库");
 	child6.AppendTo(basemenu, MF_STRING | MF_POPUP, "帮助");
-	basemenu.AppendMenuSeparator();
-	basemenu.AppendMenuItem(MF_STRING, 1301, "foobox 设置");
+	if(custom_panel){
+		basemenu.AppendMenuSeparator();
+		basemenu.AppendMenuItem(MF_STRING, 1301, "foobox 设置");
+	}
 
 	menuman1.Init("file");
 	menuman2.Init("edit");
@@ -641,7 +647,7 @@ function menu_bar(i) {
 			x = x + menubtnw * 4 + menulibw;
 			break;
 	}
-	if(i == 0){
+	if(i == 0 && custom_panel){
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 201, "foobox 设置");
 	}
@@ -667,14 +673,14 @@ function get_images() {
 	//creat static images
 	var gb;
 	let _x2 = 2*zdpi, _x3 = 3*zdpi, _x4 = 4*zdpi, _x5 = 5*zdpi, _x6 = 6*zdpi,  _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi,
-		_x12 = 12*zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x20 = 20*zdpi;
+		_x12 = 12*zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x20 = 20*zdpi, floor_x14 = Math.floor(_x14);
 
 	let imgh = z(30), imgh2 = imgh * 2, hotdia = 28*zdpi;
 	img_stop = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_stop.GetGraphics();
 	time_length = gb.CalcTextWidth("00:00:00", g_font);
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(_x7, _x7, Math.floor(_x14)+1, Math.floor(_x14)+1, 2, c_normal);
+	gb.DrawRect(_x7, _x7, floor_x14+1, floor_x14+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, hotdia, hotdia, c_shadow_h);
 	gb.FillEllipse(0, imgh2, hotdia, hotdia, c_shadow);
@@ -779,12 +785,13 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	img_pbo[4].ReleaseGraphics(gb);
 	
+	let floor_201 = Math.floor(_x20-1);
 	img_pbo[1] = gdi.CreateImage(imgw, imgh);
 	gb = img_pbo[1].GetGraphics();
 	gb.DrawLine(_x2, _x7, _x16, _x7, 2, c_normal);
 	gb.DrawLine(_x2+1, _x6+1, _x2+1, _x12, 2, c_normal);
 	gb.DrawLine(_x7, _x15, _x20, _x15, 2, c_normal);
-	gb.DrawLine(Math.floor(_x20-1), _x10, Math.floor(_x20-1), _x15-1, 2, c_normal);
+	gb.DrawLine(floor_201, _x10, floor_201, _x15-1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillPolygon(c_normal, 0, point_arr);
 	point_arr_2 = new Array(_x7, _x12-0.5, _x7, _x18, zdpi, 14.5*zdpi);
@@ -797,7 +804,7 @@ function get_images() {
 	gb.DrawLine(_x2, _x7, _x16, _x7, 2, c_normal);
 	gb.DrawLine(_x2+1, _x6+1, _x2+1, _x12, 2, c_normal);
 	gb.DrawLine(_x7, _x15, _x20, _x15, 2, c_normal);
-	gb.DrawLine(Math.floor(_x20-1), _x10, Math.floor(_x20-1), _x15-1, 2, c_normal);
+	gb.DrawLine(floor_201, _x10, floor_201, _x15-1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillPolygon(c_normal, 0, point_arr);
 	gb.FillPolygon(c_normal, 0, point_arr_2);
@@ -850,6 +857,8 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	btn_img.ReleaseGraphics(gb);
 	
+	let floor_x05 = Math.floor(zdpi/2);
+	let floor_xa5 = Math.floor(_x3)*2-floor_x05;
 	let floor_x6 = Math.floor(_x6);
 	let floor_x62 = zdpi+floor_x6*2;
 	point_arr = new Array(zdpi, _x2, zdpi, floor_x6*2-1,  _x7, (floor_x6*2+_x2-1)/2);
@@ -882,8 +891,8 @@ function get_images() {
 	gb = img_bio.GetGraphics();
 	gb.SetSmoothingMode(0);
 	gb.DrawRect(Math.floor(_x4), zdpi+1, z(14), floor_x62-1, 2, c_normal);
-	gb.DrawLine(zdpi, _x5, Math.floor(_x6), _x5, 2, c_normal);
-	gb.DrawLine(zdpi, floor_x62-_x3, Math.floor(_x6), floor_x62-_x3, 2, c_normal);
+	gb.DrawLine(zdpi, _x5, floor_x6, _x5, 2, c_normal);
+	gb.DrawLine(zdpi, floor_x62-_x3, floor_x6, floor_x62-_x3, 2, c_normal);
 	gb.SetTextRenderingHint(4);
 	gb.DrawString("B", GdiFont("Tahoma", Math.round(_x10), 1), c_normal, z(2), z(1.3), _x18, _x13, cc_stringformat);
 	gb.SetTextRenderingHint(0);
@@ -891,16 +900,26 @@ function get_images() {
 
 	img_vis = gdi.CreateImage(imgw, imgh);
 	gb = img_vis.GetGraphics();
-	gb.DrawLine(zdpi+1, _x13+1, zdpi+1, _x5, 2, c_normal);
-	gb.DrawLine(_x6+1, _x13+1, _x6+1, zdpi, 2, c_normal);
-	gb.DrawLine(_x11+1, _x13+1, _x11+1, _x7, 2, c_normal);
-	gb.DrawLine(_x16+1, _x13+1, _x16+1, _x4, 2, c_normal);
+	gb.DrawLine(zdpi+1, floor_x14+1, zdpi+1, _x5, 2, c_normal);
+	gb.DrawLine(_x6+1, floor_x14+1, _x6+1, zdpi, 2, c_normal);
+	gb.DrawLine(_x11+1, floor_x14+1, _x11+1, _x7, 2, c_normal);
+	gb.DrawLine(_x16+1, floor_x14+1, _x16+1, _x4, 2, c_normal);
 	img_vis.ReleaseGraphics(gb);
+	
+	img_settings = gdi.CreateImage(imgw, imgh);
+	gb = img_settings.GetGraphics();
+	gb.DrawLine(_x3+1, floor_x14+1, _x3+1, zdpi, 2, c_normal);
+	gb.DrawLine(_x3+floor_x6+1, floor_x14+1, _x3+floor_x6+1, zdpi, 2, c_normal);
+	gb.DrawLine(_x3+floor_x62+1-zdpi, floor_x14+1, _x3+floor_x62+1-zdpi, zdpi, 2, c_normal);
+	gb.DrawLine(zdpi-floor_x05, _x5, floor_xa5+zdpi, _x5, 2, c_normal);
+	gb.DrawLine(floor_x6+zdpi-floor_x05, _x10, floor_x6+zdpi+floor_xa5, _x10, 2, c_normal);
+	gb.DrawLine(floor_x62-floor_x05, _x7, floor_x62+floor_xa5, _x7, 2, c_normal);
+	img_settings.ReleaseGraphics(gb);
 
 	img_video = gdi.CreateImage(imgw, imgh);
 	gb = img_video.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(zdpi+1, _x7+1, _x9, Math.floor(_x6), 2, c_normal);
+	gb.DrawRect(zdpi+1, _x7+1, _x9, floor_x6, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(zdpi, zdpi, _x5, _x5, 2,c_normal);
 	gb.DrawEllipse(_x7, zdpi, _x5, _x5, 2,c_normal);
@@ -981,10 +1000,8 @@ function get_images() {
 }
 
 function on_init(){
-	if(bio_panel) BIO.ShowCaption = false; 
-	if(video_panel) VIDEO.ShowCaption = false;
 	get_font();
-	uiHacksInit();
+	UiCompInit();
 	get_color();
 	get_images();
 	get_panel();
@@ -1009,16 +1026,21 @@ function on_size() {
 	init_obj();
 	setSize();
 	if(ww) set_panel();
-	uiHacksResetCaption();
+	UiCompSetCaption();
 }
 
 function on_paint(gr) {
 	let grey_1 = RGBA(0, 0, 0, 45);
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
+	gr.FillGradRect(0, 0, ww, 1, 0, c_background, c_background, 1);//bug of win10 border
+	gr.FillGradRect(0, 0, 1, topbarh, 0, c_background, c_background, 1);//bug of win10 border
+	gr.FillGradRect(ww-1, 0, 1, topbarh, 0, c_background, c_background, 1);//bug of win10 border
 	gr.FillSolidRect(0, 0, ww, topbarh, c_topbg);
 	gr.DrawLine(0, topbarh-1, ww, topbarh-1, 1, grey_1);
+	gr.FillGradRect(0, wh-2, ww, 2, 0, c_background, c_background, 1);//bug of win10 border
+	gr.FillGradRect(0, win_y, 1, wh-win_y, 0, c_background, c_background, 1);//bug of win10 border
+	gr.FillGradRect(ww-1, win_y, 1, wh-win_y, 0, c_background, c_background, 1);//bug of win10 border
 	gr.FillSolidRect(0, win_y, ww, wh-win_y, c_btmbg);
-	//gr.FillGradRect(0, wh-3, ww, 3, 0, c_btmbg, c_btmbg, 1);//bug of uihacks
 	CloseBtn.Paint(gr);
 	MaxBtn.Paint(gr);
 	MinBtn.Paint(gr);
@@ -1046,12 +1068,12 @@ function on_paint(gr) {
 			else gr.DrawImage(playing_ico, leftbarw + space_1, Math.floor((topbarh - _icow)/2), _icow, _icow, 0, 0, _icow, _icow,0,255);
 		}
 		TopTitle.SetSize(leftbarw + space_1 + space_2, 0, title_w, topbarh);
-		TopSubTitle.SetSize(leftbarw + title_w + space_1 + space_2, 0, ww - menubtnw - title_w - 3*topbtnw - g_fsize, topbarh);
+		TopSubTitle.SetSize(leftbarw + title_w + space_1 + space_2, 0, ww - leftbarw - title_w - 3*topbtnw - g_fsize, topbarh);
 	} else {
 		gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
 		MenuBtn.Paint(gr);
 		TopTitle.SetSize(leftbarw, 0, title_w, topbarh);
-		TopSubTitle.SetSize(leftbarw + title_w, 0, ww - leftbarw - title_w - 3*topbtnw - g_fsize, topbarh);
+		TopSubTitle.SetSize(leftbarw + title_w, 0, captionw - title_w - g_fsize, topbarh);
 	}
 	gr.DrawImage(img_max, Math.round(ww - topbtnw*1.5 - img_max.Width/2), 1, img_max.Width, img_max.Height, 0, 0, img_max.Width, img_max.Height);
 	gr.DrawImage(img_min, Math.round(ww - topbtnw*2.5 - img_min.Width/2), 1, img_min.Width, img_min.Height, 0, 0, img_min.Width, img_min.Height);
@@ -1069,7 +1091,7 @@ function on_paint(gr) {
 	PlaybackLengthText.Paint(gr);
 	seekbar.Paint(gr);
 	TimeTip.Paint(gr);
-	if(ww > (11.5 - (bio_panel+video_panel)/2)*vol_len){
+	if(ww > 11.5*vol_len){
 		VolumeBar.Paint(gr);
 		VolumeTip.Paint(gr);
 		LibBtn.Paint(gr);
@@ -1193,11 +1215,11 @@ function on_mouse_lbtn_up(x, y) {
 	if(y < topbarh + 1) {
 		if (CloseBtn.MouseUp()) fb.Exit();
 		if (MaxBtn.MouseUp()) {
-			if(UIHacks.MainWindowState != 2) UIHacks.MainWindowState = 2;//maximized
-			else UIHacks.MainWindowState = 0;// normal
+			if(UIComp.WindowState != 2) UIComp.WindowState = 2;//maximized
+			else UIComp.WindowState = 0;// normal
 		}
 		if (MinBtn.MouseUp()) {
-			UIHacks.MainWindowState = 1;// minimized
+			UIComp.WindowState = 1;// minimized
 		}
 		if(show_menu){
 			for(var i = 0; i < MenubarBtn.length; i++){
@@ -1381,6 +1403,16 @@ function on_notify_data(name, info) {
 		cbkg_chroma = info;
 		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
+	case "panel_switch":
+		if(custom_panel) break;
+		if(info){
+			active_pid = 3;
+			g_switchbar.repaint();
+		} else {
+			active_pid = 0;
+			g_switchbar.repaint();
+		}
+		break;
 	case "Show_menubar":
 		show_menu = info;
 		window.SetProperty("foobox.show.menubar", show_menu);
@@ -1402,7 +1434,8 @@ function on_notify_data(name, info) {
 			MenuBtn.SetXY(0, 0);
 			leftbarw = menubtnw;
 		}
-		uiHacksResetCaption();
+		captionw = ww - 3*topbtnw - leftbarw;
+		UiCompSetCaption();
 		repaintWin("T");
 		break;
 	}

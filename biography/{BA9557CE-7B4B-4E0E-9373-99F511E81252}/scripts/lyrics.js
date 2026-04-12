@@ -73,25 +73,31 @@ class Lyrics {
 			this.transTop[transition_factor] = fadeTop;
 		}
 
+		gr.SetTextRenderingHint(5);
 		this.lyrics.forEach((lyric, i) => {
 			const lyric_y = this.lineHeight * i;
 			const line_y = Math.round(y - top + lyric_y);
 			const bottomLine = line_y > this.bot;
 			if (this.showlyric(lyric_y, top)) {
 				const font = !lyric.highlight ? ui.font.lyrics : this.font.lyrics;
-				if (this.shadowEffect && line_y >= this.top && !bottomLine) {
-					if (this.dropNegativeShadowLevel) {
-						gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x - this.dropNegativeShadowLevel, line_y, this.w + 1, this.lineHeight + 1, txt.cc);
-						gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x, line_y - this.dropNegativeShadowLevel, this.w + 1, this.lineHeight + 1, txt.cc);
+				if (line_y >= this.top - 1 && !bottomLine) {
+					if (this.dropNegativeShadowLevel > 0) {
+						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x - this.dropNegativeShadowLevel, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
+						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x, line_y - this.dropNegativeShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
 					}
-					gr.GdiDrawText(lyric.content, font, ui.col.dropShadow, this.x + this.dropShadowLevel, line_y + this.dropShadowLevel, this.w + 1, this.lineHeight + 1, txt.cc);
+					col = lyric.highlight ? blendIn : i == this.locus - 1 ? blendOut : ui.col.text;
+					if (this.dropShadowLevel > 0) {
+						gr.DrawString(lyric.content, font, ui.col.dropShadow, this.x + this.dropShadowLevel, line_y + this.dropShadowLevel, this.w + 1, this.lineHeight + 1, this.alignCenter);
+						gr.DrawString(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
+					} else gr.GdiDrawText(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, txt.cc);
+				} else{
+					col = bottomLine ? fadeBot :fadeTop;
+					gr.DrawString(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
 				}
-				col = line_y >= this.top ? lyric.highlight ? blendIn : i == this.locus - 1 ? blendOut : bottomLine ? fadeBot : ui.col.text : fadeTop;
-				gr.SetTextRenderingHint(4);
-				gr.DrawString(lyric.content, font, col, this.x, line_y, this.w + 1, this.lineHeight + 1, this.alignCenter);
-				gr.SetTextRenderingHint(0);
 			}
 		});
+		gr.SetTextRenderingHint(0);
+		
 		if (this.showOffset) {
 			const offsetW = gr.CalcTextWidth(`偏移: ${this.userOffset / 1000}s`, ui.font.main) + this.lineHeight;
 			gr.SetSmoothingMode(4);
@@ -201,7 +207,6 @@ class Lyrics {
 		this.minDurationScroll = Math.min(this.durationScroll, 250); 
 		this.newHighlighted = false;
 		this.scroll = 0;
-		this.shadowEffect = ppt.dropShadowLevel > 0;
 		this.dropShadowLevel = ppt.dropShadowLevel;
 		this.dropNegativeShadowLevel = this.dropShadowLevel > 1 ? Math.floor(this.dropShadowLevel / 2) : 0;
 		this.showOffsetTimer = null;

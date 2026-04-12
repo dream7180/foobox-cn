@@ -30,6 +30,7 @@ function reset_esl_color(reset_hl) {
 
 function get_colors() {
 	g_color_background_default = window.GetColourDUI(ColorTypeDUI.background);
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_background = g_color_background_default;
 	dark_mode = isDarkMode(g_color_background);
 	if(dark_mode){
@@ -37,7 +38,6 @@ function get_colors() {
 	}else{
 		divcolor = RGBA(0, 0, 0, 75);
 	}
-	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 }
 
@@ -65,8 +65,9 @@ function on_size() {
 function on_paint(gr) {
 	if (!ww || !wh) return;
     gr.FillSolidRect(0, 0, ww, wh, g_color_background);
+	gr.FillGradRect(ww-1, 0, 1, wh, 0, g_color_background, g_color_background, 1);//bug of win10 border
 	if(draw_splitter){
-		gr.FillGradRect(0, PUpper.Height, ww, 1, 0, g_color_background, /*linecolor*/divcolor, 0.5);
+		gr.FillGradRect(0, PUpper.Height, ww, 1, 0, g_color_background, divcolor, 0.5);
 	} else if(splitter_hover) gr.DrawLine(0, PUpper.Height, ww, PUpper.Height, 1, divcolor);
 	
 }

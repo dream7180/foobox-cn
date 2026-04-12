@@ -27,24 +27,13 @@ var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
 var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
-var openhacks = utils.CheckComponent("foo_openhacks");
-if(openhacks) {
-	try{
-		var show_menu = fb.IsMainMenuCommandChecked("视图/显示主菜单");
-		var show_status = fb.IsMainMenuCommandChecked("视图/显示状态栏");
-	} catch(e){
-		var show_menu = true;
-		var show_status = true;
-	}
-} else {
-	var show_menu =  window.GetProperty("foobox.Show.menu.bar", true);
-}
+var show_menu =  window.GetProperty("foobox.Show.menu.bar", true);
 var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.10";
+var g_script_version = "8.11";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -1914,7 +1903,15 @@ function on_notify_data(name, info) {
 		}
 		break;
 	case "foobox_setting":
-		show_setting(3);
+		if(info) show_setting(3);
+		else if(cSettings.visible){
+			p.settings.colorWidgetFocusedId = -1;
+			p.settings.colorSliderFocusedId = -1;
+			cSettings.visible = false;
+			resize_panels();
+			update_playlist(layout.collapseGroupsByDefault);
+			full_repaint();
+		}
 		break;
 	};
 };
@@ -1956,13 +1953,13 @@ function get_font() {
 
 function get_colors() {
 	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
-	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_selected_txt = g_color_normal_txt;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	g_color_selected_bg = g_color_selected_bg_default;
-	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
 	g_color_star = g_color_normal_txt & 0x2dffffff;
 	if(isDarkMode(g_color_normal_bg)){
@@ -2236,7 +2233,7 @@ function on_playback_queue_changed(origin) {
 			// changed_user_removed
 			var queue_pl_idx = isQueuePlaylistPresent();
 			if (queue_pl_idx < 0) {
-				return false;
+				break;
 			} else {
 				plman.ClearPlaylist(queue_pl_idx);
 			};
@@ -2258,7 +2255,7 @@ function on_playback_queue_changed(origin) {
 			// changed_playback_advance
 			var queue_pl_idx = isQueuePlaylistPresent();
 			if (queue_pl_idx < 0) {
-				return false;
+				break;
 			}
 			else {
 				var vbarr = plman.GetPlaybackQueueContents();
@@ -2283,7 +2280,7 @@ function on_playback_queue_changed(origin) {
 			window.ClearTimeout(cList.addToQueue_timer);
 			cList.addToQueue_timer = false;
 			g_delay_refresh_items = false;
-			if (isQueuePlaylistActive()) {
+			if (plman.ActivePlaylist == queue_pl_idx) {
 				update_playlist(layout.collapseGroupsByDefault);
 			}
 			full_repaint();

@@ -414,11 +414,13 @@ function on_notify_data(name, info) {
 			} else sync.get = true;
 			break;
 		case "color_scheme_updated":
-			let c_h = window.GetColourDUI(2), c_bg = window.GetColourDUI(1);
+			let c_h = false, c_bg = false;
 			if(info) {
 				c_h = RGB(info[0], info[1], info[2]);
 				if(info.length > 3) c_bg = RGB(info[3], info[4], info[5]);
 			}
+			if(!c_h) c_h = ui.dui ? window.GetColourDUI(2) : window.GetColourCUI(2);
+			if(!c_bg) c_bg = ui.dui ? window.GetColourDUI(1) : window.GetColourCUI(3);
 			ui.getColours(c_h, c_bg);
 			txt.rev.cur = '';
 			txt.bio.cur = '';

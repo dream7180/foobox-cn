@@ -278,9 +278,9 @@ function _panel() {
 	
 	this.colours_changed = () => {
 		this.colours.background_default = window.GetColourDUI(ColorTypeDUI.background);
+		this.colours.text = window.GetColourDUI(ColorTypeDUI.text);
 		this.colours.background = this.colours.background_default;
 		this.dark_mode = isDarkMode(this.colours.background);
-		this.colours.text = window.GetColourDUI(0);
 		if(this.dark_mode){
 			this.colours.line = RGBA(0, 0, 0, 120);
 			this.colours.tagtext = blendColors(c_black, this.colours.text, 0.65);
@@ -310,6 +310,7 @@ function _panel() {
 	
 	this.paint = (gr) => {
 		gr.FillSolidRect(0, 0, this.w, this.h, this.colours.background);
+		gr.FillGradRect(this.w-1, 0, 1, this.h, 0, this.colours.background, this.colours.background, 1);//bug of win10 border
 	}
 	
 	this.rbtn_up = (x, y, object) => {

@@ -2210,6 +2210,7 @@ function on_paint(gr) {
 	if (pman.offset > 0) pman.draw(gr);
 	g_filterbox.draw(gr, cFilterBox.x, cFilterBox.y);
 	g_switchbar.draw(gr);
+	gr.FillGradRect(0, 0, 1, wh, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 };
 
 function on_mouse_lbtn_down(x, y) {
@@ -2574,13 +2575,15 @@ function get_font() {
 
 function get_colors() {
 	g_color_normal_bg_default = window.GetColourDUI(ColorTypeDUI.background);
-	g_color_normal_bg = g_color_normal_bg_default;
 	g_color_normal_txt = window.GetColourDUI(ColorTypeDUI.text);
+	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
+	c_default_hl =  window.GetColourDUI(ColorTypeDUI.highlight);
+	g_color_normal_bg = g_color_normal_bg_default;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_btn_color1 = g_color_normal_txt & 0x35ffffff;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
-	c_default_hl =  window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
+	g_color_selected_bg = g_color_selected_bg_default;
 	g_color_grid_bg = g_color_normal_bg & 0x60ffffff;
 	if(isDarkMode(g_color_normal_bg)) {
 		dark_mode = 1;
@@ -2590,8 +2593,6 @@ function get_colors() {
 		dark_mode = 0;
 		g_color_topbar = RGBA(0,0,0,15);
 	}
-	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
-	g_color_selected_bg = g_color_selected_bg_default;
 };
 
 function on_script_unload() {

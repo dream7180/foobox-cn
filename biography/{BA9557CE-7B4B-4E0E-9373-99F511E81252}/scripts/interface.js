@@ -485,7 +485,8 @@ class UserInterface {
 		} else {
 			switch (this.dui) {
 				case 0:
-					if (this.col.bg === '') this.col.bg = this.blur.light ? RGB(245, 247, 255) : window.GetColourCUI(3);
+					if(bg_new) this.col.bg = bg_new;
+					else if (this.col.bg === '') this.col.bg = this.blur.light ? RGB(245, 247, 255) : window.GetColourCUI(3);
 					this.col.bgSel = this.blur.dark ? RGBA(255, 255, 255, 36) : this.blur.light ? RGBA(50, 50, 50, 36) : window.GetColourCUI(4);
 					this.col.txt = window.GetColourCUI(0);
 					this.col.txt_h = highlight_new ? highlight_new : window.GetColourCUI(2);

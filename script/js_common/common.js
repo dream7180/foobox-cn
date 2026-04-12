@@ -82,12 +82,8 @@ function GetKeyboardMask() {
 	return ret;
 };
 // }}
-// Used in utils.GetSysColour()
-COLOR_WINDOW = 5;
-COLOR_HIGHLIGHT = 13;
-COLOR_3DFACE = 15;//3dface
-COLOR_BTNTEXT = 18;
-// Used in window.GetColorDUI()
+
+// Used in window.GetColourDUI()
 ColorTypeDUI = {
 	text: 0,
 	background: 1,
@@ -110,7 +106,6 @@ var AlbumArtId = {
 	disc: 2,
 	icon: 3,
 	artist: 4,
-
 	GetName: function(value) {
 		for (var i in this) {
 			if (this[i] == value) return i;

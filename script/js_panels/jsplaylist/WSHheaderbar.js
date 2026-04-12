@@ -789,6 +789,7 @@ oHeaderBar = function() {
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 12):
+			window.NotifyOthers("panel_switch", true);
 			show_setting(3);
 			break;
 		case (idx == 14):

@@ -132,10 +132,10 @@ var ww = 0, wh = 0;
 
 function get_colors() {
 	c_background_default = window.GetColourDUI(ColorTypeDUI.background);
-	c_background = c_background_default;
 	g_color_selected_bg_default = window.GetColourDUI(ColorTypeDUI.selection);
 	fontcolor = window.GetColourDUI(ColorTypeDUI.text);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
+	c_background = c_background_default;
 	c_highlight = c_default_hl;
 	c_rating_h = c_highlight;
 	icocolor = fontcolor & 0x2dffffff;
@@ -143,6 +143,7 @@ function get_colors() {
 	fontcolor2_default = fontcolor2;
 	dark_mode = isDarkMode(c_background);
 }
+
 function get_font() {
 	g_font2 = window.GetFontDUI(FontTypeDUI.playlists);
 	g_fname = g_font2.Name;
@@ -2235,6 +2236,7 @@ if(show_infobar && info_cycle) activate_infotimer();
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
+	gr.FillGradRect(ww-1, 0, 1, wh, 0, c_background, c_background, 1);//bug of win10 border
 	CoverDisplay.Draw(gr);
 	if (currentMetadb && show_infobar) {
 		if(show_rating){
