@@ -17,7 +17,6 @@ var Caption_Pack = {
 }
 var currentMetadb = null, l_mood;
 var get_imgCol = false;
-var get_col_forced = false;
 var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
@@ -1915,17 +1914,18 @@ function Controller(imgArray, imgDisplay, prop) {
 	var isNewgroup;
 
 	function OnNewTrack(metadb) {
-		if (metadb && currentMetadb && currentMetadb.Compare(metadb)) {
-			_this.SwitchCover(0);
-			if(get_col_forced) imgArray.Update(currentMetadb, OnNewTrack_UpdateFinished);
-			else getColorSchemeFromImage();
-		}
-		else {
-			isNewgroup = false;
-			currentIndex = -1;
-			currentMetadb = metadb;
-			imgArray.Update(currentMetadb, OnNewTrack_UpdateFinished);
-		}
+		window.SetTimeout(function() {
+			if (metadb && currentMetadb && currentMetadb.Compare(metadb)) {
+				_this.SwitchCover(0);
+				getColorSchemeFromImage();
+			}
+			else {
+				isNewgroup = false;
+				currentIndex = -1;
+				currentMetadb = metadb;
+				imgArray.Update(currentMetadb, OnNewTrack_UpdateFinished);
+			}
+		}, 10);
 	}
 
 	function OnNewTrack_UpdateFinished() {
@@ -1936,10 +1936,6 @@ function Controller(imgArray, imgDisplay, prop) {
 				currentPathItem = imgArray.pathArray[0];
 				if (isNewgroup) imgDisplay.ChangeImage(1, currentImage, 2);
 				if (imgArray.length > 1) _this.cycle.Active();
-				if(get_col_forced) {
-					imgArray.GetImage(currentIndex, OnNewTrack_GetImageFinished);
-					get_col_forced = false;
-				}
 			} else {
 				currentPathItem = imgArray.pathArray[0];
 				imgArray.GetImage(currentIndex, OnNewTrack_GetImageFinished);
@@ -2271,13 +2267,6 @@ function on_playlist_switch() {
 		metadb = fb.GetFocusItem();
 		MainController.OnSelectionChanged(metadb);
 		OnMetadbChanged();
-	}
-}
-
-function on_playback_starting(cmd, is_paused){
-	if(cmd == 6){
-		get_col_forced = true;
-		if(color_bycover) get_imgCol = true;
 	}
 }
 

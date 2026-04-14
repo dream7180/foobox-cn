@@ -39,17 +39,11 @@ var g_color_highlight = 0;
 var c_default_hl = 0;
 var g_first_populate_launched = false;
 //
-var repaintforced = false;
-var repaint_main = true,
-	repaint_main1 = true,
-	repaint_main2 = true;
+var repaintforced = false, repaint_main = true, repaint_main1 = true, repaint_main2 = true;
 var window_visible = false;
-var scroll_ = 0,
-	scroll = 0,
-	scroll_prev = 0;
-var g_start_ = 0,
-	g_end_ = 0;
-var radiom3u = [];
+var scroll_ = 0, scroll = 0, scroll_prev = 0;
+var g_start_ = 0, g_end_ = 0;
+var radiom3u = [], radioname = [], radiolist = fb.ProfilePath + "foobox\\config\\radio.list";
 
 ppt = {
 	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
@@ -957,11 +951,11 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "网络电台列表");
-		_radiolist.AppendMenuItem(MF_STRING, 30, "Radio (gitee)");
-		_radiolist.AppendMenuItem(MF_STRING, 31, "Radio (github)");
-		if(radiom3u.length > 0){
-			for(var urlcount = 0; urlcount < radiom3u.length; urlcount++){
-				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
+		_radiolist.AppendMenuItem(MF_STRING, 30, "编辑电台列表地址");
+		_radiolist.AppendMenuSeparator();
+		if(radioname.length > 0){
+			for(var i = 0; i < radioname.length; i++){
+				_radiolist.AppendMenuItem(MF_STRING, 300 + i, radioname[i]);
 			}
 		}
 		_menu.AppendMenuSeparator();
@@ -1040,10 +1034,7 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("网络电台", "https://gitee.com/dream7180/Resource/raw/main/radio/radio.fpl");
-			break
-		case (idx == 31):
-			LoadRadio("网络电台", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
+			utils.EditTextFile(radiolist);
 			break;
 		case (idx >= 300 && idx < 300 + radiom3u.length):
 			LoadRadio("网络电台", radiom3u[idx - 300]);
@@ -1235,11 +1226,17 @@ function on_init() {
 	brw = new oBrowser();
 	if(ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
 	try{
-		var _radiolist = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misc", 0);
-		_radiolist = _radiolist.split("##")[0];
-	}catch(e){}
-	if(_radiolist && _radiolist != "null") {
-		radiom3u = _radiolist.split(";");
+		var _radiolist = utils.ReadTextFile(radiolist, 0);
+		_radiolist = _radiolist.split("\r\n");
+		if(_radiolist.length) {
+			for(var i = 0; i < _radiolist.length; i++){
+				let radio_i = _radiolist[i].split(": ");
+				radioname.push(radio_i[0]);
+				radiom3u.push(radio_i[1]);
+			}
+		} else reset_radiolist();
+	}catch(e){
+		reset_radiolist();
 	}
 };
 on_init();
@@ -1897,7 +1894,15 @@ function on_focus(is_focused) {
 	};
 };
 
-//=================================================// Custom functions
+//====== Custom functions ======//
+
+function reset_radiolist() {
+	radioname.push("boxRadios (github)");
+	radiom3u.push("https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
+	radioname.push("boxRadios (github CDN)");
+	radiom3u.push("https://cdn.gh-proxy.org/https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
+	utils.WriteTextFile(radiolist, radioname[0]+": "+radiom3u[0]+"\r\n"+radioname[1]+": "+radiom3u[1]);
+};
 
 function match(input, str) {
 	var temp = "";
@@ -2029,12 +2034,6 @@ function on_notify_data(name, info) {
 	case "ScrollStep":
 		ppt.rowScrollStep = info;
 		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
-		break;
-	case "Radio_list":
-		radiom3u.splice(0, radiom3u.length);
-		if(info && info != "null") {
-			radiom3u = info.split(";");
-		}
 		break;
 	case "row_height_changed":
 		ppt.defaultRowHeight = info;

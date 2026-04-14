@@ -29,7 +29,6 @@ var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", tru
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
 var show_menu =  window.GetProperty("foobox.Show.menu.bar", true);
 var title_add = "";
-var radiom3u = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
@@ -173,10 +172,9 @@ var sort_pattern_codec = "%codec% | %album artist% | $if(%album%,%date%,'9999') 
 var sort_pattern_queue = "%queue_index% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %title%";
 // Singletons
 cRow = {
-	default_playlist_h: window.GetProperty("SYSTEM.Playlist Row Height in Pixel", 33),
+	default_playlist_h: 33,
 	playlist_h: 29,
-	extra_line_h: window.GetProperty("SYSTEM.Playlist Extra-row Height in Pixel", 10),
-//	headerBar_h: 26,
+	extra_line_h: window.GetProperty("SYSTEM.Playlist Extra-row Height in Pixel", 12),
 	settings_h: 30
 };
 
@@ -257,8 +255,8 @@ cList = {
 	clear_incsearch_timer: false,
 	incsearch_timer: false,
 	repaint_timer: false,
-	scrollstep: window.GetProperty("SYSTEM.Playlist Scroll Step", 3),
-	touchstep: window.GetProperty("SYSTEM.Playlist Touch Step", 3),
+	scrollstep: 3,
+	touchstep: 3,
 	scroll_timer: false,
 	scroll_delta: cTrack.height,
 	scroll_direction: 1,
@@ -2451,40 +2449,27 @@ function get_misccfg(){
 	try{
 		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
 	}catch(e){}
-	if(!misccfg){
+	if(!misccfg || misccfg.length < 5){
 		title_add = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
 		save_misccfg();
 	}else{
 		misccfg = misccfg.split("##");
-		radiom3u = misccfg[0];
-		if(radiom3u == "null") radiom3u = "";
-		if(misccfg.length > 1) {
-			track_edit_app = misccfg[1];
-			if(track_edit_app == "null") track_edit_app = "";
-			else if(track_edit_app == "") save_misccfg();
-		} else {
-			track_edit_app = "";
-			save_misccfg();
-		}
-		if(misccfg.length > 2) {
-			title_add = misccfg[2];
-			if(title_add == "null") title_add = "";
-			else if(title_add == "") save_misccfg();
-		} else {
-			title_add = "";
-			save_misccfg();
-		}
+		cList.scrollstep = Number(misccfg[0]);
+		cList.touchstep = Number(misccfg[1]);
+		cRow.default_playlist_h = Number(misccfg[2]);
+		track_edit_app = misccfg[3];
+		if(track_edit_app == "null") track_edit_app = "";
+		title_add = misccfg[4];
+		if(title_add == "null") title_add = "";
 	}
 }
 
 function save_misccfg(){
-	var _radiom3u = radiom3u;
 	var _track_edit_app = track_edit_app;
 	var _title_add = title_add;
-	if(_radiom3u == "") _radiom3u = "null";
 	if(_track_edit_app == "") _track_edit_app = "null";
 	if(_title_add == "") _title_add = "null";
-	utils.WriteTextFile(config_dir + "misc", _radiom3u + "##" + _track_edit_app + "##" + _title_add);
+	utils.WriteTextFile(config_dir + "misc", cList.scrollstep + "##" + cList.touchstep + "##" + cRow.default_playlist_h + "##" + _track_edit_app + "##" + _title_add);
 }
 
 function get_layout(plname){
