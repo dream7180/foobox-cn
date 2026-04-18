@@ -74,7 +74,7 @@ var g_delay_refresh_items = false;
 var g_avoid_on_item_focus_change = false;
 
 //albumart
-var albumart_id, cache_subdir;
+var albumart_id, cache_subdir, crclist = [];
 
 var g_z2, g_z3, g_z4, g_z5, g_z6, g_z7, g_z8, g_z10, g_z12, g_z16, g_z30;
 var ww = 0,
@@ -429,8 +429,7 @@ image_cache = function() {
 	this.preload = function(albumIndex) {
 		var img = this._cachelist[p.list.groups[albumIndex].cachekey];
 		if (typeof(img) == "undefined") {
-			var crc_exist = check_cache(albumIndex);
-			if (crc_exist) {
+			if(crclist.indexOf(p.list.groups[albumIndex].cachekey) > -1){
 				p.list.groups[albumIndex].load_requested = 1;
 				load_image_from_cache(albumIndex, true);
 			}
@@ -518,8 +517,7 @@ system_init();
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
 	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\config")) {
-		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		fso.CreateFolder(fb.ProfilePath + "foobox\\config");
+		utils.CreateFolder(fb.ProfilePath + "foobox\\config");
 	}
 	// clear queue and queue playlist
 	plman.FlushPlaybackQueue();
@@ -1248,19 +1246,16 @@ function on_item_focus_change(playlist, from, to) {
 function on_metadb_changed(handles, fromhook) {
 	p.list.setItems(false);
 	if(!fromhook) {
-		for (var i = 0; i < handles.Count; i++) {
-			var found = -1;
-			for (var j = 1; j < p.list.groups.length; j++) {
-				var _same = p.list.groups[j].metadb.Compare(handles[i]);
-				if (_same) {
-					found = j;
-					break;
-				}
+		var found = -1;
+		for (var j = 0; j < p.list.groups.length; j++) {
+			if (handles.Find(p.list.groups[j].metadb) > -1) {
+				found = j;
+				break;
 			}
-			if(found > -1){
-				p.list.groups[found].load_requested = 0;
-				g_image_cache._cachelist[p.list.groups[found].cachekey] = null;
-			}
+		}
+		if(found > -1){
+			p.list.groups[found].load_requested = 0;
+			g_image_cache._cachelist[p.list.groups[found].cachekey] = null;
 		}
 	}
 	full_repaint();
@@ -2447,7 +2442,7 @@ function get_playlist_layout_id(){
 function get_misccfg(){
 	var misccfg = "";
 	try{
-		misccfg = utils.ReadTextFile(config_dir + "misc", 0);
+		misccfg = utils.ReadTextFile(config_dir + "misccfg", 0);
 	}catch(e){}
 	if(!misccfg || misccfg.length < 5){
 		title_add = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
@@ -2469,7 +2464,7 @@ function save_misccfg(){
 	var _title_add = title_add;
 	if(_track_edit_app == "") _track_edit_app = "null";
 	if(_title_add == "") _title_add = "null";
-	utils.WriteTextFile(config_dir + "misc", cList.scrollstep + "##" + cList.touchstep + "##" + cRow.default_playlist_h + "##" + _track_edit_app + "##" + _title_add);
+	utils.WriteTextFile(config_dir + "misccfg", cList.scrollstep + "##" + cList.touchstep + "##" + cRow.default_playlist_h + "##" + _track_edit_app + "##" + _title_add);
 }
 
 function get_layout(plname){
@@ -2617,6 +2612,10 @@ function get_covercahe_config(){
 			albumart_id = AlbumArtId.front;
 			cache_subdir = "album\\";
 	};
+	crclist.length = 0;
+	try{
+		crclist = utils.ReadTextFile(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + "crc", 0).split(",");
+	}catch(e){};
 }
 
 function on_script_unload() {

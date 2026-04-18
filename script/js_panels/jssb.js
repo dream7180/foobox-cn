@@ -1850,8 +1850,6 @@ oBrowser = function() {
 		_menu2.AppendMenuItem(MF_STRING, 911, "合计项目");
 		_menu2.CheckMenuItem(911, ppt.showAllItem);
 		_menu2.AppendMenuSeparator();
-		_menu2.AppendMenuItem(MF_STRING, 913, "重置缓存索引文件");
-		_menu2.AppendMenuSeparator();
 		_menu2.AppendMenuItem(MF_STRING, 912, "重置磁盘缓存");
 		_menu2.AppendTo(_menu, MF_STRING, "显示");
 		_menu.AppendMenuItem(MF_STRING, 200, "刷新封面 (F5)");
@@ -1961,30 +1959,17 @@ oBrowser = function() {
 				for (let i = 0; i < crcloaded.length; i++) {
 					crclist[i] = [];
 				}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\artist_album\\*");} catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\album\\*");} catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\artist\\*");} catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\genre_dir\\*");} catch(e){}
-			}
-			var tot = brw.groups.length;
-			var crc;
-			for (var k = (ppt.showAllItem ? 1 : 0); k < tot; k++) {
-				crc = brw.groups[k].cachekey;
-				brw.groups[k].load_requested = 0;
-				g_image_cache.reset(crc);
-				brw.groups[k].cover_img = null;
-			}
-			brw.repaint();
-			break;
-		case (idx == 913):
-			if (utils.IsDirectory(CACHE_FOLDER)){
-				for (let i = 0; i < crcloaded.length; i++) {
-					crcmod[i] = false;
-				}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\artist_album\\crc");}catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\album\\crc");}catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\artist\\crc");}catch(e){}
-				try{fso.DeleteFile(CACHE_FOLDER + "\\genre_dir\\crc");}catch(e){}
+				utils.RemovePath(CACHE_FOLDER + "\\artist_album");
+				utils.RemovePath(CACHE_FOLDER + "\\album");
+				utils.RemovePath(CACHE_FOLDER + "\\artist");
+				utils.RemovePath(CACHE_FOLDER + "\\genre_dir");
+				window.SetTimeout(function() {
+					utils.CreateFolder(CACHE_FOLDER + "\\artist_album");
+					utils.CreateFolder(CACHE_FOLDER + "\\album");
+					utils.CreateFolder(CACHE_FOLDER + "\\artist");
+					utils.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+					refresh_cover(true);
+				}, 50);
 			}
 			break;
 		case (idx == 991):
@@ -2084,7 +2069,6 @@ const load_image_to_cache = async () =>
 
 //==============================Main=========================================================
 
-var fso = new ActiveXObject("Scripting.FileSystemObject");
 var brw = null;
 var isScrolling = false;
 var g_switchbar = null;
@@ -2136,16 +2120,16 @@ var playing_title;
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
 	if (!utils.IsDirectory(CACHE_FOLDER)) {
-		fso.CreateFolder(CACHE_FOLDER);
-		fso.CreateFolder(CACHE_FOLDER + "\\artist_album");
-		fso.CreateFolder(CACHE_FOLDER + "\\album");
-		fso.CreateFolder(CACHE_FOLDER + "\\artist");
-		fso.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+		utils.CreateFolder(CACHE_FOLDER);
+		utils.CreateFolder(CACHE_FOLDER + "\\artist_album");
+		utils.CreateFolder(CACHE_FOLDER + "\\album");
+		utils.CreateFolder(CACHE_FOLDER + "\\artist");
+		utils.CreateFolder(CACHE_FOLDER + "\\genre_dir");
 	} else {
-		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist_album")) fso.CreateFolder(CACHE_FOLDER + "\\artist_album");
-		if (!utils.IsDirectory(CACHE_FOLDER + "\\album")) fso.CreateFolder(CACHE_FOLDER + "\\album");
-		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist")) fso.CreateFolder(CACHE_FOLDER + "\\artist");
-		if (!utils.IsDirectory(CACHE_FOLDER + "\\genre_dir")) fso.CreateFolder(CACHE_FOLDER + "\\genre_dir");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist_album")) utils.CreateFolder(CACHE_FOLDER + "\\artist_album");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\album")) utils.CreateFolder(CACHE_FOLDER + "\\album");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\artist")) utils.CreateFolder(CACHE_FOLDER + "\\artist");
+		if (!utils.IsDirectory(CACHE_FOLDER + "\\genre_dir")) utils.CreateFolder(CACHE_FOLDER + "\\genre_dir");
 	}
 	get_font();
 	get_colors();
@@ -2960,20 +2944,17 @@ function on_item_focus_change(playlist_idx, from, to) {
 function on_metadb_changed(handles, fromhook) {
 	if(!fromhook) {
 		var _repaint = false; 
-		for (var i = 0; i < handles.Count; i++) {
-			var found = -1;
-			for (var j = 1; j < brw.groups.length; j++) {
-				var _same = brw.groups[j].metadb.Compare(handles[i]);
-				if (_same) {
-					found = j;
-					if(j >= g_start_ && j <= g_end_) _repaint = true;
-					break;
-				}
+		var found = -1;
+		for (var j = (ppt.showAllItem ? 1 : 0); j < brw.groups.length; j++) {
+			if (handles.Find(brw.groups[j].metadb) > -1) {
+				found = j;
+				if(j >= g_start_ && j <= g_end_) _repaint = true;
+				break;
 			}
-			if(found > -1){
-				brw.groups[found].load_requested = 0;
-				brw.groups[found].cover_img = null;
-			}
+		}
+		if(found > -1){
+			brw.groups[found].load_requested = 0;
+			brw.groups[found].cover_img = null;
 		}
 		if(_repaint) brw.repaint();
 	}
@@ -3252,13 +3233,8 @@ function process_cachekey(str) {
 
 function reset_this_cache(idx, crc){
 	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
-		try {
-			fso.DeleteFile(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
-		}
-		catch (e) {
-			console.log("错误: 图像缓存 [" + crc + "] 无法删除, 文件正在使用中,稍后重试或重载面板.");
-		};
-	};
+		utils.RemovePath(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
+	}
 	brw.groups[idx].load_requested = 0;
 	g_image_cache.reset(crc);
 	brw.groups[idx].cover_img = null;

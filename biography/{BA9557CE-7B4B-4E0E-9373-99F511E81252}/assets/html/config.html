@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 	<html>
 	<head>
-
+	<title>简介: 设置</title>
 	<meta http-equiv="x-ua-compatible" content="IE=8"/>
 	<link rel="stylesheet" type="text/css" href="styles10.css">
 	<style type="text/css">
@@ -117,7 +117,7 @@
 
 	.input66 {width:66%}
 	.input98 {width:98%;}
-	.input66, input98 {
+	.input66, .input98 {
 		display:block;
 	}
 
@@ -849,7 +849,8 @@ info is an object:
 			function getValue(id) {
 				var div = document.getElementById(id);
 				div.style.height = '1em';
-				return (em = Math.max(div.offsetHeight, 13.6));
+				em = Math.max(div.offsetHeight, 13.6);
+				return em;
 			}
 			getValue('div');
 
@@ -865,24 +866,25 @@ info is an object:
 				height = document.documentElement.clientHeight || document.body.clientHeight;	
 			}
 
-			function openTab(tabName,elmnt,color) {
+			function openTab(tabName, elmnt, color) {
 				cur.tab = tabName;
 				var cur_id = document.getElementById(cur.tab);
+				var gray_id;
 				if (cur.tab == 'PanelCfg') {
 					cur_id.style.borderLeft = "0.31em solid #329932";
 					cur_id.style.borderRight = "0.31em solid #329932";
-					var gray_id = document.getElementById("ServerCfg");
+					gray_id = document.getElementById("ServerCfg");
 					gray_id.style.borderLeft = "none";
 					gray_id.style.borderRight = "none";
 				} else if (cur.tab == 'ServerCfg') {
 					cur_id.style.borderLeft = "0.31em solid #326edb";
 					cur_id.style.borderRight = "0.31em solid #326edb";
-					var gray_id = document.getElementById("PanelCfg");
+					gray_id = document.getElementById("PanelCfg");
 					gray_id.style.borderLeft = "none";
 					gray_id.style.borderRight = "none";
 					
 				}
-				var tabcontent2, tablinks2;
+				var tabcontent, tabcontent2, tablinks2;
 				tabcontent2 = document.querySelectorAll(".tabcontent2");
 				tablinks2 = document.getElementsByTagName("a");
 				for (i = 0; i < tablinks2.length; i++) {
@@ -974,6 +976,7 @@ info is an object:
 			}
 
 			function getPreview(id, value) {
+				var ev;
 				if (cur.page == "title_format" || cur.page == "download" || cur.page == "cover" || cur.page == "textreader" && id.slice(-1) < 8) {
 					var sFind = null;
 					var sReplace = null;
@@ -992,7 +995,7 @@ info is an object:
 						tfAll += document.getElementById('tf_container' + i).value;
 						if (i < 4) tfAll += '~#~'
 					}
-					var ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
+					ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
 					if (tf) ev = ev.slice(0, -1);
 					if (cur.page == "title_format" && document.getElementById("tf_preview") && id != "tf_preview") document.getElementById("tf_preview").value = ev;
 					if (cur.page == "download" && document.getElementById("dld_preview") && id != "dld_preview") document.getElementById("dld_preview").value = ev;
@@ -1004,7 +1007,7 @@ info is an object:
 					var t_id = id.slice(-1);
 					var artistType = t_id < 2;
 					var trackType = t_id > 1;
-					var ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
+					ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
 					if (document.getElementById("tf_heading_preview") && id != "tf_heading_preview") document.getElementById("tf_heading_preview").value = ev;
 				}
 			}
@@ -1050,14 +1053,14 @@ info is an object:
 			}
 			
 			function clamp(num, min, max) {
-				num = num <= max ? num : max; num = num >= min ? num : min; return num;
+				return Math.max(Math.min(num, max), min);
 			}
 
 			function getSelCol(c) {
 				var cc = [], v = 1;
 				for (i = 0; i < c.length; i++) {
 					v = c[i] / 255;
-					cc.push(v <= 0.03928 ? v /= 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4));
+					cc.push(v <= 0.03928 ? v / 12.92 : Math.pow(((v + 0.055 ) / 1.055), 2.4));
 				}
 				var L = 0.2126 * cc[0] + 0.7152 * cc[1] + 0.0722 * cc[2]; if (L > 0.31) return 'black'; else return 'white';
 			}
@@ -1846,12 +1849,12 @@ info is an object:
 				window.cache_dropdown.style.display = !cur.displaySaveFolders && window.autoCache1.checked && showStorageTimeOption ? "inline-block" : "none";
 				window.cache_dropdown.style.width = !cur.displaySaveFolders && window.autoCache1.checked && showStorageTimeOption ? "auto" : 0;
 				window.photoLimit.style.display = window.autoCache1.checked && showStorageTimeOption && cfg['autoCacheTime_internal']. value > 3 ? "block" : "none";
-				window.cacheLocation.style.display = !cur.displaySaveFolders ? "block" : "none";
-				window.cache0.style.display = !cur.displaySaveFolders ? "block" : "none";
-				window.cache1.style.display = !cur.displaySaveFolders ? "block" : "none";
+				window.cacheLocation.style.display = cur.displaySaveFolders ? "none" : "block";
+				window.cache0.style.display = cur.displaySaveFolders ? "none" : "block";
+				window.cache1.style.display = cur.displaySaveFolders ? "none" : "block";
 				window.save_folders.style.display = cur.displaySaveFolders || showStorageTimeOption && window.autoCache1.checked ? "none" : "block";
 				if (!showStorageTimeOption) window.save_folders.disabled = window.autoCache1.checked;
-				window.hide_folders.style.display = !cur.displaySaveFolders ? "none" : "block";
+				window.hide_folders.style.display = cur.displaySaveFolders ? "block" : "none";
 			
 				var showsupplCacheOption = false;
 				if (!showsupplCacheOption) {
@@ -1983,8 +1986,7 @@ info is an object:
 
 			window.btn_reset.onclick = function () {
 				var msg = cur.tab == 'PanelCfg' ? '将面板设置重置为默认值\n继续？' : '将服务器设置重置为默认值\n\n原始 ('+  cfg.cfgBaseName +'.cfg ) 将备份\n\n继续？';
-				var r = window.confirm(msg);
-				if (r == true) {
+				if (window.confirm(msg)) {
 					var new_cur = JSON.stringify(cur);
 					if (new_cur == parsed_args[2]) new_cur = '';
 					close_window();
@@ -2033,8 +2035,8 @@ info is an object:
 			}
 			
 			function toggle(item) {
-				if (window[item].style.display != 'block') window[item].style.display = 'block'
-				else window[item].style.display = 'none';
+				if (window[item].style.display == 'block') { window[item].style.display = 'none'; }
+				else { window[item].style.display = 'block' }
 			}
 
 			var h = [

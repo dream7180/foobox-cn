@@ -16,17 +16,18 @@ class PopUpBox {
 	}
 
 	getHtmlCode() {
-		let cssPath = `${my_utils.packagePath}/assets/html/`;
-		if (this.getWindowsVersion() === '6.1') {
-			cssPath += 'styles7.css';
-		} else {
-			cssPath += 'styles10.css';
-		}
+		//let cssPath = `${my_utils.packagePath}/assets/html/`;
+		//if (this.getWindowsVersion() === '6.1') {
+		//	cssPath += 'styles7.css';
+		//} else {
+		//	cssPath += 'styles10.css';
+		//}
+		let cssPath = `${my_utils.packagePath}/assets/html/styles10.css`;
 		this.configHtmlCode = my_utils.getAsset('\\html\\config.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
 		this.inputHtmlCode = my_utils.getAsset('\\html\\input.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
 		this.confirmHtmlCode = my_utils.getAsset('\\html\\confirm.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
 	}
-
+	/*
 	getWindowsVersion() {
 		let version = '';
 
@@ -42,7 +43,7 @@ class PopUpBox {
 		} catch (e) {}
 		return '6.1';
 	}
-
+	*/
 	config(ppt, cfg, dialogWindow, ok_callback, lang, recycler) {
 		utils.ShowHtmlDialog(0, this.configHtmlCode, {
 			data: [ppt, cfg, dialogWindow, window.IsTransparent, ok_callback, this.tf_callback, lang, recycler],

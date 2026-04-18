@@ -1008,8 +1008,8 @@ function on_init(){
 	init_overlay_obj(c_seek_bg, c_seekoverlay);
 	initbuttons();
 	try{
-		var _addtext = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misc", 0);
-		_addtext = _addtext.split("##")[2];
+		var _addtext = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misccfg", 0);
+		_addtext = _addtext.split("##")[4];
 	}catch(e){}
 	if(_addtext && _addtext != "null") {
 		top_addtext = _addtext;
@@ -1302,9 +1302,21 @@ function on_playback_new_track(info) {
 	}
 	
 	TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(info);
-	TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)").EvalWithMetadb(info) + fb.TitleFormat("$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
+	TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
 	if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(info);
 	repaintWin("TX");
+}
+
+function on_metadb_changed(handles, fromhook) {
+	if(!fromhook && fb.IsPlaying) {
+		metadb = fb.GetNowPlaying();
+		if(handles && handles.Find(metadb) > -1){
+			TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(metadb);
+			TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(metadb);
+			if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(metadb);
+			repaintWin("TX");
+		}
+	}
 }
 
 function on_playback_stop(reason) {

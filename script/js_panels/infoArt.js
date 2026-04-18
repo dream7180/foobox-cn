@@ -55,14 +55,6 @@ if(!show_rating) is_mood = false;
 var g_font, g_font2;
 var currentMetadb;
 var rating_x, imgw, imgh, mood_h, infobar_h, pointArr, line2_h, infobar_y = 0;
-g_tfo = {
-	rating: fb.TitleFormat("%rating%"),
-	title: fb.TitleFormat("$if2(%title%,)"),
-	artist: fb.TitleFormat("$if2(%artist%,)"),
-	album: fb.TitleFormat("$if2(%album%,)"),
-	mood: fb.TitleFormat("%mood%"),
-	tracktech: fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz")
-}
 var rating, txt_title, txt_info, txt_profile, main_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
 if (time_circle < 3000) time_circle = 3000;
@@ -198,27 +190,30 @@ function initbutton() {
 	TextBtn_info = new TextBtn();
 }
 
-function OnMetadbChanged() {
+function OnMetadbChanged(metadb) {
 	if(!show_infobar) return;
-	if(!currentMetadb){
+	if(!metadb) metadb = currentMetadb;
+	if(!metadb){
 		window.RepaintRect(0, infobar_y, ww, infobar_h);
 		return;
 	}
-	rating = g_tfo.rating.EvalWithMetadb(currentMetadb);
+	var tf_general = fb.TitleFormat("$if2(%title%,)^#^$if2(%artist%,)^#^$if2(%album%,)^#^%mood%^#^%rating%").EvalWithMetadb(metadb);
+	tf_general = tf_general.split("^#^");
+	rating = tf_general[4];
 	if (rating == "?") {
 		rating = 0;
 	}
-	txt_title = g_tfo.title.EvalWithMetadb(currentMetadb);
-	var txt_info_artist = g_tfo.artist.EvalWithMetadb(currentMetadb);
-	var txt_info_album = g_tfo.album.EvalWithMetadb(currentMetadb);
+	txt_title =  tf_general[0];
+	var txt_info_artist = tf_general[1];
+	var txt_info_album = tf_general[2];
 	if(txt_info_artist) {
 		txt_info = txt_info_artist;
 		if(txt_info_album) txt_info = txt_info + "  |  " + txt_info_album;
 	}else if(txt_info_album) txt_info = txt_info_album;
 	else txt_info = "";
-	txt_profile = g_tfo.tracktech.EvalWithMetadb(currentMetadb);
-	l_mood = g_tfo.mood.EvalWithMetadb(currentMetadb);
-	tracktype = TrackType(currentMetadb.RawPath.substring(0, 4));
+	txt_profile = fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz").EvalWithMetadb(metadb);
+	l_mood = tf_general[3];
+	tracktype = TrackType(metadb.RawPath.substring(0, 4));
 	main_info = true;
 	window.RepaintRect(0, infobar_y, ww, infobar_h);
 }
@@ -2258,7 +2253,7 @@ function on_selection_changed(metadb) {
 	if (!fb.IsPlaying || MainController.Properties.FollowCursor) {
 		metadb = fb.GetFocusItem();
 		MainController.OnSelectionChanged(metadb);
-		OnMetadbChanged();
+		OnMetadbChanged(metadb);
 	}
 }
 
@@ -2266,14 +2261,14 @@ function on_playlist_switch() {
 	if (!fb.IsPlaying || MainController.Properties.FollowCursor) {
 		metadb = fb.GetFocusItem();
 		MainController.OnSelectionChanged(metadb);
-		OnMetadbChanged();
+		OnMetadbChanged(metadb);
 	}
 }
 
 function on_playback_new_track(metadb) {
 	if(color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
-	OnMetadbChanged();
+	OnMetadbChanged(metadb);
 }
 
 function on_playback_stop(reason) {
@@ -2328,8 +2323,8 @@ function on_mouse_wheel(delta) {
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(currentMetadb && currentMetadb.Compare(handles[0])) {
-		if(!fromhook) MainController.Refresh(true, handles[0]);
+	if(handles.Find(currentMetadb) > -1) {
+		if(!fromhook) MainController.Refresh(true, currentMetadb);
 		OnMetadbChanged();
 	}
 }

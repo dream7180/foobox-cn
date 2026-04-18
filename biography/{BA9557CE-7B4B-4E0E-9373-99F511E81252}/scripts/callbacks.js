@@ -136,8 +136,15 @@ function on_load_image_done(task_id, image, image_path) {
 	filmStrip.on_load_image_done(image, image_path);
 }
 
-function on_metadb_changed() {
-	if (panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
+function on_metadb_changed(handleList, fromhook) {
+	if(fromhook) return;
+	if(panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
+	// Regorxxx <- Tag changes affect panel focus
+	const [handle, pls] = fb.IsPlaying && !panel.id.focus
+		? [fb.GetNowPlaying(), plman.PlayingPlaylist]
+		: [fb.GetFocusItem(true), plman.ActivePlaylist];
+	if(!handle || handleList.BSearch(handle) === -1) { return; }
+	// Regorxxx ->
 	panel.getList(true, true);
 	panel.focusLoad();
 	panel.focusServer();

@@ -4,6 +4,7 @@ ppts = {
 	autosearch: window.GetProperty("Search Box: Auto-validation", false),
 	scope: window.GetProperty("Search Box: Scope", 0),
 	multiple: window.GetProperty("Search Box: Keep Playlist", true),
+	followcursor: window.GetProperty("Quick Search: Follow Cursor", 1),
 	historymaxitems: 10,
 	historytext: window.GetProperty("Search Box: Search History", ""),
 	showreset: window.GetProperty("Search Box: Always Show Reset Button", false)
@@ -384,6 +385,10 @@ function quickSearch(metadb, search_function) {
 	var tfo = fb.TitleFormat("%album artist%|%date%|%album%|%discnumber%|%tracknumber%");
 
 	switch (search_function) {
+	case 'title':
+		str = fb.TitleFormat("%title%").EvalWithMetadb(metadb);
+		album_items = fb.GetQueryItems(fb.GetLibraryItems(), "%title% IS " + trimstr(str));
+		break;
 	case 'artist':
 		str = fb.TitleFormat("%artist%").EvalWithMetadb(metadb);
 		album_items = fb.GetQueryItems(fb.GetLibraryItems(), "%artist% IS " + trimstr(str));
