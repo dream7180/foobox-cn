@@ -194,7 +194,10 @@ class UserInterface {
 	}
 
 	draw(gr) {
-		if (this.style.bg) gr.FillSolidRect(0, 0, panel.w, panel.h, this.col.bg);
+		if (this.style.bg) {
+			gr.FillSolidRect(0, 0, panel.w, panel.h, this.col.bg);
+			gr.FillGradRect(0, 0, 1, panel.h, 0,  this.col.bg,  this.col.bg, 1);//bug of win10 border
+		}
 	}
 	
 	getAccentColour() {

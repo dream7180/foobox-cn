@@ -22,10 +22,10 @@ class PopUpBox {
 		//} else {
 		//	cssPath += 'styles10.css';
 		//}
-		let cssPath = `${my_utils.packagePath}/assets/html/styles10.css`;
-		this.configHtmlCode = my_utils.getAsset('\\html\\config.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
-		this.inputHtmlCode = my_utils.getAsset('\\html\\input.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
-		this.confirmHtmlCode = my_utils.getAsset('\\html\\confirm.html').replace(/href="styles10.css"/i, `href="${cssPath}"`);
+		let cssPath = `${my_utils.packagePath}/assets/html/styles.css`;
+		this.configHtmlCode = my_utils.getAsset('\\html\\config.html').replace(/href="styles.css"/i, `href="${cssPath}"`);
+		this.inputHtmlCode = my_utils.getAsset('\\html\\input.html').replace(/href="styles.css"/i, `href="${cssPath}"`);
+		this.confirmHtmlCode = my_utils.getAsset('\\html\\confirm.html').replace(/href="styles.css"/i, `href="${cssPath}"`);
 	}
 	/*
 	getWindowsVersion() {

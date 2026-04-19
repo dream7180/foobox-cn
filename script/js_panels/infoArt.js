@@ -1912,7 +1912,9 @@ function Controller(imgArray, imgDisplay, prop) {
 		window.SetTimeout(function() {
 			if (metadb && currentMetadb && currentMetadb.Compare(metadb)) {
 				_this.SwitchCover(0);
-				getColorSchemeFromImage();
+				window.SetTimeout(function() {
+					getColorSchemeFromImage();
+				}, 10);
 			}
 			else {
 				isNewgroup = false;
@@ -2323,9 +2325,11 @@ function on_mouse_wheel(delta) {
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(handles.Find(currentMetadb) > -1) {
-		if(!fromhook) MainController.Refresh(true, currentMetadb);
-		OnMetadbChanged();
+	if(!fromhook && currentMetadb){
+		if(handles.Find(currentMetadb) > -1) {
+			if(!fromhook) MainController.Refresh(true, currentMetadb);
+			OnMetadbChanged();
+		}
 	}
 }
 

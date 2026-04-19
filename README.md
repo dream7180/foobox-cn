@@ -2,7 +2,8 @@
 foobox 是一个 [foobar2000](https://www.foobar2000.org) 默认用户界面 (DUI) 的皮肤配置，基于 jsplitter 组件，符合主流软件的审美，扩展功能丰富并保持软件的流畅运行.
 ## 【制作和使用】
 foobox 中文版适用于 foobar2000 汉化版 by [Asion](https://www.cnblogs.com/asionwu)，使用以下第三方组件:  
-* 基于 [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) 的 [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378)，汉化[智享阁](https://www.esnpc.com/);  
+* 基于 [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) 的 [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378)，汉化[智享阁](https://www.esnpc.com/); 
+* 基于 [openhacks](https://github.com/ttsping/foo_openhacks) 的 [openhacks_mod](https://github.com/simear2004/foo_openhacks_mod);  
 * ttsping 的歌词组件 [ESLyric](https://github.com/ESLyric/release);  
 * [foo_enhanced_spectrum_analyzer](https://hydrogenaud.io/index.php/topic,116014.0.html).
 

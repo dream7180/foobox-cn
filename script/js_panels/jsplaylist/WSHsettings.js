@@ -40,25 +40,25 @@ function settings_checkboxes_action(id, status, parentId) {
 		case 0:
 			let _showmenu = show_menu;
 			if (status) {
-				show_menu = true;
+				show_menu = 1;
 			} else {
-				show_menu = false;
+				show_menu = 0;
 			}
 			if(show_menu != _showmenu){
 				window.NotifyOthers("Show_menubar", show_menu);
-				window.SetProperty("foobox.Show.menu.bar", show_menu);
+				save_misccfg();
 				p.settings.pages[parentId].elements[id].repaint();
 			}
 			break;
 		case 3:
 			if (status) {
-				show_extrabtn = true;
+				show_extrabtn = 1;
 			}
 			else {
-				show_extrabtn = false;
+				show_extrabtn = 0;
 			}
 			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
-			window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
+			save_misccfg();
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 6:
@@ -243,16 +243,16 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 4:
 			p.settings.pages[pid].elements[4].status = true;
 			p.settings.pages[pid].elements[5].status = false;
-			libbtn_fuc = true;
+			libbtn_fuc = 1;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
+			save_misccfg();
 			break;
 		case 5:
 			p.settings.pages[pid].elements[4].status = false;
 			p.settings.pages[pid].elements[5].status = true;
-			libbtn_fuc = false;
+			libbtn_fuc = 0;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
+			save_misccfg();
 			break;
 		};
 		full_repaint();
@@ -623,7 +623,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
 			else if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
-			save_misccfg();
+			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
 			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
@@ -632,7 +632,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!cList.touchstep) cList.touchstep = org_touchstep;
 			else if(cList.touchstep < 0) cList.touchstep = 1;
 			else if(cList.touchstep > 20) cList.touchstep = 20;
-			save_misccfg();
+			window.SetProperty("SYSTEM.Playlist Touch Step", cList.touchstep);
 			break;
 		case 6:
 			let org_default_playlist_h = cRow.default_playlist_h;
@@ -641,7 +641,7 @@ function settings_textboxes_action(pageId, elementId) {
 			else if(cRow.default_playlist_h < 15) cRow.default_playlist_h = 15;
 			else if(cRow.default_playlist_h > 100) cRow.default_playlist_h = 100;
 			if(cRow.default_playlist_h != org_default_playlist_h) {
-				save_misccfg();
+				window.SetProperty("SYSTEM.Playlist Row Height in Pixel", cRow.default_playlist_h);
 				resize_panels();
 				get_grprow_minimum(p.headerBar.columns[0].w);
 				update_playlist(layout.collapseGroupsByDefault, 2);
@@ -1717,8 +1717,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 4.5, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(2, z(120), cSettings.topBarHeight + rh * 4.5, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.5, "显示 '打开' 和 '停止' 按钮", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(4, 20, cSettings.topBarHeight + rh * 8.25, "专辑列表", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(5, z(120), cSettings.topBarHeight + rh * 8.25, "分面查看器", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, 20, cSettings.topBarHeight + rh * 8.25, "专辑列表", (libbtn_fuc == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, z(120), cSettings.topBarHeight + rh * 8.25, "分面查看器", (libbtn_fuc == 0), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 10.5, "界面跟随较鲜艳的封面颜色", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, z(240), cSettings.topBarHeight + rh * 10.5, "背景色除外", "cbkg_bycover ? false : true", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, z(390), cSettings.topBarHeight + rh * 10.5, "歌词高亮色除外", "color_noesl ? true : false", "settings_checkboxes_action", this.id));

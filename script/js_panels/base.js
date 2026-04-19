@@ -20,11 +20,11 @@ var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn, MenubarBtn = [];
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
-var show_extrabtn = window.GetProperty("foobox.show.Open.Stop.buttons", true);
-var lib_albumlist = Number(fb.Version.substr(0, 1)) == 1 ? true : window.GetProperty("Library.button: Show.Albumlist", true);
-var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
-var show_menu = window.GetProperty("foobox.show.menubar", true);
-var lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
+var show_menu = 1;
+var show_extrabtn = 1;
+var fbver = Number(fb.Version.substr(0, 1));
+var lib_albumlist = 1;
+var lib_tooltip = "专辑列表";
 var custom_panel;
 var LIST, BRW, CUSTOM, BIO, active_p, active_pid;
 var p_tips = ['播放列表', '封面浏览器', '简介'];
@@ -282,7 +282,7 @@ function get_color() {
 		c_tip_bg = RGBA(0, 0, 0, 200);
 		c_menubar = RGBA(0, 0, 0, 20);
 		c_gradline = RGBA(255, 255, 255, 25);
-		c_subtitle = blendColors(c_black, c_font, 0.65);
+		c_subtitle = blendColors(c_black, c_font, 0.75);
 		c_normal = blendColors(c_black, c_font, 0.8);
 	} else {
 		c_topbg = RGBA(0, 0, 0, 32);
@@ -290,7 +290,7 @@ function get_color() {
 		c_tip_bg = RGBA(255, 255, 255, 200);
 		c_menubar = RGBA(0, 0, 0, 12);
 		c_gradline = RGBA(255, 255, 255, 50); 
-		c_subtitle = blendColors(c_white, c_font, 0.65);
+		c_subtitle = blendColors(c_white, c_font, 0.75);
 		c_normal = blendColors(c_white, c_font, 0.8);
 	}
 	c_background = c_background_default;
@@ -1000,6 +1000,21 @@ function get_images() {
 }
 
 function on_init(){
+	let _addtext;
+	try{
+		let _cfg = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\mainconf", 0);
+		_cfg = _cfg.split("##");
+		show_menu = Number(_cfg[0]);
+		show_extrabtn = Number(_cfg[1]);
+		if(fbver > 1){
+			lib_albumlist = Number(_cfg[2]);
+			lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
+		}
+		_addtext = _cfg[4];
+	}catch(e){}
+	if(_addtext && _addtext != "null") {
+		top_addtext = _addtext;
+	}
 	get_font();
 	UiCompInit();
 	get_color();
@@ -1007,13 +1022,6 @@ function on_init(){
 	get_panel();
 	init_overlay_obj(c_seek_bg, c_seekoverlay);
 	initbuttons();
-	try{
-		var _addtext = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\misccfg", 0);
-		_addtext = _addtext.split("##")[4];
-	}catch(e){}
-	if(_addtext && _addtext != "null") {
-		top_addtext = _addtext;
-	}
 }
 
 //=============start=====================
@@ -1310,7 +1318,7 @@ function on_playback_new_track(info) {
 function on_metadb_changed(handles, fromhook) {
 	if(!fromhook && fb.IsPlaying) {
 		metadb = fb.GetNowPlaying();
-		if(handles && handles.Find(metadb) > -1){
+		if(metadb && handles.Find(metadb) > -1){
 			TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(metadb);
 			TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(metadb);
 			if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(metadb);
@@ -1398,22 +1406,16 @@ function on_notify_data(name, info) {
 		break;
 	case "Show_open_stop_buttons":
 		show_extrabtn = info;
-		window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
 		repaintWin("B");
 		break;
 	case "Lib_button_function":
-		if(Number(fb.Version.substr(0, 1)) > 1){
+		if(fbver > 1){
 			lib_albumlist = info;
-			window.SetProperty("Library.button: Show.Albumlist", lib_albumlist);
 			lib_tooltip = lib_albumlist ? "专辑列表" : "分面查看器";
 		}
 		break;
 	case "titlebar_addinfo":
 		top_addtext = info;
-		break;
-	case "set_bgcolor_chroma":
-		cbkg_chroma = info;
-		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
 	case "panel_switch":
 		if(custom_panel) break;
@@ -1427,7 +1429,6 @@ function on_notify_data(name, info) {
 		break;
 	case "Show_menubar":
 		show_menu = info;
-		window.SetProperty("foobox.show.menubar", show_menu);
 		if(show_menu) {
 			MenubarBtn = [];
 			for(var i = 0; i < 6; i++){
