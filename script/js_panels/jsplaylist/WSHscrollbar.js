@@ -4,11 +4,11 @@
 
 oScrollbar = function( /*themed*/ ) {
 	this.cursorScrollTimer = false;
-	this.buttons = Array(null, null, null);
+	this.buttons = null;
 
 	this.draw = function(gr, x, y) {
 		// draw cursor
-		this.buttons[cScrollBar.buttonType.cursor] && this.buttons[cScrollBar.buttonType.cursor].draw(gr, this.x, this.cursorPos, 255);
+		this.buttons && this.buttons.draw(gr, this.x, this.cursorPos, 255);
 	};
 
 	this.setCursor = function(totalRowVisible, totalRows, offset) {
@@ -45,69 +45,7 @@ oScrollbar = function( /*themed*/ ) {
 		this.cursorImage_down.ReleaseGraphics(gb);
 
 		// create/refresh cursor Button in buttons array
-		this.buttons[cScrollBar.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-	};
-
-	this.setButtons = function() {
-
-		// normal scroll_up Image
-		this.upImage_normal = gdi.CreateImage(this.w, this.w);
-		var gb = this.upImage_normal.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, g_color_normal_txt & 0x55ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.upImage_normal.ReleaseGraphics(gb);
-
-		// hover scroll_up Image
-		this.upImage_hover = gdi.CreateImage(this.w, this.w);
-		gb = this.upImage_hover.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, g_color_normal_txt & 0x99ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		//};
-		this.upImage_hover.ReleaseGraphics(gb);
-
-		// down scroll_up Image
-		this.upImage_down = gdi.CreateImage(this.w, this.w);
-		gb = this.upImage_down.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, g_color_normal_txt, 0, 0, this.w, this.w, cc_stringformat);
-		this.upImage_down.ReleaseGraphics(gb);
-
-		// normal scroll_down Image
-		this.downImage_normal = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_normal.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, g_color_normal_txt & 0x55ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.downImage_normal.ReleaseGraphics(gb);
-
-		// hover scroll_down Image
-		this.downImage_hover = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_hover.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, g_color_normal_txt & 0x99ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		//};
-		this.downImage_hover.ReleaseGraphics(gb);
-
-		// down scroll_down Image
-		this.downImage_down = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_down.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, g_color_normal_txt, 0, 0, this.w, this.w, cc_stringformat);
-		this.downImage_down.ReleaseGraphics(gb);
-
-		var fin = this.buttons.length;
-		for (i = 1; i < fin; i++) {
-			switch (i) {
-			case cScrollBar.buttonType.cursor:
-				this.buttons[cScrollBar.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-				break;
-			case cScrollBar.buttonType.up:
-				this.buttons[cScrollBar.buttonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down);
-				break;
-			case cScrollBar.buttonType.down:
-				this.buttons[cScrollBar.buttonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down);
-				break;
-			};
-		};
+		this.buttons = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
 	};
 
 	this.setSize = function(x, y, w, h) {
@@ -118,7 +56,6 @@ oScrollbar = function( /*themed*/ ) {
 		// scrollbar area for the cursor (<=> scrollbar height minus up & down buttons height)
 		this.area_y = y;
 		this.area_h = h;
-		this.setButtons();
 	};
 
 	this.setOffsetFromCursorPos = function() {
@@ -134,7 +71,7 @@ oScrollbar = function( /*themed*/ ) {
 
 		switch (event) {
 		case "down":
-			this.buttons[0] && this.buttons[0].checkstate(event, x, y);
+			this.buttons && this.buttons.checkstate(event, x, y);
 			if (this.ishover) {
 				this.cursorClickX = x;
 				this.cursorClickY = y;
@@ -144,7 +81,7 @@ oScrollbar = function( /*themed*/ ) {
 			};
 			break;
 		case "up":
-			this.buttons[0] && this.buttons[0].checkstate(event, x, y);
+			this.buttons && this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				p.list.offset = this.setOffsetFromCursorPos();
 				p.list.setItems(false);
@@ -156,7 +93,7 @@ oScrollbar = function( /*themed*/ ) {
 			this.clicked = false;
 			break;
 		case "move":
-			this.buttons[0] && this.buttons[0].checkstate(event, x, y);
+			this.buttons && this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				this.cursorPos = y - this.cursorDragDelta;
 				if (this.cursorPos + this.cursorHeight > this.area_y + this.area_h) {
@@ -179,7 +116,7 @@ oScrollbar = function( /*themed*/ ) {
 			};
 			break;
 		case "leave":
-			this.buttons[0] && this.buttons[0].checkstate(event, x, y);
+			this.buttons && this.buttons.checkstate(event, x, y);
 			break;
 		};
 	};
@@ -189,154 +126,15 @@ oScrollbar = function( /*themed*/ ) {
 	};
 
 	this.check = function(event, x, y) {
-
 		this.hover = this.isHoverObject(x, y);
-
-		// check cursor
 		this.cursorCheck(event, x, y);
-
-		// check other buttons
-		var fin = this.buttons.length;
-		for (var i = 1; i < fin; i++) {
-			switch (event) {
-			case "dblclk":
-				switch (i) {
-				case 1:
-					// up button
-					if (this.buttons[i] && this.buttons[i].checkstate(event, x, y) == ButtonStates.hover) {
-						this.clicked = true;
-						p.list.buttonclicked = true;
-						this.buttons[i].checkstate("down", x, y);
-
-						p.list.offset = p.list.offset > 0 ? p.list.offset - 1 : 0;
-						p.list.setItems(false);
-						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-						if (properties.smoothscrolling) {
-							cList.scroll_direction = 1;
-							set_scroll_delta();
-						};
-						full_repaint();
-						if (!cScrollBar.timerID2) {
-							cScrollBar.timerID2 = window.SetInterval(function() {
-								cScrollBar.timer_counter++;
-								if (cScrollBar.timer_counter > 7) {
-									p.list.offset = p.list.offset > 0 ? p.list.offset - 1 : 0;
-									p.list.setItems(false);
-									p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-									full_repaint();
-								};
-							}, 60);
-						};
-					};
-					break;
-				case 2:
-					// down button
-					if (this.buttons[i] && this.buttons[i].checkstate(event, x, y) == ButtonStates.hover) {
-						this.clicked = true;
-						p.list.buttonclicked = true;
-						this.buttons[i].checkstate("down", x, y);
-
-						p.list.offset = p.list.offset >= (p.list.totalRows - p.list.totalRowVisible) ? (p.list.totalRows - p.list.totalRowVisible) : p.list.offset + 1;
-						p.list.setItems(false);
-						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-						if (properties.smoothscrolling) {
-							cList.scroll_direction = -1;
-							set_scroll_delta();
-						};
-						full_repaint();
-						if (!cScrollBar.timerID2) {
-							cScrollBar.timerID2 = window.SetInterval(function() {
-								cScrollBar.timer_counter++;
-								if (cScrollBar.timer_counter > 7) {
-									p.list.offset = p.list.offset >= (p.list.totalRows - p.list.totalRowVisible) ? (p.list.totalRows - p.list.totalRowVisible) : p.list.offset + 1;
-									p.list.setItems(false);
-									p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-									full_repaint();
-								};
-							}, 60);
-						};
-					};
-					break;
-				};
-				break;
-			case "down":
-				switch (i) {
-				case 1:
-					// up button
-					if (this.buttons[i] && this.buttons[i].checkstate(event, x, y) == ButtonStates.down) {
-						this.clicked = true;
-						p.list.buttonclicked = true;
-						cScrollBar.timer_counter = 0;
-						p.list.offset = p.list.offset > 0 ? p.list.offset - 1 : 0;
-						p.list.setItems(false);
-						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-						if (properties.smoothscrolling) {
-							cList.scroll_direction = 1;
-							set_scroll_delta();
-						};
-						full_repaint();
-						if (!cScrollBar.timerID2) {
-							cScrollBar.timerID2 = window.SetInterval(function() {
-								cScrollBar.timer_counter++;
-								if (cScrollBar.timer_counter > 7) {
-									p.list.offset = p.list.offset > 0 ? p.list.offset - 1 : 0;
-									p.list.setItems(false);
-									p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-									full_repaint();
-								};
-							}, 60);
-						};
-					};
-					break;
-				case 2:
-					// down button
-					if (this.buttons[i] && this.buttons[i].checkstate(event, x, y) == ButtonStates.down) {
-						this.clicked = true;
-						p.list.buttonclicked = true;
-						cScrollBar.timer_counter = 0;
-						p.list.offset = p.list.offset >= (p.list.totalRows - p.list.totalRowVisible) ? (p.list.totalRows - p.list.totalRowVisible) : p.list.offset + 1;
-						p.list.setItems(false);
-						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-						if (properties.smoothscrolling) {
-							cList.scroll_direction = -1;
-							set_scroll_delta();
-						};
-						full_repaint();
-						if (!cScrollBar.timerID2) {
-							cScrollBar.timerID2 = window.SetInterval(function() {
-								cScrollBar.timer_counter++;
-								if (cScrollBar.timer_counter > 7) {
-									p.list.offset = p.list.offset >= (p.list.totalRows - p.list.totalRowVisible) ? (p.list.totalRows - p.list.totalRowVisible) : p.list.offset + 1;
-									p.list.setItems(false);
-									p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-									full_repaint();
-								};
-							}, 60);
-						};
-					};
-					break;
-				};
-				break;
-			case "up":
-				if (cScrollBar.timerID2) {
-					window.ClearInterval(cScrollBar.timerID2);
-					cScrollBar.timerID2 = false;
-				};
-				cScrollBar.timer_counter = 0;
-				this.buttons[i] && this.buttons[i].checkstate(event, x, y);
-				this.clicked = false;
-				break;
-			default:
-				this.buttons[i] && this.buttons[i].checkstate(event, x, y);
-			};
-		};
 	};
 	this.repaint = function() {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
 	};
 };
 
-oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, offset, parent_object, show_buttons, scroll_step, isbox) {
+oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, offset, parent_object,/* show_buttons,*/ scroll_step, isbox) {
 	this.id = id;
 	this.objectName = object_name;
 	this.x = x;
@@ -348,18 +146,11 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 	this.offset = offset;
 	this.parentObject = parent_object;
 	this.cursorColor = RGB(105, 105, 105);
-	this.buttons = Array(null, null, null);
-	this.buttonType = {
-		cursor: 0,
-		up: 1,
-		down: 2
-	};
-	this.showButtons = show_buttons;
+	this.buttons = null;
 	this.scrollStep = scroll_step;
 
 	this.parentRepaint = function() {
 		eval(this.parentObject).repaint();
-		//window.Repaint();
 	};
 
 	this.repaint = function() {
@@ -387,72 +178,13 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		this.cursorImage_down.ReleaseGraphics(gb);
 
 		// create/refresh cursor Button in buttons array
-		this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-	};
-
-	this.setButtons = function() {
-		// normal scroll_up Image
-		this.upImage_normal = gdi.CreateImage(this.w, this.w);
-		var gb = this.upImage_normal.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, this.color_txt & 0x55ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.upImage_normal.ReleaseGraphics(gb);
-
-		// hover scroll_up Image
-		this.upImage_hover = gdi.CreateImage(this.w, this.w);
-		gb = this.upImage_hover.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, this.color_txt & 0x99ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.upImage_hover.ReleaseGraphics(gb);
-
-		// down scroll_up Image
-		this.upImage_down = gdi.CreateImage(this.w, this.w);
-		gb = this.upImage_down.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(112), g_font_wd3_scrollBar, this.color_txt, 0, 0, this.w, this.w, cc_stringformat);
-		this.upImage_down.ReleaseGraphics(gb);
-
-		// normal scroll_down Image
-		this.downImage_normal = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_normal.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, this.color_txt & 0x55ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.downImage_normal.ReleaseGraphics(gb);
-
-		// hover scroll_down Image
-		this.downImage_hover = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_hover.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, this.color_txt & 0x99ffffff, 0, 0, this.w, this.w, cc_stringformat);
-		this.downImage_hover.ReleaseGraphics(gb);
-
-		// down scroll_down Image
-		this.downImage_down = gdi.CreateImage(this.w, this.w);
-		gb = this.downImage_down.GetGraphics();
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(String.fromCharCode(113), g_font_wd3_scrollBar, this.color_txt, 0, 0, this.w, this.w, cc_stringformat);
-		this.downImage_down.ReleaseGraphics(gb);
-
-		for (i = 1; i < this.buttons.length; i++) {
-			switch (i) {
-			case this.buttonType.cursor:
-				this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-				break;
-			case this.buttonType.up:
-				this.buttons[this.buttonType.up] = new button(this.upImage_normal, this.upImage_hover, this.upImage_down);
-				break;
-			case this.buttonType.down:
-				this.buttons[this.buttonType.down] = new button(this.downImage_normal, this.downImage_hover, this.downImage_down);
-				break;
-			};
-		};
+		this.buttons = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
 	};
 
 	this.setDefaultColors = function() {
 		this.color_bg = g_color_normal_bg;
 		this.color_txt = g_color_normal_txt;
 		if (this.cursorHeight) this.setCursorButton();
-		this.setButtons();
 	};
 	this.setDefaultColors();
 
@@ -460,7 +192,6 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		this.color_bg = color_bg;
 		this.color_txt = color_txt;
 		if (this.cursorHeight) this.setCursorButton();
-		this.setButtons();
 	};
 
 	this.updateCursorPos = function(offset) {
@@ -481,23 +212,13 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		this.total = total_items;
 		this.itemHeight = item_height;
 		this.offset = offset;
-		//
-		this.setButtons();
 		this.totalRowsFull = Math.floor(this.h / this.itemHeight);
 		this.totalRowsVisibles = Math.ceil(this.h / this.itemHeight);
 		this.visible = (this.total > this.totalRowsFull);
-		if (this.showButtons) {
-			this.buttonHeight = this.buttons[this.buttonType.up].h;
-			this.cursorAreaY = this.y + this.buttonHeight;
-			this.cursorAreaHeight = this.h - (this.buttonHeight * 2);
-		}
-		else {
-			this.buttonHeight = 0;
-			this.cursorAreaY = this.y;
-			this.cursorAreaHeight = this.h;
-		};
+		this.buttonHeight = 0;
+		this.cursorAreaY = this.y;
+		this.cursorAreaHeight = this.h;
 		if (this.visible) this.updateCursorPos(this.offset);
-
 	};
 	this.reSet(this.total, this.itemHeight, this.offset);
 
@@ -516,23 +237,13 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		this.x = x;
 		this.y = y;
 		if (this.visible) {
-			// scrollbar buttons
-			this.buttons[this.buttonType.cursor].draw(gr, x, this.cursorY, 255);
-			if (this.showButtons) {
-				this.buttons[this.buttonType.up].draw(gr, x, y, 255);
-				this.buttons[this.buttonType.down].draw(gr, x, this.cursorAreaY + this.cursorAreaHeight, 255);
-			};
+			this.buttons.draw(gr, x, this.cursorY, 255);
 		};
 	};
 
 	this.draw = function(gr) {
 		if (this.visible) {
-			// scrollbar buttons
-			this.buttons[this.buttonType.cursor].draw(gr, this.x, this.cursorY, 255);
-			if (this.showButtons) {
-				this.buttons[this.buttonType.up].draw(gr, this.x, this.y, 255);
-				this.buttons[this.buttonType.down].draw(gr, this.x, this.cursorAreaY + this.cursorAreaHeight, 255);
-			};
+			this.buttons.draw(gr, this.x, this.cursorY, 255);
 		};
 	};
 
@@ -559,11 +270,11 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 	this.cursorCheck = function(event, x, y) {
 		this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.cursorY && y <= (this.cursorY + this.cursorHeight));
 
-		if (!this.buttons[this.buttonType.cursor]) return;
+		if (!this.buttons) return;
 
 		switch (event) {
 		case "down":
-			if (this.buttons[this.buttonType.cursor].checkstate(event, x, y) == ButtonStates.down) {
+			if (this.buttons.checkstate(event, x, y) == ButtonStates.down) {
 				this.cursorClickX = x;
 				this.cursorClickY = y;
 				this.cursorDrag = true;
@@ -571,7 +282,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 			};
 			break;
 		case "up":
-			this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				eval(this.parentObject).offset = this.getOffsetFromCursorPos();
 				this.setCursorPosFromOffset();
@@ -582,7 +293,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 			this.cursorDrag = false;
 			break;
 		case "move":
-			this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				this.cursorY = y - this.cursorDragDelta;
 				if (this.cursorY + this.cursorHeight > this.cursorAreaY + this.cursorAreaHeight) {
@@ -605,7 +316,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 			};
 			break;
 		case "leave":
-			this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			this.buttons.checkstate(event, x, y);
 			break;
 		};
 	};
@@ -615,87 +326,8 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		this.isHoverScrollbar = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
 		this.isHoverCursor = (x >= this.x && x <= this.x + this.w && y >= this.cursorY && y <= this.cursorY + this.cursorHeight);
 		this.isHoverEmptyArea = (x >= this.x && x <= this.x + this.w && y >= this.y + this.buttonHeight && y <= this.cursorAreaY + this.cursorAreaHeight) && !this.isHoverCursor;
-		this.isHoverButtons = this.isHoverScrollbar && !this.isHoverCursor && !this.isHoverEmptyArea;
-
-		// cursor events
 		if (!this.buttonClick) this.cursorCheck(event, x, y);
-
 		if (!this.cursorDrag) {
-			// buttons events
-			var totalButtonToCheck = 3; //(this.themed ? 3 : 3);
-			for (var i = 1; i < totalButtonToCheck; i++) {
-				switch (event) {
-				case "down":
-					switch (i) {
-					case 1:
-						// up button
-						if (this.buttons[i].checkstate(event, x, y) == ButtonStates.down) {
-							this.buttonClick = true;
-							this.offset = this.offset > 0 ? this.offset - 1 : 0;
-							eval(this.parentObject).offset = this.offset;
-							this.updateCursorPos(this.offset);
-							this.parentRepaint();
-							cScrollBar.obj = eval(this.objectName);
-							if (!cScrollBar.timerID) {
-								cScrollBar.timerID = window.SetInterval(function() {
-									if (cScrollBar.timerCounter > 7) {
-										var obj = cScrollBar.obj;
-										obj.offset = obj.offset > 0 ? obj.offset - 1 : 0;
-										eval(obj.parentObject).offset = obj.offset;
-										obj.updateCursorPos(obj.offset);
-										obj.parentRepaint();
-									}
-									else {
-										cScrollBar.timerCounter++;
-									};
-								}, 60);
-							};
-						};
-						break;
-					case 2:
-						// down button
-						if (this.buttons[i].checkstate(event, x, y) == ButtonStates.down) {
-							this.buttonClick = true;
-							var max_offset = this.total - this.totalRowsFull;
-							this.offset = (this.offset + 1 >= max_offset ? max_offset : this.offset + 1);
-							eval(this.parentObject).offset = this.offset;
-							this.updateCursorPos(this.offset);
-							this.parentRepaint();
-							cScrollBar.obj = eval(this.objectName);
-							if (!cScrollBar.timerID) {
-								cScrollBar.timerID = window.SetInterval(function() {
-									if (cScrollBar.timerCounter > 7) {
-										var obj = cScrollBar.obj;
-										var max_offset = obj.total - obj.totalRowsFull;
-										obj.offset = (obj.offset + 1 >= max_offset ? max_offset : obj.offset + 1);
-										eval(obj.parentObject).offset = obj.offset;
-										obj.updateCursorPos(obj.offset);
-										obj.parentRepaint();
-									}
-									else {
-										cScrollBar.timerCounter++;
-									};
-								}, 60);
-							};
-						};
-						break;
-					};
-					break;
-				case "up":
-					this.buttonClick = false;
-					if (cScrollBar.timerID) {
-						window.ClearInterval(cScrollBar.timerID);
-						cScrollBar.timerID = false;
-					};
-					cScrollBar.timerCounter = 0;
-					this.buttons[i].checkstate(event, x, y);
-					this.setCursorPosFromOffset();
-					break;
-				default:
-					this.buttons[i].checkstate(event, x, y);
-				};
-			};
-
 			// click on empty scrollbar area to scroll page
 			if (this.isHoverEmptyArea) {
 				switch (event) {

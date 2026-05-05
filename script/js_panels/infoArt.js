@@ -4,9 +4,9 @@ window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'})
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
-
+commoncfg = commoncfg.split(",");
 var zdpi = 1;
-var g_fname, g_fsize, menubutton_w, menubutton_h;
+var menubutton_w, menubutton_h;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var Caption_Pack = {
 	"Front": "封面",
@@ -20,11 +20,12 @@ var get_imgCol = false;
 var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
-var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var color_bycover = Number(commoncfg[4]);
 var color_bycover_default = color_bycover;
-var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
-var color_threshold = window.GetProperty("foobox.color.threshold", 5);
-var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
+var cbkg_bycover = Number(commoncfg[5]);
+var color_threshold = Number(commoncfg[7]);
+var cbkg_chroma = Number(commoncfg[8]);
+commoncfg.length = 0;
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 
 function GetCaption(name) {
@@ -54,7 +55,7 @@ var is_mood = window.GetProperty("Display.Mood", false);
 if(!show_rating) is_mood = false;
 var g_font, g_font2;
 var currentMetadb;
-var rating_x, imgw, imgh, mood_h, infobar_h, pointArr, line2_h, infobar_y = 0;
+var rating_x, imgw, imgh, mood_h, infobar_h, line2_h, infobar_y = 0;
 var rating, txt_title, txt_info, txt_profile, main_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
 if (time_circle < 3000) time_circle = 3000;
@@ -116,7 +117,6 @@ function get_var() {
 	imgh = imgw;
 	mood_h = Math.floor(20*zdpi);
 	line2_h = 25*zdpi;
-	pointArr = Array(9*zdpi, zdpi, 6.4*zdpi, 5.6*zdpi, zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi);
 }
 
 var ww = 0, wh = 0;
@@ -137,34 +137,35 @@ function get_colors() {
 
 function get_font() {
 	g_font2 = window.GetFontDUI(FontTypeDUI.playlists);
-	g_fname = g_font2.Name;
-	g_fsize = g_font2.Size;
-	g_fstyle = g_font2.Style;
-	zdpi = g_fsize / 12;
-	g_font = GdiFont(g_fname, g_fsize + 2, 1);
+	let fname = g_font2.Name;
+	let fsize = g_font2.Size;
+	zdpi = fsize / 12;
+	g_font = GdiFont(fname, fsize + 2, 1);
+	g_fnt_ico = GdiFont("FontAwesome", Math.round(fsize*1.4), 0);
+	g_fnt_mood = GdiFont("FontAwesome", Math.round(fsize*1.2), 0);
 }
 
 function get_imgs() {
-	let gb, mood_font = GdiFont("Segoe UI", Math.round(g_fsize*1.8), 0), mood_color = RGB(255, 0, 0);
+	let gb, mood_color = RGB(255, 0, 0);
 	img_rating_on = gdi.CreateImage(imgw, imgh);
 	gb = img_rating_on.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.FillPolygon(c_rating_h, 0, pointArr);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("\uF005", g_fnt_ico, c_rating_h, 0, 0, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	img_rating_on.ReleaseGraphics(gb);
 
 	img_rating_off = gdi.CreateImage(imgw, imgh);
 	gb = img_rating_off.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.FillPolygon(icocolor, 0, pointArr);
-	gb.SetSmoothingMode(0);
+	gb.SetTextRenderingHint(4);
+	gb.DrawString("\uF005", g_fnt_ico, icocolor, 0, 0, imgw, imgh, cc_stringformat);
+	gb.SetTextRenderingHint(0);
 	img_rating_off.ReleaseGraphics(gb);
 
 	mood_img = gdi.CreateImage(imgw, mood_h*2);
 	gb = mood_img.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("♥", mood_font,mood_color, 0, -2*zdpi, imgw, mood_h, cc_stringformat);
-	gb.DrawString("♥", mood_font, icocolor, 0, mood_h-2*zdpi, imgw, mood_h, cc_stringformat);
+	gb.DrawString("\uF004", g_fnt_mood, mood_color, 0, 0, imgw, mood_h, cc_stringformat);
+	gb.DrawString("\uF004", g_fnt_mood, icocolor, 0, mood_h, imgw, mood_h, cc_stringformat);
 	menubutton_w = gb.CalcTextWidth("封面宽度w", g_font);
 	menubutton_h = gb.CalcTextHeight("高", g_font) * 1.65;
 	gb.SetTextRenderingHint(0);
@@ -1958,7 +1959,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		let c_blend = null;
 		if(currentImage){
 			let c_dev = -1, cv_max;
-			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(color_threshold));
+			let ColorData = JSON.parse(currentImage.GetColourSchemeJSONV2(color_threshold));
 			for(let i = 0; i < color_threshold; i++){
 				let c_img = toRGB(ColorData[i].col);
 				let cv_max_tmp = Math.max(...c_img);
@@ -2248,6 +2249,8 @@ function on_size() {
 	if (!window.Width || !window.Height) return;
 	ww = window.Width;
 	wh = window.Height;
+	window.MinWidth = 50;
+	window.MinHeight = 50;
 	panel_setsize();
 }
 
@@ -2325,7 +2328,7 @@ function on_mouse_wheel(delta) {
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(!fromhook && currentMetadb){
+	if(currentMetadb){
 		if(handles.Find(currentMetadb) > -1) {
 			if(!fromhook) MainController.Refresh(true, currentMetadb);
 			OnMetadbChanged();
@@ -2445,21 +2448,17 @@ function on_notify_data(name, info) {
 		break;
 	case "foobox_color_bycover":
 		color_bycover = info;
-		window.SetProperty("foobox.color.by.cover", color_bycover);
 		color_bycover_default = color_bycover;
 		set_getcolor_state();
 		break;
 	case "set_corlor_threshold":
 		color_threshold = info;
-		window.SetProperty("foobox.color.threshold", color_threshold);
 		break;
 	case "set_bgcolor_chroma":
 		cbkg_chroma = info;
-		window.SetProperty("foobox.bgcolor.chroma", cbkg_chroma);
 		break;
 	case "foobox_bgcolor_bycover":
 		cbkg_bycover = info;
-		window.SetProperty("foobox.background.color.by.cover", cbkg_bycover);
 		if(!cbkg_bycover) reset_background();
 		break;
 	}
@@ -2491,7 +2490,7 @@ function panel_setsize(){
 		initbutton();
 		if(show_rating){
 			if(is_mood) {
-				var spacing = Math.min(15, Math.round(ww / 25));
+				var spacing = z(15);
 			}else{
 				var spacing = imgw;
 			}

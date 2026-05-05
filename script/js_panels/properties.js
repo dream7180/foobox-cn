@@ -52,7 +52,10 @@ panel.item_focus_change();
 
 //callback function
 function on_size() {
+	window.MinWidth = 50;
+	window.MinHeight = 50;
 	panel.size();
+	if (!panel.w || !panel.h) return;
 	list.size();
 }
 

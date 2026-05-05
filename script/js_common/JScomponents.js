@@ -8,14 +8,12 @@
 	this.getImages = function() {
 		var gb;
 		var w = Math.round(18 * zdpi);
-		var x5 = 5*zdpi, x_c = (w-3*zdpi)/2;
+		var x5 = 5*zdpi;
 		this.images.magnify = gdi.CreateImage(w, w);
 		gb = this.images.magnify.GetGraphics();
-		var point_arr = new Array(3*zdpi,Math.round(3*zdpi),w-6*zdpi,Math.round(3*zdpi),x_c,w/2);
-		gb.DrawLine(x_c, w/2 -1, x_c, w-x5, 2, g_color_normal_txt);
-		gb.SetSmoothingMode(2);
-		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
-		gb.SetSmoothingMode(0);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uED23", g_fnico1, g_color_normal_txt, 0, 0, w, w, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.images.magnify.ReleaseGraphics(gb);
 
 		this.images.resetIcon_off = gdi.CreateImage(w, w);
@@ -132,13 +130,7 @@
 };
 
 oScrollbar = function() {
-	this.showButtons = window.GetProperty("_DISPLAY: Show Scrollbar Buttons", false);
-	this.buttons = Array(null, null, null);
-	this.buttonType = {
-		cursor: 0,
-		up: 1,
-		down: 2
-	};
+	this.buttons = null;
 	this.buttonClick = false;
 
 	this.color_bg = g_color_normal_bg;
@@ -147,54 +139,7 @@ oScrollbar = function() {
 	this.setNewColors = function() {
 		this.color_bg = g_color_normal_bg;
 		this.color_txt = g_color_normal_txt;
-		this.setButtons();
 		this.setCursorButton();
-	};
-
-	this.setButtons = function() {
-		this.upImage_normal = gdi.CreateImage(70, 70);
-		var gb = this.upImage_normal.GetGraphics();
-		DrawPolyStar(gb, 11, 16, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.5), 0, 200);
-		this.upImage_normal.ReleaseGraphics(gb);
-
-		this.upImage_hover = gdi.CreateImage(70, 70);
-		var gb = this.upImage_hover.GetGraphics();
-		DrawPolyStar(gb, 11, 16, 44, 1, 3, 0, blendColors(this.color_txt, this.color_bg, 0.3), blendColors(this.color_txt, this.color_bg, 0.3), 0, 240);
-		this.upImage_hover.ReleaseGraphics(gb);
-		this.upImage_down = gdi.CreateImage(70, 70);
-		gb = this.upImage_down.GetGraphics();
-		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.05), 0, 160);
-		this.upImage_down.ReleaseGraphics(gb);
-
-		this.downImage_normal = gdi.CreateImage(70, 70);
-		gb = this.downImage_normal.GetGraphics();
-		DrawPolyStar(gb, 11, 10, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.5), 180, 200);
-		this.downImage_normal.ReleaseGraphics(gb);
-
-		this.downImage_hover = gdi.CreateImage(70, 70);
-		gb = this.downImage_hover.GetGraphics();
-		DrawPolyStar(gb, 11, 10, 44, 1, 3, 1, blendColors(this.color_txt, this.color_bg, 0.3), blendColors(this.color_txt, this.color_bg, 0.3), 180, 240);
-		this.downImage_hover.ReleaseGraphics(gb);
-
-		this.downImage_down = gdi.CreateImage(70, 70);
-		gb = this.downImage_down.GetGraphics();
-		DrawPolyStar(gb, 11, 13, 44, 1, 3, 0, c_black, blendColors(this.color_txt, this.color_bg, 0.05), 180, 160);
-
-		this.downImage_down.ReleaseGraphics(gb);
-
-		for (i = 1; i < this.buttons.length; i++) {
-			switch (i) {
-			case this.buttonType.cursor:
-				this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-				break;
-			case this.buttonType.up:
-				this.buttons[this.buttonType.up] = new button(this.upImage_normal.Resize(this.w, this.w, 2), this.upImage_hover.Resize(this.w, this.w, 2), this.upImage_down.Resize(this.w, this.w, 2));
-				break;
-			case this.buttonType.down:
-				this.buttons[this.buttonType.down] = new button(this.downImage_normal.Resize(this.w, this.w, 2), this.downImage_hover.Resize(this.w, this.w, 2), this.downImage_down.Resize(this.w, this.w, 2));
-				break;
-			};
-		};
 	};
 
 	this.setCursorButton = function() {
@@ -217,18 +162,13 @@ oScrollbar = function() {
 		this.cursorImage_down.ReleaseGraphics(gb);
 
 		// create/refresh cursor Button in buttons array
-		this.buttons[this.buttonType.cursor] = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
-		this.buttons[this.buttonType.cursor].x = this.x;
-		this.buttons[this.buttonType.cursor].y = this.cursory;
+		this.buttons = new button(this.cursorImage_normal, this.cursorImage_hover, this.cursorImage_down);
+		this.buttons.x = this.x;
+		this.buttons.y = this.cursory;
 	};
 
 	this.draw = function(gr) {
-		// scrollbar buttons
-		if (cScrollBar.visible) this.buttons[this.buttonType.cursor].draw(gr, this.x, this.cursory, 255);
-		if (this.showButtons) {
-			this.buttons[this.buttonType.up].draw(gr, this.x, this.y, 255);
-			this.buttons[this.buttonType.down].draw(gr, this.x, this.areay + this.areah, 255);
-		};
+		if (cScrollBar.visible) this.buttons.draw(gr, this.x, this.cursory, 255);
 	};
 
 	this.updateScrollbar = function() {
@@ -241,7 +181,7 @@ oScrollbar = function() {
 		// set cursor width/height
 		this.cursorw = cScrollBar.width;
 		if (this.total > 0) {
-			this.cursorh = Math.round((brw.h / this.totalh) * this.areah);
+			this.cursorh = Math.round((brw.h / this.totalh) * this.h);
 			if (this.cursorh < cScrollBar.minCursorHeight) this.cursorh = cScrollBar.minCursorHeight;
 			if (this.cursorh > cScrollBar.maxCursorHeight) this.cursorh = cScrollBar.maxCursorHeight;
 		}
@@ -256,38 +196,28 @@ oScrollbar = function() {
 	this.setCursorY = function() {
 		// set cursor y pos
 		var ratio = scroll / (this.totalh - this.totalRowsVish);
-		this.cursory = this.areay + Math.round((this.areah - this.cursorh) * ratio);
+		this.cursory = this.y + Math.round((this.h - this.cursorh) * ratio);
 	};
 
 	this.setSize = function() {
-		if (this.showButtons) this.buttonh = this.showButtons ? cScrollBar.width : 0;
 		this.x = brw.x + brw.w;
-		this.y = brw.y;// - ppt.headerBarHeight * 0;
+		this.y = brw.y;
 		this.w = cScrollBar.width;
-		this.h = brw.h;// + ppt.headerBarHeight * 0;
-		if (this.showButtons) {
-			this.areay = this.y + this.buttonh;
-			this.areah = this.h - (this.buttonh * 2);
-		}
-		else {
-			this.areay = this.y;
-			this.areah = this.h;
-		};
-		this.setButtons();
+		this.h = brw.h;
 	};
 
 	this.setScrollFromCursorPos = function() {
 		// calc ratio of the scroll cursor to calc the equivalent item for the full list (with gh)
-		var ratio = (this.cursory - this.areay) / (this.areah - this.cursorh);
+		var ratio = (this.cursory - this.y) / (this.h - this.cursorh);
 		// calc idx of the item (of the full list with gh) to display at top of the panel list (visible)
 		scroll = Math.round((this.totalh - this.totalRowsVish) * ratio);
 	};
 
 	this.cursorCheck = function(event, x, y) {
-		if (!this.buttons[this.buttonType.cursor]) return;
+		if (!this.buttons) return;
 		switch (event) {
 		case "down":
-			var tmp = this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			var tmp = this.buttons.checkstate(event, x, y);
 			if (tmp == ButtonStates.down) {
 				this.cursorClickX = x;
 				this.cursorClickY = y;
@@ -296,7 +226,7 @@ oScrollbar = function() {
 			};
 			break;
 		case "up":
-			this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				this.setScrollFromCursorPos();
 				brw.repaint();
@@ -306,21 +236,21 @@ oScrollbar = function() {
 			this.cursorDrag = false;
 			break;
 		case "move":
-			this.buttons[this.buttonType.cursor].checkstate(event, x, y);
+			this.buttons.checkstate(event, x, y);
 			if (this.cursorDrag) {
 				this.cursory = y - this.cursorDragDelta;
-				if (this.cursory + this.cursorh > this.areay + this.areah) {
-					this.cursory = (this.areay + this.areah) - this.cursorh;
+				if (this.cursory + this.cursorh > this.y + this.h) {
+					this.cursory = (this.y + this.h) - this.cursorh;
 				};
-				if (this.cursory < this.areay) {
-					this.cursory = this.areay;
+				if (this.cursory < this.y) {
+					this.cursory = this.y;
 				};
 				this.setScrollFromCursorPos();
 				brw.repaint();
 			};
 			break;
 		case "leave":
-			this.buttons[this.buttonType.cursor].checkstate(event, 0, 0);
+			this.buttons.checkstate(event, 0, 0);
 			break;
 		};
 	};
@@ -330,7 +260,7 @@ oScrollbar = function() {
 	};
 
 	this._isHoverArea = function(x, y) {
-		return (x >= this.x && x <= this.x + this.w && y >= this.areay && y <= this.areay + this.areah);
+		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
 	};
 
 	this._isHoverCursor = function(x, y) {
@@ -341,7 +271,6 @@ oScrollbar = function() {
 		this.isHover = this._isHover(x, y);
 		this.isHoverArea = this._isHoverArea(x, y);
 		this.isHoverCursor = this._isHoverCursor(x, y);
-		this.isHoverButtons = this.isHover && !this.isHoverCursor && !this.isHoverArea;
 		this.isHoverEmptyArea = this.isHoverArea && !this.isHoverCursor;
 
 		var scroll_step = ppt.rowHeight;
@@ -354,52 +283,6 @@ oScrollbar = function() {
 				this.cursorCheck(event, x, y);
 			}
 			else {
-				// buttons events
-				var bt_state = ButtonStates.normal;
-				for (var i = 1; i < 3; i++) {
-					switch (i) {
-					case 1:
-						// up button
-						bt_state = this.buttons[i].checkstate(event, x, y);
-						if ((event == "down" && bt_state == ButtonStates.down) || (event == "dblclk" && bt_state == ButtonStates.hover)) {
-							this.buttonClick = true;
-							scroll = scroll - scroll_step;
-							scroll = check_scroll(scroll);
-							if (!cScrollBar.timerID) {
-								cScrollBar.timerID = window.SetInterval(function() {
-									if (cScrollBar.timerCounter > 6) {
-										scroll = scroll - scroll_step;
-										scroll = check_scroll(scroll);
-									}
-									else {
-										cScrollBar.timerCounter++;
-									};
-								}, 80);
-							};
-						};
-						break;
-					case 2:
-						// down button
-						bt_state = this.buttons[i].checkstate(event, x, y);
-						if ((event == "down" && bt_state == ButtonStates.down) || (event == "dblclk" && bt_state == ButtonStates.hover)) {
-							this.buttonClick = true;
-							scroll = scroll + scroll_step;
-							scroll = check_scroll(scroll);
-							if (!cScrollBar.timerID) {
-								cScrollBar.timerID = window.SetInterval(function() {
-									if (cScrollBar.timerCounter > 6) {
-										scroll = scroll + scroll_step;
-										scroll = check_scroll(scroll);
-									}
-									else {
-										cScrollBar.timerCounter++;
-									};
-								}, 80);
-							};
-						};
-						break;
-					};
-				};
 				if (!this.buttonClick && this.isHoverEmptyArea) {
 					// check click on empty area scrollbar
 					if (y < this.cursory) {
@@ -448,16 +331,10 @@ oScrollbar = function() {
 			cScrollBar.timerCounter = -1;
 
 			this.cursorCheck(event, x, y);
-			for (var i = 1; i < 3; i++) {
-				this.buttons[i].checkstate(event, x, y);
-			};
 			this.buttonClick = false;
 			break;
 		case "move":
 			this.cursorCheck(event, x, y);
-			for (var i = 1; i < 3; i++) {
-				this.buttons[i].checkstate(event, x, y);
-			};
 			break;
 		case "wheel":
 			if (!this.buttonClick) {
@@ -466,9 +343,6 @@ oScrollbar = function() {
 			break;
 		case "leave":
 			this.cursorCheck(event, 0, 0);
-			for (var i = 1; i < 3; i++) {
-				this.buttons[i].checkstate(event, 0, 0);
-			};
 			break;
 		};
 	};

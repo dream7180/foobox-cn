@@ -1,5 +1,9 @@
 ﻿'use strict';
 
+try{
+	window.DrawMode = Number(utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\common", 0).split(",")[0]);
+}catch(e){}
+
 if (typeof my_utils === 'undefined') include('utils.js');
 
 const loadAsync = false; // window.GetProperty('Load Biography Asynchronously', true); // changed to false: issue on loading fth with many panels

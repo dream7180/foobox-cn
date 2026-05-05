@@ -33,61 +33,43 @@ searchbox = function() {
 
 	this.getImages = function() {
 		var gb;
-		var x2 = 2 * zdpi, x4 = 4 * zdpi, x5 = 5 * zdpi, x11 = 11 * zdpi, x12 = 12 * zdpi, 
-			x14 = z(14), x17 = 17 * zdpi, x18 = z(18);
+		var x14 = z(14), x17 = 17 * zdpi, x18 = z(18);
 
 		this.images.resetIcon_off = gdi.CreateImage(x18, x18);
 		gb = this.images.resetIcon_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(x5, x5, x12, x12, 1, g_color_normal_txt);
-		gb.DrawLine(x5, x12, x12, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEB99", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.images.resetIcon_off.ReleaseGraphics(gb);
 
 		this.images.resetIcon_ov = gdi.CreateImage(x18, x18);
 		gb = this.images.resetIcon_ov.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(0, 0, x17, x17, g_color_bt_overlay);
-		gb.DrawLine(x5, x5, x12, x12, 1, g_color_normal_txt);
-		gb.DrawLine(x5, x12, x12, x5, 1, g_color_normal_txt);
 		gb.SetSmoothingMode(0);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEB99", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.images.resetIcon_ov.ReleaseGraphics(gb);
 
 		this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_ov);
 
 		this.images.source_switch = gdi.CreateImage(z(20), x18);
-		gb = this.images.source_switch.GetGraphics();
+		gb = this.images.source_switch.GetGraphics();;
 		this.images.source_switch.ReleaseGraphics(gb);
 		
 		this.images.source_pl = gdi.CreateImage(x14, x14);
 		gb = this.images.source_pl.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(x2, x2, x2, x2, 1, g_color_normal_txt);
-		gb.DrawEllipse(x2, 6*zdpi, x2, x2, 1, g_color_normal_txt);
-		gb.DrawEllipse(x2, 10*zdpi, x2, x2, 1, g_color_normal_txt);
-		
-		gb.SetSmoothingMode(0);
-		gb.DrawLine(6*zdpi, 3*zdpi, x12, 3*zdpi, 1, g_color_normal_txt);
-		gb.DrawLine(6*zdpi, 7*zdpi, x12, 7*zdpi, 1, g_color_normal_txt);
-		gb.DrawLine(6*zdpi, x11, x12, x11, 1, g_color_normal_txt);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEEBA", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.images.source_pl.ReleaseGraphics(gb);
-		
-		var img_arc = gdi.CreateImage(x14, x14);
-		gb = img_arc.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(0, -3*zdpi, x11, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
-		img_arc.ReleaseGraphics(gb);
 		
 		this.images.source_lib = gdi.CreateImage(x14, x14);
 		gb = this.images.source_lib.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(0, x2, x11, x5, 1, g_color_normal_txt);
-		gb.DrawImage(img_arc, 0, z(8), x14, z(8), 0, 0, x14, z(8), 0, 255);
-		gb.DrawImage(img_arc, 0, z(11), x14, z(8), 0, 0, x14, z(8), 0, 255);
-		gb.DrawLine(0, x4, 0, x11, 1, g_color_normal_txt);
-		gb.DrawLine(x11, x4, x11, x11, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEC16", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.images.source_lib.ReleaseGraphics(gb);
 		this.src_btn = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, "");	
 	}
@@ -121,7 +103,7 @@ searchbox = function() {
 			var src_img = this.images.source_lib;
 		}
 		if ((this.inputbox.text.length > 0 || ppts.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, Math.round(this.x + this.inputbox.w + 22 * zdpi), Math.round(this.y + zdpi), 255);
-		gr.DrawImage(src_img, this.x + 5, Math.round(this.y + 3 * zdpi), src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
+		gr.DrawImage(src_img, this.x + 2, Math.round(this.y + 3 * zdpi), src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
 	}
 
 	this.historylist = Array();

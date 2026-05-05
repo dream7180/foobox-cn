@@ -11,9 +11,8 @@ var dark_mode = 0;
 //}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var CACHE_FOLDER = fb.ProfilePath + "foobox\\covercache";
-var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
-var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
-var g_fname, g_fsize, g_fstyle;
+var sys_scrollbar = Number(commoncfg.split(",")[3]);
+var g_fsize;
 var avoid_checkscroll = false;
 var pidx = -1; //libview playlist index
 var boxText_len = 0;
@@ -331,11 +330,10 @@ oSwitchbar = function() {
 		gr.FillSolidRect((ppt.tagMode - 1) * _linex, ppt.headerBarHeight, _linex, 1, g_color_normal_bg);
 		gr.FillSolidRect((ppt.tagMode - 1) * _linex - 1, 0, 1, ppt.headerBarHeight, g_color_line);
 		gr.FillSolidRect(ppt.tagMode * _linex, 0, 1, ppt.headerBarHeight, g_color_line);
-		var sw_img_y = Math.ceil((ppt.headerBarHeight - images.album.Height)/2);
-		gr.DrawImage(images.album, z(11), sw_img_y, images.album.Width, images.album.Height, 0, 0, images.album.Width, images.album.Height,0,255);
-		gr.DrawImage(images.artist, z(50), sw_img_y, images.artist.Width, images.artist.Height, 0, 0, images.artist.Width, images.artist.Height,0,255);
-		gr.DrawImage(images.folder, z(90) - 1, sw_img_y, images.folder.Width, images.folder.Height, 0, 0, images.folder.Width, images.folder.Height,0,255);
-		gr.DrawImage(images.genre, z(130) - 1, sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
+		gr.GdiDrawText("\uEA1F", g_fnico2, g_color_normal_txt, 0, 0, _linex, ppt.headerBarHeight, cc_txt);
+		gr.GdiDrawText("\uF256", g_fnico2, g_color_normal_txt, 0, 0, _linex*3, ppt.headerBarHeight, cc_txt);
+		gr.GdiDrawText("\uED52", g_fnico2, g_color_normal_txt, 0, 0, _linex*5, ppt.headerBarHeight, cc_txt);
+		gr.GdiDrawText("\uEF83", g_fnico2, g_color_normal_txt, 0, 0, _linex*7, ppt.headerBarHeight, cc_txt);
 	}
 }
 
@@ -2078,8 +2076,7 @@ var filter_text = "";
 // fonts
 var g_font = null, g_font_b = null, g_font_s = null, g_font_bb = null;
 //
-var ww = 0,
-	wh = 0;
+var ww = 0, wh = 0;
 clipboard = {
 	selection: null
 };
@@ -2174,12 +2171,7 @@ on_init();
 function on_size() {
 	ww = window.Width;
 	wh = window.Height;
-
-	if (!ww || !wh) {
-		ww = ppt.default_lineHeightMin;
-		wh = ppt.default_lineHeightMin;
-	};
-
+	if (!ww || !wh) return;
 	window.MinWidth = ppt.default_lineHeightMin;
 	window.MinHeight = ppt.default_lineHeightMin;
 	// set Size of browser
@@ -2473,7 +2465,7 @@ function get_images_static() {
 function get_images() {
 	var gb;
 	var txt = "";
-	var x5 = 5*zdpi, _x10 = 10*zdpi, _x14 = 14*zdpi;
+	var x5 = 5*zdpi, _x10 = 10*zdpi;
 	
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
@@ -2488,45 +2480,6 @@ function get_images() {
 	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,_x10, x5,x5, g_btn_color1);
 	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	images.sw_btn_n1.ReleaseGraphics(gb);
-	
-	let nw = Math.round(16*zdpi);
-	let nh = Math.round(15*zdpi);
-	images.album = gdi.CreateImage(nw, nw);
-	gb = images.album.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(zdpi,zdpi, _x14,_x14, 1, g_color_normal_txt);
-	gb.DrawEllipse(6*zdpi,6*zdpi, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0);
-	images.album.ReleaseGraphics(gb);
-	
-	images.artist = gdi.CreateImage(nw, nh);
-	gb = images.artist.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(4*zdpi,zdpi, 8*zdpi,8*zdpi, 1, g_color_normal_txt);
-	gb.DrawEllipse(zdpi,9*zdpi, _x14,_x14, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0);
-	images.artist.ReleaseGraphics(gb);
-	
-	images.genre = gdi.CreateImage(nw, nh);
-	gb = images.genre.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(zdpi,_x10, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
-	gb.DrawEllipse(_x10,_x10, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(Math.round(x5),12*zdpi, Math.round(x5),2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(_x14),12*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(x5),2*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(x5),x5, Math.round(_x14),x5, 1, g_color_normal_txt);
-	images.genre.ReleaseGraphics(gb);
-	
-	images.folder = gdi.CreateImage(nw, nh);
-	gb = images.folder.GetGraphics();
-	gb.SetSmoothingMode(0);
-	var pointArr = Array(zdpi,zdpi, 6*zdpi,zdpi, 8*zdpi,3*zdpi, _x14,3*zdpi, _x14,_x14, zdpi,_x14);
-	gb.DrawPolygon(g_color_normal_txt, 1, pointArr);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(zdpi,z(6), _x14,z(6), 1, g_color_normal_txt);
-	images.folder.ReleaseGraphics(gb);
 }
 
 function get_images_loading() {
@@ -2546,15 +2499,16 @@ function get_images_loading() {
 
 function get_font() {
 	g_font = window.GetFontDUI(FontTypeDUI.playlists);
-	g_fname = g_font.Name;
+	let g_fname = g_font.Name;
 	g_fsize = g_font.Size;
-	g_fstyle = g_font.Style;
 	zdpi = g_fsize / 12;
 	g_font_b = GdiFont(g_fname, g_fsize, 1);
 	g_font_s = GdiFont(g_fname, g_fsize - 1, 0);
 	g_font_bb = GdiFont(g_fname, g_fsize + 1, 1);
 	g_font_lock = GdiFont(g_fname, g_fsize*2, 1);
 	cList.incsearch_font = GdiFont(g_fname, g_fsize + 10, 1);
+	g_fnico1 = GdiFont("remixicon", g_font.Size+4, 0);
+	g_fnico2 = GdiFont("remixicon", z(17), 0);
 };
 
 function get_colors() {
@@ -2564,7 +2518,7 @@ function get_colors() {
 	c_default_hl =  window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_normal_bg = g_color_normal_bg_default;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
-	g_btn_color1 = g_color_normal_txt & 0x35ffffff;
+	g_btn_color1 = g_color_normal_txt & 0x45ffffff;
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_color_highlight = c_default_hl;
 	g_color_selected_bg = g_color_selected_bg_default;
@@ -3066,21 +3020,12 @@ function on_notify_data(name, info) {
 		break;
 	case "scrollbar_width":
 		sys_scrollbar = info;
-		window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
 		cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
 		cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 		get_metrics();
 		brw.scrollbar.updateScrollbar();
 		brw.scrollbar.setSize();
 		brw.repaint();
-		break;
-	case "alb_ignoring_art":
-		albcov_lt = info;
-		window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
-		get_tagprop();
-		if(ppt.tagMode == 1){
-			brw.populate();
-		}
 		break;
 	case "set_cache_size":
 		ppt.cache_size = info;
@@ -3156,15 +3101,9 @@ function get_tagprop(){
 		if(ppt.albumMode == 0){
 			ppt.tf_groupkey = fb.TitleFormat("%album artist% ^^ %album% ## %title%");
 			ppt.TFsorting = "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
-			if(albcov_lt){
-				ppt.cache_subdir = "\\album\\";
-				ppt.tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
-				crcidx = 1;
-			}else{
-				ppt.cache_subdir = "\\artist_album\\";
-				ppt.tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
-				crcidx = 0;
-			}
+			ppt.cache_subdir = "\\artist_album\\";
+			ppt.tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+			crcidx = 0;
 		} else {
 			ppt.cache_subdir = "\\album\\";
 			ppt.TFsorting = "%album% | %discnumber% | %tracknumber% | %title%";

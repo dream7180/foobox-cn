@@ -64,7 +64,6 @@ oColumn = function() {
 };
 
 oHeaderBar = function() {
-	//this.visible = true;
 	this.columns = [];
 	this.borders = [];
 	this.totalColumns = 0;
@@ -83,28 +82,25 @@ oHeaderBar = function() {
 	this.clickX = 0;
 	
 	this.setButtons = function() {
-		var menu_ico = g_color_normal_txt&0x88ffffff;
 		var btn_h = cHeaderBar.height;
-		var add_h = Math.round(3*zdpi);
-		var y_ini = Math.round((btn_h-add_h*2)/2);
-		var x_ini =  cScrollBar.width / 4;
+		var fn_ico = GdiFont("remixicon", g_fsize, 1);
 
 		this.menu_btn = gdi.CreateImage(cScrollBar.width, btn_h);
 		var gb = this.menu_btn.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, menu_ico);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, menu_ico);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, menu_ico);	
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEF76", fn_ico, g_color_normal_txt, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.menu_btn.ReleaseGraphics(gb);
 
 		this.menu_btn_ov = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.menu_btn_ov.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_normal_txt & 0x35ffffff);
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(x_ini, y_ini, x_ini*3, y_ini, 1, g_color_normal_txt);
-		gb.DrawLine(x_ini, y_ini+add_h, x_ini*3, y_ini+add_h, 1, g_color_normal_txt);
-		gb.DrawLine(x_ini, y_ini+add_h*2, x_ini*3, y_ini+add_h*2, 1, g_color_normal_txt);	
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("\uEF76", fn_ico, g_color_normal_txt, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
+		gb.SetTextRenderingHint(0);
 		this.menu_btn_ov.ReleaseGraphics(gb);
 
 		this.button = new button(this.menu_btn, this.menu_btn_ov, this.menu_btn_ov, "");
@@ -315,7 +311,7 @@ oHeaderBar = function() {
 				}
 			layout.columnWidth.push(tmp);
 			}
-			save_config("columnWidth");
+			save_layout();
 		}
 		this.initColumns();
 	};
@@ -328,7 +324,7 @@ oHeaderBar = function() {
 				tmp = tmp + "^^";
 		}
 		layout.columnWidth[layout.index] = tmp;
-		save_config("columnWidth");
+		save_layout();
 	}
 
 	this.initColumns = function() {
@@ -400,7 +396,7 @@ oHeaderBar = function() {
 					break;
 				case 6:
 					layout.columnWidth[0] = tmp;
-					utils.WriteTextFile(config_dir + "layout_columnWidth", tmp);
+					save_layout();
 					break;
 				};
 			};
@@ -456,7 +452,7 @@ oHeaderBar = function() {
 							layout.columnWidth[j] = tmp;
 						}
 						layout.columnWidth[layout.ids.length - 1] = tmp;
-						utils.WriteTextFile(config_dir + "layout_columnWidth", tmp2);
+						save_layout();
 					}
 					break;
 				};
@@ -570,7 +566,7 @@ oHeaderBar = function() {
 									};
 								};
 								layout.columnWidth[layout.index] = tmp;
-								save_config("columnWidth");
+								save_layout();
 								// update border object status
 								this.borders[i].on_mouse(event, x, y);
 								this.repaint();
@@ -707,7 +703,6 @@ oHeaderBar = function() {
 		var _this = window.CreatePopupMenu();
 		var _groups = window.CreatePopupMenu();
 		var _sorting = window.CreatePopupMenu();
-		//var _cover = window.CreatePopupMenu();
 		var _patterns = window.CreatePopupMenu();
 		var _collapsed_height = window.CreatePopupMenu();
 		var _expanded_height = window.CreatePopupMenu();
@@ -724,7 +719,6 @@ oHeaderBar = function() {
 		if (layout.index != 0) _thislayout = "此布局: ";
 		if(layout.uid == "默认布局") {
 			_menu.AppendMenuItem(MF_STRING, 15, "为此播放列表创建新布局");
-			//_menu.AppendMenuSeparator();
 		}
 		_menu.AppendMenuItem(MF_STRING, 18, _thislayout + "启用分组");
 		_menu.CheckMenuItem(18, layout.showgroupheaders);
@@ -801,10 +795,7 @@ oHeaderBar = function() {
 			layout.config.push(layout.config[layout.index]);
 			layout.columnWidth.push(layout.columnWidth[layout.index]);
 			layout.index = layout.ids.length - 1;
-			save_config("ids");
 			this.saveColumnsWidth();
-			save_config("config");
-			reinit_config();
 			if(setting_init && p.settings.page_loaded[4]){
 				var arr = [];
 				fin = layout.ids.length;
@@ -830,7 +821,7 @@ oHeaderBar = function() {
 			layout.pattern_idx = idx - groupByMenuIdx;
 			layout.config[layout.index][0] = layout.pattern_idx.toString();
 			layout.gopts[0] = layout.pattern_idx.toString();
-			save_config("config");
+			save_layout();
 			get_covercahe_config();
 			plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[layout.pattern_idx].sortOrder, 1);
 			p.list.updateHandleList(plman.ActivePlaylist, false);
@@ -855,7 +846,7 @@ oHeaderBar = function() {
 			else layout.enableExtraLine = 1;
 			layout.config[layout.index][7] = layout.enableExtraLine.toString();
 			layout.gopts[7] = layout.enableExtraLine.toString();
-			save_config("config");
+			save_layout();
 			resize_panels();
 			p.list.updateHandleList(plman.ActivePlaylist, false, true);
 			p.list.setItems(2);

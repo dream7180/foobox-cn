@@ -1,4 +1,11 @@
 ﻿//common script
+var commoncfg = "0,33,3,0,1,1,0,5,4,0";
+var cfgexist = 1;
+try{
+	commoncfg = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\common", 0);
+}catch(e){cfgexist = 0;}
+window.DrawMode = Number(commoncfg.split(",")[0]);
+
 function RGBA(r, g, b, a) {
 	return ((a << 24) | (r << 16) | (g << 8) | (b));
 }

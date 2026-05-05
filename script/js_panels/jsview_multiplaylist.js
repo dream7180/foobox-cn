@@ -4,8 +4,8 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\uicomposite.js');
-
-var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
+commoncfg = commoncfg.split(",");
+var sys_scrollbar = Number(commoncfg[3]);
 var zdpi = 1, dark_mode = 0;
 var g_font, g_font_b, g_font_track;
 var g_color_line, g_color_line_div, g_color_playing_txt = c_white;
@@ -36,7 +36,7 @@ var g_start_ = 0,
 	g_end_ = 0;
 
 var pidx = -1;
-var playing_ico, btn_sw;
+var btn_sw;
 var btn_clicked = false;
 var btn_w = 22, btn_h = 22;
 
@@ -44,15 +44,17 @@ var g_delay_refresh_items = false;
 var Queue_timer = false;
 
 ppt = {
-	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
+	defaultRowHeight: Number(commoncfg[1]),
 	rowHeight: 0,
-	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
+	rowScrollStep: Number(commoncfg[2]),
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
+commoncfg.length = 0;
+var rowScrollStep_org = ppt.rowScrollStep;
 
 cTouch = {
 	down: false,
@@ -144,8 +146,8 @@ oBrowser = function(name) {
 		this.show_tracknum = false;
 		this.getlimits();
 		this.name = plman.GetPlaylistName(pidx);
-		if(pidx > -1 && plman.IsAutoPlaylist(pidx)) this.tag = "\uF023";
-		else this.tag = "\uF0CA";
+		if(pidx > -1 && plman.IsAutoPlaylist(pidx)) this.tag = "\uEECD";
+		else this.tag = "\uECEC";
 	};
 
 	this.getlimits = function() {
@@ -230,7 +232,7 @@ oBrowser = function(name) {
 							var name_color = g_color_playing_txt;
 							track_color = g_color_playing_txt;
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
-							gr.DrawImage(playing_ico, ax + this.paddingLeft/2, Math.round(ay + (ppt.rowHeight - playing_ico.Height) / 2), playing_ico.Width, playing_ico.Height, 0, 0, playing_ico.Width, playing_ico.Height, 0, 255);
+							gr.GdiDrawText("\uF507", g_font_tag, c_white, ax + this.paddingLeft, ay, rh, ah, lc_txt);
 						} else {
 							var font = g_font;
 							var name_color = g_color_normal_txt;
@@ -527,12 +529,9 @@ on_init();
 function on_size() {
 	ww = window.Width;
 	wh = window.Height;
-	if (!ww || !wh) {
-		ww = 1;
-		wh = 1;
-	};
-	window.MinWidth = 1;
-	window.MinHeight = 1;
+	if (!ww || !wh) return;
+	window.MinWidth = ppt.headerBarHeight;
+	window.MinHeight = ppt.headerBarHeight;
 	brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 	brw.repaint();
 };
@@ -541,8 +540,8 @@ function on_paint(gr) {
 	if (!ww) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
 	brw && brw.draw(gr);
-	btn_sw.draw(gr, Math.round(ww - btn_w - 3*zdpi), Math.floor((ppt.headerBarHeight - btn_h) / 2), 255);
-	gr.DrawImage(img_plsw, Math.round(ww - btn_w), Math.floor((ppt.headerBarHeight - btn_h) / 2 + img_plsw.Height/4), img_plsw.Width, img_plsw.Height, 0, 0, img_plsw.Width, img_plsw.Height);
+	btn_sw.draw(gr, ww - btn_w - z(3), Math.floor((ppt.headerBarHeight - btn_h - z(2)) / 2), 255);
+	gr.GdiDrawText("\uEF3E", g_font_tag, g_color_normal_txt, btn_sw.x, btn_sw.y, btn_sw.w, btn_sw.h, cc_txt);
 };
 
 function on_mouse_lbtn_down(x, y) {
@@ -626,7 +625,7 @@ function on_mouse_lbtn_up(x, y) {
 		};
 	};
 	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		if(plman.PlaylistCount < 901) PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		if(plman.PlaylistCount < 901) PL_Menu(ww-btn_w-4*zdpi, btn_h+4*zdpi);
 		else fb.RunMainMenuCommand("视图/播放列表管理器");
 		btn_sw.state = ButtonStates.normal;
 		btn_sw.repaint();
@@ -679,12 +678,7 @@ function on_mouse_wheel(step) {
 		cTouch.timer = false;
 	};
     if(brw.rowsCount == 0) return;
-	var g_start_y = brw.rows[g_start_].y;
-	if(g_start_ && g_start_y) {
-		var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
-		scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
-	}
-	else scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
+	scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
 	scroll = check_scroll(scroll);
 };
 
@@ -710,7 +704,7 @@ function get_metrics() {
 
 function get_images() {
 	var gb;
-	var add_h = z(4), bt_h = z(24), _x2 = 2*zdpi, x2 = Math.floor(_x2), _x12 = 12*zdpi;
+	var bt_h = z(24);
 	btn_w = z(22);
 	btn_h = z(22);
 	
@@ -721,24 +715,8 @@ function get_images() {
 	img_menubt_ov = gdi.CreateImage(bt_h, bt_h);
 	gb = img_menubt_ov.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(zdpi, zdpi, z(20)-1, z(20)-1, z(3), z(3), g_color_bt_overlay);
+	gb.FillRoundRect(0, 0, bt_h-1, bt_h-1, z(3), z(3), g_color_bt_overlay);
 	img_menubt_ov.ReleaseGraphics(gb);
-	
-	img_plsw = gdi.CreateImage(z(14), add_h*3+3);
-	gb = img_plsw.GetGraphics();
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(Math.ceil(_x2), x2+1, Math.ceil(_x12), x2+1, 1, g_color_normal_txt);
-	gb.DrawLine(Math.ceil(_x2), x2+add_h+1, Math.ceil(_x12), x2+add_h+1, 1, g_color_normal_txt);
-	gb.DrawLine(Math.ceil(_x2), x2+add_h*2+1, Math.ceil(_x12), x2+add_h*2+1, 1, g_color_normal_txt);	
-	img_plsw.ReleaseGraphics(gb)
-	
-	playing_ico = gdi.CreateImage(z(16), z(14));
-	gb = playing_ico.GetGraphics();
-	gb.SetSmoothingMode(2);
-	var ponit_arr = new Array(3 * zdpi, _x2, 3 * zdpi, _x12, 13 * zdpi, 7 * zdpi);
-	gb.FillPolygon(c_white, 0, ponit_arr);
-	gb.SetSmoothingMode(0);
-	playing_ico.ReleaseGraphics(gb);
 };
 
 function get_font() {
@@ -748,7 +726,7 @@ function get_font() {
 	g_font_b = GdiFont(g_font.Name, g_font.Size, 1);
 	g_track_size = Math.max(10, g_font.Size - 2);
 	g_font_track = GdiFont(g_font.Name, g_track_size, g_font.Style);
-	g_font_tag = GdiFont("FontAwesome", g_fsize+2, 0);
+	g_font_tag = GdiFont("remixicon", g_fsize+2, 0);
 };
 
 function get_colors() {
@@ -872,6 +850,13 @@ function on_key_down(vkey) {
 		}
 	} else if (mask == KMask.alt) {
 		if(vkey == 115) fb.RunMainMenuCommand("文件/退出");
+	} else if (mask == KMask.ctrl) {
+		if(vkey == 49){
+			if(rowScrollStep_org != 1){
+				if(ppt.rowScrollStep != 1) ppt.rowScrollStep = 1;
+				else ppt.rowScrollStep = rowScrollStep_org;
+			}
+		}
 	}
 };
 
@@ -981,7 +966,6 @@ function on_notify_data(name, info) {
 		break;
 	case "scrollbar_width":
 		sys_scrollbar = info;
-		window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
 		cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
 		cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 		get_metrics();
@@ -992,11 +976,9 @@ function on_notify_data(name, info) {
 		break;
 	case "ScrollStep":
 		ppt.rowScrollStep = info;
-		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
 		break;
 	case "row_height_changed":
 		ppt.defaultRowHeight = info;
-		window.SetProperty("_PROPERTY: Row Height", ppt.defaultRowHeight),
 		get_metrics();
 		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 		brw.repaint();

@@ -53,7 +53,7 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 				tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
 				break;
 			case 1:
-				tf_crc = albcov_lt ? fb.TitleFormat("$crc32('alb'%album%)") : fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+				tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
 				break;
 			case 2:
 				tf_crc = fb.TitleFormat("$crc32('art'%album artist%)");
@@ -183,10 +183,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							if (this.track_index == p.list.nowplaying.PlaylistItemIndex) {
 								gr.SetTextRenderingHint(0);
 								if (g_seconds / 2 == Math.floor(g_seconds / 2)) {
-									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, 0, imgw, imgh, 0, 100);
 								}
 								else {
-									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, imgh, imgw, imgh, 0, 255);
+									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
 								};
 							}
 							else {
@@ -194,7 +194,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
 									if (this.queue_idx > 0) {
 										gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-										gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+										gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 									}
 									else {
 										gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
@@ -203,7 +203,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								else { // if not selected
 									gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
 									if (this.queue_idx > 0) {
-										gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+										gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 									};
 								};
 							};
@@ -213,7 +213,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
 								if (this.queue_idx > 0) {
 									gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-									gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+									gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 								}
 								else {
 									gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
@@ -222,7 +222,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							else { // if not selected
 								gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
 								if (this.queue_idx > 0) {
-									gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+									gr.DrawString(num(this.queue_idx, 2), g_font_b, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 								};
 							};
 						};
@@ -232,7 +232,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
 							if (this.queue_idx > 0) {
 								gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-								gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+								gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 							}
 							else {
 								gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
@@ -241,7 +241,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						else { // if not selected
 							gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
 							if (this.queue_idx > 0) {
-								gr.DrawString(num(this.queue_idx, 2), g_font_queue_idx, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
+								gr.DrawString(num(this.queue_idx, 2), g_font_b, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
 							};
 						};
 					};
@@ -1940,7 +1940,7 @@ oList = function(object_name, playlist) {
 		};
 
 		// set variables used in Items object (optimization)
-		this.state_queue_w = Math.round(gr.CalcTextWidth("00", g_font_queue_idx) + 1);
+		this.state_queue_w = Math.round(gr.CalcTextWidth("00", g_font_b) + 1);
 		this.state_icon_w = this.state_queue_w + g_z6;
 
 		// Draw items (tracks and group headers)
@@ -2235,6 +2235,8 @@ oList = function(object_name, playlist) {
 		var _child01 = window.CreatePopupMenu();
 		var _child02 = window.CreatePopupMenu();
 		var _child03 = window.CreatePopupMenu();
+		var _child04 = window.CreatePopupMenu();
+		var _apps = [];
 
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(this.playlist);
 		Context.InitContext(this.metadblist_selection);
@@ -2252,12 +2254,19 @@ oList = function(object_name, playlist) {
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 3, -1);
 		if(track_edit_app != ""){
-			if(utils.FileExists(track_edit_app) && (g_track_type < 2)){
-				_menu.AppendMenuSeparator();
-				var idx1 = track_edit_app.lastIndexOf(".");
-				var idx2 = track_edit_app.lastIndexOf("\\");
-				var app_txt = track_edit_app.substr(idx2+1, idx1-idx2-1);
-				_menu.AppendMenuItem(MF_STRING, 1012, "用 "+app_txt+" 编辑");
+			if(g_track_type < 2){
+				_apps = track_edit_app.split("; ");
+				if(_apps.length == 1){
+					_menu.AppendMenuSeparator();
+					let arr = utils.SplitFilePath(track_edit_app);
+					_menu.AppendMenuItem(MF_STRING, 1012, "用 "+arr[1]+" 打开");
+				} else {
+					_child04.AppendTo(_menu, MF_STRING, "用外部程序打开...");
+					for (var i = 0; i < _apps.length; i++) {
+						let arr = utils.SplitFilePath(_apps[i]);
+						_child04.AppendMenuItem(MF_STRING, 1012 + i, arr[1]);
+					}
+				}
 			}
 		}
 		if(properties.selectionmenu){
@@ -2305,14 +2314,16 @@ oList = function(object_name, playlist) {
 			case (ret == 1011):
 				plman.RemovePlaylistSelection(this.playlist, false);
 				break;
-			case (ret == 1012):
+			case (ret > 1011 && ret < 1111):
 				var WshShell = new ActiveXObject("WScript.Shell");
 				if (g_track_type > -1) {
 					var obj_file = fb.TitleFormat("%path%").EvalWithMetadb(fb.GetFocusItem());
-					WshShell.Run("\"" + track_edit_app + "\" " + "\"" + obj_file + "\"", 5);
+					try{WshShell.Run("\"" + _apps[ret - 1012] + "\" " + "\"" + obj_file + "\"", 5);}
+					catch(e){fb.ShowPopupMessage("找不到该应用程序.", "出错信息");}
 				} else{
 					var obj_file = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
-					WshShell.Run("\"" + track_edit_app + "\" " + "\"" + obj_file + "\"", 5);
+					try{WshShell.Run("\"" + _apps[ret - 1012] + "\" " + "\"" + obj_file + "\"", 5);}
+					catch(e){fb.ShowPopupMessage("找不到该应用程序.", "出错信息");}
 				}
 				break;
 			case (ret == 4000):

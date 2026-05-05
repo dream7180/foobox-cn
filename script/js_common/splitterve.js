@@ -3,7 +3,7 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 var PUpper = window.GetPanel('infoart');
 var PLower = window.GetPanel('ESLProp');
 window.DlgCode = DLGC_WANTALLKEYS;
-let ww = 0, wh = 0;
+let ww = 0, wh = 0, minh = 50;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
 var upperratio = 0;
@@ -13,8 +13,10 @@ var splitter_hover = false;
 PUpper.ShowCaption = PLower.ShowCaption = false;
 var c_default_hl = 0, g_color_highlight = 0;
 var eslCtrl = null, eslPanels = null;
-var sw_eslcolor = window.GetProperty("ESLyric.hightlight.follow.cover", true);
-var cbkg_bycover = window.GetProperty("foobox.background.color.by.cover", true);
+commoncfg = commoncfg.split(",");
+var sw_noesl = Number(commoncfg[6]);
+var cbkg_bycover = Number(commoncfg[5]);
+commoncfg.length = 0;
 var initial_load = true;
 
 if(fb.TitleFormat("%esl_expose_api%").Eval(true) === '1'){
@@ -47,17 +49,21 @@ get_colors();
 function on_size() {
     ww = window.Width;
 	wh = window.Height;
-	if(upperratio && wh) {
-		var uh_calc = Math.round((wh-2)*upperratio);
-		PUpper.Move(0, 0, ww, uh_calc);
-		PLower.Move(0, uh_calc + 2, ww, wh - uh_calc - 2);
-	} else{
-		PUpper.Move(0, 0, ww, PUpper.Height);
-		PLower.Move(0, PUpper.Height + 2, ww, wh - PUpper.Height - 2);
-	}
-	if(wh) upperratio = PUpper.Height/(wh-2);
+	if (!ww || !wh) return;
+	window.SetTimeout(function() {
+		if(upperratio) {
+			var uh_calc = Math.round((wh-2)*upperratio);
+			PUpper.Move(0, 0, ww, uh_calc);
+			PLower.Move(0, uh_calc + 2, ww, wh - uh_calc - 2);
+		} else{
+			PUpper.Move(0, 0, ww, PUpper.Height);
+			PLower.Move(0, PUpper.Height + 2, ww, wh - PUpper.Height - 2);
+		}
+		upperratio = PUpper.Height/(wh-2);
+		window.Repaint();
+	}, 50);
 	if(initial_load){
-		reset_esl_color(sw_eslcolor);
+		reset_esl_color(!sw_noesl);
 		initial_load = false;
 	}
 }
@@ -75,7 +81,7 @@ function on_paint(gr) {
 function on_mouse_move(x, y) {
 	if(m_x == x && m_y == y) return;
 	var splitter_tmp = splitter_hover;
-	if(x > 0 && y > 0 && x < ww && y < wh) {
+	if(x > 0 && y > minh && x < ww && y < wh - minh) {
 		window.SetCursor(32645);//IDC_SIZE
 		if(sp_drag){
 			PUpper.Move(0, 0, ww, y);
@@ -135,17 +141,15 @@ function on_notify_data(name, info) {
 				window.Repaint();
 			}
 		}
-		if(eslPanels && sw_eslcolor) eslPanels.SetTextHighlightColor(g_color_highlight);
+		if(eslPanels && !sw_noesl) eslPanels.SetTextHighlightColor(g_color_highlight);
 		break;
 	case "foobox_bgcolor_bycover":
 		cbkg_bycover = info;
-		window.SetProperty("foobox.background.color.by.cover", cbkg_bycover);
 		if(!cbkg_bycover) reset_esl_color(false);
 		break;
 	case "foobox_color_noesl":
-		sw_eslcolor = !info;
-		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
-		if(eslPanels) eslPanels.SetTextHighlightColor(sw_eslcolor ? g_color_highlight : c_default_hl);
+		sw_noesl = info;
+		if(eslPanels) eslPanels.SetTextHighlightColor(sw_noesl ? c_default_hl : g_color_highlight);
 		break;
 	}
 }

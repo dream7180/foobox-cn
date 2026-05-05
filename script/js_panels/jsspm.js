@@ -5,13 +5,19 @@ include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
-
-var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
+commoncfg = commoncfg.split(",");
+var sys_scrollbar =  Number(commoncfg[3]);
 var zdpi = 1, dark_mode = 0;
 var default_sort =  window.GetProperty("_PROPERTY: New playlist sortorder", "%album% | %discnumber% | %tracknumber% | %title%");
 var g_font, g_font_b, g_font_track;
 var g_color_line, g_color_line_div, g_color_playing_txt = c_white;
-
+var plIco = {
+	"媒体库": "\uF0E0",
+	"最近添加": "\uF00F",
+	"历史记录": "\uEB21",
+	"最常播放": "\uEDA1",
+	"喜爱的音轨": "\uF5C7"
+}
 var brw = null;
 var isScrolling = false;
 
@@ -46,9 +52,9 @@ var g_start_ = 0, g_end_ = 0;
 var radiom3u = [], radioname = [], radiolist = fb.ProfilePath + "foobox\\config\\radio.list";
 
 ppt = {
-	defaultRowHeight: window.GetProperty("_PROPERTY: Row Height", 33),
+	defaultRowHeight: Number(commoncfg[1]),
 	rowHeight: 0,
-	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 3),
+	rowScrollStep: Number(commoncfg[2]),
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
@@ -59,6 +65,8 @@ ppt = {
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
+commoncfg.length = 0;
+var rowScrollStep_org = ppt.rowScrollStep;
 
 cPlaylistManager = {
 	drag_clicked: false,
@@ -98,11 +106,6 @@ cSearchBox = {
 cScrollBar = {
 	visible: true,
 	width: 12,
-	ButtonType: {
-		cursor: 0,
-		up: 1,
-		down: 2
-	},
 	minCursorHeight: 25,
 	maxCursorHeight: 110,
 	timerID: false,
@@ -387,6 +390,7 @@ oBrowser = function() {
 				var ay = 0;
 				var aw = this.w + cScrollBar.width;
 				var ah = ppt.rowHeight;
+				var rh = g_font.Size * 2;
 				for (var i = g_start_; i <= g_end_; i++) {
 					ay = Math.floor(this.y + (i * ah) - scroll_);
 					this.rows[i].x = ax;
@@ -438,9 +442,7 @@ oBrowser = function() {
 						// =====
 						// text
 						// =====
-						var playlist_icon = playlistName2icon(this.rows[i].name, this.rows[i].isAutoPlaylist, (fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist));
-						var rh = playlist_icon.Width;
-						gr.DrawImage(playlist_icon, ax + this.paddingLeft, ay + Math.round(ah / 2 - playlist_icon.Height / 2) - 1, playlist_icon.Width, playlist_icon.Height, 0, 0, playlist_icon.Width, playlist_icon.Height, 0, 255);
+						var playlist_icon = playlistName2icon(this.rows[i].name, this.rows[i].isAutoPlaylist);
 						if (fb.IsPlaying && this.rows[i].idx == plman.PlayingPlaylist){
 							var font = g_font_b;
 							var name_color = g_color_playing_txt;
@@ -455,6 +457,7 @@ oBrowser = function() {
 						var track_total = plman.PlaylistItemCount(this.rows[i].idx);
 						var track_total_w = gr.CalcTextWidth(track_total, font);
 						var tx = ax + rh + this.paddingLeft + 4;
+						gr.GdiDrawText(playlist_icon, g_fnico1, name_color, this.paddingLeft, ay, rh, ah, cc_txt);
 						if (this.inputboxID == i) {
 							this.inputbox.draw(gr, tx + 2, ay + 5);
 						}
@@ -470,17 +473,17 @@ oBrowser = function() {
 			gr.FillGradRect(0, 0, 1, ppt.headerBarHeight+1, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 			if(ppt.showFilter){
 				var boxText = this.rows.length.toString();
-				var tw = gr.CalcTextWidth(boxText, g_font_track);
+				var tw = gr.CalcTextWidth(boxText+" ", g_font_track);
 				gr.GdiDrawText(boxText, g_font_track, g_color_normal_txt, this.w - tw, 0, tw, ppt.headerBarHeight + ppt.SearchBarHeight - 1, rc_txt);
 			}
 			gr.DrawLine(0, ppt.SearchBarHeight, ww, ppt.SearchBarHeight, 1, g_color_line_div);
-			var bt_y = (ppt.SearchBarHeight - brw.images.topbar_btn.Height)/2;
-			this.new_menu.draw(gr, Math.round(ww - 2*brw.images.topbar_btn.Width), Math.round(bt_y - zdpi), 255);
-			this.new_bt.draw(gr, Math.round(ww - brw.images.topbar_btn.Width),  Math.round(bt_y - zdpi), 255);
-			gr.DrawImage(images.add_menu, Math.round(ww - 1.5*brw.images.topbar_btn.Width - images.add_menu.Height/2), Math.round((ppt.SearchBarHeight - images.add_menu.Height)/2-2), images.add_menu.Width, images.add_menu.Height, 0, 0, images.add_menu.Width, images.add_menu.Height, 0, 255);
+			var bt_y = Math.round((ppt.SearchBarHeight - brw.images.topbar_btn.Height)/2 - zdpi);
+			this.new_menu.draw(gr, Math.round(ww - 2*brw.images.topbar_btn.Width), bt_y, 255);
+			this.new_bt.draw(gr, Math.round(ww - brw.images.topbar_btn.Width),  bt_y, 255);
+			gr.GdiDrawText("\uEA4D", g_fnico1, g_color_normal_txt, this.new_menu.x, bt_y, this.new_menu.w, this.new_menu.h, cc_txt);
 			gr.FillGradRect(Math.round(ww - brw.images.topbar_btn.Width-1), 0, 1, ppt.SearchBarHeight, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35), 0.5);
 			gr.FillSolidRect(Math.round(ww - brw.images.topbar_btn.Width), 0, 1, ppt.SearchBarHeight - 2, g_color_normal_bg);
-			gr.DrawImage(images.newplaylist_img, Math.round(ww - 0.5*brw.images.topbar_btn.Width - images.newplaylist_img.Height/2), Math.round((ppt.SearchBarHeight - images.newplaylist_img.Height)/2-2), images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 0, images.newplaylist_img.Width, images.newplaylist_img.Height, 0, 255);
+			gr.GdiDrawText("\uEA13", g_fnico1, g_color_normal_txt, this.new_bt.x, bt_y, this.new_bt.w, this.new_bt.h, cc_txt);
 			brw.scrollbar && brw.scrollbar.draw(gr);
 		};
 	};
@@ -1234,7 +1237,6 @@ function on_init() {
 	get_font();
 	get_colors();
 	get_metrics();
-	get_images();
 	g_active_playlist = plman.ActivePlaylist;
 	g_filterbox = new oFilterBox();
 	g_searchbox = new searchbox();
@@ -1262,12 +1264,9 @@ on_init();
 function on_size() {
 	ww = window.Width;
 	wh = window.Height;
-	if (!ww || !wh) {
-		ww = 1;
-		wh = 1;
-	};
-	window.MinWidth = 1;
-	window.MinHeight = 1;
+	if (!ww || !wh) return;
+	window.MinWidth = ppt.SearchBarHeight;
+	window.MinHeight = ppt.SearchBarHeight;
 	cFilterBox.w = Math.floor(ww * 0.6);
 	cSearchBox.w = ww - brw.images.topbar_btn.Width * 2 - cSearchBox.x;
 	// set Size of browser
@@ -1413,12 +1412,13 @@ function on_mouse_wheel(step) {
 		cTouch.timer = false;
 	};
 	if (brw.rowsCount >0) {
-		var g_start_y = brw.rows[g_start_].y;
+		/*var g_start_y = brw.rows[g_start_].y;
 		if(g_start_ && g_start_y) {
 			var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
 			scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
 		}
-		else scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
+		else */
+		scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
 		scroll = check_scroll(scroll);
 	}
 };
@@ -1449,213 +1449,16 @@ function get_metrics() {
 	cSearchBox.y = Math.round((ppt.SearchBarHeight - cSearchBox.h)/2);
 };
 
-function playlistName2icon(name, auto_playlist, playing_playlist) {
-	if (playing_playlist && !dark_mode) {
-		if (auto_playlist){
-			if (name == "媒体库") return images.library_icon_hl;
-			if (name == "最近添加") return images.newly_added_icon_hl;
-			if (name == "历史记录") return images.history_icon_hl;
-			if (name == "最常播放") return images.most_played_icon_hl;
-			if (name == "喜爱的音轨") return images.mood_icon_hl;
-			else return images.icon_auto_pl_hl;
-		}else{
-			if (name.substr(0, 2) == "电台") return images.radios_icon_hl;
-			else if(name.substr(0, 4) == "网络电台") return images.radios_icon_hl;
-			else return images.icon_normal_pl_playing_hl;
-		}
-	} else {
-		if (auto_playlist){
-			if (name == "媒体库") return images.library_icon;
-			if (name == "最近添加") return images.newly_added_icon;
-			if (name == "历史记录") return images.history_icon;
-			if (name == "最常播放") return images.most_played_icon;
-			if (name == "喜爱的音轨") return images.mood_icon;
-			else return images.icon_auto_pl;
-		} else{
-			if (name.substr(0, 2) == "电台") return images.radios_icon;
-			else if(name.substr(0, 4) == "网络电台") return images.radios_icon;
-			else return images.icon_normal_pl;
-		}
+function playlistName2icon(name, auto_playlist) {
+	var ico = "\uEA27";
+	if (auto_playlist){
+		ico = plIco[name];
+		if(!ico) ico = "\uEEBD";
+	}else{
+		if(name == "网络电台") ico = "\uEAF9";
 	}
+	return ico;
 }
-
-function get_images() {
-	var gb, mood_font = GdiFont("Segoe UI", Math.round(g_font.Size*1.5), 0);
-	var imgw = Math.floor(27*zdpi), imgh = Math.floor(25*zdpi);
-	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x5 = 5*zdpi, _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
-			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
-	let x8 = Math.round(_x8), x7 = Math.round(_x7), x14 = Math.round(_x14), x19 = Math.round(_x19);
-	
-	images.newplaylist_img = gdi.CreateImage(_x10, _x10);
-		gb = images.newplaylist_img.GetGraphics();
-		gb.FillSolidRect(1, Math.floor(_x10/2), Math.floor(_x10), 1, g_color_normal_txt);
-		gb.FillSolidRect(Math.floor(_x10/2), 1, 1, Math.floor(_x10), g_color_normal_txt);
-	images.newplaylist_img.ReleaseGraphics(gb);
-		
-	images.add_menu = gdi.CreateImage(x14, x14);
-		gb = this.images.add_menu.GetGraphics();
-		var point_arr = new Array(3*zdpi,Math.floor(_x5),_x11,Math.floor(_x5),_x7,_x10);
-		gb.SetSmoothingMode(2);
-		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
-		gb.SetSmoothingMode(0);
-	images.add_menu.ReleaseGraphics(gb);
-		
-	images.icon_normal_pl = gdi.CreateImage(imgw, imgh);
-	gb = images.icon_normal_pl.GetGraphics();
-	
-	gb.DrawLine(_x8, _x8, _x19, _x8, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3, 17*zdpi, _x8+x3, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*2, _x19, _x8+x3*2, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*3, _x18, _x8+x3*3, 1, g_color_normal_txt);
-	images.icon_normal_pl.ReleaseGraphics(gb);
-
-	images.icon_normal_pl_playing = gdi.CreateImage(imgw, imgh);
-	gb = images.icon_normal_pl_playing.GetGraphics();
-	gb.DrawLine(_x8, _x11, _x8, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x8+x3, _x7, _x8+x3, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x8+x3*2, _x13, _x8+x3*2, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x8+x3*3, _x9, _x8+x3*3, _x18, 1, g_color_normal_txt);
-	images.icon_normal_pl_playing.ReleaseGraphics(gb);
-
-	images.icon_auto_pl = gdi.CreateImage(imgw, imgh);
-	gb = images.icon_auto_pl.GetGraphics();
-	gb.DrawLine(_x8, _x8, _x16, _x8, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*2, _x12, _x8+x3*2, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*3, _x12, _x8+x3*3, 1, g_color_normal_txt);
-	gb.DrawLine(18.3*zdpi, _x9, 18.3*zdpi, 17*zdpi, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(2)
-	gb.DrawEllipse(_x14, _x15, 4*zdpi, 4*zdpi, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0)
-	images.icon_auto_pl.ReleaseGraphics(gb);
-
-	images.history_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.history_icon.GetGraphics();
-	gb.DrawRect(x7, x7, Math.round(_x12), Math.round(_x10), 1, g_color_normal_txt);
-	gb.DrawLine(Math.round(_x10), Math.ceil(_x5), Math.round(_x10), Math.floor(_x9), 1, g_color_normal_txt);
-	gb.DrawLine(x7+Math.round(_x9), Math.ceil(_x5),x7+Math.round(_x9), Math.floor(_x9), 1, g_color_normal_txt);
-	gb.DrawLine(x7, Math.ceil(_x11), x7+Math.round(_x12), Math.ceil(_x11), 1, g_color_normal_txt);
-	images.history_icon.ReleaseGraphics(gb);
-	
-	images.library_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.library_icon.GetGraphics();
-	gb.DrawRect(x8, x7, Math.round(_x12)-1, x2*6, 1, g_color_normal_txt);
-	gb.DrawLine(x8+x2, x7+x2, x14, x7+x2, 1, g_color_normal_txt);gb.DrawLine(_x16, x7+x2, x19-x2, x7+x2, 1, g_color_normal_txt);
-	gb.DrawLine(x8, x7+x2*2, x19, x7+x2*2, 1, g_color_normal_txt);
-	gb.DrawLine(x8+x2, x7+x2*3, x14, x7+x2*3, 1, g_color_normal_txt);gb.DrawLine(_x16, x7+x2*3, x19-x2, x7+x2*3, 1, g_color_normal_txt);
-	gb.DrawLine(x8, x7+x2*4, x19, x7+x2*4, 1, g_color_normal_txt);
-	gb.DrawLine(x8+x2, x7+x2*5, x14, x7+x2*5, 1, g_color_normal_txt);gb.DrawLine(_x16, x7+x2*5, x19-x2, x7+x2*5, 1, g_color_normal_txt);
-	images.library_icon.ReleaseGraphics(gb);
-
-	images.newly_added_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.newly_added_icon.GetGraphics();
-	gb.DrawLine(_x8, _x8, _x19, _x8, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*2, _x13, _x8+x3*2, 1, g_color_normal_txt);
-	gb.DrawLine(_x8, _x8+x3*3, _x13, _x8+x3*3, 1, g_color_normal_txt);
-	gb.DrawLine(_x18, _x13, _x18, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x15, _x15, 20*zdpi, _x15, 1, g_color_normal_txt);
-	images.newly_added_icon.ReleaseGraphics(gb);
-
-	var point_arr2 = new Array(x7, Math.round(_x11), (x7+Math.round(_x18))/2, 6*zdpi, Math.round(_x18), Math.round(_x11), Math.round(_x15), Math.round(_x11), Math.round(_x15), Math.floor(_x18), Math.round(_x10), Math.floor(_x18), Math.round(_x10), Math.round(_x11));
-	images.most_played_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.most_played_icon.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_normal_txt,1,point_arr2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(x7, Math.floor(_x18), Math.round(_x18), Math.floor(_x18), 1, g_color_normal_txt);
-	images.most_played_icon.ReleaseGraphics(gb);
-	
-	images.radios_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.radios_icon.GetGraphics();
-	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_normal_txt);
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_normal_txt);
-	gb.DrawEllipse(_x7, _x5, _x10, _x10, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0);
-	images.radios_icon.ReleaseGraphics(gb);
-	
-	images.mood_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.mood_icon.GetGraphics();
-	gb.SetTextRenderingHint(4);
-	gb.DrawString("♡", mood_font, g_color_normal_txt, 0, 0, imgw, imgh, cc_stringformat);
-	gb.SetTextRenderingHint(0);
-	images.mood_icon.ReleaseGraphics(gb);
-
-	if (dark_mode) return;
-
-	images.icon_normal_pl_playing_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.icon_normal_pl_playing_hl.GetGraphics();
-	gb.DrawLine(_x8, _x11, _x8, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x3, _x7, _x8+x3, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x3*2, _x13, _x8+x3*2, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x3*3, _x9, _x8+x3*3, _x18, 1, g_color_playing_txt);
-	images.icon_normal_pl_playing_hl.ReleaseGraphics(gb);
-
-	images.icon_auto_pl_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.icon_auto_pl_hl.GetGraphics();
-	gb.DrawLine(_x8, _x8, _x16, _x8, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3*2, _x12, _x8+x3*2, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3*3, _x12, _x8+x3*3, 1, g_color_playing_txt);
-	gb.DrawLine(_x18, _x8, _x18, _x14, 1, g_color_playing_txt);
-	gb.SetSmoothingMode(2)
-	gb.DrawEllipse(_x14, _x13, 4*zdpi, 4*zdpi, 1, g_color_playing_txt);
-	gb.SetSmoothingMode(0)
-	images.icon_auto_pl_hl.ReleaseGraphics(gb);
-	
-	images.history_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.history_icon_hl.GetGraphics();
-	gb.DrawRect(x7, x7, Math.round(_x12), Math.round(_x10), 1, g_color_playing_txt);
-	gb.DrawLine(Math.round(_x10), Math.ceil(_x5), Math.round(_x10), Math.floor(_x9), 1, g_color_playing_txt);
-	gb.DrawLine(x7+Math.round(_x9), Math.ceil(_x5),x7+Math.round(_x9), Math.floor(_x9), 1, g_color_playing_txt);
-	gb.DrawLine(x7, Math.ceil(_x11), x7+Math.round(_x12), Math.ceil(_x11), 1, g_color_playing_txt);
-	images.history_icon_hl.ReleaseGraphics(gb);
-
-	images.library_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.library_icon_hl.GetGraphics();
-	gb.DrawRect(_x8, _x7, Math.floor(_x11), x2*6, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x2, _x7+x2, _x14, _x7+x2, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2, _x16+1, _x7+x2, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x7+x2*2, _x19, _x7+x2*2, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x2, _x7+x2*3, _x14, _x7+x2*3, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2*3, _x16+1, _x7+x2*3, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x7+x2*4, _x19, _x7+x2*4, 1, g_color_playing_txt);
-	gb.DrawLine(_x8+x2, _x7+x2*5, _x14, _x7+x2*5, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2*5, _x16+1, _x7+x2*5, 1, g_color_playing_txt);
-	images.library_icon_hl.ReleaseGraphics(gb);
-	
-	images.newly_added_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.newly_added_icon_hl.GetGraphics();
-	gb.DrawLine(_x8, _x8, _x19, _x8, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3*2, _x13, _x8+x3*2, 1, g_color_playing_txt);
-	gb.DrawLine(_x8, _x8+x3*3, _x13, _x8+x3*3, 1, g_color_playing_txt);
-	gb.DrawLine(_x18, _x13, _x18, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x15, _x15, 20*zdpi, _x15, 1, g_color_playing_txt);
-	images.newly_added_icon_hl.ReleaseGraphics(gb);
-
-	images.most_played_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.most_played_icon_hl.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_playing_txt,1,point_arr2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(x7, Math.floor(_x18), Math.round(_x18), Math.floor(_x18), 1, g_color_playing_txt);
-	images.most_played_icon_hl.ReleaseGraphics(gb);
-	
-	images.radios_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.radios_icon_hl.GetGraphics();
-	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_playing_txt);
-	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_playing_txt);
-	gb.DrawEllipse(_x7, _x5, _x10, _x10, 1, g_color_playing_txt);
-	gb.SetSmoothingMode(0);
-	images.radios_icon_hl.ReleaseGraphics(gb);
-	
-	images.mood_icon_hl = gdi.CreateImage(imgw, imgh);
-	gb = images.mood_icon_hl.GetGraphics();
-	gb.SetTextRenderingHint(4);
-	gb.DrawString("♡", mood_font, g_color_playing_txt, 0, 0, imgw, imgh, cc_stringformat);
-	gb.SetTextRenderingHint(0);
-	images.mood_icon_hl.ReleaseGraphics(gb);
-};
 
 function get_font() {
 	g_font = window.GetFontDUI(FontTypeDUI.playlists);
@@ -1663,6 +1466,7 @@ function get_font() {
 	g_font_b = GdiFont(g_font.Name, g_font.Size, 1);
 	g_track_size = Math.max(10, g_font.Size - 2);
 	g_font_track = GdiFont(g_font.Name, g_track_size, g_font.Style);
+	g_fnico1 = GdiFont("remixicon", g_font.Size+4, 0);
 };
 
 function get_colors() {
@@ -1844,9 +1648,14 @@ function on_key_down(vkey) {
 					if(!brw.rows[i].islocked) brw.actionRows.push(i);
 				}
 				brw.repaint();
+			} else if(vkey == 49){
+				if(rowScrollStep_org != 1){
+					if(ppt.rowScrollStep != 1) ppt.rowScrollStep = 1;
+					else ppt.rowScrollStep = rowScrollStep_org;
+				}
 			}
 		}
-	};
+	}
 };
 
 function on_char(code) {
@@ -1990,7 +1799,6 @@ function on_font_changed() {
 	get_metrics();
 	g_searchbox.inputbox.FontUpdte();
 	g_searchbox.getImages();
-	get_images();
 	brw.getImages();
 	g_filterbox.inputbox.FontUpdte();
 	g_filterbox.getImages();
@@ -2003,7 +1811,6 @@ function on_colours_changed() {
 	get_colors();
 	g_searchbox.getImages();
 	g_searchbox.reset_colors();
-	get_images();
 	brw.getImages();
 	if (brw)
 		brw.scrollbar.setNewColors();
@@ -2038,7 +1845,6 @@ function on_notify_data(name, info) {
 		break;
 	case "scrollbar_width":
 		sys_scrollbar = info;
-		window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
 		cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : 12*zdpi;
 		cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 		get_metrics();
@@ -2049,11 +1855,10 @@ function on_notify_data(name, info) {
 		break;
 	case "ScrollStep":
 		ppt.rowScrollStep = info;
-		window.SetProperty("_PROPERTY: Scroll Step", ppt.rowScrollStep);
+		rowScrollStep_org = ppt.rowScrollStep;
 		break;
 	case "row_height_changed":
 		ppt.defaultRowHeight = info;
-		window.SetProperty("_PROPERTY: Row Height", ppt.defaultRowHeight),
 		get_metrics();
 		brw.setSize(0, ppt.headerBarHeight, ww - cScrollBar.width, wh - ppt.headerBarHeight);
 		brw.repaint();

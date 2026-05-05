@@ -1,6 +1,6 @@
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 window.DlgCode = DLGC_WANTALLKEYS;
-let ww = 0, wh = 0;
+let ww = 0, wh = 0, minh = 50;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
 var upperratio = 0;
@@ -18,15 +18,19 @@ get_colors();
 function on_size() {
     ww = window.Width;
 	wh = window.Height;
-	if(upperratio && wh) {
-		var uh_calc = Math.round((wh-2)*upperratio);
-		PUpper.Move(0, 0, ww, uh_calc);
-		PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
-	} else{
-		PUpper.Move(0, 0, ww, PUpper.Height);
-		PLower.Move(splitter_vis, PUpper.Height + 2, ww - splitter_vis*2, wh - PUpper.Height - 2);
-	}
-	if(wh) upperratio = PUpper.Height/(wh-2);
+	if (!ww || !wh) return;
+	window.SetTimeout(function() {
+		if(upperratio) {
+			var uh_calc = Math.round((wh-2)*upperratio);
+			PUpper.Move(0, 0, ww, uh_calc);
+			PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
+		} else{
+			PUpper.Move(0, 0, ww, PUpper.Height);
+			PLower.Move(splitter_vis, PUpper.Height + 2, ww - splitter_vis*2, wh - PUpper.Height - 2);
+		}
+		upperratio = PUpper.Height/(wh-2);
+		window.Repaint();
+	}, 50);
 }
 
 function on_paint(gr) {
@@ -42,7 +46,7 @@ function on_paint(gr) {
 
 function on_mouse_move(x, y) {
 	if(m_x == x && m_y == y) return;
-	if(x > 0 && y > 0 && x < ww && y < wh) {
+	if(x > 0 && y > minh && x < ww && y < wh - minh) {
 		window.SetCursor(32645);//IDC_SIZE
 		if(sp_drag){
 			PUpper.Move(0, 0, ww, y);
