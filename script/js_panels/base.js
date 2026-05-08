@@ -1069,6 +1069,10 @@ function on_playback_time(time) {
 	}
 }
 
+function on_playback_seek(time) {
+	on_playback_time(time);
+}
+
 function on_volume_change(v) {
 	VolumeBar.ChangeValue(vol2pos(v) | 0);
 }
