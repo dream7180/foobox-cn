@@ -224,6 +224,26 @@ function TimeFmt(t) {
 	return zpad(h) + ":" + zpad(m) + ":" + zpad(s);
 }
 
+function refresh_time_text_layout() {
+	// 预留更宽的时间文本空间，避免手写体或比例字体把秒数挤成省略号。
+	var tmp_img = gdi.CreateImage(1, 1);
+	var gb = tmp_img.GetGraphics();
+	var next_width = Math.ceil(Math.max(
+		gb.CalcTextWidth("88:88:88", g_font),
+		gb.CalcTextWidth(PlaybackTimeText ? PlaybackTimeText.Text : "00:00:00", g_font),
+		gb.CalcTextWidth(PlaybackLengthText ? PlaybackLengthText.Text : "00:00:00", g_font)
+	) + z(8));
+	tmp_img.ReleaseGraphics(gb);
+
+	var layout_changed = (time_length !== next_width);
+	time_length = next_width;
+	if (layout_changed && ww && wh && PlaybackTimeText && PlaybackLengthText && PBPrevious && PBPlay && PBNext && PBStop && MuteBtn && PBOBtn && seekbar && VolumeBar) {
+		init_obj();
+		setSize();
+		window.Repaint();
+	}
+}
+
 function Format_hms(t) {
 	if (t=="?") return "00:00:00";
 	var hms;
@@ -317,6 +337,7 @@ function initbuttons(){
 	RBtnTips = new UITextView("", g_font, c_font, rc_txt);
 	PlaybackTimeText = new UITextView(track_time, g_font, c_font, rc_txt);
 	PlaybackLengthText = new UITextView(track_len, g_font, c_font, lc_txt);
+	refresh_time_text_layout();
 	PBOpen = new ButtonUI(img_open);
 	PBPrevious = new ButtonUI(img_previous);
 	PBPlay = new ButtonUI((fb.IsPlaying && !fb.IsPaused) ? img_pause : img_play);
@@ -939,7 +960,10 @@ function on_playback_new_track(info) {
 	if(info){
 		track_len = fb.TitleFormat("%length%").EvalWithMetadb(info);
 		track_len = Format_hms(track_len);
-		if(track_len) PlaybackLengthText.ChangeText(track_len);
+		if(track_len) {
+			PlaybackLengthText.ChangeText(track_len);
+			refresh_time_text_layout();
+		}
 	}
 }
 
@@ -952,6 +976,7 @@ function on_playback_stop(reason) {
 		PlaybackTimeText.ChangeText("00:00:00");
 		seekbar.MaxValue = 0;
 		seekbar.ChangeValue(0);
+		refresh_time_text_layout();
 	}
 }
 

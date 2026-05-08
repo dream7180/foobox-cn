@@ -74,6 +74,72 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 	}
 };
 
+function get_fixed_cover_rect(base_x, base_y, column_width, row_height) {
+	// 封面大小跟随单行高度，避免大封面把相邻条目压住。
+	var cover_side = Math.max(0, Math.min(column_width, row_height));
+	var inner_side = Math.max(0, cover_side - cover.margin * 2 - 1);
+	var offset_x = get_cover_left_padding(column_width, cover_side);
+	var offset_y = Math.max(0, Math.floor((row_height - cover_side) / 2));
+	return {
+		x: Math.floor(base_x + offset_x + cover.margin),
+		y: Math.floor(base_y + offset_y + cover.margin),
+		w: inner_side,
+		h: inner_side
+	};
+}
+
+function get_cover_left_padding(column_width, cover_side) {
+	// 左边距固定为 2 个缩放单位，列宽不足时自动收缩，避免坐标溢出。
+	return Math.max(0, Math.min(g_z2, column_width - cover_side));
+}
+
+function get_cover_content_x(base_x, column_width, row_height) {
+	if (column_width <= 0 || row_height <= 0) {
+		return Math.floor(base_x);
+	}
+	var cover_side = Math.max(0, Math.min(column_width, row_height));
+	var inner_side = Math.max(0, cover_side - cover.margin * 2 - 1);
+	var offset_x = get_cover_left_padding(column_width, cover_side);
+	var content_x = base_x + offset_x + cover.margin + inner_side;
+	return Math.floor(Math.max(base_x, Math.min(base_x + column_width, content_x)));
+}
+
+function get_cover_crop(img, dst_w, dst_h) {
+	// 保持目标区域尺寸不变，通过裁切源图来铺满方形封面区域。
+	var src_x = 1;
+	var src_y = 1;
+	var src_w = Math.max(1, img.Width - 2);
+	var src_h = Math.max(1, img.Height - 2);
+	if (!cover.keepaspectratio) {
+		return {
+			src_x: src_x,
+			src_y: src_y,
+			src_w: src_w,
+			src_h: src_h
+		};
+	}
+
+	var dst_ratio = dst_w / Math.max(1, dst_h);
+	var src_ratio = src_w / Math.max(1, src_h);
+	if (src_ratio > dst_ratio) {
+		var cropped_w = Math.floor(src_h * dst_ratio);
+		src_x += Math.max(0, Math.floor((src_w - cropped_w) / 2));
+		src_w = Math.max(1, cropped_w);
+	}
+	else if (src_ratio < dst_ratio) {
+		var cropped_h = Math.floor(src_w / dst_ratio);
+		src_y += Math.max(0, Math.floor((src_h - cropped_h) / 2));
+		src_h = Math.max(1, cropped_h);
+	}
+
+	return {
+		src_x: src_x,
+		src_y: src_y,
+		src_w: src_w,
+		src_h: src_h
+	};
+}
+
 oItem = function(playlist, row_index, type, handle, track_index, group_index, track_index_in_group, heightInRow, groupRowDelta, obj, empty_row_index) {
 	this.type = type;
 	this.playlist = playlist;
@@ -417,14 +483,14 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			// ===============
 			if (p.headerBar.columns[0].w > 0) {
 				cover.w = p.headerBar.columns[0].w;
-				cover.h = cover.w;
+				cover.h = Math.min(cover.w, cTrack.height);
 			}
 			else {
 				cover.w = 0;
 				cover.h = 0;
 			};
-			var tcolumn_x = this.x + Math.floor(cover.w);
-			var line_width = this.w - cover.w + cScrollBar.width;
+			var tcolumn_x = get_cover_content_x(this.x, cover.w, Math.min(this.h, cTrack.height));
+			var line_width = this.w - Math.max(0, tcolumn_x - this.x) + cScrollBar.width;
 			if (this.empty_row_index == 0) {
 				this.queue_idx = plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1;
 				if (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex) {
@@ -484,10 +550,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				};
 				if ((this.track_index_in_group == 0 || (this.row_index == 0 && cover_draw_delta > 0))) {
 					// cover bg
-					var cv_x = Math.floor(this.x);
-					var cv_y = Math.floor(this.y - cover_draw_delta);
-					var cv_w = Math.floor(cover.w);
-					var cv_h = Math.floor(cover.h);
+					var cover_rect = get_fixed_cover_rect(this.x, this.y - cover_draw_delta, cover.w, Math.min(this.h, cTrack.height));
+					var cv_x = cover_rect.x;
+					var cv_y = cover_rect.y;
+					var cv_w = cover_rect.w;
+					var cv_h = cover_rect.h;
 
 					if(p.list.groups[this.group_index].load_requested == 0)
 						p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
@@ -495,25 +562,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 						if (p.list.groups[this.group_index].cover_img == null) p.list.groups[this.group_index].cover_img = images.nocover;
 						if (p.list.groups[this.group_index].cover_img) {
-							if (cover.keepaspectratio) {
-								// *** check aspect ratio *** //
-								if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
-									var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-									var cv_offset = Math.floor((cv_h - cv_w * ratio) / 2);
-									cv_x += cv_offset;
-									cv_w = cv_w - cv_offset * 2 - 1;
-									cv_h = cv_h - 1;
-								}
-								else {
-									var ratio = p.list.groups[this.group_index].cover_img.Height / p.list.groups[this.group_index].cover_img.Width;
-									var cv_offset = Math.floor((cv_w - cv_h * ratio) / 2);
-									cv_y += cv_offset;
-									cv_w = cv_w - 1;
-									cv_h = cv_h - cv_offset * 2 - 1;
-								};
-								// *** check aspect ratio *** //
-							};
-							gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
+							var cover_crop = get_cover_crop(p.list.groups[this.group_index].cover_img, cv_w, cv_h);
+							gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, cover_crop.src_x, cover_crop.src_y, cover_crop.src_w, cover_crop.src_h);
 						};
 					}
 					else {
@@ -541,11 +591,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					if (g_dragndrop_status && dragndrop.drop_id == this.track_index && p.list.ishover && !g_dragndrop_bottom) {
 						if (!plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
 							if (this.track_index > dragndrop.drag_id) {
-								gr.FillSolidRect(tcolumn_x, this.cal_y1, this.w - cover.w, cList.borderWidth, g_color_normal_txt);
+								gr.FillSolidRect(tcolumn_x, this.cal_y1, line_width, cList.borderWidth, g_color_normal_txt);
 								//dragndrop.drop_id = this.track_index;
 							}
 							else if (this.track_index < dragndrop.drag_id) {
-								gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half, this.w - cover.w, cList.borderWidth, g_color_normal_txt);
+								gr.FillSolidRect(tcolumn_x, this.y - cList.borderWidth_half, line_width, cList.borderWidth, g_color_normal_txt);
 								//dragndrop.drop_id = this.track_index;
 							};
 						}
@@ -599,7 +649,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			}
 			// Draw Header content
 			// ===================
-			var line_x = this.x + cover.w + g_z2;
+			var line_x = get_cover_content_x(this.x, cover.w, Math.min(this.h, cTrack.height)) + g_z2;
 			var vpadding = g_z3;
 			var l1_y = this.y - groupDelta;
 			var r1_w = gr.CalcTextWidth(this.r1, g_font_group1) + g_z10;
@@ -677,10 +727,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				if (!p.headerBar.columns[0].w > 0 || (p.headerBar.columns[0].w > 0 && this.obj.collapsed)) {
 					if (this.heightInRow > 1 && cover.show) {
 						// cover bg
-						var cv_x = Math.floor(this.x + cover.margin);
-						var cv_y = Math.floor((this.y - groupDelta) + cover.margin + 1);
-						var cv_w = Math.floor(cover.w - cover.margin * 2);
-						var cv_h = Math.floor(cover.h - cover.margin * 2);
+						var cover_rect = get_fixed_cover_rect(this.x, this.y - groupDelta + 1, cover.w, Math.min(this.h, cTrack.height));
+						var cv_x = cover_rect.x;
+						var cv_y = cover_rect.y;
+						var cv_w = cover_rect.w;
+						var cv_h = cover_rect.h;
 						//
 						if(p.list.groups[this.group_index].load_requested == 0)
 							p.list.groups[this.group_index].cover_img = g_image_cache.hit(this.group_index);
@@ -688,25 +739,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						if (typeof p.list.groups[this.group_index].cover_img != "undefined") {
 							if (p.list.groups[this.group_index].cover_img == null) p.list.groups[this.group_index].cover_img = images.nocover;
 							if (p.list.groups[this.group_index].cover_img) {
-								if (cover.keepaspectratio) {
-									// *** check aspect ratio *** //
-									if (p.list.groups[this.group_index].cover_img.Height >= p.list.groups[this.group_index].cover_img.Width) {
-										var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
-										var cv_offset = Math.floor((cv_h - cv_w * ratio) / 2);
-										cv_x += cv_offset;
-										cv_w = cv_w - cv_offset * 2 - 1;
-										cv_h = cv_h - 1;
-									}
-									else {
-										var ratio = p.list.groups[this.group_index].cover_img.Height / p.list.groups[this.group_index].cover_img.Width;
-										var cv_offset = Math.floor((cv_w - cv_h * ratio) / 2);
-										cv_y += cv_offset;
-										cv_w = cv_w - 1;
-										cv_h = cv_h - cv_offset * 2 - 1;
-									};
-									// *** check aspect ratio *** //
-								};
-								gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
+								var group_cover_crop = get_cover_crop(p.list.groups[this.group_index].cover_img, cv_w, cv_h);
+								gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, group_cover_crop.src_x, group_cover_crop.src_y, group_cover_crop.src_w, group_cover_crop.src_h);
 							};
 						}
 						else {
@@ -722,14 +756,16 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				if (!properties.enableTouchControl) {
 					if (g_dragndrop_status && this.ishover && p.list.ishover && this.obj.collapsed) {
 						if (!plman.IsPlaylistItemSelected(plman.ActivePlaylist, this.track_index)) {
+							var group_drop_x = get_cover_content_x(this.x, cover.w, Math.min(this.h, cTrack.height));
+							var group_drop_w = this.w - Math.max(0, group_drop_x - this.x);
 							if (this.track_index <= dragndrop.drag_id  && !g_dragndrop_bottom) {
 								if (this.groupRowDelta == 0) {
-									gr.FillSolidRect(this.x, this.y - cList.borderWidth_half, this.w, cList.borderWidth, g_color_normal_txt);
+									gr.FillSolidRect(group_drop_x, this.y - cList.borderWidth_half, group_drop_w, cList.borderWidth, g_color_normal_txt);
 								}
 								//dragndrop.drop_id = this.track_index;
 							}
 							else {
-								gr.FillSolidRect(this.x, this.cal_y1, this.w, cList.borderWidth, g_color_normal_txt);
+								gr.FillSolidRect(group_drop_x, this.cal_y1, group_drop_w, cList.borderWidth, g_color_normal_txt);
 								dragndrop.drop_id = this.track_index + this.obj.count - 1;
 							};
 						}
@@ -745,13 +781,17 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 
 	this.dragndrop_check = function(x, y, id) {
 		var groupDelta = this.groupRowDelta * cTrack.height;
-		this.ishover = (x >= this.x + p.headerBar.columns[0].w * (1 - this.type) && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
+		var col_cover_w = (p.headerBar.columns[0].w > 0 ? p.headerBar.columns[0].w : 0);
+		var col_cover_x = get_cover_content_x(this.x, col_cover_w, Math.min(this.h, cTrack.height));
+		this.ishover = (x >= col_cover_x && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
 		if(this.ishover) dragndrop.drop_id = this.track_index;
 	};
 
 	this.check = function(event, x, y) {
 		var groupDelta = this.groupRowDelta * cTrack.height;
-		this.ishover = (x >= this.x && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
+		var col_cover_w = (p.headerBar.columns[0].w > 0 ? p.headerBar.columns[0].w : 0);
+		var col_cover_x = get_cover_content_x(this.x, col_cover_w, Math.min(this.h, cTrack.height));
+		this.ishover = (x >= col_cover_x && x < this.x + this.w && y >= this.y && y < this.y + this.h - groupDelta);
 
 		var prev_rating_hover = this.rating_hover;
 		var prev_l_rating = this.l_rating;
@@ -1961,8 +2001,10 @@ oList = function(object_name, playlist) {
 				var rx = this.items[rowId].x;
 				var ry = this.items[rowId].y;
 				var rw = this.items[rowId].w;
+				var drop_column_width = (p.headerBar.columns[0].w > 0 ? p.headerBar.columns[0].w : 0);
+				var drop_x = get_cover_content_x(rx, drop_column_width, Math.min(item_height, cTrack.height));
 
-				gr.FillSolidRect(rx, ry + item_height - cList.borderWidth_half * 2, rw, cList.borderWidth, g_color_normal_txt);
+				gr.FillSolidRect(drop_x, ry + item_height - cList.borderWidth_half * 2, rw - Math.max(0, drop_x - rx), cList.borderWidth, g_color_normal_txt);
 			};
 		}
 

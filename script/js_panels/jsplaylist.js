@@ -248,6 +248,9 @@ cGroup = {
 	count_minimum_pre: 0
 };
 
+// 关闭后，播放列表间距会保持固定，不会因为右侧面板或封面列宽变化而自动补空白行。
+var auto_minimum_rows_by_cover = window.GetProperty("*GROUP: Auto minimum rows follow cover width", false);
+
 cover = {
 	show: true,
 	keepaspectratio: window.GetProperty("CUSTOM.Cover keep ration aspect", true),
@@ -2593,7 +2596,7 @@ function reinit_config(){
 
 function get_grprow_minimum(column_w){
 	cGroup.count_minimum_pre = cGroup.count_minimum;
-	if (column_w > 0) {
+	if (auto_minimum_rows_by_cover && column_w > 0) {
 		cGroup.count_minimum = Math.ceil(column_w / cTrack.height);
 		if (cGroup.count_minimum < cGroup.default_count_minimum) cGroup.count_minimum = cGroup.default_count_minimum;
 	} else {
