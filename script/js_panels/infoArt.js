@@ -70,6 +70,7 @@ if (time_circle < 3000) time_circle = 3000;
 if (time_circle > 60000) time_circle = 60000;
 var rbutton = Array();
 var c_background, c_highlight, fontcolor, fontcolor2, icocolor, c_default_hl, c_rating_h;
+var cover_accent_fallback = [223, 48, 73];
 var tracktype;
 var img_rating_on, img_rating_off, mood_img, btn_mood, TextBtn_info, img_btn;
 
@@ -332,6 +333,161 @@ function RGB(r, g, b) {
 
 function RGBA(r, g, b, a) {
 	return ((a << 24) | (r << 16) | (g << 8) | (b));
+}
+
+function clamp01(value) {
+	return Math.max(0, Math.min(1, value));
+}
+
+function clampChannel(value) {
+	return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+function cloneColor(color) {
+	return [color[0], color[1], color[2]];
+}
+
+function hueToRgbComponent(p, q, t) {
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6) return p + (q - p) * 6 * t;
+	if (t < 1 / 2) return q;
+	if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+	return p;
+}
+
+function rgbToHsl(color) {
+	var r = color[0] / 255;
+	var g = color[1] / 255;
+	var b = color[2] / 255;
+	var max = Math.max(r, g, b);
+	var min = Math.min(r, g, b);
+	var h = 0;
+	var s = 0;
+	var l = (max + min) / 2;
+	var d = max - min;
+	if (d !== 0) {
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+		case r:
+			h = (g - b) / d + (g < b ? 6 : 0);
+			break;
+		case g:
+			h = (b - r) / d + 2;
+			break;
+		default:
+			h = (r - g) / d + 4;
+			break;
+		}
+		h /= 6;
+	}
+	return [h * 360, s, l];
+}
+
+function hslToRgb(h, s, l) {
+	var hue = ((h % 360) + 360) % 360 / 360;
+	var r = l;
+	var g = l;
+	var b = l;
+	if (s !== 0) {
+		var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+		var p = 2 * l - q;
+		r = hueToRgbComponent(p, q, hue + 1 / 3);
+		g = hueToRgbComponent(p, q, hue);
+		b = hueToRgbComponent(p, q, hue - 1 / 3);
+	}
+	return [clampChannel(r * 255), clampChannel(g * 255), clampChannel(b * 255)];
+}
+
+function getRelativeLuminance(color) {
+	function normalizeChannel(value) {
+		var channel = value / 255;
+		return channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+	}
+	return 0.2126 * normalizeChannel(color[0]) + 0.7152 * normalizeChannel(color[1]) + 0.0722 * normalizeChannel(color[2]);
+}
+
+function getContrastRatio(colorA, colorB) {
+	var luminanceA = getRelativeLuminance(colorA);
+	var luminanceB = getRelativeLuminance(colorB);
+	var light = Math.max(luminanceA, luminanceB);
+	var dark = Math.min(luminanceA, luminanceB);
+	return (light + 0.05) / (dark + 0.05);
+}
+
+function getCoverAccentFallbackColor() {
+	return cloneColor(cover_accent_fallback);
+}
+
+function getCoverAccentCandidates(image, count) {
+	var candidates = [];
+	var exists = {};
+	var requestCounts = [count, 4, 1];
+	for (var i = 0; i < requestCounts.length; i++) {
+		var swatches = null;
+		try {
+			swatches = JSON.parse(image.GetColourSchemeJSON(requestCounts[i]));
+		} catch (e) {}
+		if (!swatches || !swatches.length) continue;
+		for (var j = 0; j < swatches.length; j++) {
+			if (!swatches[j] || typeof swatches[j].col === "undefined") continue;
+			var color = toRGB(swatches[j].col);
+			var key = color.join(",");
+			if (exists[key]) continue;
+			exists[key] = true;
+			candidates.push(color);
+		}
+		if (candidates.length) break;
+	}
+	return candidates;
+}
+
+// 把封面色修正成更适合黑底 UI 的强调色，只改饱和度和明度，尽量保留原色相。
+function normalizeCoverAccentColor(color) {
+	var hsl = rgbToHsl(color);
+	var saturationFloor = dark_mode ? 0.48 : 0.36;
+	var saturationCeiling = 0.88;
+	var lightnessFloor = dark_mode ? 0.40 : 0.34;
+	var lightnessCeiling = dark_mode ? 0.58 : 0.68;
+	hsl[1] = clamp01(Math.max(hsl[1], saturationFloor));
+	hsl[1] = clamp01(Math.min(hsl[1], saturationCeiling));
+	hsl[2] = clamp01(Math.max(hsl[2], lightnessFloor));
+	hsl[2] = clamp01(Math.min(hsl[2], lightnessCeiling));
+	return hslToRgb(hsl[0], hsl[1], hsl[2]);
+}
+
+function scoreCoverAccentColor(rawColor, accentColor, backgroundColor, index) {
+	var rawHsl = rgbToHsl(rawColor);
+	var accentHsl = rgbToHsl(accentColor);
+	var contrast = getContrastRatio(accentColor, backgroundColor);
+	var targetLightness = dark_mode ? 0.50 : 0.46;
+	var score = 0;
+	score += accentHsl[1] * 3.2;
+	score += Math.min(contrast, 5) * 0.55;
+	score -= Math.abs(accentHsl[2] - targetLightness) * 1.6;
+	score -= index * 0.12;
+	if (rawHsl[1] < 0.18) score -= (0.18 - rawHsl[1]) * 8;
+	if (accentHsl[2] > 0.66) score -= (accentHsl[2] - 0.66) * 5;
+	if (dark_mode && accentHsl[2] < 0.34) score -= (0.34 - accentHsl[2]) * 6;
+	if (contrast < 2.4) score -= (2.4 - contrast) * 3;
+	return score;
+}
+
+function pickCoverAccentColor(image) {
+	var candidates = getCoverAccentCandidates(image, 8);
+	if (!candidates.length) return getCoverAccentFallbackColor();
+	var backgroundColor = toRGB(c_background);
+	var bestColor = null;
+	var bestScore = -999;
+	for (var i = 0; i < candidates.length; i++) {
+		var accentColor = normalizeCoverAccentColor(candidates[i]);
+		var score = scoreCoverAccentColor(candidates[i], accentColor, backgroundColor, i);
+		if (score > bestScore) {
+			bestScore = score;
+			bestColor = accentColor;
+		}
+	}
+	return bestColor && bestScore >= 2.35 ? bestColor : getCoverAccentFallbackColor();
 }
 
 //-------------------------------------
@@ -1961,39 +2117,14 @@ function Controller(imgArray, imgDisplay, prop) {
 	
 	getColorSchemeFromImage = function() {
 		if(!get_imgCol) return;
-		let c_blend = null;
+		let c_blend = getCoverAccentFallbackColor();
 		if(currentImage){
-			let c_dev = -1, cv_max;
-			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(color_threshold));
-			for(let i = 0; i < color_threshold; i++){
-				let c_img = toRGB(ColorData[i].col);
-				let cv_max_tmp = Math.max(...c_img);
-				let c_dev_tmp = cv_max_tmp - Math.min(...c_img);
-				if(c_dev_tmp > c_dev){
-					c_dev = c_dev_tmp;
-					c_blend = c_img;
-					cv_max = cv_max_tmp;
-				}
-			}
-			if(cbkg_bycover){
-				c_blend[3] = c_blend[0];
-				c_blend[4] = c_blend[1];
-				c_blend[5] = c_blend[2];
-			}
-			let c_aggr = c_blend[0] + c_blend[1] + c_blend[2];
-			if(c_dev < 16) {
-				c_blend = false;
-			} else if(c_aggr > 450){
-				let reduction = Math.round((c_aggr - 450) / 3);
-				c_blend[0] = Math.max(c_blend[0]-reduction, 0);
-				c_blend[1] = Math.max(c_blend[1]-reduction, 0);
-				c_blend[2] = Math.max(c_blend[2]-reduction, 0);
-			}else if(cv_max < 90){
-				let reduction = Math.round((270-c_aggr) / 3);
-				c_blend[0] = c_blend[0]+reduction;
-				c_blend[1] = c_blend[1]+reduction;
-				c_blend[2] = c_blend[2]+reduction;
-			}
+			c_blend = pickCoverAccentColor(currentImage);
+		}
+		if(cbkg_bycover){
+			c_blend[3] = c_blend[0];
+			c_blend[4] = c_blend[1];
+			c_blend[5] = c_blend[2];
 		}
 		get_imgCol = false;
 		on_colorscheme_update(c_blend);
@@ -2005,10 +2136,6 @@ function Controller(imgArray, imgDisplay, prop) {
 		if(c_blend) {
 			c_highlight = RGB(c_blend[0], c_blend[1], c_blend[2]);
 			c_arr = [c_blend[0], c_blend[1], c_blend[2]];
-		}else{
-			c_highlight = c_default_hl;
-			c_background = c_background_default;
-			fontcolor2 = fontcolor2_default;
 		}
 		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
