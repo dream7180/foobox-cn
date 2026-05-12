@@ -60,7 +60,7 @@ ppt = {
 	rowHeight: 22,
 	rowScrollStep: 1,
 	scrollSmoothness: 1.0,
-	refreshRate: 25,
+	refreshRate: 20,
 	headerBarHeight: 28,
 	enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", true),
 	botStampHeight: 48,

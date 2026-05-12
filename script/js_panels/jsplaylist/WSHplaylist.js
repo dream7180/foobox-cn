@@ -160,91 +160,26 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						};
 						var columnColor = this.state_color;
 					};
-					var queue_w = p.list.state_queue_w;
-					var icon_w = p.list.state_icon_w;
+					var imgw = images.playing_ico.Width;
 					switch (p.headerBar.columns[j].align) {
 					case 0:
-						var icon_x = cx + g_z2;
+						var icon_x = cx;
 						break;
 					case 1:
-						var icon_x = cx + Math.round((cw / 2) - (queue_w / 2)) - g_z5;
+						var icon_x = cx + Math.round((cw - imgw)/2);
 						break;
 					case 2:
-						var icon_x = Math.floor(cx + cw - queue_w - g_z10);
+						var icon_x = cx + cw - imgw;
 						break;
 					};
-					var imgw = images.playing_ico.Width;
-					var imgh = images.selected_ico.Height;
-					var icon_img_x = Math.round(icon_x + icon_w / 2 - imgw/2);
-					var icon_img_x2 = Math.round(icon_x + icon_w / 2 - imgh/2);
-					var icon_img_y = Math.round(this.y + cTrack.height / 2 - imgh/2);
-					if (fb.IsPlaying) {
-						if (plman.PlayingPlaylist == this.playlist) {
-							if (this.track_index == p.list.nowplaying.PlaylistItemIndex) {
-								gr.SetTextRenderingHint(0);
-								if (g_seconds / 2 == Math.floor(g_seconds / 2)) {
-									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, 0, imgw, imgh, 0, 100);
-								}
-								else {
-									gr.DrawImage(images.playing_ico, icon_img_x, icon_img_y, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
-								};
-							}
-							else {
-								gr.SetTextRenderingHint(5);
-								if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
-									if (this.queue_idx > 0) {
-										gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-										gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-									}
-									else {
-										gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
-									};
-								}
-								else { // if not selected
-									gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
-									if (this.queue_idx > 0) {
-										gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-									};
-								};
-							};
-						}
-						else {
-							gr.SetTextRenderingHint(5);
-							if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
-								if (this.queue_idx > 0) {
-									gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-									gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-								}
-								else {
-									gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
-								};
-							}
-							else { // if not selected
-								gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
-								if (this.queue_idx > 0) {
-									gr.DrawString(num(this.queue_idx, 2), g_font_b, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-								};
-							};
-						};
-					}
-					else {
-						gr.SetTextRenderingHint(5);
-						if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) { // if selected
-							if (this.queue_idx > 0) {
-								gr.DrawRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 1, cTrack.height - g_z16 + 1, 1.0, columnColor & 0x77ffffff);
-								gr.DrawString(num(this.queue_idx, 2), g_font_b, columnColor, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-							}
-							else {
-								gr.DrawImage(images.selected_ico, icon_img_x2, icon_img_y, imgh, imgh, 0, 0, imgh, imgh, 0, 255);
-							};
-						}
-						else { // if not selected
-							gr.FillSolidRect(icon_x - 1, this.y + g_z8 - 1, queue_w + g_z6 + 2, cTrack.height - g_z16 + 2, g_color_normal_txt & 0x08ffffff);
-							if (this.queue_idx > 0) {
-								gr.DrawString(num(this.queue_idx, 2), g_font_b, g_color_highlight, icon_x + g_z3, this.y, queue_w, cTrack.height, lc_stringformat);
-							};
-						};
-					};
+					var icon_y = this.y + Math.round((cTrack.height - imgw)/2);
+					if(_playing_idx){
+						if (g_seconds / 2 == Math.floor(g_seconds / 2)) gr.DrawImage(images.playing_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 100);
+						else gr.DrawImage(images.playing_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
+					} else if (this.queue_idx > 0) {
+						gr.FillSolidRect(cx, icon_y, cw - g_z2, imgw, InfoPane.c_border);
+						gr.GdiDrawText(num(this.queue_idx, 2), g_font_b, c_white, cx, this.y, cw, cTrack.height, cc_txt);
+					} else if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) gr.DrawImage(images.selected_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
 					break;
 				case "喜爱":
 					if (typeof(this.mood) == "undefined") {
@@ -425,12 +360,14 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			};
 			var tcolumn_x = this.x + Math.floor(cover.w);
 			var line_width = this.w - cover.w + cScrollBar.width;
+			var _playing_idx = (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex);
 			if (this.empty_row_index == 0) {
 				this.queue_idx = plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1;
-				if (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex) {
+				if (_playing_idx) {
 					// playing track bg
 					gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
 					this.text_colour = g_color_playing_txt;
+					p.list.nowplaying_y = this.y;
 				}
 				else {
 					// no playing track bg
@@ -454,17 +391,6 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				};
 			}
 			else {};
-
-			// now playing track
-			if (this.empty_row_index == 0) {
-				if (fb.IsPlaying) {
-					if (plman.PlayingPlaylist == this.playlist) {
-						if (this.track_index == p.list.nowplaying.PlaylistItemIndex) {
-							p.list.nowplaying_y = this.y;
-						};
-					};
-				};
-			};
 
 			// Draw Track content
 			// ==================
@@ -1183,6 +1109,7 @@ oList = function(object_name, playlist) {
 	this.drawRectSel = false;
 	this.beam = 0;
 	this.item_clicked = false;
+	this.queue_total = 0;
 
 	// items variables used in Item object (optimization)
 	this.setItemColors = function() {
@@ -1939,10 +1866,6 @@ oList = function(object_name, playlist) {
 			this.nowplaying = plman.GetPlayingItemLocation();
 		};
 
-		// set variables used in Items object (optimization)
-		this.state_queue_w = Math.round(gr.CalcTextWidth("00", g_font_b) + 1);
-		this.state_icon_w = this.state_queue_w + g_z6;
-
 		// Draw items (tracks and group headers)
 		var fin = this.items.length;
 		if(fin){
@@ -2246,11 +2169,6 @@ oList = function(object_name, playlist) {
 		var o_genre = fb.TitleFormat("$ifequal($stricmp(%genre%,?),1,,%genre%)");
 
 		_menu.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "移除");
-		if (plman.GetPlaybackQueueHandles().Count > 0) {
-			if (layout.playlistName != "播放队列") {
-				_menu.AppendMenuItem(MF_STRING, 2, "显示播放队列");
-			};
-		};
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 3, -1);
 		if(track_edit_app != ""){
@@ -2269,6 +2187,11 @@ oList = function(object_name, playlist) {
 				}
 			}
 		}
+		if (p.list.queue_total > 0) {
+			if (layout.playlistName != "播放队列") {
+				_menu.AppendMenuItem(MF_STRING, 2, "显示播放队列");
+			};
+		};
 		if(properties.selectionmenu){
 			var pl_count = plman.PlaylistCount;
 			_child01.AppendTo(_menu, MF_STRING, "选择...");

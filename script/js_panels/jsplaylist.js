@@ -102,7 +102,7 @@ properties = {
 	selectionmenu: window.GetProperty("CUSTOM Enable Selection Menu", true),
 	cursor_min: 25,
 	cursor_max: 110,
-	repaint_rate: 25,
+	repaint_rate: 20,
 	max_columns: 24,
 	max_patterns: 25
 };
@@ -1982,12 +1982,11 @@ function get_images_color() {
 	gb.SetTextRenderingHint(0);
 	images.star_h.ReleaseGraphics(gb);
 	
-	imgh = z(18);
-	images.mood_ico = gdi.CreateImage(g_z16, imgh*2);
+	images.mood_ico = gdi.CreateImage(imgh, imgh*2);
 	gb = images.mood_ico.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("\uF004", fn_ico2, g_color_star, 0, 0, g_z16, imgh, cc_stringformat);
-	gb.DrawString("\uF004", fn_ico2, g_color_highlight, 0, imgh, g_z16, imgh, cc_stringformat);
+	gb.DrawString("\uF004", fn_ico2, g_color_star, 0, 0, imgh, imgh, cc_stringformat);
+	gb.DrawString("\uF004", fn_ico2, g_color_highlight, 0, imgh, imgh, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	images.mood_ico.ReleaseGraphics(gb);
 	
@@ -1996,7 +1995,7 @@ function get_images_color() {
 
 function get_img_nocover() {
 	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
-	let imgh = z(16);
+	let imgh = g_z16;
 	
 	images.nocover = gdi.CreateImage(250, 250);
 	gb = images.nocover.GetGraphics();
@@ -2024,16 +2023,15 @@ function get_img_nocover() {
 
 function get_images_static() {
 	let gb, color_playing_alpha = g_color_playing_txt & 0x2dffffff;
-	let imgh = z(14);
+	let imgh = g_z16;
 	
-	images.playing_ico = gdi.CreateImage(g_z16, imgh);
+	images.playing_ico = gdi.CreateImage(imgh, imgh);
 	gb = images.playing_ico.GetGraphics();
 	gb.SetTextRenderingHint(4);
 	gb.DrawString("\uF04B", fn_ico2, g_color_playing_txt, 0, 0, imgh, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	images.playing_ico.ReleaseGraphics(gb);
 
-	imgh = z(16);
 	images.star_h_playing = gdi.CreateImage(imgh, imgh);
 	gb = images.star_h_playing.GetGraphics();
 	gb.SetTextRenderingHint(4);
@@ -2048,12 +2046,11 @@ function get_images_static() {
 	gb.SetTextRenderingHint(0);
 	images.star_playing.ReleaseGraphics(gb);
 	
-	imgh = z(18);
-	images.mood_ico_playing = gdi.CreateImage(g_z16, imgh*2);
+	images.mood_ico_playing = gdi.CreateImage(imgh, imgh*2);
 	gb = images.mood_ico_playing.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("\uF004", fn_ico2, color_playing_alpha, 0, 0, g_z16, imgh, cc_stringformat);
-	gb.DrawString("\uF004", fn_ico2, g_color_playing_txt, 0, imgh, g_z16, imgh, cc_stringformat);
+	gb.DrawString("\uF004", fn_ico2, color_playing_alpha, 0, 0, imgh, imgh, cc_stringformat);
+	gb.DrawString("\uF004", fn_ico2, g_color_playing_txt, 0, imgh, imgh, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	images.mood_ico_playing.ReleaseGraphics(gb);
 }
@@ -2171,9 +2168,8 @@ function CheckPlaylistQueue() {
 		plman.CreatePlaylist(total_pl, "播放队列");
 		queue_pl_idx = total_pl;
 		var vbarr = plman.GetPlaybackQueueContents();
-		var queue_total = vbarr.length;
 		var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-		for (var i = 0; i < queue_total; i++) {
+		for (var i = 0; i < p.list.queue_total; i++) {
 			q_handlelist.Add(vbarr[i].Handle);
 		};
 		plman.InsertPlaylistItems(queue_pl_idx, i, q_handlelist, false);
@@ -2184,6 +2180,8 @@ function CheckPlaylistQueue() {
 function on_playback_queue_changed(origin) {
 	if (!cList.addToQueue_timer) {
 		g_delay_refresh_items = true;
+		let vbarr = plman.GetPlaybackQueueContents();
+		p.list.queue_total = vbarr.length;
 		switch (origin) {
 		case 0:
 			// changed_user_added
@@ -2197,10 +2195,8 @@ function on_playback_queue_changed(origin) {
 			};
 			// fill it
 			if(queue_pl_idx > -1){
-				var vbarr = plman.GetPlaybackQueueContents();
-				var queue_total = vbarr.length;
 				var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-				for (var i = 0; i < queue_total; i++) {
+				for (var i = 0; i < p.list.queue_total; i++) {
 					q_handlelist.Add(vbarr[i].Handle);
 				};
 				plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
@@ -2215,11 +2211,9 @@ function on_playback_queue_changed(origin) {
 				plman.ClearPlaylist(queue_pl_idx);
 			};
 			// fill it
-			var vbarr = plman.GetPlaybackQueueContents();
-			var queue_total = vbarr.length;
-			if (queue_total > 0) {
+			if (p.list.queue_total > 0) {
 				var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-				for (var i = 0; i < queue_total; i++) {
+				for (var i = 0; i < p.list.queue_total; i++) {
 					q_handlelist.Add(vbarr[i].Handle);
 				};
 				plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
@@ -2235,13 +2229,11 @@ function on_playback_queue_changed(origin) {
 				break;
 			}
 			else {
-				var vbarr = plman.GetPlaybackQueueContents();
-				var queue_total = vbarr.length;
-				if (queue_total > 0) {
+				if (p.list.queue_total > 0) {
 					plman.ClearPlaylist(queue_pl_idx);
 					// fill it
 					var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-					for (var i = 0; i < queue_total; i++) {
+					for (var i = 0; i < p.list.queue_total; i++) {
 						q_handlelist.Add(vbarr[i].Handle);
 					};
 					plman.InsertPlaylistItems(queue_pl_idx, 0, q_handlelist, false);
