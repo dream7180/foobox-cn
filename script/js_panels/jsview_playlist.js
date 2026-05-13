@@ -3,7 +3,6 @@ window.DefinePanel('simple js playlist viewer', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\uicomposite.js');
 commoncfg = commoncfg.split(",");
 var sys_scrollbar = Number(commoncfg[3]);
 var zdpi = 1, dark_mode = 0;

@@ -6,7 +6,7 @@ function UiCompInit() {
 	window.SetTimeout(function() {
 		if(UIComp.WindowFrameStyle == 0) UIComp.WindowFrameStyle = 2;//noboarder
 		else if(UIComp.WindowFrameStyle == 1) upper_border = Math.ceil(zdpi*6);
-		if(UIComp.MenuBarVisible) UIComp.MenuBarVisible = false;
+		//if(UIComp.MenuBarVisible) UIComp.MenuBarVisible = false;
 		UIComp.PseudoCaptionTopEnabled = true;
 		UIComp.PseudoCaptionLeftEnabled = true;
 		UIComp.PseudoCaptionRightEnabled = false;

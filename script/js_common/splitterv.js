@@ -3,7 +3,7 @@ window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0, wh = 0, minh = 50;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
-var upperratio = 0;
+var upperratio = window.GetProperty("UpperPane.Ratio", 0.5);
 PUpper.ShowCaption = PLower.ShowCaption = false;
 let splitter_vis = (PLower.Text == "spectrogram") ? 1 : 0;
 
@@ -20,15 +20,9 @@ function on_size() {
 	wh = window.Height;
 	if (!ww || !wh) return;
 	window.SetTimeout(function() {
-		if(upperratio) {
-			var uh_calc = Math.round((wh-2)*upperratio);
-			PUpper.Move(0, 0, ww, uh_calc);
-			PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
-		} else{
-			PUpper.Move(0, 0, ww, PUpper.Height);
-			PLower.Move(splitter_vis, PUpper.Height + 2, ww - splitter_vis*2, wh - PUpper.Height - 2);
-		}
-		upperratio = PUpper.Height/(wh-2);
+		var uh_calc = Math.round((wh-2)*upperratio);
+		PUpper.Move(0, 0, ww, uh_calc);
+		PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
 		window.Repaint();
 	}, 50);
 }
@@ -53,6 +47,7 @@ function on_mouse_move(x, y) {
 			PLower.Move(splitter_vis, y + 2, ww - splitter_vis*2, wh - y - 2);
 			window.Repaint();
 			upperratio = PUpper.Height/(wh-2);
+			window.SetProperty("UpperPane.Ratio", Math.round(upperratio*100000)/100000);
 		}
 	}
 	m_x = x;

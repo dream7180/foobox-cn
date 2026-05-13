@@ -6,7 +6,7 @@ window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0, wh = 0, minh = 50;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
-var upperratio = 0;
+var upperratio = window.GetProperty("UpperPane.Ratio", 0.5);
 var divcolor;
 var draw_splitter = window.GetProperty("Splitter.on", true);
 var splitter_hover = false;
@@ -50,16 +50,11 @@ function on_size() {
     ww = window.Width;
 	wh = window.Height;
 	if (!ww || !wh) return;
+	if(PUpper.Height < minh || PLower.Height < minh) leftratio = 0.5;
 	window.SetTimeout(function() {
-		if(upperratio) {
-			var uh_calc = Math.round((wh-2)*upperratio);
-			PUpper.Move(0, 0, ww, uh_calc);
-			PLower.Move(0, uh_calc + 2, ww, wh - uh_calc - 2);
-		} else{
-			PUpper.Move(0, 0, ww, PUpper.Height);
-			PLower.Move(0, PUpper.Height + 2, ww, wh - PUpper.Height - 2);
-		}
-		upperratio = PUpper.Height/(wh-2);
+		var uh_calc = Math.round((wh-2)*upperratio);
+		PUpper.Move(0, 0, ww, uh_calc);
+		PLower.Move(0, uh_calc + 2, ww, wh - uh_calc - 2);
 		window.Repaint();
 	}, 50);
 	if(initial_load){
@@ -88,6 +83,7 @@ function on_mouse_move(x, y) {
 			PLower.Move(0, y + 2, ww, wh - y - 2);
 			window.Repaint();
 			upperratio = PUpper.Height/(wh-2);
+			window.SetProperty("UpperPane.Ratio", Math.round(upperratio*100000)/100000);
 		}
 		splitter_hover = true;
 	} else splitter_hover = false;

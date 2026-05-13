@@ -3,7 +3,6 @@ window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0, wh = 0, minw = 1;
 let m_x = 0, m_y = 0;
 let sp_drag = false;
-var leftratio = 0;
 PLeft.ShowCaption = PRight.ShowCaption = false;
 
 function get_colors() {
@@ -35,15 +34,9 @@ function on_size() {
 	wh = window.Height;
 	if (!ww || !wh) return;
 	window.SetTimeout(function() {
-		if(leftratio) {
-			var lw_calc = Math.round((ww-2)*leftratio);
-			PLeft.Move(0, 0, lw_calc, wh);
-			PRight.Move(lw_calc + 2, 0, ww - lw_calc - 2, wh);
-		} else{
-			PLeft.Move(0, 0, PLeft.Width, wh);
-			PRight.Move(PLeft.Width + 2, 0, ww - PLeft.Width - 2, wh);
-		}
-		leftratio = PLeft.Width/(ww-2);
+		var lw_calc = Math.round((ww-2)*leftratio);
+		PLeft.Move(0, 0, lw_calc, wh);
+		PRight.Move(lw_calc + 2, 0, ww - lw_calc - 2, wh);
 		window.Repaint();
 	}, 50);
 }
@@ -67,6 +60,7 @@ function on_mouse_move(x, y) {
 			PRight.Move(x + 2, 0, ww - x - 2, wh);
 			window.Repaint();
 			leftratio = PLeft.Width/(ww -2);
+			window.SetProperty("LeftPane.Ratio", Math.round(leftratio*100000)/100000);
 		}
 	}
 	m_x = x;
