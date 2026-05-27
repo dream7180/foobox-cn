@@ -2,7 +2,6 @@
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\uicomposite.js');
 
 var time_length = 0;
 var zdpi, dark_mode;
@@ -45,6 +44,37 @@ panel = {
 		"bio": "简介",
 		"vis": "可视化",
 		"video": "视频"
+	}
+}
+
+//open_hacks_mod
+var UIComp = new ActiveXObject("OpenHacksMod");
+var setCaption_timer = false;
+var upper_border = 0;
+
+function UiCompInit() {
+	window.SetTimeout(function() {
+		if(UIComp.WindowFrameStyle == 0) UIComp.WindowFrameStyle = 2;//noboarder
+		else if(UIComp.WindowFrameStyle == 1) upper_border = Math.ceil(zdpi*6);
+		//if(UIComp.MenuBarVisible) UIComp.MenuBarVisible = false;
+		UIComp.PseudoCaptionTopEnabled = true;
+		UIComp.PseudoCaptionLeftEnabled = true;
+		UIComp.PseudoCaptionRightEnabled = false;
+		UIComp.PseudoCaptionBottomEnabled = false;
+	}, 100);
+}
+
+function UiCompSetCaption(){
+	if(!ww) return;
+	if(!setCaption_timer){
+		setCaption_timer = window.SetTimeout(function() {
+			UIComp.PseudoCaptionTop = 0;
+			UIComp.PseudoCaptionLeft = leftbarw;
+			UIComp.PseudoCaptionWidth = captionw;
+			UIComp.PseudoCaptionHeight = topbarh + upper_border;		
+			setCaption_timer && window.ClearTimeout(setCaption_timer);
+			setCaption_timer = false;
+		}, 200);
 	}
 }
 
@@ -582,7 +612,7 @@ function menu_bar(i) {
 function get_images() {
 	//creat static images
 	var gb;
-	let _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, x12 = z(12), _x18 = 18*zdpi, _x27 = 27*zdpi, x28 = z(28);
+	let _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, x12 = z(12), _x18 = 18*zdpi, _x27 = 27*zdpi, x28 = z(28), x1 = z(1);
 	
 	let vol_active = gdi.CreateImage(100, z(18));
 	gb = vol_active.GetGraphics();
@@ -654,18 +684,18 @@ function get_images() {
 	img_close = gdi.CreateImage(topbtnw, imgh*3);
 	gb = img_close.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9, _x27, _x18, z(1), c_font);
-	gb.DrawLine(_x18, _x18, _x27, _x9, z(1), c_font);
+	gb.DrawLine(_x18, _x9, _x27, _x18, x1, c_font);
+	gb.DrawLine(_x18, _x18, _x27, _x9, x1, c_font);
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(0, imgh, topbtnw, imgh, RGB(232, 17, 35));
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9 + imgh, _x27, _x18 + imgh, z(1), c_white);
-	gb.DrawLine(_x18, _x18 + imgh, _x27, _x9 + imgh, z(1),  c_white);
+	gb.DrawLine(_x18, _x9 + imgh, _x27, _x18 + imgh, x1, c_white);
+	gb.DrawLine(_x18, _x18 + imgh, _x27, _x9 + imgh, x1,  c_white);
 	gb.SetSmoothingMode(0);
 	gb.FillSolidRect(0, imgh2, topbtnw, imgh, RGB(241, 112, 122));
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x18, _x9 + imgh2, _x27, _x18 + imgh2, z(1),  c_white);
-	gb.DrawLine(_x18, _x18 + imgh2, _x27, _x9 + imgh2, z(1),  c_white);
+	gb.DrawLine(_x18, _x9 + imgh2, _x27, _x18 + imgh2, x1,  c_white);
+	gb.DrawLine(_x18, _x18 + imgh2, _x27, _x9 + imgh2, x1,  c_white);
 	gb.SetSmoothingMode(0);
 	img_close.ReleaseGraphics(gb);
 	
@@ -681,13 +711,20 @@ function get_images() {
 	img_max = gdi.CreateImage(imgh, imgh);
 	gb = img_max.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(_x8, _x8, _x10-1, _x10-1, z(1), c_font);
+	gb.DrawRect(_x8, _x8, _x10-1, _x10-1, x1, c_font);
 	img_max.ReleaseGraphics(gb);
+	
+	img_restore = gdi.CreateImage(imgh, imgh);
+	gb = img_restore.GetGraphics();
+	gb.SetSmoothingMode(0);
+	gb.DrawRect(_x8, _x10, _x8-1, _x8-1, x1, c_font);
+	gb.DrawPolygon(c_font, x1, [_x9+1-(0.5*window.DrawMode),_x10, _x9+1,_x8, _x18-1,_x8, _x18-1,17*zdpi-2, 16*zdpi-1,17*zdpi-2, 16*zdpi-1,_x10])
+	img_restore.ReleaseGraphics(gb);
 	
 	img_min = gdi.CreateImage(imgh, imgh);
 	gb = img_min.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x8, 13*zdpi, _x18, 13*zdpi, z(1), c_font);
+	gb.DrawLine(_x8, 13*zdpi, _x18, 13*zdpi, x1, c_font);
 	img_min.ReleaseGraphics(gb);
 	
 	imgh = x12;
@@ -787,7 +824,8 @@ function on_paint(gr) {
 		TopTitle.SetSize(leftbarw, 0, title_w, topbarh);
 		TopSubTitle.SetSize(leftbarw + title_w, 0, captionw - title_w - g_fsize, topbarh);
 	}
-	gr.DrawImage(img_max, Math.round(ww - topbtnw*1.5 - img_max.Width/2), 1, img_max.Width, img_max.Height, 0, 0, img_max.Width, img_max.Height);
+	if(UIComp.WindowState == 2) gr.DrawImage(img_restore, Math.round(ww - topbtnw*1.5 - img_restore.Width/2), 1, img_restore.Width, img_restore.Height, 0, 0, img_restore.Width, img_restore.Height);
+	else gr.DrawImage(img_max, Math.round(ww - topbtnw*1.5 - img_max.Width/2), 1, img_max.Width, img_max.Height, 0, 0, img_max.Width, img_max.Height);
 	gr.DrawImage(img_min, Math.round(ww - topbtnw*2.5 - img_min.Width/2), 1, img_min.Width, img_min.Height, 0, 0, img_min.Width, img_min.Height);
 	
 	TopTitle.Paint(gr);
@@ -935,14 +973,12 @@ function on_mouse_lbtn_up(x, y) {
 	}
 	if(btnall) VolumeBar.MouseUp();
 	if(y < topbarh + 1) {
-		if (CloseBtn.MouseUp()) fb.Exit();
+		if (CloseBtn.MouseUp()) UIComp.OhClose();
 		if (MaxBtn.MouseUp()) {
 			if(UIComp.WindowState != 2) UIComp.WindowState = 2;//maximized
 			else UIComp.WindowState = 0;// normal
 		}
-		if (MinBtn.MouseUp()) {
-			UIComp.WindowState = 1;// minimized
-		}
+		if (MinBtn.MouseUp()) UIComp.OhMinimize();
 		if(show_menu){
 			for(var i = 0; i < MenubarBtn.length; i++){
 				MenubarBtn[i].MouseUp();
@@ -1030,7 +1066,7 @@ function on_playback_new_track(info) {
 	}
 	
 	TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(info);
-	TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
+	TopSubTitle.Text = fb.TitleFormat("$if2( - %artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
 	if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(info);
 	repaintWin("TX");
 }
@@ -1040,7 +1076,7 @@ function on_metadb_changed(handles, fromhook) {
 		metadb = fb.GetNowPlaying();
 		if(metadb && handles.Find(metadb) > -1){
 			TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(metadb);
-			TopSubTitle.Text = fb.TitleFormat("$if2( - %album artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(metadb);
+			TopSubTitle.Text = fb.TitleFormat("$if2( - %artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(metadb);
 			if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(metadb);
 			repaintWin("TX");
 		}
@@ -1067,6 +1103,10 @@ function on_playback_time(time) {
 		g_seconds = time;
 		window.RepaintRect(leftbarw, 0, menuicow, topbarh);
 	}
+}
+
+function on_playback_seek(time) {
+	on_playback_time(time);
 }
 
 function on_volume_change(v) {

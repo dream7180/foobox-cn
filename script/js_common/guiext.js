@@ -196,8 +196,7 @@ ButtonUI.prototype.SetXY = function(x, y){
 }
 
 ButtonUI.prototype.Paint = function(gr) {
-	gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, 0, this.width, this.height, 0);
-	if(this.state > 0) gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, this.state * this.height, this.width, this.height, 0);
+	gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, this.state * this.height, this.width, this.height, 0);
 }
 
 ButtonUI.prototype.Repaint = function() {

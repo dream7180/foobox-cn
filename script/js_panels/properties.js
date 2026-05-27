@@ -1,12 +1,5 @@
 ﻿'use strict';
-window.DefinePanel('Track properties', {author:'marc2003, dreamawake'});
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-window.DlgCode = DLGC_WANTALLKEYS;
-let g_font, zdpi;
-const IDC_ARROW = 32512;
-const IDC_HAND = 32649;
-let margin_L, margin_T, z12, sb_font, tooltip;
-let showheader = window.GetProperty('List.show.header', false);
+let margin_L, z12, sb_font, tooltip;
 let _bmp = gdi.CreateImage(1, 1);
 let _gr = _bmp.GetGraphics();
 
@@ -42,134 +35,6 @@ let lang_tech = {
 	"COMPOSER" : "作曲",
 	"PERFORMER" : "指挥",
 	"TOTALTRACKS" : "合计音轨"
-}
-
-//main
-get_font();
-let panel = new _panel();
-let list = new _list();
-panel.item_focus_change();
-
-//callback function
-function on_size() {
-	window.MinWidth = 50;
-	window.MinHeight = 50;
-	panel.size();
-	if (!panel.w || !panel.h) return;
-	list.size();
-}
-
-function on_paint(gr) {
-	panel.paint(gr);
-	if(showheader){
-		var line_w = Math.round(list.w/2);
-		gr.GdiDrawText(list.header_text(), panel.fonts.title, panel.colours.text, margin_L, 0, panel.w - (margin_L * 2), margin_T, cc_txt);
-		gr.FillGradRect(list.x, list.y + 1, line_w, 1, 0, panel.colours.background, panel.colours.line, 1.0);
-		gr.FillGradRect(line_w, list.y + 1, line_w, 1, 0, panel.colours.line, panel.colours.background, 1.0);
-		gr.FillSolidRect(line_w, list.y + 1, 1, 1, panel.colours.line);
-	}
-	list.paint(gr);
-}
-
-function on_metadb_changed() {
-	list.metadb_changed();
-}
-function on_mouse_wheel(s) {
-	list.wheel(s);
-}
-
-function on_mouse_move(x, y) {
-	list.move(x, y);
-}
-
-function on_mouse_lbtn_up(x, y) {
-	list.lbtn_up(x, y);
-}
-
-function on_mouse_rbtn_up(x, y) {
-	return panel.rbtn_up(x, y, list);
-}
-
-function on_key_down(k) {
-	list.key_down(k);
-}
-
-function on_colours_changed() {
-	panel.colours_changed();
-	window.Repaint();
-}
-
-function on_font_changed() {
-	get_font();
-	list.size();
-	panel.font_changed();
-	window.Repaint();
-}
-
-function on_item_focus_change() {
-	panel.item_focus_change();
-}
-
-function on_playback_dynamic_info_track() {
-	panel.item_focus_change();
-}
-
-function on_playback_new_track() {
-	panel.item_focus_change();
-}
-
-function on_playback_stop(reason) {
-	if (reason != 2) {
-		panel.item_focus_change();
-	}
-}
-
-function on_playlist_switch() {
-	panel.item_focus_change();
-}
-
-function on_notify_data(name, info) {
-	switch (name) {
-	case "MetadataInfo":
-		showheader = !info;
-		window.SetProperty('List.show.header', showheader);
-		list.size();
-		window.Repaint();
-		break;
-	case "foobox_infoArt_followcursor":
-		panel.selection.value = info * 1;
-		panel.item_focus_change();
-		break;
-	case "color_scheme_updated":
-		if(!info) {
-			panel.colours.background = panel.colours.background_default;
-			window.Repaint();
-		}else if(info.length > 3){
-			panel.colours.background = RGB(info[3], info[4], info[5]);
-			window.Repaint();
-		}
-		break;
-	}
-}
-
-function on_script_unload() {
-	_tt('');
-	if (_bmp) {
-		_bmp.ReleaseGraphics(_gr);
-	}
-	_gr = null;
-	_bmp = null;
-}
-
-function get_font() {
-	g_font = window.GetFontDUI(FontTypeDUI.playlists);
-	zdpi = g_font.Size / 12;
-	margin_L = z(5);
-	margin_T = z(20);
-	z12 = z(12);
-	sb_font = GdiFont('FontAwesome', margin_L*2, 0);
-	tooltip = window.CreateTooltip(g_font.Name, g_font.Size);
-	tooltip.SetMaxWidth(z(1200));
 }
 
 function _cc(name) {
@@ -223,7 +88,6 @@ function _sb(t, v, fn) {
 			window.SetCursor(IDC_HAND);
 			return true;
 		} else {
-			//window.SetCursor(IDC_ARROW);
 			return false;
 		}
 	}
@@ -266,25 +130,42 @@ function getstr(langpack, name){
 	return str;
 }
 
-function _panel() {
-	this.item_focus_change = () => {
-		if (this.selection.value == 0) {
-			this.metadb = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
-		} else {
-			this.metadb = fb.GetFocusItem();
+function _splitv() {
+	this.paint = (gr) => {
+		gr.FillGradRect(0, upperh + 1, ww, 1, 0, c_background, panel.colours.line, 0.5);
+	}
+	this.move = (x, y) => {
+		let state_org = this.hover;
+		if(this.drag && y > infobar_h && y < wh - infobar_h){
+			window.SetCursor(IDC_SIZENS);
+			upperh = y - 1;
+			panel_setsize();
+			upperRatio = upperh/wh;
+				window.SetProperty("Upper panel ratio", Math.round(upperRatio*100000)/100000);
+				window.Repaint();
 		}
-		on_metadb_changed();
-		if (!this.metadb) {
-			_tt('');
+		if(x > 0 && y > upperh - 1 && x < ww && y < upperh + 4) {
+			this.hover = true;
+			window.SetCursor(IDC_SIZENS);
+		} else {
+			this.hover = false;
 		}
 	}
-	
+	this.lbtn_down = (x, y) => {
+		if(this.hover) this.drag = true;
+	}
+	this.lbtn_up = (x, y) => {
+		if(this.drag) this.drag = false;
+	}
+	this.repaint = () => {
+		window.RepaintRect(0, upperh - 1, ww, 5);
+	}
+}
+
+function _panel() {
 	this.colours_changed = () => {
-		this.colours.background_default = window.GetColourDUI(ColorTypeDUI.background);
-		this.colours.text = window.GetColourDUI(ColorTypeDUI.text);
-		this.colours.background = this.colours.background_default;
-		this.dark_mode = isDarkMode(this.colours.background);
-		if(this.dark_mode){
+		this.colours.text = fontcolor;
+		if(dark_mode){
 			this.colours.line = RGBA(0, 0, 0, 120);
 			this.colours.tagtext = blendColors(c_black, this.colours.text, 0.65);
 		}else{
@@ -302,20 +183,9 @@ function _panel() {
 		this.row_height = Math.round(this.fonts.normal.Height * 1.25);
 		this.list_objects.forEach((item) => {
 			item.size();
-			item.metadb_changed();
 		});
 	}
-	
-	this.size = () => {
-		this.w = window.Width;
-		this.h = window.Height;
-	}
-	
-	this.paint = (gr) => {
-		gr.FillSolidRect(0, 0, this.w, this.h, this.colours.background);
-		gr.FillGradRect(this.w-1, 0, 1, this.h, 0, this.colours.background, this.colours.background, 1);//bug of win10 border
-	}
-	
+
 	this.rbtn_up = (x, y, object) => {
 		this.m = window.CreatePopupMenu();
 		// panel 1-999
@@ -361,7 +231,6 @@ function _panel() {
 	this.w = 0;
 	this.h = 0;
 	this.metadb = fb.GetFocusItem();
-	this.selection = new _p('Panel.Selection', 0);
 	this.click_plfunc = new _p('Panel.click.autoplaylist', true);
 	this.list_objects = [];
 	this.tfo = {
@@ -376,9 +245,9 @@ function _list() {
 		this.index = 0;
 		this.offset = 0;
 		this.x = margin_L;
-		this.y = margin_T*showheader;
+		this.y = upperh + 3;
 		this.w = panel.w - (margin_L * 2);
-		this.h = panel.h - margin_T * showheader;
+		this.h = panel.h;
 		this.rows = Math.floor((this.h - z(24)) / panel.row_height);
 		this.up_btn.size(this.x + Math.round((this.w - z12) / 2), this.y, z12, z12);
 		this.down_btn.size(this.up_btn.x, this.y + this.h - z12, z12, z12);
@@ -396,26 +265,13 @@ function _list() {
 		this.up_btn.paint(gr, panel.colours.text);
 		this.down_btn.paint(gr, panel.colours.text);
 	}
-	
-	this.metadb_changed = () => {
-		if(!panel.metadb){
-			this.artist = '';
-			this.data = [];
-			this.items = 0;
-			window.Repaint();
-		} else this.update();
-	}
-	
-	this.playback_new_track = () => {
-		panel.item_focus_change();
-	}
-	
+
 	this.trace = (x, y) => {
 		return x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h;
 	}
 	
 	this.wheel = (s) => {
-		if (this.trace(this.mx, this.my)) {
+		if (this.trace(cursorX, cursorY)) {
 			if (this.items > this.rows) {
 				let offset = this.offset - (s * 3);
 				if (offset < 0) {
@@ -436,9 +292,6 @@ function _list() {
 	}
 	
 	this.move = (x, y) => {
-		if(this.mx == x && this.my == y) return false;
-		this.mx = x;
-		this.my = y;
 		window.SetCursor(IDC_ARROW);
 		if (this.trace(x, y)) {
 			this.index = Math.floor((y - this.y - z12) / panel.row_height) + this.offset;
@@ -503,23 +356,23 @@ function _list() {
 		switch (idx) {
 		case 1300:
 			this.properties.meta.toggle();
-			panel.item_focus_change();
+			OnMetadbChanged();
 			break;
 		case 1301:
 			this.properties.location.toggle();
-			panel.item_focus_change();
+			OnMetadbChanged();
 			break;
 		case 1302:
 			this.properties.tech.toggle();
-			panel.item_focus_change();
+			OnMetadbChanged();
 			break;
 		case 1303:
 			this.properties.playcount.toggle();
-			panel.item_focus_change();
+			OnMetadbChanged();
 			break;
 		case 1304:
 			this.properties.rg.toggle();
-			panel.item_focus_change();
+			OnMetadbChanged();
 			break;
 		}
 	}
@@ -569,11 +422,6 @@ function _list() {
 		this.items = this.data.length;
 		this.offset = 0;
 		this.index = 0;
-		window.Repaint();
-	}
-
-	this.header_text = () => {
-		return panel.tf('%artist% - %title%');
 	}
 	
 	this.reset = () => {
@@ -688,8 +536,6 @@ function _list() {
 	}
 	
 	panel.list_objects.push(this);
-	this.mx = 0;
-	this.my = 0;
 	this.index = 0;
 	this.offset = 0;
 	this.items = 0;

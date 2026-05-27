@@ -37,7 +37,6 @@ var g_start_ = 0,
 var pidx = -1;
 var btn_sw;
 var btn_clicked = false;
-var btn_w = 22, btn_h = 22;
 
 var g_delay_refresh_items = false;
 var Queue_timer = false;
@@ -253,8 +252,8 @@ oBrowser = function(name) {
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight - 2, g_color_topbar);
 			gr.DrawLine(0, ppt.headerBarHeight, ww, ppt.headerBarHeight, 1, g_color_line_div);
 			gr.GdiDrawText(this.tag, g_font_tag, tag_color, this.paddingLeft, 0, this.paddingLeft*2, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_w - rh - this.paddingLeft*6.5, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_w - rh - this.paddingLeft*1.5, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
+			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_sw.w - rh - this.paddingLeft*6.5, ppt.headerBarHeight, lc_txt);
+			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_sw.h - rh - this.paddingLeft*1.5, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
 			brw.scrollbar && brw.scrollbar.draw(gr);
 		};
 	};
@@ -480,7 +479,7 @@ PL_Menu = function(x, y) {
 }
 //=================================== Main ================================================================
 function init_btn(){
-	btn_sw = new button(img_menubt, img_menubt_ov, img_menubt_ov, "");
+	btn_sw = new button(false, img_menubt, img_menubt);
 }
 
 function SelectAtoB(start_id, end_id) {
@@ -539,7 +538,7 @@ function on_paint(gr) {
 	if (!ww) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
 	brw && brw.draw(gr);
-	btn_sw.draw(gr, ww - btn_w - z(3), Math.floor((ppt.headerBarHeight - btn_h - z(2)) / 2), 255);
+	btn_sw.draw(gr, ww - btn_sw.w - z(3), Math.floor((ppt.headerBarHeight - btn_sw.h - z(2)) / 2), 255);
 	gr.GdiDrawText("\uEF3E", g_font_tag, g_color_normal_txt, btn_sw.x, btn_sw.y, btn_sw.w, btn_sw.h, cc_txt);
 };
 
@@ -624,7 +623,7 @@ function on_mouse_lbtn_up(x, y) {
 		};
 	};
 	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		if(plman.PlaylistCount < 901) PL_Menu(ww-btn_w-4*zdpi, btn_h+4*zdpi);
+		if(plman.PlaylistCount < 901) PL_Menu(ww-btn_sw.w-4*zdpi, btn_sw.h+4*zdpi);
 		else fb.RunMainMenuCommand("视图/播放列表管理器");
 		btn_sw.state = ButtonStates.normal;
 		btn_sw.repaint();
@@ -703,19 +702,12 @@ function get_metrics() {
 
 function get_images() {
 	var gb;
-	var bt_h = z(24);
-	btn_w = z(22);
-	btn_h = z(22);
-	
-	img_menubt = gdi.CreateImage(bt_h, bt_h);
+	let btn_w = z(24);
+	img_menubt = gdi.CreateImage(btn_w, btn_w);
 	gb = img_menubt.GetGraphics();
-	img_menubt.ReleaseGraphics(gb);
-		
-	img_menubt_ov = gdi.CreateImage(bt_h, bt_h);
-	gb = img_menubt_ov.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(0, 0, bt_h-1, bt_h-1, z(3), z(3), g_color_bt_overlay);
-	img_menubt_ov.ReleaseGraphics(gb);
+	gb.FillRoundRect(0, 0, btn_w-1, btn_w-1, z(3), z(3), g_color_bt_overlay);
+	img_menubt.ReleaseGraphics(gb);
 };
 
 function get_font() {

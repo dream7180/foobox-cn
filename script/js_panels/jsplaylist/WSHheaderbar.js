@@ -103,7 +103,7 @@ oHeaderBar = function() {
 		gb.SetTextRenderingHint(0);
 		this.menu_btn_ov.ReleaseGraphics(gb);
 
-		this.button = new button(this.menu_btn, this.menu_btn_ov, this.menu_btn_ov, "");
+		this.button = new button(this.menu_btn, this.menu_btn_ov, this.menu_btn_ov);
 	};
 	this.setButtons();
 
@@ -121,13 +121,13 @@ oHeaderBar = function() {
 
 	this.calculateColumns = function() {
 		var tmp = this.x;
-
 		// calc column metrics for calculating border metrics as well
 		for (var i = 0; i < this.totalColumns; i++) {
 			if (this.columns[i].percent > 0) {
 				this.columns[i].x = tmp;
 				this.columns[i].y = this.y;
-				this.columns[i].w = Math.abs(this.w * this.columns[i].percent / 10000);
+				if(i == 0) this.columns[i].w = z(this.columns[i].percent);
+				else this.columns[i].w = Math.abs((this.w - this.columns[0].w) * this.columns[i].percent / 10000);
 				this.columns[i].h = this.h;
 				if (i != this.columnDraggedId || (this.columnDragged == 1)) {
 					// start >> on last column, adjust width of last drawn column to fit headerbar width!
@@ -363,7 +363,7 @@ oHeaderBar = function() {
 					fields.push(new Array("null", sort_pattern_queue, "null", sort_pattern_tracknumber, sort_pattern_title, sort_pattern_date, sort_pattern_artist, sort_pattern_albumartist, sort_pattern_album, sort_pattern_genre, "%mood% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", sort_pattern_rating, sort_pattern_playcount, sort_pattern_bitrate, sort_pattern_codec, "%samplerate% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", "$if2(%length%,' 0:00') | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%"));
 					break;
 				case 6:
-					fields.push(new Array("1000", "500", "0", "500", "3700", "0", "2600", "0", "0", "0", "0", "1000", "0", "0", "0", "0", "700"));
+					fields.push(new Array("99", "600", "0", "600", "3850", "0", "2850", "0", "0", "0", "0", "1250", "0", "0", "0", "0", "850"));
 					break;
 				};
 				// convert array to csv string
@@ -442,7 +442,7 @@ oHeaderBar = function() {
 				case 6:
 					tmp = layout.columnWidth[layout.index];
 					if (!tmp) {
-						tmp = "1000^^500^^0^^500^^3700^^0^^2600^^0^^0^^0^^0^^1000^^0^^0^^0^^0^^700";
+						tmp = "99^^600^^0^^600^^3850^^0^^2850^^0^^0^^0^^0^^1250^^0^^0^^0^^0^^850";
 						for (var j = 17; j < this.totalColumns; j++){
 							tmp = tmp + "^^0";
 						}
@@ -653,10 +653,14 @@ oHeaderBar = function() {
 								var toDoRight = (this.columns[this.borders[i].rightId].w - d > this.columns[this.borders[i].rightId].minWidth);
 								if (toDoLeft && toDoRight) { // ok, we can resize the left and the right columns
 									this.columns[this.borders[i].leftId].w += d;
-									this.columns[this.borders[i].rightId].w -= d;
-									var addedPercent = Math.round(Math.abs(this.columns[this.borders[i].leftId].percent) + Math.abs(this.columns[this.borders[i].rightId].percent));
-									this.columns[this.borders[i].leftId].percent = Math.round(Math.abs(this.columns[this.borders[i].leftId].w / this.w * 10000));
-									this.columns[this.borders[i].rightId].percent = addedPercent - this.columns[this.borders[i].leftId].percent;
+									if(this.borders[i].leftId == 0) {
+										this.columns[0].percent = Math.round(this.columns[0].w/zdpi*100)/100;
+									}else{
+										this.columns[this.borders[i].rightId].w -= d;
+										var addedPercent = Math.round(Math.abs(this.columns[this.borders[i].leftId].percent) + Math.abs(this.columns[this.borders[i].rightId].percent));
+										this.columns[this.borders[i].leftId].percent = Math.round(Math.abs(this.columns[this.borders[i].leftId].w / (this.w - this.columns[0].w) * 10000));
+										this.columns[this.borders[i].rightId].percent = addedPercent - this.columns[this.borders[i].leftId].percent;
+									}
 									this.borders[i].sourceX = x;
 									this.calculateColumns();
 									full_repaint();
@@ -852,14 +856,22 @@ oHeaderBar = function() {
 			p.list.setItems(2);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
-		case (idx >= 100 && idx <= 200):
+		case (idx == 100):
+			if (this.columns[0].percent == 0) this.columns[0].percent = 99;
+			else this.columns[0].percent = 0;
+			this.saveColumnsWidth();
+			this.initColumns();
+			get_grprow_minimum(this.columns[0].w);
+			update_playlist(layout.collapseGroupsByDefault, 2);
+			break;
+		case (idx > 100 && idx <= 200):
 			// all size changes are in percent / ww
 			if (this.columns[idx - 100].percent == 0) {
 				var newColumnSize = 800;
 				this.columns[idx - 100].percent = newColumnSize;
 				var totalColsToResizeDown = 0;
 				var last_idx = 0;
-				for (var k = 0; k < this.columns.length; k++) {
+				for (var k = 1; k < this.columns.length; k++) {
 					if (k != idx - 100 && this.columns[k].percent > newColumnSize) {
 						totalColsToResizeDown++;
 						last_idx = k;
@@ -867,21 +879,21 @@ oHeaderBar = function() {
 				};
 				var minus_value = Math.floor(newColumnSize / totalColsToResizeDown);
 				var reste = newColumnSize - (minus_value * totalColsToResizeDown);
-				for (var k = 0; k < this.columns.length; k++) {
+				for (var k = 1; k < this.columns.length; k++) {
 					if (k != idx - 100 && this.columns[k].percent > newColumnSize) {
 						this.columns[k].percent = Math.abs(this.columns[k].percent) - minus_value;
 						if (reste > 0 && k == last_idx) {
 							this.columns[k].percent = Math.abs(this.columns[k].percent) - reste;
 						};
 					};
-					this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 10000);
+					//this.columns[k].w = Math.abs((this.w - this.columns[0].w) * this.columns[k].percent / 10000);
 				};
 				this.saveColumnsWidth();
 			}
 			else {
 				// check if it's not the last column visible, otherwise, we coundn't hide it!
 				var nbvis = 0;
-				for (var k = 0; k < this.columns.length; k++) {
+				for (var k = 1; k < this.columns.length; k++) {
 					if (this.columns[k].percent > 0) {
 						nbvis++;
 					};
@@ -891,7 +903,7 @@ oHeaderBar = function() {
 					this.columns[idx - 100].percent = 0;
 					var totalColsToResizeUp = 0;
 					var last_idx = 0;
-					for (var k = 0; k < this.columns.length; k++) {
+					for (var k = 1; k < this.columns.length; k++) {
 						if (k != idx - 100 && this.columns[k].percent > 0) {
 							totalColsToResizeUp++;
 							last_idx = k;
@@ -899,20 +911,19 @@ oHeaderBar = function() {
 					};
 					var add_value = Math.floor(RemovedColumnSize / totalColsToResizeUp);
 					var reste = RemovedColumnSize - (add_value * totalColsToResizeUp);
-					for (var k = 0; k < this.columns.length; k++) {
+					for (var k = 1; k < this.columns.length; k++) {
 						if (k != idx - 100 && this.columns[k].percent > 0) {
 							this.columns[k].percent = Math.abs(this.columns[k].percent) + add_value;
 							if (reste > 0 && k == last_idx) {
 								this.columns[k].percent = Math.abs(this.columns[k].percent) + reste;
 							};
 						};
-						this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 10000);
+						//this.columns[k].w = Math.abs((this.w - this.columns[0].w) * this.columns[k].percent / 10000);
 					};
 					this.saveColumnsWidth();
 				};
 			};
 			this.initColumns();
-
 			// set minimum rows / cover column size
 			get_grprow_minimum(this.columns[0].w);
 			update_playlist(layout.collapseGroupsByDefault, 2);

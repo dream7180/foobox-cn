@@ -37,7 +37,6 @@ var g_start_ = 0,
 var pidx = -1;
 var tf_string = ["$if2(%album%,单曲)", "$if2(%album artist%,未知艺术家)", "$if2(%artist%,未知艺术家)", "$if2(%genre%,未知流派)", "%directoryname%"];
 var btn_sw;
-var btn_w = 24, btn_h = 24;
 
 var g_delay_refresh_items = false;
 var Queue_timer = false;
@@ -288,8 +287,8 @@ oBrowser = function(name) {
 			gr.FillSolidRect(0, 0, ww, ppt.headerBarHeight - 2, g_color_topbar);
 			gr.DrawLine(0, ppt.headerBarHeight, ww, ppt.headerBarHeight, 1, g_color_line_div);
 			gr.GdiDrawText(this.tag, g_font_tag, tag_color, this.paddingLeft, 0, this.paddingLeft*2, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_w - rh - this.paddingLeft*6, ppt.headerBarHeight, lc_txt);
-			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_w - rh - this.paddingLeft, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
+			gr.GdiDrawText(this.name, g_font, g_color_normal_txt, this.paddingLeft*4, 0, ww - btn_sw.w - rh - this.paddingLeft*6, ppt.headerBarHeight, lc_txt);
+			gr.GdiDrawText(this.rows.length, g_font, g_color_normal_txt, ww - btn_sw.w - rh - this.paddingLeft, 0, rh+this.paddingLeft, ppt.headerBarHeight, cc_txt);
 			brw.scrollbar && brw.scrollbar.draw(gr);
 		};
 	};
@@ -551,7 +550,7 @@ function on_paint(gr) {
 	if (!ww) return;
 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
 	brw && brw.draw(gr);
-	btn_sw.draw(gr, ww - btn_w - 1, Math.floor((ppt.headerBarHeight - btn_h) / 2), 255);
+	btn_sw.draw(gr, ww - btn_sw.w - 1, Math.floor((ppt.headerBarHeight - btn_sw.h) / 2), 255);
 };
 
 function on_mouse_lbtn_down(x, y) {
@@ -710,9 +709,9 @@ function get_metrics() {
 };
 
 function get_images() {
-	btn_w = Math.floor(24 * zdpi);
-	btn_h = Math.floor(12 * zdpi) + 12;
-	var gb, x5 = 5*zdpi;
+	let btn_w = Math.floor(24 * zdpi);
+	let btn_h = Math.floor(12 * zdpi) + 12;
+	let gb, x5 = 5*zdpi;
 	img_plsw = gdi.CreateImage(btn_w, btn_h);
 	gb = img_plsw.GetGraphics();
 	gb.SetSmoothingMode(2);

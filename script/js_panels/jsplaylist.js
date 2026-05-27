@@ -13,7 +13,7 @@ var zdpi = 1;
 commoncfg = commoncfg.split(",");
 var drawmode = window.DrawMode;
 var follow_cursor = window.GetProperty("foobox.infoArt.follow.cursor", false);
-var rating2tag = window.GetProperty("foobox.rating.write.to.file", false);
+var rating2tag = 0;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var config_dir = fb.ProfilePath + "foobox\\config\\";
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
@@ -34,7 +34,7 @@ var title_add = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.12";
+var g_script_version = "8.13";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -1886,6 +1886,9 @@ function on_notify_data(name, info) {
 			save_layout();
 		}
 		break;
+	case "DoRepaint":
+		full_repaint();
+		break;
 	case "foobox_setting":
 		if(info) show_setting(3);
 		else if(cSettings.visible){
@@ -2414,6 +2417,7 @@ function get_misccfg(){
 		color_noesl = Number(commoncfg[6]);
 		color_threshold = Number(commoncfg[7]);
 		cbkg_chroma = Number(commoncfg[8]);
+		rating2tag = Number(commoncfg[9]);
 		commoncfg.length = 0;
 	}
 	var misccfg = "";
@@ -2446,7 +2450,7 @@ function save_misccfg(conf){
 			utils.WriteTextFile(config_dir + "miscconf", show_menu + "##" + show_extrabtn + "##" + libbtn_fuc + "##" + _track_edit_app + "##" + _title_add +  "##" + colorful_seek);
 			break;
 		case "common":
-			utils.WriteTextFile(config_dir + "common", drawmode +","+ cRow.default_playlist_h +","+ cList.scrollstep +","+ sys_scrollbar +","+ color_bycover +","+ cbkg_bycover +","+ color_noesl +","+ color_threshold +","+ cbkg_chroma +","+ "0");
+			utils.WriteTextFile(config_dir + "common", drawmode +","+ cRow.default_playlist_h +","+ cList.scrollstep +","+ sys_scrollbar +","+ color_bycover +","+ cbkg_bycover +","+ color_noesl +","+ color_threshold +","+ cbkg_chroma +","+ rating2tag);
 	}
 }
 

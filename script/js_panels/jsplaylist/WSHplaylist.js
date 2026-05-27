@@ -141,11 +141,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		}
 		var _playing_idx = (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex);
 		var fin = p.headerBar.columns.length;
-		for (var j = 0; j < fin; j++) {
+		for (var j = 1; j < fin; j++) {
 			tf1 = tf2 = null;
 			if (p.headerBar.columns[j].w > 0) {
 				cx = p.headerBar.columns[j].x + g_z5;
-				cw = (Math.abs(p.headerBar.w * p.headerBar.columns[j].percent / 10000)) - g_z10;
+				cw = (Math.abs((p.headerBar.w - p.headerBar.columns[0].w)* p.headerBar.columns[j].percent / 10000)) - g_z10;
 				switch (p.headerBar.columns[j].ref) {
 				case "状态":
 					if (p.headerBar.columns[j].tf == "null") {

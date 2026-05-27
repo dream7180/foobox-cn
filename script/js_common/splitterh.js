@@ -38,7 +38,12 @@ function on_size() {
 		PLeft.Move(0, 0, lw_calc, wh);
 		PRight.Move(lw_calc + 2, 0, ww - lw_calc - 2, wh);
 		window.Repaint();
-	}, 50);
+		if(window.DrawMode && PRight.Text == "jsspv") {
+			window.SetTimeout(function() {
+				window.NotifyOthers("DoRepaint", true);
+			}, 20);
+		}
+	}, 25);
 }
 
 function on_paint(gr) {

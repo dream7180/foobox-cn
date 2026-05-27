@@ -1,9 +1,5 @@
-﻿// *****************************************************************************************************************************************
-// Common functions & flags by Br3tt aka Falstaff (c)2013-2015
-// *****************************************************************************************************************************************
-//=================================================// General declarations
-SM_CXVSCROLL = 2;
-SM_CYHSCROLL = 3;
+﻿// Common functions & flags by Br3tt aka Falstaff (c)2013-2015
+// ***********************************************************
 // Used in window.SetCursor()
 // {{
 IDC_ARROW = 32512;
@@ -84,8 +80,8 @@ function replaceAll(str, search, repl) {
 ButtonStates = {normal: 0, hover: 1, down: 2};
 button = function (normal, hover, down, tooltipText) {
 	this.img = Array(normal, hover, down);
-	this.w = this.img[0].Width;
-	this.h = this.img[0].Height;
+	this.w = this.img[1].Width;
+	this.h = this.img[1].Height;
 	if(tooltipText){
 		this.Tooltip = window.CreateTooltip("", g_fsize);
 		this.Tooltip.Text = tooltipText;
@@ -94,22 +90,19 @@ button = function (normal, hover, down, tooltipText) {
 	this.update = function (normal, hover, down, Tooltip) {
 		this.img = Array(normal, hover, down);
 		if(tooltipText)this.Tooltip.Text = Tooltip;
-		this.w = this.img[0].Width;
-		this.h = this.img[0].Height;
+		this.w = this.img[1].Width;
+		this.h = this.img[1].Height;
 	};
 	this.draw = function (gr, x, y, alpha) {
 		this.x = x;
 		this.y = y;
 		this.img[this.state] && gr.DrawImage(this.img[this.state], this.x, this.y, this.w, this.h, 0, 0, this.w, this.h, 0, alpha);
 	};
-	this.display_context_menu = function (x, y, id) {}
+
 	this.repaint = function () {
 		if(tooltipText)this.Tooltip.Deactivate();
 		window.RepaintRect(this.x, this.y, this.w, this.h);
 	};
-	this.changeTooltip = function (newTooltip){
-		this.Tooltip.Text = newTooltip;
-	}
 	
 	this.checkstate = function (event, x, y) {
 		this.ishover = (x > this.x && x < this.x + this.w - 1 && y > this.y && y < this.y + this.h - 1);
@@ -160,43 +153,8 @@ button = function (normal, hover, down, tooltipText) {
 	};
 };
 
-function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, line_color, fill_color, angle, opacity){
-	// ---------------------
-	// code by ExtremeHunter
-	// ---------------------
-
-	if(!opacity && opacity != 0) opacity = 255;
-
-	//---> Create points
-	var point_arr = [];
-	for (var i = 0; i != points; i++) {
-		i % 2 ? r = Math.round((out_radius-line_thickness*4)/2) / in_radius : r = Math.round((out_radius-line_thickness*4)/2);
-		var x_point = Math.floor(r * Math.cos(Math.PI * i / points * 2 - Math.PI / 2));
-		var y_point = Math.ceil(r * Math.sin(Math.PI * i / points * 2 - Math.PI / 2));
-		point_arr.push(x_point + out_radius/2);
-		point_arr.push(y_point + out_radius/2);
-	};
-
-	//---> Crate poligon image
-	var img = gdi.CreateImage(out_radius, out_radius);
-	var _gr = img.GetGraphics();
-	_gr.SetSmoothingMode(2);
-	_gr.FillPolygon(fill_color, 1, point_arr);
-	if(line_thickness > 0)
-	_gr.DrawPolygon(line_color, line_thickness, point_arr);
-	img.ReleaseGraphics(_gr);
-
-	//---> Draw image
-	gr.DrawImage(img, x, y, out_radius, out_radius, 0, 0, out_radius, out_radius, angle, opacity);
-};
-
 function get_system_scrollbar_width() {
-	var tmp = utils.GetSystemMetrics(SM_CXVSCROLL);
-	return tmp;
-};
-
-function get_system_scrollbar_height() {
-	var tmp = utils.GetSystemMetrics(SM_CYHSCROLL);
+	var tmp = utils.GetSystemMetrics(2);//2-SM_CXVSCROLL
 	return tmp;
 };
 

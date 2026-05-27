@@ -190,8 +190,7 @@ oBrowser = function() {
 	this.new_bt = null;
 
 	this.images = {
-		topbar_btn: null,
-		topbar_btn_ov: null
+		topbar_btn: null
 	};
 
 	this.getImages = function() {
@@ -200,16 +199,12 @@ oBrowser = function() {
 		
 		this.images.topbar_btn = gdi.CreateImage(bt_h, bt_h);
 		gb = this.images.topbar_btn.GetGraphics();
-		this.images.topbar_btn.ReleaseGraphics(gb);
-		
-		this.images.topbar_btn_ov = gdi.CreateImage(bt_h, bt_h);
-		gb = this.images.topbar_btn_ov.GetGraphics();
 		gb.SetSmoothingMode(2);
 		gb.FillRoundRect(zdpi, zdpi, z(22)-1, z(22)-1, z(3), z(3), g_color_bt_overlay);
-		this.images.topbar_btn_ov.ReleaseGraphics(gb);
+		this.images.topbar_btn.ReleaseGraphics(gb);
 
-		this.new_bt = new button(this.images.topbar_btn, this.images.topbar_btn_ov, this.images.topbar_btn_ov);
-		this.new_menu = new button(this.images.topbar_btn, this.images.topbar_btn_ov, this.images.topbar_btn_ov);
+		this.new_bt = new button(false, this.images.topbar_btn, this.images.topbar_btn);
+		this.new_menu = new button(false, this.images.topbar_btn, this.images.topbar_btn);
 	};
 	this.getImages();
 	

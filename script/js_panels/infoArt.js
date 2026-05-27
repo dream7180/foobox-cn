@@ -4,6 +4,7 @@ window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'})
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\script\\js_panels\\properties.js');
 commoncfg = commoncfg.split(",");
 var zdpi = 1;
 var menubutton_w, menubutton_h;
@@ -15,6 +16,8 @@ var Caption_Pack = {
 	"Icon": "图标",
 	"Artist": "艺术家"
 }
+var upperRatio = window.GetProperty("Upper panel ratio", 0.5);
+var upperh = 0;
 var currentMetadb = null, l_mood;
 var get_imgCol = false;
 var dark_mode = false;
@@ -23,10 +26,13 @@ var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = Number(commoncfg[4]);
 var color_bycover_default = color_bycover;
 var cbkg_bycover = Number(commoncfg[5]);
+var sw_noesl = Number(commoncfg[6]);
 var color_threshold = Number(commoncfg[7]);
 var cbkg_chroma = Number(commoncfg[8]);
+var rating_to_tag =  Number(commoncfg[9]);
 commoncfg.length = 0;
-var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
+var auto_eslprop = window.GetProperty("Auto.switch.esl.prop", true);
+var eslCtrl = null, eslPanels = null;
 
 function GetCaption(name) {
 	var str = Caption_Pack[name];
@@ -48,14 +54,13 @@ SearchItems.push(new SearchItem("Google.com", "https://www.google.com/search?q=%
 SearchItems.push(new SearchItem("Last.fm", "http://www.last.fm/search?q=%s&type=album", "[%album artist% ][%album%]"));
 
 //----------infobar---------------------
-var show_infobar = window.GetProperty("Display.InfoBar", true);
-var show_rating = window.GetProperty("Display.Rating", true);
-var rating_to_tag =  window.GetProperty("foobox.rating.write.to.file", false);
-var is_mood = window.GetProperty("Display.Mood", false);
+var infofull = window.GetProperty("Info.FullMode", true);
+var show_rating = window.GetProperty("Info.Rating", true);
+var is_mood = window.GetProperty("Info.Mood", false);
 if(!show_rating) is_mood = false;
 var g_font, g_font2;
 var currentMetadb;
-var rating_x, imgw, imgh, mood_h, infobar_h, line2_h, infobar_y = 0;
+var rating_x, imgh, infobar_h, line2_h, infobar_y = 0;
 var rating, txt_title, txt_info, txt_profile, main_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
 if (time_circle < 3000) time_circle = 3000;
@@ -79,8 +84,8 @@ function TextBtn() {
 
 function obtn_mood(){
 	this.y = infobar_y;
-	this.w = imgw;
-	this.h = mood_h;
+	this.w = imgh;
+	this.h = imgh;
 	this.img = mood_img;
 	this.isXYInButton = function(x, y) {
 		return (x >= this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h) ? true : false;
@@ -94,8 +99,9 @@ function obtn_mood(){
 	this.resetImg = function(){
 		this.img = mood_img;
 	}
-	this.setx= function(x){
+	this.setxy= function(x, y){
 		this.x = x;
+		this.y = y;
 	}
 	this.OnClick = function() {
 		if (!currentMetadb) {
@@ -110,13 +116,6 @@ function obtn_mood(){
 			}
 		}
 	}
-}
-
-function get_var() {
-	imgw = Math.floor(18*zdpi);
-	imgh = imgw;
-	mood_h = Math.floor(20*zdpi);
-	line2_h = 25*zdpi;
 }
 
 var ww = 0, wh = 0;
@@ -136,38 +135,47 @@ function get_colors() {
 }
 
 function get_font() {
-	g_font2 = window.GetFontDUI(FontTypeDUI.playlists);
-	let fname = g_font2.Name;
-	let fsize = g_font2.Size;
+	g_font = window.GetFontDUI(FontTypeDUI.playlists);
+	let fname = g_font.Name;
+	let fsize = g_font.Size;
 	zdpi = fsize / 12;
-	g_font = GdiFont(fname, fsize + 2, 1);
+	g_font2 = GdiFont(fname, fsize + 2, 1);
 	g_fnt_ico = GdiFont("FontAwesome", Math.round(fsize*1.4), 0);
 	g_fnt_mood = GdiFont("FontAwesome", Math.round(fsize*1.2), 0);
+	imgh = z(18);
+	line1_h = z(28);
+	line2_h = z(25);
+	//-----
+	margin_L = z(5);
+	z12 = z(12);
+	sb_font = GdiFont('FontAwesome', margin_L*2, 0);
+	tooltip = window.CreateTooltip(fname, fsize);
+	tooltip.SetMaxWidth(z(1200));
 }
 
 function get_imgs() {
 	let gb, mood_color = RGB(255, 0, 0);
-	img_rating_on = gdi.CreateImage(imgw, imgh);
+	img_rating_on = gdi.CreateImage(imgh, imgh);
 	gb = img_rating_on.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("\uF005", g_fnt_ico, c_rating_h, 0, 0, imgw, imgh, cc_stringformat);
+	gb.DrawString("\uF005", g_fnt_ico, c_rating_h, 0, 0, imgh, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	img_rating_on.ReleaseGraphics(gb);
 
-	img_rating_off = gdi.CreateImage(imgw, imgh);
+	img_rating_off = gdi.CreateImage(imgh, imgh);
 	gb = img_rating_off.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("\uF005", g_fnt_ico, icocolor, 0, 0, imgw, imgh, cc_stringformat);
+	gb.DrawString("\uF005", g_fnt_ico, icocolor, 0, 0, imgh, imgh, cc_stringformat);
 	gb.SetTextRenderingHint(0);
 	img_rating_off.ReleaseGraphics(gb);
 
-	mood_img = gdi.CreateImage(imgw, mood_h*2);
+	mood_img = gdi.CreateImage(imgh, imgh*2);
 	gb = mood_img.GetGraphics();
 	gb.SetTextRenderingHint(4);
-	gb.DrawString("\uF004", g_fnt_mood, mood_color, 0, 0, imgw, mood_h, cc_stringformat);
-	gb.DrawString("\uF004", g_fnt_mood, icocolor, 0, mood_h, imgw, mood_h, cc_stringformat);
-	menubutton_w = gb.CalcTextWidth("封面宽度w", g_font);
-	menubutton_h = gb.CalcTextHeight("高", g_font) * 1.65;
+	gb.DrawString("\uF004", g_fnt_mood, mood_color, 0, 0, imgh, imgh, cc_stringformat);
+	gb.DrawString("\uF004", g_fnt_mood, icocolor, 0, imgh, imgh, imgh, cc_stringformat);
+	menubutton_w = gb.CalcTextWidth("封面宽度w", g_font2);
+	menubutton_h = gb.CalcTextHeight("高", g_font2) * 1.65;
 	gb.SetTextRenderingHint(0);
 	mood_img.ReleaseGraphics(gb);
 	
@@ -183,45 +191,46 @@ function get_imgs() {
 	img_btn = CreateRawBitmap2(img_btn);
 }
 
-function initbutton() {
-	btn_mood = new obtn_mood();
-	for(var i = 0; i < 5; i++){
-		rbutton[i] = new ButtonUI_R();
-	}
-	TextBtn_info = new TextBtn();
-}
-
 function OnMetadbChanged(metadb) {
-	if(!show_infobar) return;
 	if(!metadb) metadb = currentMetadb;
+	panel.metadb = metadb;
 	if(!metadb){
-		window.RepaintRect(0, infobar_y, ww, infobar_h);
+		_tt('');
+		list.artist = '';
+		list.data = [];
+		list.items = 0;
+		window.RepaintRect(0, infobar_y, ww, wh - infobar_y);
 		return;
 	}
-	var tf_general = fb.TitleFormat("$if2(%title%,)^#^$if2(%artist%,)^#^$if2(%album%,)^#^%mood%^#^%rating%").EvalWithMetadb(metadb);
-	tf_general = tf_general.split("^#^");
-	rating = tf_general[4];
-	if (rating == "?") {
-		rating = 0;
+	if(infofull){
+		var tf_general = fb.TitleFormat("$if2(%title%,)^#^$if2(%artist%,)^#^$if2(%album%,)^#^%mood%^#^%rating%").EvalWithMetadb(metadb);
+		tf_general = tf_general.split("^#^");
+		rating = tf_general[4];
+		if (rating == "?") {
+			rating = 0;
+		}
+		txt_title =  tf_general[0];
+		var txt_info_artist = tf_general[1];
+		var txt_info_album = tf_general[2];
+		if(txt_info_artist) {
+			txt_info = txt_info_artist;
+			if(txt_info_album) txt_info = txt_info + "  |  " + txt_info_album;
+		}else if(txt_info_album) txt_info = txt_info_album;
+		else txt_info = "";
+		txt_profile = fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz").EvalWithMetadb(metadb);
+		l_mood = tf_general[3];
+		tracktype = TrackType(metadb.RawPath.substring(0, 4));
+		main_info = true;
+	} else {
+		txt_title = fb.TitleFormat("$if2(%artist% - ,)%title%").EvalWithMetadb(metadb);
 	}
-	txt_title =  tf_general[0];
-	var txt_info_artist = tf_general[1];
-	var txt_info_album = tf_general[2];
-	if(txt_info_artist) {
-		txt_info = txt_info_artist;
-		if(txt_info_album) txt_info = txt_info + "  |  " + txt_info_album;
-	}else if(txt_info_album) txt_info = txt_info_album;
-	else txt_info = "";
-	txt_profile = fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$if2(%bitrate%K | ,)%samplerate%Hz").EvalWithMetadb(metadb);
-	l_mood = tf_general[3];
-	tracktype = TrackType(metadb.RawPath.substring(0, 4));
-	main_info = true;
-	window.RepaintRect(0, infobar_y, ww, infobar_h);
+	list.update();
+	window.RepaintRect(0, infobar_y, ww, wh - infobar_y);
 }
 
 function initMetadb(){
 	if (fb.IsPlaying || fb.IsPaused) currentMetadb = fb.GetNowPlaying();
-	else if (fb.GetFocusItem()) currentMetadb = fb.GetFocusItem();
+	else currentMetadb = fb.GetFocusItem();
 	OnMetadbChanged();
 	if (currentMetadb) {
 		MainController.Refresh(true, currentMetadb);
@@ -335,66 +344,7 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-
 // Misc Classes =========================================
-function MatchLogger() { // Debug class. The log info is not always correct.
-	this.pathFormatGroup;
-	this.pathStringGroup;
-	this.pathArray;
-	this.pathGroups = [];
-	this.consuming;
-	this.profiler = fb.CreateProfiler();
-
-	this.Reset = function() {
-		this.profiler.Reset();
-		this.pathGroups = [];
-		this.pathArray = null;
-	}
-
-	this.Print = function(toPopup) {
-		var count = 0;
-		var string = [];
-
-		string.push(toPopup ? "" : "\n");
-		string.push("Cover match log -------------------------------\n");
-		string.push("The info below are debug infomation, they are not absolutely correct.\n");
-
-		for (var i = 0; i < this.pathGroups.length; i++) {
-			string.push("\n" + (i == 0 ? "Build-in Sources" : "Genre Image Sources") + " -----------------------\n");
-			string.push("PathFormat:  " + this.pathFormatGroup[i] + "\n");
-			i && string.push("PathString:  " + this.pathStringGroup[i] + "\n");
-			string.push("\n");
-
-			var pg = this.pathGroups[i];
-			for (var j = 0; j < pg.length; j++) {
-				var pi = pg[j];
-				if (pi.artId == -1) string.push("Path: " + pi.path + "\n");
-				else string.push("Path: <" + AlbumArtId.GetName(pi.artId) + ">\n");
-				string.push("\tMatched: " + pi.results.length + " files");
-				string.push("\tScan used: " + (pi.results.scanConsuming == -1 ? "n/a" : pi.results.scanConsuming) + " ms" + (pi.results.pathCacheHit ? "\t(Cache hit)" : "") + "\n");
-				for (var k = 0; k < pi.results.length; k++) {
-					var pi2 = pi.results[k];
-					string.push("\t");
-					if (pi2.embed) string.push("<Embed Image: " + AlbumArtId.GetName(pi2.artId) + ">");
-					else string.push(pi2.path);
-					if (pi2.duplicate) string.push("\t(Duplicate)");
-					else count++;
-					string.push((pi2.loadConsuming == -1 ? "" : ("\tLoad used: " + pi2.loadConsuming + " ms")) + (pi2.cacheHit ? "\t(Cache hit)" : "") + "\n");
-				}
-			}
-		}
-		string.push("\nTotal ---------------");
-		string.push("\nMatched: " + count + " files");
-		string.push("\tScan used: " + this.consuming + " ms");
-
-		if (toPopup) PopMessage(string.join(""), 0);
-		else console.log(string.join(""));
-	}
-}
-var Logger = new MatchLogger(); // Debug object.
-
-//============================================
-
 function PathItem(path, artid, metadb, index) {
 	this.path = path ? path : "";
 	this.artId = artid;
@@ -402,12 +352,6 @@ function PathItem(path, artid, metadb, index) {
 	this.metadb = metadb;
 	this.index = index;
 	this.results = [];
-	// These below are for match logs.
-	this.time;
-	this.loadConsuming = -1;
-	this.cacheHit = false;
-	this.results.scanConsuming = -1;
-	this.results.pathCacheHit = false;
 }
 
 PathItem.prototype.SimpleClone = function() {
@@ -528,16 +472,12 @@ function ImageLoader(maxCacheLength, w, h) {
 		return new ImageItem(img, srcW, srcH);
 	}
 
-	this.Load = function(pathitem, whendone, ignoreCache){//, sync) {
-		pathitem.time = Logger.profiler.Time;
+	this.Load = function(pathitem, whendone, ignoreCache){
 		var imgitem = (!maxCacheLength || ignoreCache) ? null : SearchCache(pathitem, w, h);
 		if (imgitem) {
-			pathitem.loadConsuming = Logger.profiler.Time - pathitem.time;
-			pathitem.cacheHit = true;
 			whendone && whendone(imgitem);
 			return;
-		} else pathitem.cacheHit = false;
-
+		}
 		var cookie = null;
 		if (pathitem.artId == -1) cookie = gdi.LoadImageAsync(window_id, pathitem.path);
 		else utils.GetAlbumArtAsync(window_id, pathitem.metadb, pathitem.artId, false, pathitem.embed);
@@ -557,7 +497,6 @@ function ImageLoader(maxCacheLength, w, h) {
 			if (art_id == pi.artId && metadb.Compare(pi.metadb)) {
 				imgLoadingQueue.splice(i, 1);
 				var imgitem = ResizeAndStoreImage(image, pi);
-				pi.loadConsuming = Logger.profiler.Time - pi.time;
 				qi.whenDone && qi.whenDone(imgitem);
 				break;
 			}
@@ -575,7 +514,6 @@ function ImageLoader(maxCacheLength, w, h) {
 			if (cookie == qi.cookie) {
 				imgLoadingQueue.splice(i, 1);
 				var imgitem = ResizeAndStoreImage(image, pi);
-				pi.loadConsuming = Logger.profiler.Time - pi.time;
 				qi.whenDone && qi.whenDone(imgitem);
 				break;
 			}
@@ -651,10 +589,7 @@ function PathChecker(supportedTypes, singleImageMode, cycleInWildCard, maxCacheC
 
 	this.Glob = function(pathitem, ignoreCache) {
 		var resultArr = (!maxCacheCapacity || ignoreCache) ? null : SearchCache(pathitem);
-
-		if (resultArr) var cachehit = true;
-		else {
-			var cachehit = false;
+		if (!resultArr){
 			paths = utils.Glob(pathitem.path);
 			resultArr = [];
 			var p, ext;
@@ -671,16 +606,13 @@ function PathChecker(supportedTypes, singleImageMode, cycleInWildCard, maxCacheC
 			}
 			StoreCache(pathitem, resultArr);
 		}
-
 		pathitem.results = resultArr;
-		pathitem.results.pathCacheHit = cachehit;
 		return pathitem;
 	}
 
 	this.CheckAlbumArt = function(pathitem, whendone, ignoreCache) {
 		var pi = (!maxCacheCapacity || ignoreCache) ? null : SearchCache(pathitem);
 		if (pi) {
-			pathitem.results.pathCacheHit = true;
 			if (pi.path) {
 				pathitem.path = pi.path;
 				pathitem.embed = pi.embed;
@@ -689,8 +621,6 @@ function PathChecker(supportedTypes, singleImageMode, cycleInWildCard, maxCacheC
 			whendone && whendone(pathitem);
 			return;
 		} else {
-			pathitem.results.pathCacheHit = false;
-
 			this.AsyncChecking = true;
 			utils.GetAlbumArtAsync(window_id, pathitem.metadb, pathitem.artId, false, pathitem.embed, true);
 			albumArtCheckQueue.push(new QueueItem(null, pathitem, whendone));
@@ -785,7 +715,6 @@ function PathProcessor(prop) {
 		this.pathChecker.FlushQueue();
 		pathGroups = ParsePathSting(psgroup, metadb);
 		pathGroups.index = 0;
-		Logger.pathGroups = pathGroups;
 		whenDone = whendone;
 		ignoreCache = ignorecache;
 		CheckOneGroup(pathGroups.index);
@@ -800,8 +729,6 @@ function PathProcessor(prop) {
 			var wait = false;
 			for (var i = 0; i < currentPathGroup.length; i++) {
 				var pi = currentPathGroup[i];
-				pi.time = Logger.profiler.Time;
-
 				if (prop.SingleImageMode && currentPathGroup.results.length) currentPathGroup.checkFinished++;
 				else {
 					if (pi.artId == -1) { // Process common paths.
@@ -823,7 +750,6 @@ function PathProcessor(prop) {
 	}
 
 	function CheckFinished(pathitem) {
-		pathitem.results.scanConsuming = Logger.profiler.Time - pathitem.time;
 		if (pathitem.results.length) currentPathGroup.results.push(pathitem);
 		currentPathGroup.checkFinished++;
 
@@ -892,7 +818,6 @@ function PathProcessor(prop) {
 	}
 
 	function ParseDone() {
-		Logger.consuming = Logger.profiler.Time;
 		whenDone && whenDone(pathArray);
 		whenDone = null;
 	}
@@ -937,15 +862,10 @@ function ImagesArray(prop) {
 		this.pathArray = [];
 		this.length = 0;
 		parse_done = whendone;
-
 		if (metadb) {
 			this.pathStringGroup = EvalTF(this.pathFormatGroup, metadb);
-			Logger.pathFormatGroup = this.pathFormatGroup;
-			Logger.pathStringGroup = this.pathStringGroup;
-			Logger.Reset();
 			pathProcessor.Parse(this.pathStringGroup, metadb, ParseFinished, ignoreCache);
 		} else {
-			Logger.pathFormatGroup = [];
 			whendone && whendone();
 		}
 	}
@@ -1346,7 +1266,7 @@ function Display(x, y, w, h, prop) {
 					imgCache.img = gdi.CreateImage(this.w, this.h);
 					var g2 = imgCache.img.GetGraphics();
 					g2.SetTextRenderingHint(4);
-					g2.DrawString(this.caption, g_font, c_white, 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
+					g2.DrawString(this.caption, g_font2, c_white, 0, 0, this.w, this.h, cc_stringformat); // This is foreground text.
 					g2.SetTextRenderingHint(0);
 					//}
 					imgCache.img.ReleaseGraphics(g2);
@@ -1621,8 +1541,6 @@ function Controller(imgArray, imgDisplay, prop) {
 			funcs[id] = [_this.ClearCache, null];
 			baseMenu.AppendMenuItem(MF_STRING, id++, "清除缓存");
 			baseMenu.AppendMenuSeparator();
-			funcs[id] = [_this.CloseInfo, null];
-			baseMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, id++, "隐藏歌曲信息");
 			subMenu_ep.AppendTo(baseMenu, MF_POPUP, "切换歌词和属性面板");
 			funcs[id] = [on_mouse_mbtn_up, null];
 			subMenu_ep.AppendMenuItem(MF_STRING, id++, "切换 (鼠标中键)");
@@ -1818,11 +1736,9 @@ function Controller(imgArray, imgDisplay, prop) {
 
 	this.SetFollowCursorProperties = function(fc) {
 		this.Properties.FollowCursor = fc;
-		window.SetProperty("foobox.infoArt.follow.cursor", this.Properties.FollowCursor);
-
+		window.SetProperty("InfoArt.follow.cursor", this.Properties.FollowCursor);
 		isFollowingCursor = this.Properties.FollowCursor || (!this.Properties.FollowCursor && !fb.IsPlaying);
 		this.cycle.Lock(isFollowingCursor);
-
 		if (isFollowingCursor) this.OnSelectionChanged(fb.GetSelection());
 		else this.OnPlaybackNewTrack(fb.GetNowPlaying());
 	}
@@ -1847,10 +1763,6 @@ function Controller(imgArray, imgDisplay, prop) {
 		shellObj.ShellExecute(arg1, arg2, arg3, arg4, arg5);
 	}
 
-	this.ShowMatchLog = function(toPopup) {
-		Logger.Print(toPopup);
-	}
-
 	this.ClearCache = function() {
 		imgArray.ClearCache();
 	}
@@ -1863,10 +1775,6 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.SetAnimation = function() {
 		Properties.Display.Animation.Enable = !Properties.Display.Animation.Enable;
 		window.SetProperty("Cycle.Animation.Enable", Properties.Display.Animation.Enable);
-	}
-	
-	this.CloseInfo = function() {
-		switch_infobar();
 	}
 
 	this.ShowProperties = function() {
@@ -2015,8 +1923,9 @@ function Controller(imgArray, imgDisplay, prop) {
 				fontcolor2 = blendColors(c_background, fontcolor, 0.75);
 			}
 			window.NotifyOthers("color_scheme_updated", c_arr);
+			sw_esl_color();
 			get_imgs();
-			if (is_mood && show_infobar) btn_mood.resetImg();
+			if (is_mood && infofull) btn_mood.resetImg();
 			if(cbkg_bycover) window.Repaint();
 			else window.RepaintRect(0, infobar_y, ww, infobar_h);
 		}
@@ -2027,7 +1936,8 @@ function Controller(imgArray, imgDisplay, prop) {
 		let carr_hl = toRGB(c_highlight);
 		let c_infobase = carr_hl.concat(toRGB(c_background_default));
 		window.NotifyOthers("color_scheme_updated", c_infobase.concat(toRGB(g_color_selected_bg_default)));
-		 window.Repaint();
+		sw_esl_color();
+		window.Repaint();
 	}
 	
 	//------------------------------------------
@@ -2096,11 +2006,9 @@ function Controller(imgArray, imgDisplay, prop) {
 	//------------------------------------------
 	this.Init = function() {
 		if (imgDisplay.menuButton && this.imgSwitchMenu) imgDisplay.menuButton.menu = this.imgSwitchMenu;
-
 		isFollowingCursor = this.Properties.FollowCursor|| (!this.Properties.FollowCursor && !fb.IsPlaying);
 		this.cycle.Lock(isFollowingCursor);
-
-		metadb = isFollowingCursor ? fb.GetSelection() : fb.GetNowPlaying();
+		let metadb = isFollowingCursor ? fb.GetSelection() : fb.GetNowPlaying();
 		if (metadb) {
 			currentMetadb = metadb;
 			groupString = fb.TitleFormat(this.Properties.GroupFormat).EvalWithMetadb(metadb);
@@ -2112,7 +2020,6 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	function Init_UpdateFinished() {
-		//this.ShowMatchLog();
 		if (imgArray.length) {
 			currentIndex = currentIndex == -1 ? 0 : currentIndex;
 			currentPathItem = imgArray.pathArray[currentIndex];
@@ -2140,7 +2047,7 @@ var Properties = new function() {
 		this.Controller = {
 			GroupFormat: window.GetProperty("Image.GroupFormat", "%album artist%|%album%"),
 			//false: When not playing, true: Always.
-			FollowCursor: window.GetProperty("foobox.infoArt.follow.cursor", false),
+			FollowCursor: window.GetProperty("InfoArt.follow.cursor", false),
 			Cycle: {
 				SingleImageMode: window.GetProperty("Cycle.SingleImageMode", false),
 				Period: window.GetProperty("Cycle.Period", 20000)
@@ -2201,7 +2108,17 @@ var Properties = new function() {
 		window.SetProperty("Image.CacheCapacity.Paths", this.Image.PathsCacheCapacity);
 }();
 
-
+//-------------------
+function reset_esl_color(reset_hl) {
+	if(!eslPanels) return;
+	if(reset_hl) eslPanels.SetTextHighlightColor(c_default_hl);
+	eslPanels.SetBackgroundColor(c_background_default);
+}
+function sw_esl_color() {
+	let _swesl = eslPanels && cbkg_bycover;
+	if(_swesl) eslPanels.SetBackgroundColor(c_background);
+	if(eslPanels && !sw_noesl) eslPanels.SetTextHighlightColor(c_highlight);
+}
 //===================================================
 for (var i = 0; i < SearchItems.length; i++) {
 	if (!SearchItems[i] instanceof SearchItem) {
@@ -2209,12 +2126,10 @@ for (var i = 0; i < SearchItems.length; i++) {
 		i--;
 	}
 }
-
 Properties.Controller.SearchScriptPresets = SearchItems;
 //====================================
 window.DlgCode = DLGC_WANTALLKEYS;
 get_font();
-get_var();
 get_colors();
 get_imgs();
 //-------------------
@@ -2224,25 +2139,48 @@ var MainController = new Controller(Covers, CoverDisplay, Properties.Controller)
 if(MainController.Properties.FollowCursor && color_bycover_default) color_bycover = false;
 
 // START ==============================================
+let splitv = new _splitv();
+let panel = new _panel();
+let list = new _list();
+if(infofull){
+	btn_mood = new obtn_mood();
+	for(var i = 0; i < 5; i++){
+		rbutton[i] = new ButtonUI_R();
+	}
+}
+TextBtn_info = new TextBtn();
+let ESL = window.GetPanel('ESLyric');
+ESL.ShowCaption = false;
 initMetadb();
-if(show_infobar && info_cycle) activate_infotimer();
-
+if(infofull && info_cycle) activate_infotimer();
+if(fb.TitleFormat("%esl_expose_api%").Eval(true) === '1'){
+	eslCtrl = new ActiveXObject("eslyric");
+	eslPanels = eslCtrl.GetAll();
+}
+window.SetTimeout(function() {
+	reset_esl_color(!sw_noesl);
+}, 5);
+//-----------
 function on_paint(gr) {
 	if (!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
 	gr.FillGradRect(ww-1, 0, 1, wh, 0, c_background, c_background, 1);//bug of win10 border
-	CoverDisplay.Draw(gr);
-	if (currentMetadb && show_infobar) {
-		if(show_rating){
-			for (var i = 1; i < rbutton.length + 1; i++) {
-				rbutton[i - 1].Paint(gr, i);
+	if(CoverDisplay.h > 1) CoverDisplay.Draw(gr);
+	if (currentMetadb){
+		if(infofull) {
+			if(show_rating){
+				for (var i = 1; i < rbutton.length + 1; i++) {
+					rbutton[i - 1].Paint(gr, i);
+				}
+				if (is_mood) btn_mood.Paint(gr);
 			}
-			if (is_mood) btn_mood.Paint(gr);
-		}
-		gr.GdiDrawText(txt_title, g_font, fontcolor, 0, infobar_y + imgh*show_rating, ww, 28*zdpi, cc_txt);
-		var txt_line2 = (txt_info !="" && main_info) ? txt_info : txt_profile;
-		gr.GdiDrawText(txt_line2, g_font2, fontcolor2, 0, wh - line2_h, ww, line2_h, cc_txt);
+			gr.GdiDrawText(txt_title, g_font2, fontcolor, 0, infobar_y + imgh*show_rating, ww, line1_h, cc_txt);
+			var txt_line2 = (txt_info !="" && main_info) ? txt_info : txt_profile;
+			if(upperh > infobar_h) gr.GdiDrawText(txt_line2, g_font, fontcolor2, 0, upperh - line2_h, ww, line2_h, cc_txt);
+		} else gr.GdiDrawText(txt_title, g_font2, fontcolor, 0, infobar_y, ww, infobar_h, cc_txt);
 	}
+	splitv.paint(gr);
+	list.paint(gr);
 }
 
 function on_size() {
@@ -2250,13 +2188,14 @@ function on_size() {
 	ww = window.Width;
 	wh = window.Height;
 	window.MinWidth = 50;
-	window.MinHeight = 50;
+	window.MinHeight = 100;
+	upperh = Math.max(Math.round(wh * upperRatio) - 1, 50);
 	panel_setsize();
 }
 
-function on_selection_changed(metadb) {
+function on_item_focus_change() {
 	if (!fb.IsPlaying || MainController.Properties.FollowCursor) {
-		metadb = fb.GetFocusItem();
+		let metadb = fb.GetFocusItem();
 		MainController.OnSelectionChanged(metadb);
 		OnMetadbChanged(metadb);
 	}
@@ -2264,7 +2203,7 @@ function on_selection_changed(metadb) {
 
 function on_playlist_switch() {
 	if (!fb.IsPlaying || MainController.Properties.FollowCursor) {
-		metadb = fb.GetFocusItem();
+		let metadb = fb.GetFocusItem();
 		MainController.OnSelectionChanged(metadb);
 		OnMetadbChanged(metadb);
 	}
@@ -2274,37 +2213,49 @@ function on_playback_new_track(metadb) {
 	if(color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
 	OnMetadbChanged(metadb);
+	if(auto_eslprop) ESL.Show(true);
 }
 
 function on_playback_stop(reason) {
 	MainController.OnPlaybackStop(reason);
-	OnMetadbChanged();
+	OnMetadbChanged(fb.GetFocusItem());
+	if(auto_eslprop) ESL.Show(false);
 }
 
 var cursorX, cursorY;
 
 function on_mouse_move(x, y) {
 	if(cursorX == x && cursorY == y) return;
-	CoverDisplay.OnMouseMove(x, y);
+	if(y < upperh) {
+		window.SetCursor(IDC_ARROW);
+		CoverDisplay.OnMouseMove(x, y);
+	}
+	else list.move(x, y);
+	splitv.move(x, y);
 	cursorX = x, cursorY = y;
 }
 
 function on_mouse_lbtn_down(x, y) {
-	CoverDisplay.OnMouseDown && CoverDisplay.OnMouseDown(x, y);
+	(y < upperh) && CoverDisplay.OnMouseDown && CoverDisplay.OnMouseDown(x, y);
+	splitv.lbtn_down(x, y);
 }
 
 function on_mouse_lbtn_up(x, y) {
-	CoverDisplay.OnMouseUp && CoverDisplay.OnMouseUp(x, y);
-	if(show_infobar){
-		for (var i = 1; i < rbutton.length + 1; i++) {
-			rbutton[i - 1].MouseUp(x, y, i);
+	if(y < upperh){
+		CoverDisplay.OnMouseUp && CoverDisplay.OnMouseUp(x, y);
+		if(infofull){
+			for (var i = 1; i < rbutton.length + 1; i++) {
+				rbutton[i - 1].MouseUp(x, y, i);
+			}
+			if (is_mood && btn_mood.isXYInButton(x, y)) btn_mood.OnClick();
 		}
-		if (is_mood && btn_mood.isXYInButton(x, y)) btn_mood.OnClick();
-	}
+	} else list.lbtn_up(x, y);
+	splitv.lbtn_up(x, y);
 }
 
 function on_mouse_mbtn_up(x, y, mask){
-	window.NotifyOthers("SwitchESLProp", true);
+	if(!ESL.Hidden) ESL.Show(false);
+	else ESL.Show(true);
 }
 
 function on_mouse_leave() {
@@ -2312,23 +2263,26 @@ function on_mouse_leave() {
 }
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
-	MainController.OnDoubleClick(x, y, mask);
-	if (show_infobar && TextBtn_info.isXYInButton(x, y)){
-		if (fb.IsPlaying) {
-			fb.RunMainMenuCommand("激活正在播放项目");
-			window.NotifyOthers("show_Now_Playing", 1);
+	if(y < upperh){
+		MainController.OnDoubleClick(x, y, mask);
+		if (TextBtn_info.isXYInButton(x, y)){
+			if (fb.IsPlaying) {
+				fb.RunMainMenuCommand("激活正在播放项目");
+				window.NotifyOthers("show_Now_Playing", 1);
+			}
 		}
 	}
 }
 
 function on_mouse_wheel(delta) {
-	if (!CoverDisplay.isXYIn(cursorX, cursorY)) return;
-	if (delta > 0) MainController.Prev();
-	else MainController.Next();
+	if(CoverDisplay.isXYIn(cursorX, cursorY)){
+		if (delta > 0) MainController.Prev();
+		else MainController.Next();
+	}else list.wheel(delta);
 }
 
 function on_metadb_changed(handles, fromhook) {
-	if(currentMetadb){
+	if(handles && currentMetadb){
 		if(handles.Find(currentMetadb) > -1) {
 			if(!fromhook) MainController.Refresh(true, currentMetadb);
 			OnMetadbChanged();
@@ -2346,21 +2300,26 @@ function on_load_image_done(cookie, image) {
 }
 
 function on_mouse_rbtn_up(x, y, vkey) {
-	if (CoverDisplay.isXYIn(x, y)) MainController.funcMenu.Pop(x, y);
-	else if (show_infobar && TextBtn_info.isXYInButton(x, y)) {
+	if (CoverDisplay.isXYIn(x, y)) {
+		MainController.funcMenu.Pop(x, y);
+		return true;
+	}
+	else if (TextBtn_info.isXYInButton(x, y)) {
 		var rMenu = window.CreatePopupMenu();
 		var rpSubMenu = window.CreatePopupMenu();
 		rMenu.AppendMenuItem(MF_STRING, 1, "激活正在播放项目");
 		rMenu.AppendMenuItem(MF_STRING, 2, "属性");
+		rMenu.AppendMenuItem(infofull ? MF_STRING : MF_CHECKED, 6, "精简歌曲信息栏");
 		rMenu.AppendMenuSeparator();
-		if(show_rating) {
-			rMenu.AppendMenuItem(MF_STRING, 3, "显示喜爱按钮");
-			rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
+		if(infofull){
+			if(show_rating) {
+				rMenu.AppendMenuItem(MF_STRING, 3, "显示喜爱按钮");
+				rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
+			}
+			rMenu.AppendMenuItem(show_rating ? MF_STRING : MF_CHECKED, 7, "隐藏评级");
+			rMenu.AppendMenuItem(info_cycle ? MF_CHECKED : MF_STRING, 4, "循环歌曲信息");
+			rMenu.AppendMenuSeparator();
 		}
-		rMenu.AppendMenuItem(show_rating ? MF_STRING : MF_CHECKED, 7, "隐藏评级");
-		rMenu.AppendMenuItem(info_cycle ? MF_CHECKED : MF_STRING, 4, "循环歌曲信息");
-		rMenu.AppendMenuSeparator();
-		rMenu.AppendMenuItem(show_infobar ? MF_STRING : MF_CHECKED, 6, "隐藏歌曲信息");
 		rpSubMenu.AppendTo(rMenu, MF_POPUP, "切换歌词和属性面板");
 		rpSubMenu.AppendMenuItem(MF_STRING, 8, "切换 (鼠标中键)");
 		rpSubMenu.AppendMenuItem(auto_eslprop ? MF_CHECKED : MF_STRING, 9, "自动切换");
@@ -2378,9 +2337,9 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			break;
 		case 3:
 			is_mood = !is_mood;
-			window.SetProperty("Display.Mood", is_mood);
+			window.SetProperty("Info.Mood", is_mood);
 			panel_setsize();
-			window.RepaintRect(0, infobar_y, ww, mood_h);
+			window.RepaintRect(0, infobar_y, ww, imgh);
 			break;
 		case 4:
 			info_cycle = !info_cycle;
@@ -2402,7 +2361,7 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			break;
 		case 7:
 			show_rating = !show_rating;
-			window.SetProperty("Display.Rating", show_rating);
+			window.SetProperty("Info.Rating", show_rating);
 			panel_setsize();
 			break;
 		case 8:
@@ -2412,26 +2371,29 @@ function on_mouse_rbtn_up(x, y, vkey) {
 			toggle_autoswitch();
 			break;
 		}
-	}
-	return true;
+		return true;
+	} else return panel.rbtn_up(x, y, list);
 }
 
 function on_font_changed() {
 	get_font();
-	if(show_infobar){
-		get_var();
+	if(infofull){
 		get_imgs();
 		panel_setsize();
 	}
+	list.size();
+	panel.font_changed();
 	CoverDisplay.menuButton.ClearCache();
 	CoverDisplay.menuButton.update_wh();
 };
 
 function on_colours_changed() {
 	get_colors();
-	if(show_infobar){
+	if(infofull){
 		get_imgs();
 	}
+	panel.colours_changed();
+	reset_esl_color(true);
 	window.Repaint();
 };
 
@@ -2444,7 +2406,6 @@ function on_notify_data(name, info) {
 		break;
 	case "set_rating_2_tag":
 		rating_to_tag = info;
-		window.SetProperty("foobox.rating.write.to.file", rating_to_tag);
 		break;
 	case "foobox_color_bycover":
 		color_bycover = info;
@@ -2459,56 +2420,72 @@ function on_notify_data(name, info) {
 		break;
 	case "foobox_bgcolor_bycover":
 		cbkg_bycover = info;
-		if(!cbkg_bycover) reset_background();
+		if(!cbkg_bycover){
+			reset_background();
+			reset_esl_color(false);
+		}
+		break;
+	case "foobox_color_noesl":
+		sw_noesl = info;
+		if(eslPanels) eslPanels.SetTextHighlightColor(sw_noesl ? c_default_hl : c_highlight);
 		break;
 	}
 }
 
 //----------------infobar-----------------------
 function switch_infobar(){
-	show_infobar = !show_infobar;
-	window.SetProperty("Display.InfoBar", show_infobar);
+	infofull = !infofull;
+	window.SetProperty("Info.FullMode", infofull);
+	if(infofull){
+		btn_mood = new obtn_mood();
+		for(var i = 0; i < 5; i++){
+			rbutton[i] = new ButtonUI_R();
+		}
+	}
 	panel_setsize();
 	OnMetadbChanged();
 	if(info_cycle){
-		if(show_infobar) activate_infotimer();
+		if(infofull) activate_infotimer();
 		else deactivate_infotimer();
 	}
-	window.NotifyOthers("MetadataInfo", show_infobar);
 }
 
 function toggle_autoswitch(){
 	auto_eslprop = !auto_eslprop;
-	window.SetProperty("auto.switch.esl.prop", auto_eslprop);
-	window.NotifyOthers("AutoESLProp", auto_eslprop);
+	window.SetProperty("Auto.switch.esl.prop", auto_eslprop);
 }
 function panel_setsize(){
-	infobar_h = show_infobar ? Math.floor((50+23*show_rating)*zdpi) : 0;
-	MainController.Resize(Math.max(ww, 50), Math.max(wh, 50) - infobar_h);
-	if(show_infobar){
-		infobar_y = Math.round(wh - infobar_h + 5*zdpi*show_rating);
-		initbutton();
+	infobar_h = infofull ? z(23*show_rating) + line1_h + line2_h : line1_h;
+	MainController.Resize(Math.max(ww, 50), upperh - infobar_h);
+	if(infofull){
+		infobar_y = Math.max(0, Math.round(upperh - infobar_h + 5*zdpi*show_rating));
 		if(show_rating){
 			if(is_mood) {
 				var spacing = z(15);
 			}else{
-				var spacing = imgw;
+				var spacing = imgh;
 			}
-			var img_rating_w = imgw * 5 + spacing * 4;
+			var img_rating_w = imgh * 5 + spacing * 4;
 			rating_x = Math.round((ww - img_rating_w) / 2);
-			if(is_mood) btn_mood.setx(rating_x - btn_mood.w - spacing);
+			if(is_mood) btn_mood.setxy(rating_x - btn_mood.w - spacing, infobar_y);
 			for(var i = 0; i < rbutton.length; i++){
-				rbutton[i].setx(rating_x + imgw * i + spacing * i);
+				rbutton[i].setxy(rating_x + imgh * i + spacing * i, infobar_y);
 			}
 		}
-		TextBtn_info.setSize(0, wh - infobar_h, ww, infobar_h);
-	}
+	} else infobar_y = Math.max(0, upperh - infobar_h);
+	TextBtn_info.setSize(0, upperh - infobar_h, ww, infobar_h);
+	panel.w = window.Width;
+	panel.h = window.Height - upperh - 3;
+	list.size();
+	window.SetTimeout(function() {
+		ESL.Move(0, list.y, ww, panel.h);
+	}, 15);
 }
 
 function activate_infotimer(){
 	if(!timer_cycle) timer_cycle = window.SetInterval(function() {
 		main_info = !main_info;
-		window.RepaintRect(0, wh - line2_h, ww, line2_h);
+		window.RepaintRect(0, upperh - line2_h, ww, line2_h);
 	}, time_circle);
 }
 
@@ -2522,11 +2499,12 @@ function deactivate_infotimer(){
  *****************************************/
 function ButtonUI_R() {
 	this.y = infobar_y;
-	this.width = imgw;
+	this.width = imgh;
 	this.height = imgh;
 	
-	this.setx = function(x){
+	this.setxy = function(x, y){
 		this.x = x;
+		this.y = y;
 	}
 
 	this.Paint = function(gr, button_n) {
@@ -2561,9 +2539,16 @@ function on_key_down(vkey) {
 		if(vkey == 116) MainController.Refresh(true, currentMetadb);//F6
 		break;
 	}
+	list.key_down(vkey);
 }
 
 function on_script_unload() {
 	deactivate_infotimer();
+	_tt('');
+	if (_bmp) {
+		_bmp.ReleaseGraphics(_gr);
+	}
+	_gr = null;
+	_bmp = null;
 }
 //EOF

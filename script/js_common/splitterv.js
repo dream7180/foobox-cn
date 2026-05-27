@@ -24,7 +24,7 @@ function on_size() {
 		PUpper.Move(0, 0, ww, uh_calc);
 		PLower.Move(splitter_vis, uh_calc + 2, ww - splitter_vis*2, wh - uh_calc - 2);
 		window.Repaint();
-	}, 50);
+	}, 25);
 }
 
 function on_paint(gr) {

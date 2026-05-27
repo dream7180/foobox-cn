@@ -116,13 +116,13 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 14:
 			if (status) {
-				rating2tag = true;
+				rating2tag = 1;
 			}
 			else {
-				rating2tag = false;
+				rating2tag = 0;
 			}
 			window.NotifyOthers("set_rating_2_tag", rating2tag);
-			window.SetProperty("foobox.rating.write.to.file", rating2tag);
+			save_misccfg("common");
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 15:
