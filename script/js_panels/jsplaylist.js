@@ -173,9 +173,10 @@ var sort_pattern_queue = "%queue_index% | %album artist% | $if(%album%,%date%,'9
 cRow = {
 	default_playlist_h: 33,
 	playlist_h: 33,
-	extra_line_h: window.GetProperty("SYSTEM.Playlist Extra-row Height in Pixel", 12),
+	extra_line_h: 16,
 	settings_h: 30
 };
+cRow.extra_line_h = Math.max(Math.round(cRow.playlist_h/2), 12);
 
 p = {
 	headerBar: null,
@@ -2376,18 +2377,6 @@ function createDragText(line1, line2){
 	return drag_img;
 };
 
-function process_cachekey(str) {
-	var str_return = "";
-	str = str.toLowerCase();
-	var len = str.length;
-	for (var i = 0; i < len; i++) {
-		var charcode = str.charCodeAt(i);
-		if (charcode > 96 && charcode < 123) str_return += str.charAt(i);
-		if (charcode > 47 && charcode < 58) str_return += str.charAt(i);
-	};
-	return str_return;
-};
-
 function check_cache(albumIndex) {
 	var crc = p.list.groups[albumIndex].cachekey;
 	if (utils.FileExists(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg")) {
@@ -2457,7 +2446,7 @@ function save_misccfg(conf){
 function get_layout(){
 	var layoutcfg_arr = "";
 	try{
-		layoutcfg_arr = utils.ReadTextFile(config_dir + "layouts", 0);
+		layoutcfg_arr = utils.ReadTextFile(config_dir + "layoutsv2", 0);
 	} catch(e){}
 	if (layoutcfg_arr == "") {
 		var default_gopts = ["0","1","0","2","1","0","1","0"];
@@ -2540,7 +2529,7 @@ function save_layout(){
 		lo_arr = lo_arr + "##" + layout.columnWidth[i];
 	}
 	tmp = tmp + "\r\n" + lo_arr;
-	utils.WriteTextFile(config_dir + "layouts", tmp);
+	utils.WriteTextFile(config_dir + "layoutsv2", tmp);
 }
 
 function get_grprow_minimum(column_w){

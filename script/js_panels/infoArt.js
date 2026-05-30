@@ -1739,7 +1739,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		window.SetProperty("InfoArt.follow.cursor", this.Properties.FollowCursor);
 		isFollowingCursor = this.Properties.FollowCursor || (!this.Properties.FollowCursor && !fb.IsPlaying);
 		this.cycle.Lock(isFollowingCursor);
-		if (isFollowingCursor) this.OnSelectionChanged(fb.GetSelection());
+		if(isFollowingCursor) this.OnSelectionChanged(fb.GetFocusItem());
 		else this.OnPlaybackNewTrack(fb.GetNowPlaying());
 	}
 
@@ -1790,7 +1790,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	//-----------------------------------------------------------------
 	this.OnSelectionChanged = function(metadb) {
 		if (metadb) {
-			if (isFollowingCursor && fb.GetSelectionType() < 3) OnNewTrack(metadb);
+			if(isFollowingCursor/* && fb.GetSelectionType() < 3*/) OnNewTrack(metadb);
 		} else OnStop();
 	}
 
@@ -1802,16 +1802,6 @@ function Controller(imgArray, imgDisplay, prop) {
 				OnNewTrack(metadb);
 			}
 		} else OnStop();
-	}
-
-	this.OnPlaybackStop = function(reason) {
-		this.cycle.Stop();
-		if (reason == 2) {
-		} else {
-			isFollowingCursor = true;
-			this.cycle.Lock(true);
-			this.OnSelectionChanged(fb.GetSelection());
-		}// else OnStop();
 	}
 
 	//------------------------------------------
@@ -1958,7 +1948,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	var refresh_ignoreCache;
 	this.Refresh = function(ignoreCache, metadb) {
 		refresh_ignoreCache = ignoreCache;
-		if (!metadb) metadb = isFollowingCursor ? fb.GetSelection() : fb.GetNowPlaying();
+		if (!metadb) metadb = isFollowingCursor ? fb.GetFocusItem() : fb.GetNowPlaying();
 		if (metadb) {
 			currentMetadb = metadb;
 			groupString = fb.TitleFormat(_this.Properties.GroupFormat).EvalWithMetadb(metadb);
@@ -2008,7 +1998,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (imgDisplay.menuButton && this.imgSwitchMenu) imgDisplay.menuButton.menu = this.imgSwitchMenu;
 		isFollowingCursor = this.Properties.FollowCursor|| (!this.Properties.FollowCursor && !fb.IsPlaying);
 		this.cycle.Lock(isFollowingCursor);
-		let metadb = isFollowingCursor ? fb.GetSelection() : fb.GetNowPlaying();
+		let metadb = isFollowingCursor ? fb.GetFocusItem() : fb.GetNowPlaying();
 		if (metadb) {
 			currentMetadb = metadb;
 			groupString = fb.TitleFormat(this.Properties.GroupFormat).EvalWithMetadb(metadb);
@@ -2157,6 +2147,7 @@ if(fb.TitleFormat("%esl_expose_api%").Eval(true) === '1'){
 	eslCtrl = new ActiveXObject("eslyric");
 	eslPanels = eslCtrl.GetAll();
 }
+if(auto_eslprop && !ESL.Hidden && !fb.IsPlaying) ESL.Show(false);
 window.SetTimeout(function() {
 	reset_esl_color(!sw_noesl);
 }, 5);
@@ -2217,9 +2208,15 @@ function on_playback_new_track(metadb) {
 }
 
 function on_playback_stop(reason) {
-	MainController.OnPlaybackStop(reason);
-	OnMetadbChanged(fb.GetFocusItem());
-	if(auto_eslprop) ESL.Show(false);
+	MainController.cycle.Stop();
+	if (reason != 2) {
+		let metadb = fb.GetFocusItem();
+		isFollowingCursor = true;
+		MainController.cycle.Lock(true);
+		MainController.OnSelectionChanged(metadb);
+		OnMetadbChanged(metadb);
+		if(auto_eslprop) ESL.Show(false);
+	}
 }
 
 var cursorX, cursorY;

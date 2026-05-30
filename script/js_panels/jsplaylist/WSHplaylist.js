@@ -50,27 +50,27 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 		var tf_crc;
 		switch (layout.pattern_idx) {
 			case 0:
-				tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
+				tf_crc = fb.TitleFormat("alb%album%");
 				break;
 			case 1:
-				tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+				tf_crc = fb.TitleFormat("aa%album artist%-%album%");
 				break;
 			case 2:
-				tf_crc = fb.TitleFormat("$crc32('art'%album artist%)");
+				tf_crc = fb.TitleFormat("art%album artist%");
 				break;
 			case 3:
-				tf_crc = fb.TitleFormat("$crc32('art'%artist%)");
+				tf_crc = fb.TitleFormat("art%artist%");
 				break;
 			case 4:
-				tf_crc = fb.TitleFormat("$crc32('gen'%genre%)");
+				tf_crc = fb.TitleFormat("gen%genre%");
 				break;
 			case 5:
-				tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
+				tf_crc = fb.TitleFormat("$directory_path(%path%)");
 				break;
 			default:
-				tf_crc = fb.TitleFormat("$crc32('alb'%album%)");
+				tf_crc = fb.TitleFormat("alb%album%");
 		};
-		this.cachekey = process_cachekey(tf_crc.EvalWithMetadb(handle));
+		this.cachekey = utils.CRC32(tf_crc.EvalWithMetadb(handle));
 	}
 };
 
@@ -129,10 +129,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		// Draw columns content
 		var cx, cw, tf1, tf2;
 		if (layout.enableExtraLine) {
-			var tf1_y = this.y - g_z2;
-			var tf1_h = Math.floor(this.h / 4 * 3);
-			var tf2_y = this.y + Math.ceil(this.h*3.1 / 6) - g_z2;
-			var tf2_h = Math.ceil(this.h / 2);
+			var tf1_y = this.y;
+			var tf1_h = Math.round(0.62 * this.h);
+			var tf2_y = Math.round(this.y + 0.82*tf1_h);
+			var tf2_h = Math.round(this.h - 0.82*tf1_h);
 		} else {
 			var tf1_y = this.y;
 			var tf1_h = this.h;

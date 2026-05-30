@@ -18,7 +18,7 @@ Var FontDir
 Var FontDir2
 
 #APP
-!define FBOX_VER "8.12"
+!define FBOX_VER "8.13"
 !define BUILD_NUM "1"
 
 # Setup
@@ -97,6 +97,11 @@ Section "foobox 主题和所需组件" fooboxCore
 	Delete "$ProfileDir\user-components\foo_uie_jsplitter\mozjs-lur-102.dll"
 	Delete "$ProfileDir\user-components\foo_uie_jsplitter\mozjs-lur-128.dll"
 	RmDir /r "$ProfileDir\foobox\script"
+	Delete "$ProfileDir\foobox\config\layouts"
+	Delete "$ProfileDir\foobox\config\layout_ids"
+	Delete "$ProfileDir\foobox\config\layout_config"
+	Delete "$ProfileDir\foobox\config\layout_columnWidth"
+	Delete "$ProfileDir\foobox\config\misc"
 	Delete "$ProfileDir\profile\configuration\foo_ui_hacks.dll.cfg"
 	RmDir /r "$ProfileDir\user-components\foo_uie_jsplitter\samples\packages\{BA9557CE-7B4B-4E0E-9373-99F511E81252}"
 	RmDir /r "$ProfileDir\user-components\foo_ui_hacks"

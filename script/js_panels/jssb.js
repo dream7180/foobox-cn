@@ -732,7 +732,7 @@ oGroup = function(index, handle, groupkey) {
 	this.metadb = handle;
 	this.groupkey = groupkey;
 	if (handle) {
-		this.cachekey = process_cachekey(ppt.tf_crc.EvalWithMetadb(handle));
+		this.cachekey = utils.CRC32(ppt.tf_crc.EvalWithMetadb(handle));
 		if (ppt.tagMode == 3 && ppt.dirMode == 0) {
 			var pathdir = groupkey.split("\\");
 			this.groupkey = pathdir[pathdir.length - 1];
@@ -3102,13 +3102,13 @@ function get_tagprop(){
 			ppt.tf_groupkey = fb.TitleFormat("%album artist% ^^ %album% ## %title%");
 			ppt.TFsorting = "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 			ppt.cache_subdir = "\\artist_album\\";
-			ppt.tf_crc = fb.TitleFormat("$crc32('aa'%album artist%-%album%)");
+			ppt.tf_crc = fb.TitleFormat("aa%album artist%-%album%");
 			crcidx = 0;
 		} else {
 			ppt.cache_subdir = "\\album\\";
 			ppt.TFsorting = "%album% | %discnumber% | %tracknumber% | %title%";
 			ppt.tf_groupkey = fb.TitleFormat("$if2(%album%,单曲) ## %title%");
-			ppt.tf_crc = fb.TitleFormat("$crc32('alb'%album%)");;
+			ppt.tf_crc = fb.TitleFormat("alb%album%");
 			crcidx = 1;
 		}
 		
@@ -3123,12 +3123,12 @@ function get_tagprop(){
 			ppt.TFsorting = "%album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 			ppt.tf_groupkey = fb.TitleFormat("$if2(%album artist%,未知艺术家) ## %title%");
 			ppt.tf_autopl = "%album artist%";
-			ppt.tf_crc = fb.TitleFormat("$crc32('art'%album artist%)");
+			ppt.tf_crc = fb.TitleFormat("art%album artist%");
 		} else {
 			ppt.TFsorting = "%artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 			ppt.tf_groupkey = fb.TitleFormat("$if2(%artist%,未知艺术家) ## %title%");
 			ppt.tf_autopl = "%artist%";
-			ppt.tf_crc = fb.TitleFormat("$crc32('art'%artist%)");
+			ppt.tf_crc = fb.TitleFormat("art%artist%");
 		}
 		crcidx = 2;
 		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.artistMode);//2,3
@@ -3139,7 +3139,7 @@ function get_tagprop(){
 		ppt.TFsorting = "$directory_path(%path%) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 		ppt.tf_groupkey = fb.TitleFormat("$directory_path(%path%) ## %title%");
 		ppt.tf_autopl = "%directoryname%";
-		ppt.tf_crc = fb.TitleFormat("$crc32($directory_path(%path%))");
+		ppt.tf_crc = fb.TitleFormat("$directory_path(%path%)");
 		crcidx = 3;
 		window.NotifyOthers("lib_cover_type", ppt.tagMode + ppt.dirMode + 2);//5,6
 		break;
@@ -3149,7 +3149,7 @@ function get_tagprop(){
 		ppt.TFsorting = "%genre% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 		ppt.tf_groupkey = fb.TitleFormat("$if2(%genre%,未知流派) ## %title%");
 		ppt.tf_autopl = "%genre%";
-		ppt.tf_crc = fb.TitleFormat("$crc32('gen'%genre%)");
+		ppt.tf_crc = fb.TitleFormat("gen%genre%");
 		crcidx = 3;
 		window.NotifyOthers("lib_cover_type", ppt.tagMode);//4
 		break;
@@ -3157,18 +3157,6 @@ function get_tagprop(){
 	
 	load_image_to_cache();
 }
-
-function process_cachekey(str) {
-	var str_return = "";
-	str = str.toLowerCase();
-	var len = str.length;
-	for (var i = 0; i < len; i++) {
-		var charcode = str.charCodeAt(i);
-		if (charcode > 96 && charcode < 123) str_return += str.charAt(i);
-		if (charcode > 47 && charcode < 58) str_return += str.charAt(i);
-	};
-	return str_return;
-};
 
 function reset_this_cache(idx, crc){
 	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
