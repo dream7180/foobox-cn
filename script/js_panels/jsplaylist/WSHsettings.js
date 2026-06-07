@@ -930,15 +930,6 @@ oLink = function(){
 	this._isHover = function(x, y) {
 		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
 	};
-	this.ShellExecute = function (arg1, arg2, arg3, arg4, arg5) {
-		try {
-			var shellObj = new ActiveXObject("Shell.Application");
-		} catch (e) {
-			PopMessage("Can not create ActiveX object (Shell.Application), command can't be execute. Please check your system authorities.", 16);
-			return;
-		}
-		shellObj.ShellExecute(arg1, arg2, arg3, arg4, arg5);
-	}
 	this.on_mouse = function(event, x, y) {
 		var link_old = this.link_hover;
 		this.ishover = this._isHover(x, y);
@@ -964,10 +955,10 @@ oLink = function(){
 					fb.RunMainMenuCommand("文件/参数选项");
 					break;
 				case 2:
-					this.ShellExecute("https://dream7180.github.io/2023/foobox-release/", "", "", "open", 1);
+					utils.Run("https://dream7180.github.io/2023/foobox-release");
 					break;
 				case 3:
-					this.ShellExecute("https://www.cnblogs.com/asionwu", "", "", "open", 1);
+					utils.Run("https://www.cnblogs.com/asionwu");
 					break;
 			};
 			this.link_hover = 0;

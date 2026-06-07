@@ -58,14 +58,14 @@ searchbox = function() {
 		gb = this.images.source_switch.GetGraphics();;
 		this.images.source_switch.ReleaseGraphics(gb);
 		
-		this.images.source_pl = gdi.CreateImage(x14, x14);
+		this.images.source_pl = gdi.CreateImage(x18, x18);
 		gb = this.images.source_pl.GetGraphics();
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("\uEEBA", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
 		gb.SetTextRenderingHint(0);
 		this.images.source_pl.ReleaseGraphics(gb);
 		
-		this.images.source_lib = gdi.CreateImage(x14, x14);
+		this.images.source_lib = gdi.CreateImage(x18, x18);
 		gb = this.images.source_lib.GetGraphics();
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("\uEC16", g_fnico1, g_color_normal_txt, 0, 0, x18, x18, cc_stringformat);
@@ -95,7 +95,8 @@ searchbox = function() {
 
 	this.draw = function(gr) {
 		// 绘制搜索框背景
-		this.src_btn.draw(gr, this.x + 4 - 2*zdpi, Math.round(this.y + zdpi), 255);
+		let bt_y = this.y + z(2);
+		this.src_btn.draw(gr, this.x + 4 - z(2), bt_y, 255);
 		this.inputbox.draw(gr, this.x + this.images.source_pl.Width + 10, this.y + 2, 0, 0);
 		if(ppts.source == 1){
 			var src_img = this.images.source_pl;
@@ -103,7 +104,7 @@ searchbox = function() {
 			var src_img = this.images.source_lib;
 		}
 		if ((this.inputbox.text.length > 0 || ppts.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, Math.round(this.x + this.inputbox.w + 22 * zdpi), Math.round(this.y + zdpi), 255);
-		gr.DrawImage(src_img, this.x + 2, Math.round(this.y + 3 * zdpi), src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
+		gr.DrawImage(src_img, this.x + 4, bt_y, src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
 	}
 
 	this.historylist = Array();

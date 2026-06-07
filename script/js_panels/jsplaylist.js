@@ -34,7 +34,7 @@ var title_add = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.13";
+var g_script_version = "8.14";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -62,9 +62,11 @@ var g_font_ud = null;
 var g_color_normal_bg = 0;
 var g_color_star = 0;
 var g_color_selected_bg = 0;
+var g_color_selected_bg2 = 0;
 var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
 var g_color_highlight = 0;
+var g_color_status = 0;
 var c_default_hl = 0;
 var c_divline = 0;
 var g_color_playing_txt = c_white;
@@ -1875,6 +1877,7 @@ function on_notify_data(name, info) {
 			}
 		}
 		p.list.lcolor_85 = blendColors(g_color_normal_txt, g_color_highlight, 0.85);
+		g_color_selected_bg2 = g_color_selected_bg & 0x85ffffff;
 		if(dark_mode) p.list.lcolor_75 = blendColors(c_black, p.list.lcolor_85, 0.75);
 		else p.list.lcolor_75 = blendColors(c_white, p.list.lcolor_85, 0.75);
 		get_images_color();
@@ -1946,7 +1949,9 @@ function get_colors() {
 	g_color_selected_txt = g_color_normal_txt;
 	g_scroll_color = g_color_normal_txt & 0x95ffffff;
 	g_color_selected_bg = g_color_selected_bg_default;
+	g_color_selected_bg2 = g_color_selected_bg & 0x85ffffff;
 	g_color_highlight = c_default_hl;
+	g_color_status = g_color_normal_txt & 0x07ffffff;
 	g_color_star = g_color_normal_txt & 0x2dffffff;
 	if(isDarkMode(g_color_normal_bg)){
 		dark_mode = 1;

@@ -15,10 +15,10 @@ var hbtn = false;
 var ww = 0, wh = 0, minw = 1, minh = 1;
 var m_x = 0, m_y = 0;
 var g_seconds = 0;
-var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw, leftbarw, title_w, captionw, z4, z5, z8;
+var seek_len, seek_start,seek_h, vol_start, vol_len, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw, leftbarw, title_w, captionw, z4, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
-var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, LibBtn, MenubarBtn = [];
+var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, OutBtn, LibBtn, MenubarBtn = [];
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
 var show_menu = 1, colorful_seek = 1, show_extrabtn = 1;
 var btnall = true;
@@ -46,6 +46,18 @@ panel = {
 		"video": "视频"
 	}
 }
+
+var devIcos = {
+	"扬声器 (": "\uF170",
+	"ASIO ": "\uF69D",
+	"ASIO+": "\uEBF0",
+	"Digit": "\uEE02",
+	"Realt": "\uEE02",
+	"UPnP ": "\uF017",
+	"无输出": "\uEF9C"
+}
+
+var devarr, devOrder, devico;
 
 //open_hacks_mod
 var UIComp = new ActiveXObject("OpenHacksMod");
@@ -76,6 +88,19 @@ function UiCompSetCaption(){
 			setCaption_timer = false;
 		}, 200);
 	}
+}
+
+function GetOutput(){
+	let outdev = fb.GetOutputDevices();
+	devarr = JSON.parse(outdev);
+	for(let i = 0; i < devarr.length; i++){
+		let _name = devarr[i].name.split(" : ");
+		if (_name.length > 1 && _name[0] == "默认") devarr[i].name = _name[1];
+		if(devarr[i].active) devOrder = i;
+		devarr[i].subname = devarr[i].name.substring(0, 5);
+	}
+	devico = devIcos[devarr[devOrder].subname];
+	if(!devico) devico = "\uF1C5";
 }
 
 //=====================================================
@@ -338,6 +363,23 @@ PBO_Menu = function(x, y) {
 	}
 }
 
+Out_Menu = function(x, y) {
+	let Outmenu = window.CreatePopupMenu();
+	var menu_item_count = 0;
+	for (var i = 0; i < devarr.length; i++)
+		Outmenu.AppendMenuItem(MF_STRING, ++menu_item_count, devarr[i].name);
+	Outmenu.CheckMenuRadioItem(1, menu_item_count, devOrder + 1);
+	var ret = 0;
+	ret = Outmenu.TrackPopupMenu(x, y, 0x0020);
+	if (ret) {
+		switch (ret) {
+		default:
+			fb.SetOutputDevice(devarr[ret-1].output_id, devarr[ret-1].device_id);
+			break;
+		}
+	}
+}
+
 function initbuttons(){
 	if(fb.IsPlaying) {
 		track_len = fb.TitleFormat("%length%").EvalWithMetadb(fb.GetNowPlaying());
@@ -360,6 +402,7 @@ function initbuttons(){
 	MuteBtn = new ButtonUI(btn_img);
 	LibBtn = new ButtonUI(btn_img);
 	PBOBtn = new ButtonUI(btn_img);
+	OutBtn = new ButtonUI(btn_img);
 	g_switchbar = new oSwitchbar();
 	CloseBtn = new ButtonUI(img_close);
 	MaxBtn = new ButtonUI(img_winbtn);
@@ -428,17 +471,17 @@ function init_obj() {
 	PBStop.SetXY(btn_end_x, btn_y2);
 	seek_start = 3*btn_space+time_length;
 	vol_start = ww - vol_len - seek_start;
-	var volbtn_x = vol_start - MuteBtn.width - z5;
 	seek_len = Math.max(0, ww - seek_start*2);
 	PlaybackTimeText.SetSize(btn_space*2, win_y2, time_length, seek_h);
 	PlaybackLengthText.SetSize(seek_len + seek_start + btn_space, win_y2, time_length, seek_h);
 	TimeTip = new UITooltip(seek_start + z(12), win_y2, "", g_font, c_font, tip_bg);
 	VolumeTip = new UITooltip(ww - seek_start + z5 - 1, btn_y + z(2), "", g_font, c_font, false);
-	MuteBtn.SetXY(volbtn_x, btn_y);
-	pbo_start = volbtn_x - btn_img.Width - z5;
-	PBOBtn.SetXY(pbo_start - z(2), btn_y);
-	LibBtn.SetXY(pbo_start - btn_img.Width - z(10) + 1, btn_y);
-	RBtnTips.SetSize(pbo_start - btn_img.Width*5 - z5, btn_y, z(100), btn_img.Height/3);
+	MuteBtn.SetXY(vol_start - MuteBtn.width - z5, btn_y);
+	OutBtn.SetXY(MuteBtn.x - btn_img.Width - z5, btn_y);
+	PBOBtn.SetXY(OutBtn.x - btn_img.Width - z5, btn_y);
+	LibBtn.SetXY(PBOBtn.x - btn_img.Width - z5, btn_y);
+	let Rbtntipx = btn_end_x + imgh + btn_space;
+	RBtnTips.SetSize(Rbtntipx, btn_y, LibBtn.x - Rbtntipx - z5, btn_img.Height/3);
 	g_switchbar.setSize(seek_start, btn_y - z(1), g_switchbar.w, g_switchbar.h);
 	CloseBtn.SetXY(ww - topbtnw, 0);
 	MaxBtn.SetXY(ww - 2*topbtnw, 0);
@@ -760,6 +803,7 @@ function on_init(){
 	get_panel();
 	init_overlay_obj();
 	initbuttons();
+	GetOutput();
 }
 
 //=============start=====================
@@ -846,15 +890,17 @@ function on_paint(gr) {
 	PlaybackLengthText.Paint(gr);
 	seekbar.Paint(gr);
 	TimeTip.Paint(gr);
-	if(ww > 10.5*vol_len){
+	if(ww > 11*vol_len){
 		btnall = true;
 		VolumeBar.Paint(gr);
 		VolumeTip.Paint(gr);
 		LibBtn.Paint(gr);
 		MuteBtn.Paint(gr);
+		OutBtn.Paint(gr);
 		PBOBtn.Paint(gr);
 		RBtnTips.Paint(gr);
 		gr.GdiDrawText(fb.Volume == -100 ? "\uF29E" : "\uF2A2", g_fnico1, c_normal, MuteBtn.x, MuteBtn.y, MuteBtn.width-2, MuteBtn.height-2, cc_txt);
+		gr.GdiDrawText(devico, g_fnico1, c_normal, OutBtn.x, OutBtn.y, OutBtn.width-2, OutBtn.height-2, cc_txt);
 		gr.GdiDrawText(PBOIcos[plman.PlaybackOrder], g_fnico1, c_normal, PBOBtn.x, PBOBtn.y, PBOBtn.width-2, PBOBtn.height-2, cc_txt);
 		gr.GdiDrawText("\uF44B", g_fnico1, c_normal, LibBtn.x, LibBtn.y, LibBtn.width-2, LibBtn.height-2, cc_txt);
 		g_switchbar.draw(gr);
@@ -903,6 +949,9 @@ function on_mouse_move(x, y) {
 			} else if (PBOBtn.MouseMove(x, y)) {
 				hbtn = true;
 				RTips_switch(PBOTips[plman.PlaybackOrder]);
+			} else if (OutBtn.MouseMove(x, y)) {
+				hbtn = true;
+				RTips_switch(devarr[devOrder].name);
 			} else RTips_switch("");
 			if (MuteBtn.MouseMove(x, y)) hbtn = true;
 			g_switchbar.on_mouse("move", x, y);
@@ -945,8 +994,14 @@ function on_mouse_lbtn_down(x, y) {
 			g_switchbar.on_mouse("lbtn_down", x, y);
 			if (PBOBtn.MouseDown(x, y)) {
 				hbtn = false;
-				PBO_Menu(pbo_start - z(2), PBOBtn.y);
+				PBO_Menu(PBOBtn.x, PBOBtn.y);
 				PBOBtn.Reset();
+			}else{
+				if (OutBtn.MouseDown(x, y)) {
+					hbtn = false;
+					Out_Menu(OutBtn.x, OutBtn.y);
+					OutBtn.Reset();
+				}
 			}
 			if (VolumeBar.MouseDown(x, y)) {
 				fb.Volume = pos2vol(VolumeBar.Value);
@@ -1000,6 +1055,7 @@ function on_mouse_lbtn_up(x, y) {
 			}
 			g_switchbar.on_mouse("lbtn_up", x, y);
 			PBOBtn.MouseUp();
+			OutBtn.MouseUp();
 		}
 	}
 }
@@ -1025,6 +1081,7 @@ function on_mouse_leave() {
 			LibBtn.Reset();
 			MuteBtn.Reset();
 			PBOBtn.Reset();
+			OutBtn.Reset();
 		}
 		CloseBtn.Reset();
 		MaxBtn.Reset();
@@ -1115,6 +1172,11 @@ function on_volume_change(v) {
 
 function on_playback_order_changed() {
 	PBOBtn.Repaint();
+}
+
+function on_output_device_changed(){
+	GetOutput();
+	OutBtn.Repaint();
 }
 
 function on_font_changed() {

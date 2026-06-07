@@ -1402,7 +1402,6 @@ function Controller(imgArray, imgDisplay, prop) {
 	var currentIndex = -1;
 	var currentPathItem = null;
 	var currentImage;
-	var shellObj;
 	var _this = this;
 
 	if (!this.Properties.SingleImageMode) {
@@ -1483,7 +1482,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			funcs[id] = [_this.AboutCurrentImage, null];
 			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "关于当前图片");
 			funcs[id] = [_this.ViewWithExternalViewer, null];
-			baseMenu.AppendMenuItem(currentPathItem && !currentPathItem.embed ? MF_STRING : MF_DISABLED, id++, "在外部查看器中查看");
+			baseMenu.AppendMenuItem(currentPathItem && !currentPathItem.embed ? MF_STRING : MF_DISABLED, id++, "查看图片");
 			funcs[id] = [_this.OpenContainingFolder, null];
 			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "打开图片所在目录");
 			funcs[id] = [_this.Refresh, true];
@@ -1702,7 +1701,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		var keyword = fb.TitleFormat(si.keyword).EvalWithMetadb(arr[1]);
 		keyword = encodeURIComponent(keyword);
 		url = si.url.replace(/%s/ig, keyword);
-		ShellExecute('"' + url + '"', "", "", "open", 1);
+		utils.Run(url);
 	}
 	
 	this.SetStretchProperties = function(switchWhichOne) {
@@ -1744,23 +1743,13 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	this.ViewWithExternalViewer = function() {
-		if (currentPathItem) ShellExecute('"' + currentPathItem.path + '"', "", "", "open", 1);
+		fb.ShowPictureViewer(currentPathItem.path);
 	}
 
 	this.OpenContainingFolder = function() {
-		if (currentPathItem) ShellExecute("explorer", '/select,\"' + currentPathItem.path + '"', "", "open", 1);
-	}
-
-	function ShellExecute(arg1, arg2, arg3, arg4, arg5) {
-		if (!shellObj) {
-			try {
-				shellObj = new ActiveXObject("Shell.Application");
-			} catch (e) {
-				PopMessage("Can not create ActiveX object (Shell.Application), command can't be execute. Please check your system authorities.", 16);
-				return;
-			}
-		}
-		shellObj.ShellExecute(arg1, arg2, arg3, arg4, arg5);
+		//utils.Run("explorer", ["/select,"+currentPathItem.path], "", "open", 1);
+		let shellObj = new ActiveXObject("Shell.Application");
+		shellObj.ShellExecute("explorer", '/select,\"' + currentPathItem.path + '\"', "", "open", 1);
 	}
 
 	this.ClearCache = function() {

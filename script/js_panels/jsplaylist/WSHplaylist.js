@@ -144,7 +144,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 		for (var j = 1; j < fin; j++) {
 			tf1 = tf2 = null;
 			if (p.headerBar.columns[j].w > 0) {
-				cx = p.headerBar.columns[j].x + g_z5;
+				cx = p.headerBar.columns[j].x + g_z4;
 				cw = (Math.abs((p.headerBar.w - p.headerBar.columns[0].w)* p.headerBar.columns[j].percent / 10000)) - g_z10;
 				switch (p.headerBar.columns[j].ref) {
 				case "状态":
@@ -161,25 +161,33 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						var columnColor = this.state_color;
 					};
 					var imgw = images.playing_ico.Width;
+					let icon_y = this.y + Math.round((cTrack.height - imgw)/2);
+					let rectz = Math.round(cTrack.height*0.6);
 					switch (p.headerBar.columns[j].align) {
 					case 0:
 						var icon_x = cx;
+						var bg_x = cx;
 						break;
 					case 1:
 						var icon_x = cx + Math.round((cw - imgw)/2);
+						var bg_x = cx + Math.round((cw - rectz)/2);
 						break;
 					case 2:
 						var icon_x = cx + cw - imgw;
+						var bg_x = cx + cw - rectz;
 						break;
 					};
-					var icon_y = this.y + Math.round((cTrack.height - imgw)/2);
+					var bgy = this.y + Math.round(rectz/3);
 					if(_playing_idx){
 						if (g_seconds / 2 == Math.floor(g_seconds / 2)) gr.DrawImage(images.playing_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 100);
 						else gr.DrawImage(images.playing_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
 					} else if (this.queue_idx > 0) {
-						gr.FillSolidRect(cx, icon_y, cw - g_z2, imgw, InfoPane.c_border);
+						gr.FillSolidRect(cx, bgy, cw, rectz, InfoPane.c_border);
 						gr.GdiDrawText(num(this.queue_idx, 2), g_font_b, c_white, cx, this.y, cw, cTrack.height, cc_txt);
-					} else if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) gr.DrawImage(images.selected_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
+					} else {
+						gr.FillSolidRect(bg_x, bgy, rectz, rectz, g_color_status);
+						if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) gr.DrawImage(images.selected_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
+					}
 					break;
 				case "喜爱":
 					if (typeof(this.mood) == "undefined") {
@@ -207,9 +215,9 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						break;
 					};
 					if (_playing_idx) {
-						gr.DrawImage(images.mood_ico_playing, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2 + 1), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
+						gr.DrawImage(images.mood_ico_playing, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
 					} else {
-						gr.DrawImage(images.mood_ico, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2 + 1), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
+						gr.DrawImage(images.mood_ico, columns.mood_x, Math.round(this.y + cTrack.height / 2 - imgh/2), imgw, imgh, 0, (this.mood != 0 ? imgh : 0), imgw, imgh, 0, 255);
 					}
 					break;
 				case "等级":
@@ -219,12 +227,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						var ratingArray = this.parseTF(this.rating, this.text_colour);
 						this.rating = ratingArray[0];
 					};
-					imgh = Math.floor(15*zdpi);
+					imgh = images.star_playing.Height;
 					columns.rating = true;
 					// column width
 					columns.rating_w = imgh * 5;
 					// for minimum width for this column
-					p.headerBar.columns[j].minWidth = columns.rating_w + z(imgh/2);
+					p.headerBar.columns[j].minWidth = columns.rating_w * 1.2;
 					//
 					var one_star_w = Math.round(columns.rating_w / 5);
 					var total_stars_drawable = Math.floor((cw - 2) / one_star_w);
@@ -376,7 +384,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg);
 						}
 						else {
-							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg & 0x85ffffff);
+							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg2);
 						};
 						this.text_colour = g_color_selected_txt;
 					}
@@ -2238,16 +2246,12 @@ oList = function(object_name, playlist) {
 				plman.RemovePlaylistSelection(this.playlist, false);
 				break;
 			case (ret > 1011 && ret < 1111):
-				var WshShell = new ActiveXObject("WScript.Shell");
 				if (g_track_type > -1) {
 					var obj_file = fb.TitleFormat("%path%").EvalWithMetadb(fb.GetFocusItem());
-					try{WshShell.Run("\"" + _apps[ret - 1012] + "\" " + "\"" + obj_file + "\"", 5);}
-					catch(e){fb.ShowPopupMessage("找不到该应用程序.", "出错信息");}
 				} else{
 					var obj_file = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
-					try{WshShell.Run("\"" + _apps[ret - 1012] + "\" " + "\"" + obj_file + "\"", 5);}
-					catch(e){fb.ShowPopupMessage("找不到该应用程序.", "出错信息");}
 				}
+				utils.Run(_apps[ret - 1012], [obj_file]);
 				break;
 			case (ret == 4000):
 				fb.RunMainMenuCommand("文件/新建播放列表");
