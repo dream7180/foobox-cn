@@ -33,6 +33,7 @@ var rating_to_tag =  Number(commoncfg[9]);
 commoncfg.length = 0;
 var auto_eslprop = window.GetProperty("Auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
+var isFollowingCursor;
 
 function GetCaption(name) {
 	var str = Caption_Pack[name];
@@ -1398,7 +1399,6 @@ function Display(x, y, w, h, prop) {
 function Controller(imgArray, imgDisplay, prop) {
 	this.Properties = prop;
 	var groupString = null;
-	var isFollowingCursor;
 	var currentIndex = -1;
 	var currentPathItem = null;
 	var currentImage;

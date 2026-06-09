@@ -66,7 +66,6 @@ ppt = {
 	botStampHeight: 48,
 	default_botGridHeight: 26,
 	botGridHeight: 0,
-	botTextRowHeight: 17,
 	textLineHeight: 10
 };
 
@@ -1294,6 +1293,11 @@ oBrowser = function() {
 		var ah = this.rowHeight - this.marginTop - this.marginBot;
 		var coverWidth = cover.max_w;
 		var txt_color = g_color_normal_txt;
+		var txt_color_lt = g_color_txt_lt;
+		var txt_color_lt2 = g_color_txt_lt2;
+		var selected_overlay = g_color_selected_bg & 0xddffffff;
+		var playing_overlay = g_color_highlight & 0xddffffff;
+		var txt_font = g_font;
 		var total = this.groups.length;
 		var all_x = -1,
 			all_y = -1,
@@ -1334,12 +1338,20 @@ oBrowser = function() {
 				};
 					
 				if (i == this.playingIndex) {
-					txt_color = ppt.panelMode <= 1 ? RGBA(255, 255, 255) : g_color_highlight;
+					txt_color = c_white;
+					txt_color_lt = c_white;
+					txt_color_lt2 = c_white;
 					if (this.stampDrawMode) gr.FillSolidRect(ax, ay, aw, ah, g_color_highlight);
-				} else if (this.stampDrawMode) {
-					if (i == this.selectedIndex) gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
-					txt_color = g_color_normal_txt;
-				} else txt_color = g_color_normal_txt; // panelMode = 3 (Grid)
+					txt_font = g_font_b;
+				} else {
+					txt_color = g_color_normal_txt; // panelMode = 3 (Grid)
+					txt_color_lt = g_color_txt_lt;
+					txt_color_lt2 = g_color_txt_lt2;
+					if(i == this.selectedIndex){
+						txt_font = g_font_b;
+						if(this.stampDrawMode) gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg);
+					} else txt_font = g_font;
+				}
 				coverTop = ppt.panelMode == 1 ? ay + 10 : ay;
 					
 				if (this.groups[i].cover_img) {
@@ -1370,15 +1382,14 @@ oBrowser = function() {
 				} else gr.DrawImage(images.noart, ax + Math.round((aw - coverWidth) / 2), ay + Math.round((aw - coverWidth) / 2), coverWidth, coverWidth, 1, 1, images.noart.Width - 2, images.noart.Height - 2);
 
 				// grid text background rect
-				if (ppt.panelMode == 3) {
-					if (i == this.playingIndex) {
-						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
+				if (ppt.panelMode > 1) {
+					if (ppt.showAllItem && i == 0) {//do nothing
+					}else if (i == this.playingIndex) {
+						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, playing_overlay);
 					} else if (i == this.selectedIndex) {
-						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_selected_bg);
-					} else gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_grid_bg);
-				} else if (ppt.panelMode == 2 && i == this.playingIndex){
-					gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_normal_bg & 0xddffffff);
-				};
+						gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, selected_overlay);
+					} else if(ppt.panelMode == 3) gr.FillSolidRect(ax + 2, coverTop + coverWidth - ppt.botGridHeight, aw - 4, ppt.botGridHeight, g_color_grid_bg);
+				}
 
 				// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
 				if (ppt.panelMode == 3 && im_h > im_w) {
@@ -1409,16 +1420,14 @@ oBrowser = function() {
 				if(i == this.playingIndex && ppt.panelMode > 1){
 					gr.DrawRect(_cx + 1, coverTop + coverWidth - frame_h + 1, frame_w - 3, frame_h - 3, 3.0, g_color_highlight);
 				}
-
+				var txth = 1.4 * g_fsize;
+				var botTxt1h = ppt.botGridHeight * 0.55;
+				var botTxt2h = ppt.botGridHeight * 0.45;
 				if (ppt.panelMode <= 1) { //(Art + bottom labels)
 					// draw text
 					if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
 						try {
-							if (ppt.tagMode == 1) {
-								gr.GdiDrawText("所有项目", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-							} else {
-								gr.GdiDrawText("所有项目", (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-							};
+								gr.GdiDrawText("所有项目", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, txth, lt_txt);
 						} catch (e) {}
 					} else {
 						if (arr[1] == "?") {
@@ -1433,16 +1442,16 @@ oBrowser = function() {
 						};
 						try {
 							if (ppt.tagMode == 1 && ppt.albumMode == 0) {
-								gr.GdiDrawText(album_name, g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
-								gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + ppt.botTextRowHeight), coverWidth, ppt.botTextRowHeight, lt_txt);
-							} else gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+								gr.GdiDrawText(album_name, txt_font, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth,txth, lt_txt);
+								gr.GdiDrawText(arr[0], g_font_s, txt_color_lt, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + txth), coverWidth, g_fsize, lt_txt);
+							} else gr.GdiDrawText(arr[0], txt_font, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, txth, lt_txt);
 						} catch (e) {}
 					};
 				} else { // panelMode = 3 (Grid)
 					// draw text
 					if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
-						// nothing
-					} else if(ppt.panelMode == 3 || (ppt.panelMode == 2 && i ==this.playingIndex)) {
+						//do nothing
+					} else if(ppt.panelMode == 3 || (i == this.selectedIndex || i == this.playingIndex)) {
 						if (arr[1] == "?") {
 							if (this.groups[i].count > 1) {
 								var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
@@ -1455,13 +1464,12 @@ oBrowser = function() {
 						};
 						try {
 							if (ppt.tagMode == 1 && ppt.albumMode == 0) {
-								gr.GdiDrawText(album_name, g_font_b, txt_color, ax + 10, (coverTop + 5 + coverWidth) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+								gr.GdiDrawText(album_name, txt_font, txt_color, ax + 10, coverTop + coverWidth - ppt.botGridHeight, aw - 20, botTxt1h, lc_txt);
 								if (this.groups[i].tracktype != 3) {
-									gr.GdiDrawText(arr[0], g_font_s, txt_color, ax + 10, (coverTop + 5 + coverWidth + ppt.botTextRowHeight) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+									gr.GdiDrawText(arr[0], g_font_s, txt_color_lt2, ax + 10, (coverTop + coverWidth + botTxt1h) - ppt.botGridHeight, aw - 20, 0.75 * botTxt2h, lt_txt);
 								}
 							}
-							else
-								gr.GdiDrawText(arr[0], (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + 10, (coverTop + coverWidth + 6) - ppt.botGridHeight, aw - 20, ppt.botTextRowHeight, lt_txt);
+							else gr.GdiDrawText(arr[0], txt_font, txt_color, ax + 10, coverTop + coverWidth - ppt.botGridHeight, aw - 20, ppt.botGridHeight, lc_txt);
 						} catch (e) {}
 					};
 				};
@@ -1533,11 +1541,22 @@ oBrowser = function() {
 			gr.DrawRect(ii_x1, ii_y1, all_w - 2, all_h - 2, 1.0, frame_col);
 			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(all_h / 2) - 1, all_w - 3, 1, frame_col);
 			gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, frame_col);
+			if (ppt.panelMode > 1) { 
+				if (ppt.showAllItem) {
+					if (this.selectedIndex == 0) {
+						gr.FillSolidRect(this.groups[0].x, this.groups[0].y + coverWidth - ppt.botGridHeight, aw, ppt.botGridHeight, selected_overlay);
+						gr.GdiDrawText("所有项目", g_font_b, txt_color, this.groups[0].x + 10, this.groups[0].y + coverWidth - ppt.botGridHeight, aw - 20, ppt.botGridHeight, lc_txt);
+					} else if(ppt.panelMode == 3) {
+						gr.FillSolidRect(this.groups[0].x, this.groups[0].y + coverWidth - ppt.botGridHeight, aw, ppt.botGridHeight, g_color_grid_bg);
+						gr.GdiDrawText("所有项目", g_font, txt_color, this.groups[0].x + 10, this.groups[0].y + coverWidth - ppt.botGridHeight, aw - 20, ppt.botGridHeight, lc_txt);
+					}
+				}
+			}
 
 			// redraw hover frame selection on ALL item for Grid view
 			if (ppt.panelMode > 1) { // grid
 				if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
-					gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg & 0xddffffff);
+					gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg);
 				};
 			};
 		};
@@ -2406,17 +2425,16 @@ function on_mouse_leave() {
 //=================================================// Metrics & Fonts & Colors & Images
 function get_botGridHeight(){
 	if(ppt.tagMode == 1 && ppt.albumMode == 0){
-		ppt.botGridHeight = Math.floor((ppt.default_botGridHeight + 14) * zdpi);
+		ppt.botGridHeight = z(ppt.default_botGridHeight) + g_fsize;
 	}
-	else ppt.botGridHeight = Math.floor(ppt.default_botGridHeight * zdpi);
+	else ppt.botGridHeight = z(ppt.default_botGridHeight);
 }
 
 function get_metrics() {
-	ppt.lineHeightMin = Math.floor(ppt.default_lineHeightMin * zdpi);
-	ppt.thumbnailWidthMin = Math.floor(ppt.default_thumbnailWidthMin * zdpi);
+	ppt.lineHeightMin = z(ppt.default_lineHeightMin);
+	ppt.thumbnailWidthMin = z(ppt.default_thumbnailWidthMin);
 	get_botGridHeight();
 	ppt.botStampHeight = 48*zdpi;
-	ppt.botTextRowHeight =  17*zdpi;
 	ppt.textLineHeight = 10*zdpi;
 	cPlaylistManager.width = 230*zdpi;
 	cPlaylistManager.topbarHeight = 30*zdpi;
@@ -2522,14 +2540,18 @@ function get_colors() {
 	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
 	g_color_highlight = c_default_hl;
 	g_color_selected_bg = g_color_selected_bg_default;
-	g_color_grid_bg = g_color_normal_bg & 0x60ffffff;
+	g_color_grid_bg = g_color_normal_bg & 0x75ffffff;
 	if(isDarkMode(g_color_normal_bg)) {
 		dark_mode = 1;
 		g_color_topbar = RGBA(0,0,0,30);
+		g_color_txt_lt = blendColors(g_color_normal_txt, c_black, 0.4);
+		g_color_txt_lt2 = blendColors(g_color_normal_txt, c_black, 0.2);
 	}
 	else {
 		dark_mode = 0;
 		g_color_topbar = RGBA(0,0,0,15);
+		g_color_txt_lt = blendColors(g_color_normal_txt, c_white, 0.5);
+		g_color_txt_lt2 = blendColors(g_color_normal_txt, c_white, 0.25);
 	}
 };
 
@@ -3002,7 +3024,7 @@ function on_notify_data(name, info) {
 			if(info.length > 3) {
 				g_color_normal_bg = RGB(info[3], info[4], info[5]);
 				g_color_selected_bg = RGB(info[6], info[7], info[8]);
-				g_color_grid_bg = g_color_normal_bg & 0x60ffffff;
+				g_color_grid_bg = g_color_normal_bg & 0x75ffffff;
 			}
 		}
 		repaint_main1 = repaint_main2;
