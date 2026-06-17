@@ -140,7 +140,7 @@ function on_metadb_changed(handleList, fromhook) {
 	if(fromhook) return;
 	if(panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
 	// Regorxxx <- Tag changes affect panel focus
-	const [handle, pls] = fb.IsPlaying && !panel.id.focus
+	const [handle,] = fb.IsPlaying && !panel.id.focus
 		? [fb.GetNowPlaying(), plman.PlayingPlaylist]
 		: [fb.GetFocusItem(true), plman.ActivePlaylist];
 	if(!handle || handleList.BSearch(handle) === -1) { return; }
@@ -158,8 +158,8 @@ function on_mouse_lbtn_dblclk(x, y) {
 		x: x,
 		y: y
 	};
-	if (!panel.trace.film) panel.click(x, y);
-	else filmStrip.lbtn_dblclk(x, y);
+	if (panel.trace.film) filmStrip.lbtn_dblclk(x, y);
+	else panel.click(x, y);
 }
 
 function on_mouse_lbtn_down(x, y) {
@@ -568,7 +568,6 @@ function on_size() {
 
 // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available
 function on_http_request_done(task_id, success, response_text, status, headers) {
-	let init = XMLHttpRequests.length;
 	XMLHttpRequests.forEach((request) => {
 		if (request.id === task_id) { 
 			request.readyState = 4;

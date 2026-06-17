@@ -1465,7 +1465,7 @@ class Panel {
 	}
 
 	uniqAlbum(artist) {
-		const flags = [];
+		const flags = {};
 		let result = [];
 		artist.forEach(v => {
 			const name = v.artist.toLowerCase() + ' - ' + v.album.toLowerCase();

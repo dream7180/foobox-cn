@@ -1000,8 +1000,8 @@ class Transition {
 			this.transition_timer = setInterval(() => {
 				Object.values(this.items).forEach(v => {
 					const saved = v.transition_factor;
-					if (this.hover(v)) v.transition_factor = Math.min(1, v.transition_factor += hover_in_step);
-					else v.transition_factor = Math.max(0, v.transition_factor -= hover_out_step);
+					if (this.hover(v)) v.transition_factor = Math.min(1, v.transition_factor + hover_in_step);
+					else v.transition_factor = Math.max(0, v.transition_factor - hover_out_step);
 					if (saved !== v.transition_factor) v.repaint();
 				});
 				const running = Object.values(this.items).some(v => v.transition_factor > 0 && v.transition_factor < 1);

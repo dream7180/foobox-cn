@@ -1295,14 +1295,14 @@ oBrowser = function() {
 		var txt_color = g_color_normal_txt;
 		var txt_color_lt = g_color_txt_lt;
 		var txt_color_lt2 = g_color_txt_lt2;
-		var selected_overlay = g_color_selected_bg & 0xddffffff;
-		var playing_overlay = g_color_highlight & 0xddffffff;
+		if(ppt.panelMode > 1){
+			var selected_overlay = g_color_selected_bg & 0xddffffff;
+			var playing_overlay = g_color_highlight & 0xddffffff;
+		}
 		var txt_font = g_font;
 		var total = this.groups.length;
 		var all_x = -1,
-			all_y = -1,
-			all_w = 0,
-			all_h = 0;
+			all_y = -1;
 		var coverImg = null;
 		var arr = ["?", "?"];
 
@@ -1371,8 +1371,6 @@ oBrowser = function() {
 					if (ppt.showAllItem && i == 0) {
 						all_x = ax + Math.round((aw - im_w) / 2);
 						all_y = coverTop + coverWidth - im_h;
-						all_w = im_w;
-						all_h = im_h;
 					}
 					let this_x = ax + Math.round((aw - im_w) / 2);
 					let this_y = coverTop + coverWidth - im_h;
@@ -1511,8 +1509,8 @@ oBrowser = function() {
 		// fill ALL cover image with the 1st four cover art found
 		// get cover
 		if (all_x > -1 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
-			var ii_w = Math.floor(all_w / 2);
-			var ii_h = Math.floor(all_h / 2);
+			var ii_w = Math.floor(im_w / 2);
+			var ii_h = Math.floor(im_h / 2);
 			var ii_x1 = all_x;
 			var ii_x2 = ii_x1 + ii_w;
 			var ii_y1 = all_y;
@@ -1537,10 +1535,10 @@ oBrowser = function() {
 					};
 				};
 			};
-			var frame_col = g_color_normal_txt & 0x25ffffff;//“所有项目”的边框
-			gr.DrawRect(ii_x1, ii_y1, all_w - 2, all_h - 2, 1.0, frame_col);
-			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(all_h / 2) - 1, all_w - 3, 1, frame_col);
-			gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, frame_col);
+			//frames of all items
+			gr.DrawRect(ii_x1, ii_y1, im_w - 2, im_h - 2, 1.0, g_color_line);
+			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(im_h / 2) - 1, im_w - 3, 1, g_color_line);
+			gr.FillSolidRect(ii_x1 + Math.round(im_w / 2) - 1, ii_y1 + 1, 1,  im_h - 3, g_color_line);
 			if (ppt.panelMode > 1) { 
 				if (ppt.showAllItem) {
 					if (this.selectedIndex == 0) {
@@ -1556,7 +1554,7 @@ oBrowser = function() {
 			// redraw hover frame selection on ALL item for Grid view
 			if (ppt.panelMode > 1) { // grid
 				if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
-					gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg);
+					gr.DrawRect(all_x + 1, all_y + 1, im_w - 3, im_h - 3, 3.0, g_color_selected_bg);
 				};
 			};
 		};
@@ -2468,7 +2466,7 @@ function get_images_static() {
 	
 	images.all = gdi.CreateImage(150, 150);
 	gb = images.all.GetGraphics();
-	gb.FillSolidRect(0, 0, 150, 150, color_ico);
+	//gb.FillSolidRect(0, 0, 150, 150, color_ico);
 	images.all.ReleaseGraphics(gb);
 	
 	images.noart = gdi.CreateImage(nw, nh);
@@ -2484,19 +2482,20 @@ function get_images() {
 	var gb;
 	var txt = "";
 	var x5 = 5*zdpi, _x10 = 10*zdpi;
+	var c1 = RGBA(255, 255, 255, 180);
 	
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,_x10, x5,x5, g_btn_color1);
-	gb.FillRoundRect(2*zdpi+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
+	gb.FillRoundRect(2*zdpi+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, c1);
 	images.sw_btn_n0.ReleaseGraphics(gb);
 	
 	images.sw_btn_n1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n1.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,_x10, x5,x5, g_btn_color1);
-	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
+	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, c1);
 	images.sw_btn_n1.ReleaseGraphics(gb);
 }
 
