@@ -952,7 +952,7 @@ function on_mouse_move(x, y) {
 				RTips_switch(PBOTips[plman.PlaybackOrder]);
 			} else if (OutBtn.MouseMove(x, y)) {
 				hbtn = true;
-				RTips_switch(devarr[devOrder]?.name);
+				RTips_switch(devarr[devOrder]?.name || "");
 			} else RTips_switch("");
 			if (MuteBtn.MouseMove(x, y)) hbtn = true;
 			g_switchbar.on_mouse("move", x, y);
