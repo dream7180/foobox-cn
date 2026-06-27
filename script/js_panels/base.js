@@ -1,4 +1,4 @@
-﻿//foobox https://github.com/dream7180
+//foobox https://github.com/dream7180
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
@@ -99,7 +99,7 @@ function GetOutput(){
 		if(devarr[i].active) devOrder = i;
 		devarr[i].subname = devarr[i].name.substring(0, 5);
 	}
-	devico = devIcos[devarr[devOrder].subname];
+	devico = devIcos[devarr[devOrder]?.subname];
 	if(!devico) devico = "\uF1C5";
 }
 
@@ -368,7 +368,8 @@ Out_Menu = function(x, y) {
 	var menu_item_count = 0;
 	for (var i = 0; i < devarr.length; i++)
 		Outmenu.AppendMenuItem(MF_STRING, ++menu_item_count, devarr[i].name);
-	Outmenu.CheckMenuRadioItem(1, menu_item_count, devOrder + 1);
+	if (devOrder)
+		Outmenu.CheckMenuRadioItem(1, menu_item_count, devOrder + 1);
 	var ret = 0;
 	ret = Outmenu.TrackPopupMenu(x, y, 0x0020);
 	if (ret) {
@@ -951,7 +952,7 @@ function on_mouse_move(x, y) {
 				RTips_switch(PBOTips[plman.PlaybackOrder]);
 			} else if (OutBtn.MouseMove(x, y)) {
 				hbtn = true;
-				RTips_switch(devarr[devOrder].name);
+				RTips_switch(devarr[devOrder]?.name);
 			} else RTips_switch("");
 			if (MuteBtn.MouseMove(x, y)) hbtn = true;
 			g_switchbar.on_mouse("move", x, y);
