@@ -336,6 +336,15 @@ const get_album_art_async = async (albumIndex) =>
 {
 	try{
 		let result = await utils.GetAlbumArtAsyncV2(0, p.list.groups[albumIndex].metadb, albumart_id, false);
+		//这里做遍历获取图片的原因是，有的歌曲没有封面，但有碟片、艺术家等图片。上面这行代码只会获取封面图片导致播放列表显示空白。
+		if (!result.image) {
+			for (var i = 0; i <= 4; i++) {
+				result = await utils.GetAlbumArtAsyncV2(0, p.list.groups[albumIndex].metadb, i, false);
+				//如果找到的图片不是有效的，继续遍历
+				if (result != null && result.image) break;
+			}
+		}
+		
 		var img = result.image;
 		if(img){
 			let dimensions = getdimension(img.Width, img.Height);
