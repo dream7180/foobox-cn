@@ -171,6 +171,7 @@ var sort_pattern_modified = "%last_modified% | %album artist% | $if(%album%,%dat
 var sort_pattern_playcount = "$if2(%play_count%,0) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 var sort_pattern_codec = "%codec% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 var sort_pattern_queue = "%queue_index% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %title%";
+var sort_pattern_created = "%file_created% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 // Singletons
 cRow = {
 	default_playlist_h: 33,

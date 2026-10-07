@@ -769,6 +769,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 212, "等级");
 		_sorting.AppendMenuItem(MF_STRING, 213, "比特率");
 		_sorting.AppendMenuItem(MF_STRING, 214, "修改时间");
+		_sorting.AppendMenuItem(MF_STRING, 220, "创建时间");
 		_sorting.AppendMenuItem(MF_STRING, 215, "播放次数");
 		_sorting.AppendMenuItem(MF_STRING, 216, "编码类型");
 		_sorting.AppendMenuItem(MF_STRING, 217, "随机");
@@ -961,6 +962,9 @@ oHeaderBar = function() {
 		case (idx == 214):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_modified, -1);
             break;
+		case (idx == 220):
+			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_created, -1);
+			break;
 		case (idx == 215):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_playcount, -1);
             break;
