@@ -34,7 +34,7 @@ var title_add = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.14";
+var g_script_version = "8.15";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -815,6 +815,16 @@ function on_mouse_lbtn_up(x, y) {
 		// after a cover column resize, update cover image cache
 		if (cover.resized == true) {
 			cover.resized = false;
+			// === 封面列宽度自动吸附到行高整数倍 ===
+			var _rowH = cTrack.height;
+			var _curW = p.headerBar.columns[0].w;
+			var _snapW = Math.round(_curW / _rowH) * _rowH;
+			if (_snapW != _curW && _snapW >= p.headerBar.columns[0].minWidth) {
+				p.headerBar.columns[0].w = _snapW;
+				p.headerBar.columns[0].percent = Math.round(_snapW / zdpi * 100) / 100;
+				p.headerBar.calculateColumns();
+			}
+			// === 吸附结束 ===
 			cover.previous_max_size = p.headerBar.columns[0].w;
 			update_playlist(layout.collapseGroupsByDefault, 2);
 		};
@@ -1834,7 +1844,11 @@ function on_font_changed() {
 	get_images_color();
 	p.headerBar.setButtons();
 	resize_panels();
-	p.scrollbar.setCursorButton();
+	if(p.list) {
+		if (p.list.totalRows > p.list.totalRowVisible) {
+			p.scrollbar.setCursorButton();
+		}
+	};
 	var settingpageid = p.settings.currentPageId;
 	p.settings = new oSettings();
 	setting_init = false;
@@ -1850,7 +1864,7 @@ function on_colours_changed() {
 	if(p.list) {
 		if (p.list.totalRows > p.list.totalRowVisible) {
 			p.scrollbar.setCursorButton();
-		};
+		}
 		p.list.setItemColors();
 	};
 	p.settings.refreshColors();

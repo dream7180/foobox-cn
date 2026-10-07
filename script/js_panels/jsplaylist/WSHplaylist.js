@@ -373,7 +373,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				this.queue_idx = plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1;
 				if (_playing_idx) {
 					// playing track bg
-					gr.FillSolidRect(tcolumn_x, this.y + 1, line_width, this.h - 1, g_color_highlight);
+					gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_highlight);
 					this.text_colour = g_color_playing_txt;
 					p.list.nowplaying_y = this.y;
 				}
@@ -392,7 +392,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						// if row is focused, draw focused colors & style ELSE draw with normal colors
 						if (p.list.focusedTrackId == this.track_index) {
 							// frame on focused item
-							gr.DrawRect(tcolumn_x + 1, this.y + 2, line_width - 2, this.h - 4, 1.0, g_color_selected_bg);
+							gr.DrawRect(tcolumn_x + 1, this.y + 1, line_width - 2, this.h - 1, 2, g_color_selected_bg);
 						};
 						this.text_colour = g_color_normal_txt;
 					};
@@ -420,7 +420,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					// cover bg
 					var cv_x = Math.floor(this.x);
 					var cv_y = Math.floor(this.y - cover_draw_delta);
-					var cv_w = Math.floor(cover.w);
+					var cv_w = Math.floor(cover.w) - 1;
 					var cv_h = Math.floor(cover.h);
 
 					if(p.list.groups[this.group_index].load_requested == 0)
@@ -435,15 +435,15 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									var ratio = p.list.groups[this.group_index].cover_img.Width / p.list.groups[this.group_index].cover_img.Height;
 									var cv_offset = Math.floor((cv_h - cv_w * ratio) / 2);
 									cv_x += cv_offset;
-									cv_w = cv_w - cv_offset * 2 - 1;
-									cv_h = cv_h - 1;
+									cv_w = cv_w - cv_offset * 2;
+									cv_h = cv_h;
 								}
 								else {
 									var ratio = p.list.groups[this.group_index].cover_img.Height / p.list.groups[this.group_index].cover_img.Width;
 									var cv_offset = Math.floor((cv_w - cv_h * ratio) / 2);
 									cv_y += cv_offset;
-									cv_w = cv_w - 1;
-									cv_h = cv_h - cv_offset * 2 - 1;
+									cv_w = cv_w;
+									cv_h = cv_h - cv_offset * 2;
 								};
 								// *** check aspect ratio *** //
 							};
@@ -456,18 +456,15 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					};
 				};
 			};
-			if (cover.w > 0) {
-			if(layout.expandedHeight != 1 || !layout.showgroupheaders) gr.DrawLine(tcolumn_x - 1, this.y + 1, tcolumn_x - 1, this.y + this.h, 1, g_color_line);
-				if(this.track_index_in_group == p.list.groups[this.group_index].rowCount -1){
-					if(!layout.showgroupheaders)
-						gr.FillSolidRect(this.x, this.y + this.h, this.w + cScrollBar.width, 1, g_color_line_div);
-					else gr.FillSolidRect(this.x, this.y + this.h, this.w + cScrollBar.width, 1, g_color_line);
-				}
-				else {
-					gr.FillSolidRect(tcolumn_x, this.y + this.h, line_width, 1, g_color_line);
-				}
+			if (this.empty_row_index == 0) {
+				if (cover.w > 0) {
+					if(layout.expandedHeight != 1 || !layout.showgroupheaders) gr.DrawLine(tcolumn_x - 1, this.y + 1, tcolumn_x - 1, this.y + this.h, 1, g_color_line);
+					if(this.track_index_in_group == p.list.groups[this.group_index].rowCount -1){
+						if(!layout.showgroupheaders) gr.FillSolidRect(this.x, this.y + this.h, this.w + cScrollBar.width, 1, g_color_line_div);
+						else gr.FillSolidRect(this.x, this.y + this.h, this.w + cScrollBar.width, 1, g_color_line);
+					} else gr.FillSolidRect(tcolumn_x, this.y + this.h, line_width, 1, g_color_line);
+				} else gr.FillSolidRect(tcolumn_x, this.y + this.h, line_width, 1, g_color_line);
 			}
-			else gr.FillSolidRect(tcolumn_x, this.y + this.h, line_width, 1, g_color_line);
 
 			// if dragging items, draw line at top of the hover items to show where dragged items will be inserted on mouse button up
 			if (!properties.enableTouchControl) {

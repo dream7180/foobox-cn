@@ -18,9 +18,9 @@ var g_seconds = 0;
 var seek_len, seek_start,seek_h, vol_start, vol_len, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menubtnw, leftbarw, title_w, captionw, z4, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
-var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, OutBtn, LibBtn, MenubarBtn = [];
+var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, DSPBtn, OutBtn, LibBtn, MenubarBtn = [];
 var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
-var show_menu = 1, colorful_seek = 1, show_extrabtn = 1;
+var show_menu = 1, colorful_seek = 1, show_extrabtn = 1, show_dsp = false;
 var btnall = true;
 var fbver = Number(fb.Version.substr(0, 1));
 var lib_albumlist = 1;
@@ -57,7 +57,7 @@ var devIcos = {
 	"无输出": "\uEF9C"
 }
 
-var devarr, devOrder, devico;
+var devarr, dsparr, devOrder, dspOrder, devico;
 
 //open_hacks_mod
 var UIComp = new ActiveXObject("OpenHacksMod");
@@ -99,8 +99,27 @@ function GetOutput(){
 		if(devarr[i].active) devOrder = i;
 		devarr[i].subname = devarr[i].name.substring(0, 5);
 	}
+	if(typeof devOrder == 'undefined') {
+		devOrder = 0;
+		fb.SetOutputDevice(devarr[devOrder].output_id, devarr[devOrder].device_id);
+	}
 	devico = devIcos[devarr[devOrder].subname];
 	if(!devico) devico = "\uF1C5";
+}
+
+function GetDSP(){
+	let dsp = fb.GetDSPPresets();
+	dsparr = JSON.parse(dsp);
+	if(dsparr.length){
+		show_dsp = true;
+		for(let i = 0; i < dsparr.length; i++){
+			if(dsparr[i].active) dspOrder = i;
+		}
+		if(typeof dspOrder == 'undefined') {
+			dspOrder = 0;
+			fb.SetDSPPreset(0);
+		}
+	} else show_dsp = false;
 }
 
 //=====================================================
@@ -380,6 +399,33 @@ Out_Menu = function(x, y) {
 	}
 }
 
+DSP_Menu = function(x, y) {
+	let DSPmenu = window.CreatePopupMenu();
+	var menu_item_count = 0;
+	for (var i = 0; i < dsparr.length; i++)
+		DSPmenu.AppendMenuItem(MF_STRING, ++menu_item_count, dsparr[i].name);
+	try{DSPmenu.CheckMenuRadioItem(1, menu_item_count, dspOrder + 1);}
+	catch(e){recheckDSP();}
+	var ret = 0;
+	ret = DSPmenu.TrackPopupMenu(x, y, 0x0020);
+	if (ret) {
+		switch (ret) {
+		default:
+			try{fb.SetDSPPreset(ret - 1);}
+			catch(e){recheckDSP();}
+			break;
+		}
+	}
+}
+
+recheckDSP = function() {
+	GetDSP();
+	initbuttons();
+	init_obj();
+	setSize();
+	repaintWin("B");
+}
+
 function initbuttons(){
 	if(fb.IsPlaying) {
 		track_len = fb.TitleFormat("%length%").EvalWithMetadb(fb.GetNowPlaying());
@@ -402,6 +448,7 @@ function initbuttons(){
 	MuteBtn = new ButtonUI(btn_img);
 	LibBtn = new ButtonUI(btn_img);
 	PBOBtn = new ButtonUI(btn_img);
+	if(show_dsp) DSPBtn = new ButtonUI(btn_img);
 	OutBtn = new ButtonUI(btn_img);
 	g_switchbar = new oSwitchbar();
 	CloseBtn = new ButtonUI(img_close);
@@ -478,7 +525,10 @@ function init_obj() {
 	VolumeTip = new UITooltip(ww - seek_start + z5 - 1, btn_y + z(2), "", g_font, c_font, false);
 	MuteBtn.SetXY(vol_start - MuteBtn.width - z5, btn_y);
 	OutBtn.SetXY(MuteBtn.x - btn_img.Width - z5, btn_y);
-	PBOBtn.SetXY(OutBtn.x - btn_img.Width - z5, btn_y);
+	if(show_dsp) {
+		DSPBtn.SetXY(OutBtn.x - btn_img.Width - z5, btn_y);
+		PBOBtn.SetXY(DSPBtn.x - btn_img.Width - z5, btn_y);
+	} else PBOBtn.SetXY(OutBtn.x - btn_img.Width - z5, btn_y);
 	LibBtn.SetXY(PBOBtn.x - btn_img.Width - z5, btn_y);
 	let Rbtntipx = btn_end_x + imgh + btn_space;
 	RBtnTips.SetSize(Rbtntipx, btn_y, LibBtn.x - Rbtntipx - z5, btn_img.Height/3);
@@ -801,9 +851,10 @@ function on_init(){
 	get_color();
 	get_images();
 	get_panel();
+	GetOutput();
+	GetDSP();
 	init_overlay_obj();
 	initbuttons();
-	GetOutput();
 }
 
 //=============start=====================
@@ -890,13 +941,17 @@ function on_paint(gr) {
 	PlaybackLengthText.Paint(gr);
 	seekbar.Paint(gr);
 	TimeTip.Paint(gr);
-	if(ww > 11*vol_len){
+	if(ww > (11+1*show_dsp)*vol_len){
 		btnall = true;
 		VolumeBar.Paint(gr);
 		VolumeTip.Paint(gr);
 		LibBtn.Paint(gr);
 		MuteBtn.Paint(gr);
 		OutBtn.Paint(gr);
+		if(show_dsp) {
+			DSPBtn.Paint(gr);
+			gr.GdiDrawText("\uF404", g_fnico1, c_normal, DSPBtn.x, DSPBtn.y, DSPBtn.width-2, DSPBtn.height-2, cc_txt);
+		}
 		PBOBtn.Paint(gr);
 		RBtnTips.Paint(gr);
 		gr.GdiDrawText(fb.Volume == -100 ? "\uF29E" : "\uF2A2", g_fnico1, c_normal, MuteBtn.x, MuteBtn.y, MuteBtn.width-2, MuteBtn.height-2, cc_txt);
@@ -952,6 +1007,9 @@ function on_mouse_move(x, y) {
 			} else if (OutBtn.MouseMove(x, y)) {
 				hbtn = true;
 				RTips_switch(devarr[devOrder].name);
+			} else if (show_dsp && DSPBtn.MouseMove(x, y)) {
+				hbtn = true;
+				RTips_switch(dsparr[dspOrder].name);
 			} else RTips_switch("");
 			if (MuteBtn.MouseMove(x, y)) hbtn = true;
 			g_switchbar.on_mouse("move", x, y);
@@ -996,12 +1054,15 @@ function on_mouse_lbtn_down(x, y) {
 				hbtn = false;
 				PBO_Menu(PBOBtn.x, PBOBtn.y);
 				PBOBtn.Reset();
-			}else{
-				if (OutBtn.MouseDown(x, y)) {
-					hbtn = false;
-					Out_Menu(OutBtn.x, OutBtn.y);
-					OutBtn.Reset();
-				}
+			}else if (OutBtn.MouseDown(x, y)) {
+				hbtn = false;
+				Out_Menu(OutBtn.x, OutBtn.y);
+				OutBtn.Reset();
+			}else if (show_dsp && DSPBtn.MouseDown(x, y)) {
+				hbtn = false;
+				GetDSP();
+				DSP_Menu(DSPBtn.x, DSPBtn.y);
+				DSPBtn.Reset();
 			}
 			if (VolumeBar.MouseDown(x, y)) {
 				fb.Volume = pos2vol(VolumeBar.Value);
@@ -1056,6 +1117,7 @@ function on_mouse_lbtn_up(x, y) {
 			g_switchbar.on_mouse("lbtn_up", x, y);
 			PBOBtn.MouseUp();
 			OutBtn.MouseUp();
+			if(show_dsp) DSPBtn.MouseUp();
 		}
 	}
 }
@@ -1082,6 +1144,7 @@ function on_mouse_leave() {
 			MuteBtn.Reset();
 			PBOBtn.Reset();
 			OutBtn.Reset();
+			if(show_dsp) DSPBtn.Reset();
 		}
 		CloseBtn.Reset();
 		MaxBtn.Reset();
@@ -1177,6 +1240,17 @@ function on_playback_order_changed() {
 function on_output_device_changed(){
 	GetOutput();
 	OutBtn.Repaint();
+}
+
+function on_dsp_preset_changed(){
+	let org = show_dsp;
+	GetDSP();
+	if(show_dsp != org) {
+		initbuttons();
+		init_obj();
+		setSize();
+		repaintWin("B");
+	} else if(show_dsp) DSPBtn.Repaint();
 }
 
 function on_font_changed() {

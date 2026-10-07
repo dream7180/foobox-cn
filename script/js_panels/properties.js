@@ -440,7 +440,7 @@ function _list() {
 					let url, _add = true;
 					let value = f.MetaValue(i, j).replace(/\s{2,}/g, ' ');
 					let _name = name.toUpperCase();
-					if(_name.indexOf('LYRICS') > -1) _add = false;
+					if(_name.indexOf('LYRIC') > -1) _add = false;
 					if(_name.startsWith('MUSICBRAINZ')) _add = false;
 					url = name.toLowerCase() + (num == 1 ? ' IS ' : ' HAS ') + '\"' + value + '\"';
 					if(_add){
