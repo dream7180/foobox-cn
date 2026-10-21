@@ -1130,85 +1130,40 @@ oList = function(object_name, playlist) {
 	};
 	this.setItemColors();
 
+	this.writeGroupTable = function() {
+		// groupby 数据写入 pv.db 的 group 表：每行一个分组模板（idx 保序）
+		try {
+			var db = pv_db_open();
+			db.Exec('CREATE TABLE IF NOT EXISTS "group" (idx INTEGER PRIMARY KEY, label TEXT, tf TEXT, sort_order TEXT, ref TEXT, l1 TEXT, r1 TEXT, l2 TEXT, r2 TEXT)');
+			db.Exec('DELETE FROM "group"');
+			for (var i = 0; i < this.groupby.length; i++) {
+				db.Exec('INSERT OR REPLACE INTO "group" (idx, label, tf, sort_order, ref, l1, r1, l2, r2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [i, this.groupby[i].label, this.groupby[i].tf, this.groupby[i].sortOrder, this.groupby[i].ref, this.groupby[i].l1, this.groupby[i].r1, this.groupby[i].l2, this.groupby[i].r2]);
+			}
+		} catch (e) {
+			console.log('WSHplaylist: save group table failed: ' + e.message);
+		}
+	};
+
 	this.saveGroupBy = function() {
-		var tmp;
-		var config_group = "";
-		var fin = this.groupby.length;
-		for (var j = 0; j < 8; j++) {
-			tmp = "";
-			for (var i = 0; i < fin; i++) {
-				switch (j) {
-				case 0:
-					tmp = tmp + this.groupby[i].label;
-					break;
-				case 1:
-					tmp = tmp + this.groupby[i].tf;
-					break;
-				case 2:
-					tmp = tmp + this.groupby[i].sortOrder;
-					break;
-				case 3:
-					tmp = tmp + this.groupby[i].ref;
-					break;
-				case 4:
-					tmp = tmp + this.groupby[i].l1;
-					break;
-				case 5:
-					tmp = tmp + this.groupby[i].r1;
-					break;
-				case 6:
-					tmp = tmp + this.groupby[i].l2;
-					break;
-				case 7:
-					tmp = tmp + this.groupby[i].r2;
-					break;
-				};
-				// add separator
-				if (i < this.groupby.length - 1) {
-					tmp = tmp + "^^";
-				};
-			};
-			switch (j) {
-			case 0:
-				config_group = tmp;
-				break;
-			case 1:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 2:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 3:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 4:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 5:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 6:
-				config_group = config_group + "##" + tmp;
-				break;
-			case 7:
-				config_group = config_group + "##" + tmp;
-				break;
-			};
-		};
-		utils.WriteTextFile(config_dir + "groups", config_group);
+		this.writeGroupTable();
 		this.initGroupBy();
 	};
 
 	this.initGroupBy = function() {
 		this.groupby.splice(0, this.groupby.length);
-		var config_group = "";
-		try{
-			config_group = utils.ReadTextFile(config_dir + "groups", 0);
-		}catch(e){}
-		if (config_group == "") {
+		var rows = [];
+		try {
+			if (utils.FileExists(pv_db_path)) {
+				var db = utils.OpenDatabase(pv_db_path);
+				rows = db.Query('SELECT label, tf, sort_order, ref, l1, r1, l2, r2 FROM "group" ORDER BY idx');
+			}
+		} catch (e) {
+			console.log('WSHplaylist: read group table failed: ' + e.message);
+			rows = [];
+		}
+		if (rows.length == 0) {
 			// INITIALIZE GroupBy patterns
-			var fields = [],
-				tmp, fin;
+			var fields = [];
 
 			for (var i = 0; i < 8; i++) {
 				switch (i) {
@@ -1242,88 +1197,20 @@ oList = function(object_name, playlist) {
 					fields.push(new Array("$if2(%genre%,' ')", "$if2(%genre%,' ')", "", "", "", "$if2(%genre%,' ')"));
 					break;
 				};
-				// convert array to csv string
-				tmp = "";
-				fin = fields[i].length;
-				for (var j = 0; j < fin; j++) {
-					tmp = tmp + fields[i][j];
-					if (j < fields[i].length - 1) {
-						tmp = tmp + "^^";
-					};
-				};
-				// save CSV string into window Properties
-				switch (i) {
-				case 0:
-					config_group = tmp;
-					break;
-				case 1:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 2:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 3:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 4:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 5:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 6:
-					config_group = config_group + "##" + tmp;
-					break;
-				case 7:
-					config_group = config_group + "##" + tmp;
-					break;
-				};
 			};
 			// create GroupBy Objects
 			this.totalGroupBy = fields[0].length;
-			utils.WriteTextFile(config_dir + "groups", config_group);
 			for (var k = 0; k < this.totalGroupBy; k++) {
 				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k]));
 			}
+			this.writeGroupTable(); // 默认模板写入 group 表
 		}
 		else {
-			var fields = [];
-			var tmp;
-			config_group = config_group.split("##");
-			// LOAD GroupBy patterns from Properties
-			for (var i = 0; i < 16; i++) {
-				switch (i) {
-				case 0:
-					tmp = config_group[0];
-					break;
-				case 1:
-					tmp = config_group[1];
-					break;
-				case 2:
-					tmp = config_group[2];
-					break;
-				case 3:
-					tmp = config_group[3];
-					break;
-				case 4:
-					tmp = config_group[4];
-					break;
-				case 5:
-					tmp = config_group[5];
-					break;
-				case 6:
-					tmp = config_group[6];
-					break;
-				case 7:
-					tmp = config_group[7];
-					break;
-				};
-				fields.push(tmp.split("^^"));
-				if(i == 0) this.totalGroupBy =  fields[0].length;
-			};
-			for (var k = 0; k < this.totalGroupBy; k++) {
-				this.groupby.push(new oGroupBy(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k], fields[7][k]));
-			};
+			// LOAD GroupBy patterns（group 表，按 idx 保序）
+			for (var k = 0; k < rows.length; k++) {
+				this.groupby.push(new oGroupBy(rows[k].label, rows[k].tf, rows[k].sort_order, rows[k].ref, rows[k].l1, rows[k].r1, rows[k].l2, rows[k].r2));
+			}
+			this.totalGroupBy = this.groupby.length;
 		};
 	};
 	this.initGroupBy();

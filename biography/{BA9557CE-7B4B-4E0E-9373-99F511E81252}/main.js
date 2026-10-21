@@ -1,8 +1,6 @@
 ﻿'use strict';
 
-try{
-	window.DrawMode = Number(utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\common", 0).split(",")[0]);
-}catch(e){}
+window.DrawMode = 1;
 
 if (typeof my_utils === 'undefined') include('utils.js');
 

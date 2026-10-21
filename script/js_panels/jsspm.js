@@ -1,12 +1,12 @@
 ﻿//foobox https://github.com/dream7180, jsspm http://br3tt.deviantart.com
 window.DefinePanel('JS Smooth Playlist Manager', {author: 'Br3tt, Asion, dreamawake, always_beta(CN)', version: '20151115-1000-151', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
-commoncfg = commoncfg.split(",");
-var sys_scrollbar =  Number(commoncfg[3]);
+var sys_scrollbar =  Number(common_cfg_map.sys_scrollbar);
 var zdpi = 1, dark_mode = 0;
 var default_sort =  window.GetProperty("_PROPERTY: New playlist sortorder", "%album% | %discnumber% | %tracknumber% | %title%");
 var g_font, g_font_b, g_font_track;
@@ -38,6 +38,9 @@ var nonGrouped = [];
 var Groups = [];
 // 分组映射：{ playlistGuid: groupId }
 var GroupMap = {};
+
+var pm_db_path = fb.ProfilePath + "foobox\\config\\pm.db";
+var pm_radio_rows = [];
 
 get_gdata();
 function getGroupMemberIndices(groupId) {
@@ -233,12 +236,12 @@ var repaintforced = false, repaint_main = true, repaint_main1 = true, repaint_ma
 var window_visible = false;
 var scroll_ = 0, scroll = 0, scroll_prev = 0;
 var g_start_ = 0, g_end_ = 0;
-var radiom3u = [], radioname = [], radiolist = fb.ProfilePath + "foobox\\config\\radio.list";
+var radiom3u = [], radioname = [];
 
 ppt = {
-	defaultRowHeight: Number(commoncfg[1]),
+	defaultRowHeight: Number(common_cfg_map.LineHeight),
 	rowHeight: 0,
-	rowScrollStep: Number(commoncfg[2]),
+	rowScrollStep: Number(common_cfg_map.ScrollStep),
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
@@ -249,7 +252,7 @@ ppt = {
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
-commoncfg.length = 0;
+common_cfg_map = {};
 var rowScrollStep_org = ppt.rowScrollStep;
 
 // --- [修改] 增加分组拖拽状态变量 ---
@@ -1187,7 +1190,7 @@ oBrowser = function() {
 	};
 
 	 this.getRowIdFromIdx = function(idx) {
-		// 核心修正：移除 8.13 的过滤框长度为0短路短路语句。
+		// 核心修正：移除 8.13 的过滤框长度为0短路语句。
 		// 在分组功能下，UI行数不再总等于播放列表序号，必须强制全局遍历，否则折叠后点击必发生乱序错位。
 		//if(g_filterbox.inputbox.text.length == 0) return idx;
 		var total = this.rows.length;
@@ -1390,7 +1393,7 @@ oBrowser = function() {
 							if (this.rows[i].level === 1) {
 								// 子列表图标向右缩进 16px
 								icon_x += 16 * zdpi; 
-								name_color = track_color_txt; // 仅改颜色，不缩小字体，保持原版一致
+								if (!is_playing_row) name_color = track_color_txt;
 							}
 							// 渲染原有的 remixicon 字体图标
 							gr.GdiDrawText(playlist_icon, g_fnico1, name_color, icon_x, ay, rh, ah, cc_txt);
@@ -2474,7 +2477,34 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 29):
+			// 临时生成电台列表文本 → 编辑对话框 → 回读存入 radio 表 → 删除临时文件（与 menu 162 同模式）
+			var radiolist = fb.ProfilePath + "foobox\\config\\radio.list";
+			var rlLines = [];
+			for (var rli = 0; rli < radioname.length; rli++) rlLines.push(radioname[rli] + ": " + radiom3u[rli]);
+			utils.WriteTextFile(radiolist, rlLines.join("\r\n"));
 			utils.EditTextFile(radiolist);
+			var rlContent = utils.ReadTextFile(radiolist, 0);
+			if (rlContent != "") {
+				var rlArr = rlContent.split(/\r\n|\n/);
+				var rlNames = [], rlUrls = [];
+				for (var ri = 0; ri < rlArr.length; ri++) {
+					var rlP = rlArr[ri].indexOf(": ");
+					if (rlP > 0) {
+						var rlName = rlArr[ri].substring(0, rlP).replace(/^\s+|\s+$/g, "");
+						var rlUrl = rlArr[ri].substring(rlP + 2).replace(/^\s+|\s+$/g, "");
+						if (rlName.length > 0 && rlUrl.length > 0 && rlUrls.indexOf(rlUrl) < 0) {
+							rlNames.push(rlName);
+							rlUrls.push(rlUrl);
+						}
+					}
+				}
+				if (rlNames.length > 0) {
+					radioname = rlNames;
+					radiom3u = rlUrls;
+					save_radiolist();
+				}
+			}
+			try { utils.RemovePath(radiolist); } catch(e) {}
 			break;
 		case (idx >= 200 && idx < 200 + radiom3u.length):
 			LoadRadio("网络电台", radiom3u[idx - 200]);
@@ -2806,17 +2836,15 @@ oBrowser = function() {
 			utils.WriteTextFile(ngFile, nonGrouped.join("\r\n"));
 			utils.EditTextFile(ngFile);
 			var ngContent = utils.ReadTextFile(ngFile, 0);
-			if (ngContent !== null && ngContent !== undefined) {
-				var ngArr = ngContent.split(/\r\n|\n/);
-				var ngNew = [];
-				for (var ni = 0; ni < ngArr.length; ni++) {
-					var ngName = ngArr[ni].replace(/^\s+|\s+$/g, "");
-					if (ngName.length > 0 && ngNew.indexOf(ngName) < 0) ngNew.push(ngName);
-				}
-				if (ngNew.indexOf("媒体库") < 0) ngNew.push("媒体库");
-				nonGrouped = ngNew;
-				save_gdata();
+			var ngArr = ngContent.split(/\r\n|\n/);
+			var ngNew = [];
+			for (var ni = 0; ni < ngArr.length; ni++) {
+				var ngName = ngArr[ni].replace(/^\s+|\s+$/g, "");
+				if (ngName.length > 0 && ngNew.indexOf(ngName) < 0) ngNew.push(ngName);
 			}
+			if (ngNew.indexOf("Library") < 0) ngNew.push("Library");
+			nonGrouped = ngNew;
+			save_gdata();
 			try { utils.RemovePath(ngFile); } catch(e) {}
 			break;
 		case (idx == 160):
@@ -2919,18 +2947,12 @@ function on_init() {
 	brw.init_groups();
 	
 	if(ppt.lockReservedPlaylist && fb.IsLibraryEnabled()) checkMediaLibrayPlaylist();
-	try{
-		var _radiolist = utils.ReadTextFile(radiolist, 0);
-		_radiolist = _radiolist.split("\r\n");
-		if(_radiolist.length) {
-			for(var i = 0; i < _radiolist.length; i++){
-				let radio_i = _radiolist[i].split(": ");
-				radioname.push(radio_i[0]);
-				radiom3u.push(radio_i[1]);
-			}
-		} else reset_radiolist();
-	}catch(e){
-		reset_radiolist();
+	if(pm_radio_rows.length == 0) reset_radiolist();
+	else{
+		for(var i = 0; i < pm_radio_rows.length; i++){
+			radioname.push(pm_radio_rows[i].name);
+			radiom3u.push(pm_radio_rows[i].url);
+		}
 	}
 };
 on_init();
@@ -3470,23 +3492,54 @@ function on_focus(is_focused) {
 
 //====== Custom functions ======//
 function get_gdata(){
-	var gdata_arr = "";
-	try{
-		gdata_arr = utils.ReadTextFile(fb.ProfilePath + "foobox\\config\\pmgroups", 0);
-	} catch(e) {
-		nonGrouped = ["媒体库", "媒体库视图", "默认列表", "搜索结果", "媒体库视图(正在播放)"];
+	// 一次性打开 pm.db 并读取 groups、radio 两张表（整个面板只读这一次）
+	if (!utils.FileExists(pm_db_path)) {
+		nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
+		return;
 	}
-	if (gdata_arr != "") {
-		gdata_arr = gdata_arr.split("\r\n");
-		nonGrouped = JSON.parse(gdata_arr[0]);
-		Groups = JSON.parse(gdata_arr[1]);
-		GroupMap = JSON.parse(gdata_arr[2]);
+	try {
+		var db = utils.OpenDatabase(pm_db_path);
+		// groups 表：name/value 结构，按 name 识别，与行顺序无关
+		var grows = db.Query('SELECT name, value FROM "groups"');
+		var gmap = {};
+		for (var i = 0; i < grows.length; i++) gmap[grows[i].name] = grows[i].value;
+		if (gmap.nonGrouped) {
+			nonGrouped = JSON.parse(gmap.nonGrouped);
+			Groups = JSON.parse(gmap.Groups);
+			GroupMap = JSON.parse(gmap.GroupMap);
+		} else {
+			nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
+		}
+		// radio 表：按 idx 保序，缓存起来供 on_init 使用
+		var rrows = db.Query('SELECT name, url FROM "radio" ORDER BY idx');
+		for (var j = 0; j < rrows.length; j++) pm_radio_rows.push({ name: rrows[j].name, url: rrows[j].url });
+	} catch (e) {
+		console.log('jsspm: read pm.db failed: ' + e.message);
+		nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
 	}
 }
 
+function pm_db_create() {
+	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\config")) utils.CreateFolder(fb.ProfilePath + "foobox\\config");
+	var db = utils.OpenDatabase(pm_db_path);
+	db.Exec('CREATE TABLE IF NOT EXISTS "groups" (name TEXT PRIMARY KEY, value TEXT)');
+	db.Exec('CREATE TABLE IF NOT EXISTS "radio" (idx INTEGER PRIMARY KEY, name TEXT, url TEXT)');
+	return db;
+}
+
 function save_gdata(){
-	var tmp = JSON.stringify(nonGrouped) + "\r\n" + JSON.stringify(Groups) + "\r\n" + JSON.stringify(GroupMap);
-	utils.WriteTextFile(fb.ProfilePath + "foobox\\config\\pmgroups", tmp);
+	var db = pm_db_create();
+	db.Exec('INSERT OR REPLACE INTO "groups" (name, value) VALUES (?, ?)', ["nonGrouped", JSON.stringify(nonGrouped)]);
+	db.Exec('INSERT OR REPLACE INTO "groups" (name, value) VALUES (?, ?)', ["Groups", JSON.stringify(Groups)]);
+	db.Exec('INSERT OR REPLACE INTO "groups" (name, value) VALUES (?, ?)', ["GroupMap", JSON.stringify(GroupMap)]);
+}
+
+function save_radiolist(){
+	var db = pm_db_create();
+	db.Exec('DELETE FROM "radio"');
+	for (var i = 0; i < radioname.length; i++) {
+		db.Exec('INSERT INTO "radio" (idx, name, url) VALUES (?, ?, ?)', [i, radioname[i], radiom3u[i]]);
+	}
 }
 
 function reset_radiolist() {
@@ -3494,7 +3547,7 @@ function reset_radiolist() {
 	radiom3u.push("https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
 	radioname.push("boxRadios (github CDN)");
 	radiom3u.push("https://cdn.gh-proxy.org/https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
-	utils.WriteTextFile(radiolist, radioname[0]+": "+radiom3u[0]+"\r\n"+radioname[1]+": "+radiom3u[1]);
+	save_radiolist();
 };
 
 function match(input, str) {

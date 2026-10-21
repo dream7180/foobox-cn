@@ -1,5 +1,6 @@
 ﻿//foobox https://github.com/dream7180; JSPlaylist http://br3tt.deviantart.com
 window.DefinePanel('JSPlaylist', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '1.3.2', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
@@ -10,12 +11,16 @@ include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHplaylist.js'
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHsettings.js');
 
 var zdpi = 1;
-commoncfg = commoncfg.split(",");
 var drawmode = window.DrawMode;
 var follow_cursor = window.GetProperty("foobox.infoArt.follow.cursor", false);
 var rating2tag = 0;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
 var config_dir = fb.ProfilePath + "foobox\\config\\";
+var pv_db_path = config_dir + "pv.db"; // 面板数据库（layout/group/column 表）
+function pv_db_open() {
+	if (!utils.IsDirectory(config_dir)) utils.CreateFolder(config_dir);
+	return utils.OpenDatabase(pv_db_path);
+}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var sys_scrollbar = 0;
 var track_edit_app = "";
@@ -78,6 +83,12 @@ var g_avoid_on_item_focus_change = false;
 
 //albumart
 var albumart_id, cache_subdir, crclist = [];
+var cover_worker = null;
+var cover_cache_folder = fb.ProfilePath + "foobox\\covercache\\";
+
+function get_table_name(subdir) {
+	return subdir.replace(/\\/g, "");
+}
 
 var g_z2, g_z3, g_z4, g_z5, g_z6, g_z7, g_z8, g_z10, g_z16, g_z30;
 var ww = 0, wh = 0;
@@ -313,108 +324,189 @@ function set_scroll_delta() {
 	};
 };
 
-// Images cache
-const load_image_from_cache = async (albumIndex, preload) =>
-{
-	try{
-		var crc = p.list.groups[albumIndex].cachekey;
-		const image = await gdi.LoadImageAsyncV2(0, fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg");
-		p.list.groups[albumIndex].cover_img = g_image_cache.getit(image, albumIndex);
-		if (!preload && !cList.repaint_timer) {
-			if (!cover.repaint_timer) {
-				cover.repaint_timer = setInterval(() => {
-					cover_repaint();
-					clearInterval(cover.repaint_timer);
-					cover.repaint_timer = null;
-				}, 2);
-			};
-		};
-	} catch(e) {}
+// ============================================================
+// Cover Worker (read-only): reads cache.db + loads cover images
+// ============================================================
+var cover_worker_source = `
+var db = null;
+
+function open_db(path) {
+	try { db = utils.OpenDatabase(path); } catch (e) { db = null; }
 }
 
-const get_album_art_async = async (albumIndex) =>
-{
-	try{
-		let result = await utils.GetAlbumArtAsyncV2(0, p.list.groups[albumIndex].metadb, albumart_id, false);
-		var img = result.image;
-		if(img){
-			let dimensions = getdimension(img.Width, img.Height);
-			img = img.Resize(dimensions[0], dimensions[1], 2);
+function db_keys(table) {
+	if (!db) return [];
+	try {
+		var rows = db.Query('SELECT crc FROM "' + table + '"');
+		var keys = [];
+		for (var i = 0; i < rows.length; i++) keys.push(rows[i].crc);
+		return keys;
+	} catch (e) { console.log('cover worker db_keys error (table: ' + table + '): ' + e.message); return []; }
+}
+
+onmessage = async function (event) {
+	var msg = event.data;
+	switch (msg.cmd) {
+	case 'init':
+		open_db(msg.dbPath);
+		postMessage({ cmd: 'init_done' });
+		break;
+	case 'load_keys':
+		postMessage({ cmd: 'keys', table: msg.table, keys: db_keys(msg.table) });
+		break;
+	case 'preload_cover':
+		try {
+			if (utils.FileExists(msg.path)) {
+				var im = gdi.Image(msg.path);
+				if (im) postMessage({ cmd: 'cached_image', albumIndex: msg.albumIndex, crc: msg.crc, image: im });
+				else postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
+			} else {
+				postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
+			}
+		} catch (e) {
+			postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
 		}
-		p.list.groups[albumIndex].cover_img = g_image_cache.getit(img, albumIndex);
-		if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) {
-			if (!cover.repaint_timer) {
-				cover.repaint_timer = setInterval(() => {
-					if (!g_mouse_wheel_timer && !cScrollBar.timerID2 && !cList.repaint_timer) cover_repaint();
-					clearInterval(cover.repaint_timer);
-					cover.repaint_timer = null;
-				}, 8);
-			};
+		break;
+	case 'get_cover':
+		try {
+			if (utils.FileExists(msg.path)) {
+				var cached = gdi.Image(msg.path);
+				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: cached, fromCache: true });
+			} else {
+				var art = null;
+				if (msg.mode == 'genre_dir') {
+					if (msg.folderPath && msg.dirCoverName) {
+						var dc = msg.dirCoverName.split(';');
+						for (var j = 0; j < dc.length; j++) {
+							var fp = msg.folderPath + dc[j];
+							if (utils.FileExists(fp)) {
+								art = gdi.Image(fp);
+								if (art != null) break;
+							}
+						}
+					} else if (msg.genreImagePath) {
+						art = gdi.Image(msg.genreImagePath);
+					}
+				} else {
+					var result = await utils.GetAlbumArtAsyncV2(0, msg.handle, msg.artId, false);
+					art = result.image;
+				}
+				if (art) {
+					var s = Math.min(msg.cacheSize / art.Width, msg.cacheSize / art.Height);
+					if (s < 1) {
+						var w = Math.floor(art.Width * s);
+						var h = Math.floor(art.Height * s);
+						art = art.Resize(w, h, 2);
+					}
+				}
+				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: art, fromCache: false });
+			}
+		} catch (e) {
+			postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: null, fromCache: false });
 		}
-	} catch(e) {}
+		break;
+	}
+};
+`;
+
+function create_cover_worker() {
+	cover_worker = new Worker(cover_worker_source, 'jsplaylist-cover-worker');
+	cover_worker.onmessage = function (event) {
+		var msg = event.data;
+		switch (msg.cmd) {
+		case 'keys':
+			crclist = msg.keys || [];
+			// Now that we know which covers are cached, kick off background preload
+			if (p.list && p.list.setList) p.list.setList();
+			break;
+		case 'cached_image':
+			g_image_cache._cachelist[msg.crc] = msg.image;
+			if (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) {
+				var grp2 = p.list.groups[msg.albumIndex];
+				if (grp2 && grp2.cachekey == msg.crc && grp2.cover_img == null) {
+					grp2.cover_img = msg.image;
+					cover_repaint();
+				}
+			}
+			break;
+		case 'preload_miss':
+			if (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) {
+				var grp3 = p.list.groups[msg.albumIndex];
+				if (grp3 && grp3.cachekey == msg.crc && grp3.cover_img == null) {
+					grp3.load_requested = 0;
+				}
+			}
+			break;
+		case 'cover_image':
+			var grp = (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) ? p.list.groups[msg.albumIndex] : null;
+			if (grp) {
+				if (msg.image) {
+					grp.cover_img = msg.image;
+					g_image_cache._cachelist[msg.crc] = msg.image;
+				} else {
+					// No cover found (cached or native) — show nocover immediately
+					grp.cover_img = images.nocover;
+				}
+				cover_repaint();
+			}
+			break;
+		}
+	};
+	cover_worker.onerror = function (event) {
+		console.log('JSPlaylist cover worker error: ' + event.message);
+	};
+	cover_worker.postMessage({ cmd: 'init', dbPath: cover_cache_folder + 'cache.db' });
+}
+
+// Send a cover request to the worker (read-only: cache lookup + native art fetch, no save)
+function request_cover(albumIndex) {
+	var grp = p.list.groups[albumIndex];
+	var table = get_table_name(cache_subdir);
+	var msg = {
+		cmd: 'get_cover',
+		albumIndex: albumIndex,
+		crc: grp.cachekey,
+		table: table,
+		path: cover_cache_folder + cache_subdir + grp.cachekey + '.jpg',
+		cacheSize: cache_size
+	};
+	if (layout.pattern_idx == 4) {
+		msg.mode = 'genre_dir';
+		var genre = fb.TitleFormat("%genre%").EvalWithMetadb(grp.metadb);
+		msg.genreImagePath = genre_cover_dir + "\\" + GetGenre(genre) + ".jpg";
+	} else if (layout.pattern_idx == 5) {
+		msg.mode = 'genre_dir';
+		msg.folderPath = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(grp.metadb);
+		msg.dirCoverName = dir_cover_name;
+	} else {
+		msg.mode = 'album';
+		msg.handle = grp.metadb;
+		msg.artId = albumart_id;
+	}
+	cover_worker.postMessage(msg);
 }
 
 image_cache = function() {
 	this._cachelist = {};
+
 	this.hit = function(albumIndex) {
-		var _crc = p.list.groups[albumIndex].cachekey;
+		var grp = p.list.groups[albumIndex];
+		if (grp.load_requested) return;
+		var _crc = grp.cachekey;
 		var img = this._cachelist[_crc];
-		if (typeof img == "undefined" || img == null) { // if image not in cache, we load it asynchronously
-			var crc_exist = check_cache(albumIndex);
-			if (crc_exist){
-				if (!cover.load_timer) {
-					cover.load_timer = window.SetTimeout(function() {
-						try {
-							p.list.groups[albumIndex].load_requested = 1;
-							load_image_from_cache(albumIndex);
-						} catch(e) {};
-						cover.load_timer && window.ClearTimeout(cover.load_timer);
-						cover.load_timer = false;
-					}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 2 : 6));
-				};
-			}
-			else if (!cover.load_timer) {
-				cover.load_timer = window.SetTimeout(function() {
-					try{
-						if (layout.pattern_idx == 4) {
-							var _path = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(p.list.groups[albumIndex].metadb));
-							var genre_img = gdi.Image( _path + ".jpg");
-							if(genre_img){
-								let dimensions = getdimension(genre_img.Width, genre_img.Height);
-								genre_img = genre_img.Resize(dimensions[0], dimensions[1], 2);
-							}
-							p.list.groups[albumIndex].load_requested = 1;
-							p.list.groups[albumIndex].cover_img = g_image_cache.getit(genre_img, albumIndex);
-							cover_repaint();
-						} else if (layout.pattern_idx == 5) {
-							var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(p.list.groups[albumIndex].metadb);
-							var dc_arr = dir_cover_name.split(";");
-							var dir_img;
-							for (var i = 0; i <= dc_arr.length; i++) {
-								dir_img = gdi.Image( _path + dc_arr[i]);
-								if(dir_img) {
-									let dimensions = getdimension(dir_img.Width, dir_img.Height);
-									dir_img = dir_img.Resize(dimensions[0], dimensions[1], 2);
-									break;
-								}
-							}
-							p.list.groups[albumIndex].load_requested = 1;
-							p.list.groups[albumIndex].cover_img = g_image_cache.getit(dir_img, albumIndex);
-							cover_repaint();
-						}
-						else {
-							p.list.groups[albumIndex].load_requested = 1;
-							get_album_art_async(albumIndex);
-						}
-					} catch(e) {};
-					cover.load_timer && window.ClearTimeout(cover.load_timer);
-					cover.load_timer = false;
-				}, (!g_mouse_wheel_timer && !cScrollBar.timerID2 ? 5 : 10));
-			}
-		} else p.list.groups[albumIndex].load_requested = 1;
+		if (typeof img == "undefined" || img == null) {
+			grp.load_requested = 1;
+			var _delay = (layout.pattern_idx >= 4 ? 4 : 8);
+			window.SetTimeout(function () {
+				try { request_cover(albumIndex); } catch (e) {}
+			}, (g_mouse_wheel_timer || cScrollBar.timerID2 ? _delay * 3 : _delay));
+		} else {
+			grp.load_requested = 1;
+			grp.cover_img = img;
+		}
 		return img;
 	};
-	
+
 	this.getit = function(image, albumIndex) {
 		if(image){
 			try{
@@ -423,19 +515,24 @@ image_cache = function() {
 		} else image = null;
 		return image;
 	};
-	
+
 	this.preload = function(albumIndex) {
-		var img = this._cachelist[p.list.groups[albumIndex].cachekey];
-		if (typeof(img) == "undefined") {
-			if(crclist.indexOf(p.list.groups[albumIndex].cachekey) > -1){
-				p.list.groups[albumIndex].load_requested = 1;
-				load_image_from_cache(albumIndex, true);
-			}
-		} else {
-			p.list.groups[albumIndex].load_requested = 1;
-			p.list.groups[albumIndex].cover_img = img;
+		var grp = p.list.groups[albumIndex];
+		var img = this._cachelist[grp.cachekey];
+		if (img) {
+			grp.load_requested = 1;
+			grp.cover_img = img;
+		} else if (crclist.indexOf(grp.cachekey) > -1) {
+			grp.load_requested = 1;
+			cover_worker.postMessage({
+				cmd: 'preload_cover',
+				albumIndex: albumIndex,
+				crc: grp.cachekey,
+				path: cover_cache_folder + cache_subdir + grp.cachekey + '.jpg'
+			});
 		}
-	}
+		// else: not cached — leave load_requested=0 so hit() fetches native art when visible
+	};
 };
 var g_image_cache = new image_cache;
 
@@ -519,6 +616,7 @@ function on_init() {
 	plman.FlushPlaybackQueue();
 	ClearQueuePlaylist();
 
+	create_cover_worker();
 	get_misccfg();
 	layout.playlistName = plman.GetPlaylistName(plman.ActivePlaylist);
 	get_layout();
@@ -2396,14 +2494,6 @@ function createDragText(line1, line2){
 	return drag_img;
 };
 
-function check_cache(albumIndex) {
-	var crc = p.list.groups[albumIndex].cachekey;
-	if (utils.FileExists(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + crc + ".jpg")) {
-		return true;
-	}
-	return false;
-};
-
 function refresh_cover(recache){
 	var fin = p.list.groups.length;
     for(var i = 0; i < fin; i++) {
@@ -2415,76 +2505,92 @@ function refresh_cover(recache){
 }
 
 function get_misccfg(){
-	if(!cfgexist) save_misccfg("common");
-	else{
-		cRow.default_playlist_h = Number(commoncfg[1]);
-		cList.scrollstep = Number(commoncfg[2]);
-		sys_scrollbar = Number(commoncfg[3]);
-		color_bycover = Number(commoncfg[4]);
-		cbkg_bycover = Number(commoncfg[5]);
-		color_noesl = Number(commoncfg[6]);
-		color_threshold = Number(commoncfg[7]);
-		cbkg_chroma = Number(commoncfg[8]);
-		rating2tag = Number(commoncfg[9]);
-		commoncfg.length = 0;
-	}
-	var misccfg = "";
-	try{
-		misccfg = utils.ReadTextFile(config_dir + "miscconf", 0);
-	}catch(e){}
-	if(!misccfg || misccfg.length < 5){
-		title_add = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
-		save_misccfg("misc");
-	}else{
-		misccfg = misccfg.split("##");
-		show_menu = Number(misccfg[0]);
-		show_extrabtn = Number(misccfg[1]);
-		libbtn_fuc = Number(misccfg[2]);
-		track_edit_app = misccfg[3];
-		if(track_edit_app == "null") track_edit_app = "";
-		title_add = misccfg[4];
-		if(title_add == "null") title_add = "";
-		colorful_seek = Number(misccfg[5]);
+	cRow.default_playlist_h = Number(common_cfg_map.LineHeight);
+	cList.scrollstep = Number(common_cfg_map.ScrollStep);
+	sys_scrollbar = Number(common_cfg_map.sys_scrollbar);
+	color_bycover = Number(common_cfg_map.color_bycover);
+	cbkg_bycover = Number(common_cfg_map.cbkg_bycover);
+	color_noesl = Number(common_cfg_map.color_noesl);
+	color_threshold = Number(common_cfg_map.color_threshold);
+	cbkg_chroma = Number(common_cfg_map.cbkg_chroma);
+	rating2tag = Number(common_cfg_map.rating2tag);
+	show_menu = Number(common_cfg_map.show_menu);
+	show_extrabtn = Number(common_cfg_map.show_extrabtn);
+	libbtn_fuc = Number(common_cfg_map.libbtn_fuc);
+	colorful_seek = Number(common_cfg_map.colorful_seek);
+	track_edit_app = common_cfg_map.track_edit_app;
+	title_add = common_cfg_map.title_add;
+	if(!cfgexist){ // 数据库不存在：创建并写入默认值
+		save_defaultcfg();
 	}
 }
 
-function save_misccfg(conf){
-	switch(conf){
-		case "misc":
-			var _track_edit_app = track_edit_app;
-			var _title_add = title_add;
-			if(_track_edit_app == "") _track_edit_app = "null";
-			if(_title_add == "") _title_add = "null";
-			utils.WriteTextFile(config_dir + "miscconf", show_menu + "##" + show_extrabtn + "##" + libbtn_fuc + "##" + _track_edit_app + "##" + _title_add +  "##" + colorful_seek);
-			break;
-		case "common":
-			utils.WriteTextFile(config_dir + "common", drawmode +","+ cRow.default_playlist_h +","+ cList.scrollstep +","+ sys_scrollbar +","+ color_bycover +","+ cbkg_bycover +","+ color_noesl +","+ color_threshold +","+ cbkg_chroma +","+ rating2tag);
+function common_cfg_write_db(map) {
+	var db = utils.OpenDatabase(fb.ProfilePath + "foobox\\config\\config.db");
+	db.Exec('CREATE TABLE IF NOT EXISTS "common" (name TEXT PRIMARY KEY, value TEXT)');
+	for (var name in map) {
+		db.Exec('INSERT OR REPLACE INTO "common" (name, value) VALUES (?, ?)', [name, String(map[name])]);
 	}
+}
+
+function save_defaultcfg(){
+	common_cfg_write_db({
+		"winFrame": winFrame,
+		"LineHeight": cRow.default_playlist_h,
+		"ScrollStep": cList.scrollstep,
+		"sys_scrollbar": sys_scrollbar,
+		"color_bycover": color_bycover,
+		"cbkg_bycover": cbkg_bycover,
+		"color_noesl": color_noesl,
+		"color_threshold": color_threshold,
+		"cbkg_chroma": cbkg_chroma,
+		"rating2tag": rating2tag,
+		"show_menu": show_menu,
+		"show_extrabtn": show_extrabtn,
+		"libbtn_fuc": libbtn_fuc,
+		"colorful_seek": colorful_seek,
+		"track_edit_app": track_edit_app,
+		"title_add": title_add
+	});
+}
+
+function save_config(name, value) {
+    var map = {};
+    map[name] = value;
+    common_cfg_write_db(map);
 }
 
 function get_layout(){
-	var layoutcfg_arr = "";
-	try{
-		layoutcfg_arr = utils.ReadTextFile(config_dir + "layoutsv2", 0);
-	} catch(e){}
-	if (layoutcfg_arr == "") {
-		var default_gopts = ["0","1","0","2","1","0","1","0"];
-		layout.config.push(default_gopts);
-		layout.columnWidth.push(null);
-	} else{
-		layoutcfg_arr = layoutcfg_arr.split("\r\n");
-		layout.ids = layoutcfg_arr[0].split("##");
+	// 布局数据：pv.db 的 layout 表，每行一个布局 {id, config, columnWidth}，仅此一次读库
+	var rows = [];
+	try {
+		if (utils.FileExists(pv_db_path)) {
+			var db = utils.OpenDatabase(pv_db_path);
+			rows = db.Query('SELECT id, config, columnWidth FROM "layout" ORDER BY rowid');
+		}
+	} catch (e) { // 表不存在等情况
+		console.log('jsplaylist: read pv.db failed: ' + e.message);
+		rows = [];
+	}
+	if (rows.length > 0) {
+		layout.ids = [];
+		layout.config = [];
+		layout.columnWidth = [];
+		for (var i = 0; i < rows.length; i++){
+			layout.ids.push(rows[i].id);
+			layout.config.push(rows[i].config.split(","));
+			layout.columnWidth.push(rows[i].columnWidth); // 缺省时为 ""（falsy，与原 null 语义一致）
+		}
 		layout.index = layout.ids.indexOf(layout.playlistName);
 		if(layout.index > -1) layout.uid = layout.playlistName;
 		else {
 			layout.uid = "默认布局";
 			layout.index = 0;
 		}
-		layout.config =layoutcfg_arr[1].split("##");
-		for (var i = 0; i < layout.config.length; i++){
-			layout.config[i] = layout.config[i].split(",");
-		}
-		layout.columnWidth = layoutcfg_arr[2].split("##");
+	} else {
+		var default_gopts = ["0","1","0","2","1","0","1","0"];
+		layout.config.push(default_gopts);
+		layout.columnWidth.push(null);
 	}
 	layout.gopts = layout.config[layout.index];
 	assign_gopts();
@@ -2533,22 +2639,19 @@ function assign_gopts(){
 }
 
 function save_layout(){
-	var lo_arr = layout.ids[0];
-	for (var i = 1; i < layout.ids.length; i++){
-		lo_arr = lo_arr + "##" + layout.ids[i];
+	// 布局数据写入 pv.db：清空后按数组顺序整表重写（rowid 顺序即数组顺序）
+	try {
+		var db = pv_db_open();
+		db.Exec('CREATE TABLE IF NOT EXISTS "layout" (id TEXT PRIMARY KEY, config TEXT, columnWidth TEXT)');
+		db.Exec('DELETE FROM "layout"');
+		for (var i = 0; i < layout.ids.length; i++){
+			var cw = layout.columnWidth[i];
+			if (cw == null || cw == "null") cw = ""; // 缺省列宽统一存空串（原文本 null 会产生 "null" 字符串，此处顺带修正）
+			db.Exec('INSERT OR REPLACE INTO "layout" (id, config, columnWidth) VALUES (?, ?, ?)', [layout.ids[i], layout.config[i].join(","), cw]);
+		}
+	} catch (e) {
+		console.log('jsplaylist: save pv.db failed: ' + e.message);
 	}
-	var tmp = lo_arr;
-	lo_arr = layout.config[0];
-	for (var i = 1; i < layout.config.length; i++){
-		lo_arr = lo_arr + "##" + layout.config[i];
-	}
-	tmp = tmp + "\r\n" + lo_arr;
-	lo_arr = layout.columnWidth[0];
-	for (var i = 1; i < layout.columnWidth.length; i++){
-		lo_arr = lo_arr + "##" + layout.columnWidth[i];
-	}
-	tmp = tmp + "\r\n" + lo_arr;
-	utils.WriteTextFile(config_dir + "layoutsv2", tmp);
 }
 
 function get_grprow_minimum(column_w){
@@ -2595,14 +2698,19 @@ function get_covercahe_config(){
 			albumart_id = AlbumArtId.front;
 			cache_subdir = "album\\";
 	};
+	// Load cached cover keys from SQLite cache.db (worker)
 	crclist.length = 0;
-	try{
-		crclist = utils.ReadTextFile(fb.ProfilePath + "foobox\\covercache\\" + cache_subdir + "crc", 0).split(",");
-	}catch(e){};
+	if (cover_worker) {
+		cover_worker.postMessage({ cmd: 'load_keys', table: get_table_name(cache_subdir) });
+	}
 }
 
 function on_script_unload() {
 	g_timer && window.ClearInterval(g_timer);
 	g_timer = false;
+	if (cover_worker) {
+		cover_worker.terminate();
+		cover_worker = null;
+	}
 	ClearQueuePlaylist();
 };

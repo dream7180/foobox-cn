@@ -1,10 +1,10 @@
 ﻿// foobox https://github.com/dream7180
 window.DefinePanel('simple multi playlist viewer', {author: 'dreamawake'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
-commoncfg = commoncfg.split(",");
-var sys_scrollbar = Number(commoncfg[3]);
+var sys_scrollbar = Number(common_cfg_map.sys_scrollbar);
 var zdpi = 1, dark_mode = 0;
 var g_font, g_font_b, g_font_track;
 var g_color_line, g_color_line_div, g_color_playing_txt = c_white;
@@ -42,16 +42,16 @@ var g_delay_refresh_items = false;
 var Queue_timer = false;
 
 ppt = {
-	defaultRowHeight: Number(commoncfg[1]),
+	defaultRowHeight: Number(common_cfg_map.LineHeight),
 	rowHeight: 0,
-	rowScrollStep: Number(commoncfg[2]),
+	rowScrollStep: Number(common_cfg_map.ScrollStep),
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
-commoncfg.length = 0;
+common_cfg_map = {};
 var rowScrollStep_org = ppt.rowScrollStep;
 
 cTouch = {

@@ -1,11 +1,11 @@
 ﻿//Jensen (jensen-yg@163.com)
 //foobox https://github.com/dream7180
 window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'});
+include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
 include(fb.ProfilePath + 'foobox\\script\\js_panels\\properties.js');
-commoncfg = commoncfg.split(",");
 var zdpi = 1;
 var menubutton_w, menubutton_h;
 var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
@@ -23,14 +23,14 @@ var get_imgCol = false;
 var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
-var color_bycover = Number(commoncfg[4]);
+var color_bycover = Number(common_cfg_map.color_bycover);
 var color_bycover_default = color_bycover;
-var cbkg_bycover = Number(commoncfg[5]);
-var sw_noesl = Number(commoncfg[6]);
-var color_threshold = Number(commoncfg[7]);
-var cbkg_chroma = Number(commoncfg[8]);
-var rating_to_tag =  Number(commoncfg[9]);
-commoncfg.length = 0;
+var cbkg_bycover = Number(common_cfg_map.cbkg_bycover);
+var sw_noesl = Number(common_cfg_map.color_noesl);
+var color_threshold = Number(common_cfg_map.color_threshold);
+var cbkg_chroma = Number(common_cfg_map.cbkg_chroma);
+var rating_to_tag =  Number(common_cfg_map.rating2tag);
+common_cfg_map = {};
 var auto_eslprop = window.GetProperty("Auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
 var isFollowingCursor;

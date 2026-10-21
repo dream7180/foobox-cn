@@ -1,5 +1,6 @@
 ﻿// foobox https://github.com/dream7180; JSSB http://br3tt.deviantart.com
 window.DefinePanel('JS Smooth Browser', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '20151114-1630-340', features: {drag_n_drop: true} });
+include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
 include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
@@ -11,16 +12,223 @@ var dark_mode = 0;
 //}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var CACHE_FOLDER = fb.ProfilePath + "foobox\\covercache";
-var sys_scrollbar = Number(commoncfg.split(",")[3]);
+var sys_scrollbar = Number(common_cfg_map.sys_scrollbar);
 var g_fsize;
 var avoid_checkscroll = false;
 var pidx = -1; //libview playlist index
 var boxText_len = 0;
 var albumsource = 0;
 var g_color_line = RGBA(0, 0, 0, 45);
-var crclist = [], crcmod = [], crcloaded = [];
-crclist.length = crcmod.length = crcloaded.length = 4;
+var crclist = [];
+crclist.length = 4;
 var crcidx = 0;
+var cover_worker = null;
+var cover_tables = ['artist_album', 'album', 'artist', 'genre_dir'];
+// table name derived from ppt.cache_subdir (strip backslashes)
+function get_table_name(cache_subdir) {
+	return cache_subdir.replace(/\\/g, '');
+}
+
+// ============================================================
+// Cover Worker: handles SQLite DB, cover caching, image loading
+// ============================================================
+var cover_worker_source = `
+var db = null;
+
+function open_db(path) {
+	db = utils.OpenDatabase(path);
+}
+
+function create_tables(tables) {
+	if (!db) return;
+	for (var i = 0; i < tables.length; i++) {
+		db.Exec('CREATE TABLE IF NOT EXISTS "' + tables[i] + '" (crc TEXT PRIMARY KEY)');
+	}
+}
+
+function db_keys(table) {
+	if (!db) return [];
+	var rows = db.Query('SELECT crc FROM "' + table + '"');
+	var keys = [];
+	for (var i = 0; i < rows.length; i++) keys.push(rows[i].crc);
+	return keys;
+}
+
+function db_add(table, crc) {
+	if (!db) return;
+	db.Exec('INSERT OR IGNORE INTO "' + table + '" (crc) VALUES (?)', [crc]);
+}
+
+function db_remove(table, crc) {
+	if (!db) return;
+	db.Exec('DELETE FROM "' + table + '" WHERE crc = ?', [crc]);
+}
+
+function db_clear(table) {
+	if (!db) return;
+	db.Exec('DELETE FROM "' + table + '"');
+}
+
+onmessage = async function (event) {
+	var msg = event.data;
+	switch (msg.cmd) {
+	case 'init':
+		open_db(msg.dbPath);
+		create_tables(msg.tables);
+		postMessage({ cmd: 'init_done' });
+		break;
+	case 'load_keys':
+		postMessage({ cmd: 'keys', table: msg.table, keys: db_keys(msg.table) });
+		break;
+	case 'load_all_images':
+		var keys = db_keys(msg.table);
+		for (var i = 0; i < keys.length; i++) {
+			var p = msg.folder + keys[i] + '.jpg';
+			if (utils.FileExists(p)) {
+				try {
+					var img = gdi.Image(p);
+					if (img) postMessage({ cmd: 'cached_image', crc: keys[i], image: img });
+				} catch (e) {}
+			}
+		}
+		postMessage({ cmd: 'load_all_done', table: msg.table, keys: keys, count: keys.length });
+		break;
+	case 'preload_cover':
+		try {
+			if (utils.FileExists(msg.path)) {
+				var im = gdi.Image(msg.path);
+				if (im) postMessage({ cmd: 'cached_image', albumIndex: msg.albumIndex, crc: msg.crc, image: im });
+				else postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
+			} else {
+				postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
+			}
+		} catch (e) {
+			postMessage({ cmd: 'preload_miss', albumIndex: msg.albumIndex, crc: msg.crc });
+		}
+		break;
+	case 'get_cover':
+		try {
+			if (utils.FileExists(msg.path)) {
+				var cached = gdi.Image(msg.path);
+				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: cached, fromCache: true });
+			} else {
+				var art = null;
+				if (msg.mode == 'genre_dir') {
+					if (msg.folderPath && msg.dirCoverName) {
+						var dc = msg.dirCoverName.split(';');
+						for (var j = 0; j < dc.length; j++) {
+							var fp = msg.folderPath + dc[j];
+							if (utils.FileExists(fp)) {
+								art = gdi.Image(fp);
+								if (art != null) break;
+							}
+						}
+					} else if (msg.genreImagePath) {
+						art = gdi.Image(msg.genreImagePath);
+					}
+				} else {
+					var result = await utils.GetAlbumArtAsyncV2(0, msg.handle, msg.artId, false);
+					art = result.image;
+				}
+				if (art) {
+					var s = Math.min(msg.cacheSize / art.Width, msg.cacheSize / art.Height);
+					if (s < 1) {
+						var w = Math.floor(art.Width * s);
+						var h = Math.floor(art.Height * s);
+						art = art.Resize(w, h, 2);
+					}
+					try {
+						art.SaveAs(msg.path, 'image/jpeg');
+						db_add(msg.table, msg.crc);
+					} catch (e) {}
+				}
+				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: art, fromCache: false });
+			}
+		} catch (e) {
+			postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: null, fromCache: false });
+		}
+		break;
+	case 'remove_cover':
+		if (utils.FileExists(msg.path)) {
+			try { utils.RemovePath(msg.path); } catch (e) {}
+		}
+		db_remove(msg.table, msg.crc);
+		postMessage({ cmd: 'cover_removed', table: msg.table, crc: msg.crc });
+		break;
+	case 'reset_table':
+		db_clear(msg.table);
+		try {
+			if (utils.IsDirectory(msg.folder)) utils.RemovePath(msg.folder);
+			utils.CreateFolder(msg.folder);
+		} catch (e) {}
+		postMessage({ cmd: 'table_reset', table: msg.table });
+		break;
+	}
+};
+`;
+
+function create_cover_worker() {
+	cover_worker = new Worker(cover_worker_source, 'cover-cache-worker');
+	cover_worker.onmessage = function (event) {
+		var msg = event.data;
+		switch (msg.cmd) {
+		case 'keys':
+			crclist[crcidx] = msg.keys || [];
+			// Now that we know which covers are cached, kick off background preload
+			if (brw && brw.setList) brw.setList();
+			break;
+		case 'cached_image':
+			g_image_cache._cachelist[msg.crc] = msg.image;
+			// A preloaded cover may now be visible — set it and repaint
+			if (brw && brw.groups && msg.albumIndex >= 0 && msg.albumIndex < brw.groups.length) {
+				var grp2 = brw.groups[msg.albumIndex];
+				if (grp2 && grp2.cachekey == msg.crc && grp2.cover_img == null) {
+					grp2.cover_img = msg.image;
+					if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
+				}
+			}
+			break;
+		case 'preload_miss':
+			// Cover not on disk — reset load_requested so hit() will fetch native art when visible
+			if (brw && brw.groups && msg.albumIndex >= 0 && msg.albumIndex < brw.groups.length) {
+				var grp3 = brw.groups[msg.albumIndex];
+				if (grp3 && grp3.cachekey == msg.crc && grp3.cover_img == null) {
+					grp3.load_requested = 0;
+				}
+			}
+			break;
+		case 'load_all_done':
+			crclist[crcidx] = msg.keys || [];
+			break;
+		case 'cover_image':
+			var grp = brw && brw.groups ? brw.groups[msg.albumIndex] : null;
+			if (grp) {
+				if (msg.image) {
+					grp.cover_img = msg.image;
+					g_image_cache._cachelist[msg.crc] = msg.image;
+					if (!msg.fromCache) {
+						if (crclist[crcidx] && crclist[crcidx].indexOf(msg.crc) < 0) {
+							crclist[crcidx].push(msg.crc);
+						}
+					}
+				} else {
+					// No cover found (cached or native) — show noart instead of loading forever
+					grp.cover_img = images.noart;
+				}
+				if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
+			}
+			break;
+		case 'cover_removed':
+			break;
+		case 'table_reset':
+			break;
+		}
+	};
+	cover_worker.onerror = function (event) {
+		console.log('Cover worker error: ' + event.message);
+	};
+	cover_worker.postMessage({ cmd: 'init', dbPath: CACHE_FOLDER + '\\cache.db', tables: cover_tables });
+}
 
 images = {
 	loading_angle: 0,
@@ -159,85 +367,69 @@ function reset_cover_timers() {
 	};
 };
 
+// Send a cover request to the worker (handles cache lookup + album art fetch + save)
+function request_cover(albumIndex) {
+	var grp = brw.groups[albumIndex];
+	var table = get_table_name(ppt.cache_subdir);
+	var msg = {
+		cmd: 'get_cover',
+		albumIndex: albumIndex,
+		crc: grp.cachekey,
+		table: table,
+		path: CACHE_FOLDER + ppt.cache_subdir + grp.cachekey + '.jpg',
+		cacheSize: ppt.cache_size
+	};
+	if (ppt.albumArtId == 5) { // genre or dir mode
+		msg.mode = 'genre_dir';
+		if (ppt.tagMode == 3) {
+			msg.folderPath = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(grp.metadb);
+			msg.dirCoverName = dir_cover_name;
+		} else if (ppt.tagMode == 4) {
+			var genre = fb.TitleFormat("%genre%").EvalWithMetadb(grp.metadb);
+			msg.genreImagePath = fb.ProfilePath + "foobox\\genre\\" + GetGenre(genre) + ".jpg";
+		}
+	} else {
+		msg.mode = 'album';
+		msg.handle = grp.metadb;
+		msg.artId = ppt.albumArtId;
+	}
+	cover_worker.postMessage(msg);
+}
+
 image_cache = function() {
 	this._cachelist = {};
-	
+
 	this.hit = function(albumIndex) {
-		var crc_exist = check_cache(albumIndex);//try cache
-		if (crc_exist) {
-			if (!timers.coverLoad) {
-				timers.coverLoad = setInterval(() => {
-					try {
-						brw.groups[albumIndex].load_requested = 1;
-						load_image_from_cache(albumIndex);
-					}
-					catch (e) {};
-					clearInterval(timers.coverLoad);
-					timers.coverLoad = null;
-				}, (!isScrolling && !cScrollBar.timerID ? 2 : 6));
-			}
-		} else {//no cache
-			var _delay = (ppt.albumArtId == 5 ? 4 : 8);
-			if (!timers.coverLoad) {
-				timers.coverLoad = setInterval(() => {
-					if (ppt.albumArtId == 5) { // genre or dir
-						try {
-							var arr = brw.groups[albumIndex].groupkey.split(", ");
-							if(ppt.tagMode == 3){
-								var dc_arr = dir_cover_name.split(";");
-								var folder_path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(brw.groups[albumIndex].metadb);
-								var _path;
-								for (var i = 0; i <= dc_arr.length; i++) {
-									_path = folder_path + dc_arr[i];
-									if(path_img(_path)) {
-										var genre_img = gdi.Image(_path);
-										if(genre_img != null) break;
-									}
-								}
-							} else {
-								var _path = fb.ProfilePath + "foobox\\genre\\" + GetGenre(arr[0]) + ".jpg";
-								var genre_img = gdi.Image(_path);
-							}
-							if(genre_img){
-								let s = Math.min(ppt.cache_size / genre_img.Width, ppt.cache_size / genre_img.Height);
-								if(s < 1){
-									let w = Math.floor(genre_img.Width * s);
-									let h = Math.floor(genre_img.Height * s);
-									genre_img = genre_img.Resize(w, h, 2);
-								}
-							}
-							try {
-								brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, genre_img, true);
-								brw.groups[albumIndex].load_requested = 1;
-								brw.repaint();
-							}catch(e) {}
-						} catch (e) {};
-					} else {
-						try {
-							brw.groups[albumIndex].load_requested = 1;
-							get_album_art_async(albumIndex);
-						} catch(e) {}
-					};
-					clearInterval(timers.coverLoad);
-					timers.coverLoad = null;
-				}, (!isScrolling && !cScrollBar.timerID ? _delay : _delay * 3));
-			};
-		};
+		var grp = brw.groups[albumIndex];
+		if (grp.load_requested) return;
+		grp.load_requested = 1;
+		// Small delay to coalesce rapid draw passes; each cover gets its own
+		// timer so all visible covers are requested in parallel (worker queues them).
+		var _delay = (ppt.albumArtId == 5 ? 4 : 8);
+		window.SetTimeout(function () {
+			try { request_cover(albumIndex); } catch (e) {}
+		}, (isScrolling || cScrollBar.timerID ? _delay * 3 : _delay));
 	};
 
 	this.preload = function(albumIndex) {
-		var img = this._cachelist[brw.groups[albumIndex].cachekey];
-		if (typeof(img) == "undefined") {
-			var crc_exist = check_cache(albumIndex);
-			if (crc_exist) {
-				brw.groups[albumIndex].load_requested = 1;
-				load_image_from_cache(albumIndex, true);
-			}
-		} else {
-			brw.groups[albumIndex].load_requested = 1;
-			brw.groups[albumIndex].cover_img = img;
+		var grp = brw.groups[albumIndex];
+		var img = this._cachelist[grp.cachekey];
+		if (img) {
+			grp.load_requested = 1;
+			grp.cover_img = img;
+		} else if (crclist[crcidx] && crclist[crcidx].indexOf(grp.cachekey) >= 0) {
+			// Cover is cached on disk (in DB) but not yet in memory — load it
+			grp.load_requested = 1;
+			cover_worker.postMessage({
+				cmd: 'preload_cover',
+				albumIndex: albumIndex,
+				crc: grp.cachekey,
+				path: CACHE_FOLDER + ppt.cache_subdir + grp.cachekey + '.jpg'
+			});
 		}
-	}
+		// else: not cached on disk — leave load_requested=0 so hit() fetches
+		// native art when the group becomes visible.
+	};
 
 	this.reset = function(key) {
 		this._cachelist[key] = null;
@@ -247,20 +439,8 @@ image_cache = function() {
 		if (image) {
 			let crc = brw.groups[albumId].cachekey;
 			this._cachelist[crc] = image;
-			if(crclist[crcidx].indexOf(crc) < 0){
+			if (crclist[crcidx] && crclist[crcidx].indexOf(crc) < 0) {
 				crclist[crcidx].push(crc);
-				crcmod[crcidx] = true;
-			}
-			if (savecache) { // save cache
-				if (!timers.saveCover) {
-					timers.saveCover = window.SetInterval(function() {
-						try{
-							image.SaveAs(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg", "image/jpeg");
-						}catch(e){}
-						window.ClearInterval(timers.saveCover);
-						timers.saveCover = false;
-					}, ppt.cache_size/10);
-				};
 			}
 			return image;
 		} else return null;
@@ -1970,22 +2150,23 @@ oBrowser = function() {
 			brw.populate();
 			break;
 		case (idx == 912):
-			if (utils.IsDirectory(CACHE_FOLDER)){
-				for (let i = 0; i < crcloaded.length; i++) {
-					crclist[i] = [];
-				}
-				utils.RemovePath(CACHE_FOLDER + "\\artist_album");
-				utils.RemovePath(CACHE_FOLDER + "\\album");
-				utils.RemovePath(CACHE_FOLDER + "\\artist");
-				utils.RemovePath(CACHE_FOLDER + "\\genre_dir");
-				window.SetTimeout(function() {
-					utils.CreateFolder(CACHE_FOLDER + "\\artist_album");
-					utils.CreateFolder(CACHE_FOLDER + "\\album");
-					utils.CreateFolder(CACHE_FOLDER + "\\artist");
-					utils.CreateFolder(CACHE_FOLDER + "\\genre_dir");
-					refresh_cover(true);
-				}, 50);
+			// reset in-memory caches
+			for (let i = 0; i < crclist.length; i++) {
+				crclist[i] = [];
 			}
+			g_image_cache = new image_cache;
+			// clear DB tables and cover folders via worker
+			var subdirs = ['\\artist_album\\', '\\album\\', '\\artist\\', '\\genre_dir\\'];
+			for (let i = 0; i < subdirs.length; i++) {
+				cover_worker.postMessage({
+					cmd: 'reset_table',
+					table: get_table_name(subdirs[i]),
+					folder: CACHE_FOLDER + subdirs[i]
+				});
+			}
+			window.SetTimeout(function() {
+				refresh_cover(true);
+			}, 50);
 			break;
 		case (idx == 991):
 			window.ShowProperties();
@@ -2059,28 +2240,17 @@ oBrowser = function() {
 	};
 };
 
-const load_image_to_cache = async () =>
-{
-	if(!crcloaded[crcidx]){
-		try{
-			crclist[crcidx] = utils.ReadTextFile(CACHE_FOLDER + ppt.cache_subdir + "crc", 0).split(",");
-			crcloaded[crcidx] = true;
-		} catch(e){crclist[crcidx] = [];return;}
-		if(!crclist[crcidx].length){
-			return;
-		}
-	}
-	for (let i = 0; i < crclist[crcidx].length; i++) {
-		if(!g_image_cache._cachelist[crclist[crcidx][i]]){//initial "undefined"
-			try{
-				const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crclist[crcidx][i] + ".jpg");
-				if(typeof(image) != "undefined") {
-					g_image_cache._cachelist[crclist[crcidx][i]] = image;
-				}
-			} catch(e){}
-		}
-	}
-};
+// Load all cached cover images for the current table into memory (via worker)
+function load_image_to_cache() {
+	// Only fetch the key list from DB; covers are loaded on-demand via get_cover
+	// (which checks disk cache first). This avoids blocking the worker with a
+	// mass preload that would delay on-demand cover requests.
+	var table = get_table_name(ppt.cache_subdir);
+	cover_worker.postMessage({
+		cmd: 'load_keys',
+		table: table
+	});
+}
 
 //==============================Main=========================================================
 
@@ -2165,6 +2335,7 @@ function on_init() {
 		}, 400);
 	} else g_active_playlist = plman.ActivePlaylist;
 
+	create_cover_worker();
 	get_tagprop();
 	get_images_static();
 	get_images();
@@ -2555,10 +2726,10 @@ function get_colors() {
 };
 
 function on_script_unload() {
-	if(crcmod[0]) utils.WriteTextFile(CACHE_FOLDER + "\\artist_album\\" + "crc", crclist[0]);
-	if(crcmod[1]) utils.WriteTextFile(CACHE_FOLDER + "\\album\\" + "crc", crclist[1]);
-	if(crcmod[2]) utils.WriteTextFile(CACHE_FOLDER + "\\artist\\" + "crc", crclist[2]);
-	if(crcmod[3]) utils.WriteTextFile(CACHE_FOLDER + "\\genre_dir\\" + "crc", crclist[3]);
+	if (cover_worker) {
+		cover_worker.terminate();
+		cover_worker = null;
+	}
 	brw.g_time && window.ClearInterval(brw.g_time);
 	brw.g_time = false;
 };
@@ -3063,58 +3234,6 @@ function path_img(path) {
 	else return false;
 }
 
-function check_cache(albumIndex) {
-	var crc = brw.groups[albumIndex].cachekey;
-	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
-		return true;
-	}
-	return false;
-};
-
-const load_image_from_cache = async (albumIndex, preload) =>
-{
-	try{
-		var crc = brw.groups[albumIndex].cachekey;
-		const image = await gdi.LoadImageAsyncV2(0, CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
-		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, image, false);
-		if (!preload && albumIndex >= g_start_ && albumIndex <= g_end_) {
-			if (!timers.coverDone) {
-				timers.coverDone = setInterval(() => {
-					brw.repaint();
-					clearInterval(timers.coverDone);
-					timers.coverDone = false;
-				}, 2);
-			};
-		}
-	} catch(e){}
-};
-
-const get_album_art_async = async (albumIndex) =>
-{
-	try{
-		let result = await utils.GetAlbumArtAsyncV2(0, brw.groups[albumIndex].metadb, ppt.albumArtId, false);
-		let img = result.image;
-		if(img){
-			let s = Math.min(ppt.cache_size / img.Width, ppt.cache_size / img.Height);
-			if(s < 1){
-				let w = Math.floor(img.Width * s);
-				let h = Math.floor(img.Height * s);
-				img = img.Resize(w, h, 2);
-			}
-		}
-		brw.groups[albumIndex].cover_img = g_image_cache.getit(albumIndex, img, true);
-		if (albumIndex >= g_start_ && albumIndex <= g_end_) {
-			if (!timers.coverDone) {
-				timers.coverDone = setInterval(() => {
-					brw.repaint();
-					clearInterval(timers.coverDone);
-					timers.coverDone = false;
-				}, 10);
-			};
-		}
-    } catch(e){}
-};
-
 function get_tagprop(){
 	switch (ppt.tagMode) {
 	case 1:
@@ -3180,17 +3299,22 @@ function get_tagprop(){
 }
 
 function reset_this_cache(idx, crc){
-	if (utils.FileExists(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg")) {
-		utils.RemovePath(CACHE_FOLDER + ppt.cache_subdir + crc + ".jpg");
-	}
 	brw.groups[idx].load_requested = 0;
 	g_image_cache.reset(crc);
 	brw.groups[idx].cover_img = null;
-	var indexid = crclist[crcidx].indexOf(crc);
-	if(indexid >= 0){
-		crclist[crcidx].splice(indexid, 1);
-		crcmod[crcidx] = true;
+	if (crclist[crcidx]) {
+		var indexid = crclist[crcidx].indexOf(crc);
+		if(indexid >= 0){
+			crclist[crcidx].splice(indexid, 1);
+		}
 	}
+	// remove image file and DB entry via worker
+	cover_worker.postMessage({
+		cmd: 'remove_cover',
+		table: get_table_name(ppt.cache_subdir),
+		crc: crc,
+		path: CACHE_FOLDER + ppt.cache_subdir + crc + '.jpg'
+	});
 }
 
 function refresh_cover(resetcache) {

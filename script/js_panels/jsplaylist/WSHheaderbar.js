@@ -248,59 +248,24 @@ oHeaderBar = function() {
 		this.button.draw(gr, this.x + this.w, this.y, 255);
 	};
 
+	this.writeColumnTable = function() {
+		// 列定义写入 pv.db 的 column 表：每行一列（idx 保序；percent 属于布局宽度，存 layout 表的 columnWidth）
+		try {
+			var db = pv_db_open();
+			db.Exec('CREATE TABLE IF NOT EXISTS "column" (idx INTEGER PRIMARY KEY, name TEXT, tf TEXT, tf2 TEXT, ref TEXT, align TEXT, sort_order TEXT)');
+			db.Exec('DELETE FROM "column"');
+			for (var i = 0; i < this.columns.length; i++) {
+				var col_name = (this.columns[i].label == "#") ? "#@" : this.columns[i].label;
+				db.Exec('INSERT OR REPLACE INTO "column" (idx, name, tf, tf2, ref, align, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)', [i, col_name, this.columns[i].tf, this.columns[i].tf2, this.columns[i].ref, this.columns[i].align, this.columns[i].sortOrder]);
+			}
+		} catch (e) {
+			console.log('WSHheaderbar: save column table failed: ' + e.message);
+		}
+	};
+
 	this.saveColumns = function(col_num_changed) {
 		var tmp;
-		var config_col = "";
-		for (var j = 0; j < 6; j++) {
-			tmp = "";
-			for (var i = 0; i < this.columns.length; i++) {
-				switch (j) {
-				case 0:
-					if(this.columns[i].label == "#") tmp = tmp + "#@";
-					else tmp = tmp + this.columns[i].label;
-					break;
-				case 1:
-					tmp = tmp + this.columns[i].tf;
-					break;
-				case 2:
-					tmp = tmp + this.columns[i].tf2;
-					break;
-				case 3:
-					tmp = tmp + this.columns[i].ref;
-					break;
-				case 4:
-					tmp = tmp + this.columns[i].align;
-					break;
-				case 5:
-					tmp = tmp + this.columns[i].sortOrder;
-					break;
-				};
-				if (i < this.columns.length - 1) {
-					tmp = tmp + "^^";
-				};
-			};
-			switch (j) {
-			case 0:
-				config_col = tmp;
-				break;
-			case 1:
-				config_col = config_col + "##" + tmp;
-				break;
-			case 2:
-				config_col = config_col + "##" + tmp;
-				break;
-			case 3:
-				config_col = config_col + "##" + tmp;
-				break;
-			case 4:
-				config_col = config_col + "##" + tmp;
-				break;
-			case 5:
-				config_col = config_col + "##" + tmp;
-				break;
-			};
-		};
-		utils.WriteTextFile(config_dir + "columns", config_col);
+		this.writeColumnTable();
 		if(col_num_changed) {
 			tmp = "";
 			layout.columnWidth.splice(0, layout.columnWidth.length);
@@ -333,14 +298,19 @@ oHeaderBar = function() {
 		//var totalColumnsToDraw = 0;
 		this.columns.splice(0, this.columns.length);
 		this.borders.splice(0, this.borders.length);
-		var config_col = "";
-		try{
-			config_col = utils.ReadTextFile(config_dir + "columns", 0);
-		}catch(e){}
-		if (config_col == "") {
+		var rows = [];
+		try {
+			if (utils.FileExists(pv_db_path)) {
+				var db = utils.OpenDatabase(pv_db_path);
+				rows = db.Query('SELECT name, tf, tf2, ref, align, sort_order FROM "column" ORDER BY idx');
+			}
+		} catch (e) {
+			console.log('WSHheaderbar: read column table failed: ' + e.message);
+			rows = [];
+		}
+		if (rows.length == 0) {
 			// INITIALIZE columns and Properties
 			var fields = [];
-			var tmp;
 			for (var i = 0; i < 7; i++) {
 				switch (i) {
 				case 0:
@@ -366,42 +336,10 @@ oHeaderBar = function() {
 					fields.push(new Array("99", "600", "0", "600", "3850", "0", "2850", "0", "0", "0", "0", "1250", "0", "0", "0", "0", "850"));
 					break;
 				};
-				// convert array to csv string
-				tmp = "";
-				for (var j = 0; j < fields[i].length; j++) {
-					tmp = tmp + fields[i][j];
-					if (j < fields[i].length - 1) {
-						tmp = tmp + "^^";
-					};
-				};
-				// save CSV string into window Properties
-				switch (i) {
-				case 0:
-					config_col = tmp;
-					break;
-				case 1:
-					config_col = config_col + "##" + tmp;
-					break;
-				case 2:
-					config_col = config_col + "##" + tmp;
-					break;
-				case 3:
-					config_col = config_col + "##" + tmp;
-					break;
-				case 4:
-					config_col = config_col + "##" + tmp;
-					break;
-				case 5:
-					config_col = config_col + "##" + tmp;
-					break;
-				case 6:
-					layout.columnWidth[0] = tmp;
-					save_layout();
-					break;
-				};
 			};
+			layout.columnWidth[0] = fields[6].join("^^"); // 列宽初始值 → layout.columnWidth（经 layout 表落库）
+			save_layout();
 			// create column Objects
-			utils.WriteTextFile(config_dir + "columns", config_col);
 			this.totalColumns = fields[0].length;
 			for (var k = 0; k < this.totalColumns; k++) {
 				this.columns.push(new oColumn(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k]));
@@ -413,54 +351,45 @@ oHeaderBar = function() {
 					previousColumnToDrawId = k;
 				};
 			};
+			this.writeColumnTable(); // 列定义写入 column 表
 
 		}
 		else {
+			// LOAD columns（column 表，按 idx 保序）
 			var fields = [];
-			var tmp;
-			config_col = config_col.split("##");
-			for (var i = 0; i < 7; i++) {
-				switch (i) {
-				case 0:
-					tmp = config_col[0];
-					break;
-				case 1:
-					tmp = config_col[1];
-					break;
-				case 2:
-					tmp = config_col[2];
-					break;
-				case 3:
-					tmp = config_col[3];
-					break;
-				case 4:
-					tmp = config_col[4];
-					break;
-				case 5:
-					tmp = config_col[5];
-					break;
-				case 6:
-					tmp = layout.columnWidth[layout.index];
-					if (!tmp) {
-						tmp = "99^^600^^0^^600^^3850^^0^^2850^^0^^0^^0^^0^^1250^^0^^0^^0^^0^^850";
-						for (var j = 17; j < this.totalColumns; j++){
-							tmp = tmp + "^^0";
-						}
-						var tmp2 = tmp;
-						for (j = 0; j < layout.ids.length - 1; j++){
-							tmp2 = tmp2 + "##" + tmp;
-							layout.columnWidth[j] = tmp;
-						}
-						layout.columnWidth[layout.ids.length - 1] = tmp;
-						save_layout();
-					}
-					break;
-				};
-				fields.push(tmp.split("^^"));
-				if(i == 0) this.totalColumns =  fields[0].length;
+			var f0 = [], f1 = [], f2 = [], f3 = [], f4 = [], f5 = [];
+			for (var r = 0; r < rows.length; r++) {
+				var nm = rows[r].name;
+				if (nm == "#@") nm = "#";
+				f0.push(nm);
+				f1.push(rows[r].tf);
+				f2.push(rows[r].tf2);
+				f3.push(rows[r].ref);
+				f4.push(rows[r].align);
+				f5.push(rows[r].sort_order);
 			};
+			fields.push(f0);
+			fields.push(f1);
+			fields.push(f2);
+			fields.push(f3);
+			fields.push(f4);
+			fields.push(f5);
+			this.totalColumns = f0.length;
+			// percent 行：来自 layout.columnWidth（layout 表，每布局一组）
+			var tmp = layout.columnWidth[layout.index];
+			if (!tmp) {
+				tmp = "99^^600^^0^^600^^3850^^0^^2850^^0^^0^^0^^0^^1250^^0^^0^^0^^0^^850";
+				for (var j = 17; j < this.totalColumns; j++){
+					tmp = tmp + "^^0";
+				}
+				for (j = 0; j < layout.ids.length - 1; j++){
+					layout.columnWidth[j] = tmp;
+				}
+				layout.columnWidth[layout.ids.length - 1] = tmp;
+				save_layout();
+			}
+			fields.push(tmp.split("^^"));
 			for (var k = 0; k < this.totalColumns; k++) {
-				if(fields[0][k] == "#@") fields[0][k] = "#";
 				this.columns.push(new oColumn(fields[0][k], fields[1][k], fields[2][k], fields[3][k], fields[4][k], fields[5][k], fields[6][k]));
 				if (this.columns[k].percent > 0) {
 					if (previousColumnToDrawId >= 0) {
@@ -796,9 +725,10 @@ oHeaderBar = function() {
 		case (idx == 15):
 			layout.uid = layout.playlistName;
 			layout.ids.push(layout.uid);
-			layout.config.push(layout.config[layout.index]);
+			layout.config.push(layout.config[layout.index].slice(0)); // 复制而非引用，避免修改新布局参数时污染原布局
 			layout.columnWidth.push(layout.columnWidth[layout.index]);
 			layout.index = layout.ids.length - 1;
+			layout.gopts = layout.config[layout.index]; // 同步 gopts 指向新布局（原代码遗漏，导致参数写入旧布局）
 			this.saveColumnsWidth();
 			if(setting_init && p.settings.page_loaded[4]){
 				var arr = [];

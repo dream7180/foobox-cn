@@ -46,7 +46,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			if(show_menu != _showmenu){
 				window.NotifyOthers("Show_menubar", show_menu);
-				save_misccfg("misc");
+				save_config("show_menu", show_menu);
 				p.settings.pages[parentId].elements[id].repaint();
 			}
 			break;
@@ -58,7 +58,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				show_extrabtn = 0;
 			}
 			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
-			save_misccfg("misc");
+			save_config("show_extrabtn", show_extrabtn);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 6:
@@ -77,7 +77,7 @@ function settings_checkboxes_action(id, status, parentId) {
 					full_repaint();
 				}
 			}
-			save_misccfg("common");
+			save_config("color_bycover", color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 7:
@@ -88,7 +88,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				cbkg_bycover = 1;
 			}
 			window.NotifyOthers("foobox_bgcolor_bycover", cbkg_bycover);
-			save_misccfg("common");
+			save_config("cbkg_bycover", cbkg_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 8:
@@ -99,7 +99,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				color_noesl = 0;
 			}
 			window.NotifyOthers("foobox_color_noesl", color_noesl);
-			save_misccfg("common");
+			save_config("color_noesl", color_noesl);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 11:
@@ -111,7 +111,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			get_covercahe_config();
 			window.NotifyOthers("colorful_seekbar", colorful_seek);
-			save_misccfg("misc");
+			save_config("colorful_seek", colorful_seek);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 14:
@@ -122,7 +122,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				rating2tag = 0;
 			}
 			window.NotifyOthers("set_rating_2_tag", rating2tag);
-			save_misccfg("common");
+			save_config("rating2tag", rating2tag);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 15:
@@ -138,13 +138,15 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 17:
 			if (status) {
-				drawmode = 1;
+				winFrame = 0;
 			}
 			else {
-				drawmode = 0;
+				winFrame = 2;
 			}
-			save_misccfg("common");
+			save_config("winFrame", winFrame);
 			p.settings.pages[parentId].elements[id].repaint();
+			if(winFrame != fb.Window.FrameStyle) fb.Window.FrameStyle = winFrame;
+			window.NotifyOthers("foobox.winFrame", winFrame);
 			break;
 		}
 		break;
@@ -234,7 +236,7 @@ function settings_radioboxes_action(id, status, parentId) {
 			p.settings.pages[pid].elements[2].status = false;
 			sys_scrollbar = 1;
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			save_misccfg("common");
+			save_config("sys_scrollbar", sys_scrollbar);
 			cScrollBar.width = get_system_scrollbar_width();
 			properties.cursor_max = 125*zdpi;
 			p.headerBar && p.headerBar.setButtons();
@@ -245,7 +247,7 @@ function settings_radioboxes_action(id, status, parentId) {
 			p.settings.pages[pid].elements[2].status = true;
 			sys_scrollbar = 0;
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			save_misccfg("common");
+			save_config("sys_scrollbar", sys_scrollbar);
 			cScrollBar.width = z(12);
 			properties.cursor_max = 110*zdpi;
 			p.headerBar && p.headerBar.setButtons();
@@ -256,14 +258,14 @@ function settings_radioboxes_action(id, status, parentId) {
 			p.settings.pages[pid].elements[5].status = false;
 			libbtn_fuc = 1;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			save_misccfg("misc");
+			save_config("libbtn_fuc", libbtn_fuc);
 			break;
 		case 5:
 			p.settings.pages[pid].elements[4].status = false;
 			p.settings.pages[pid].elements[5].status = true;
 			libbtn_fuc = 0;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			save_misccfg("misc");
+			save_config("libbtn_fuc", libbtn_fuc);
 			break;
 		};
 		full_repaint();
@@ -634,7 +636,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
 			else if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
-			save_misccfg("common");
+			save_config("ScrollStep", cList.scrollstep);
 			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
@@ -652,7 +654,7 @@ function settings_textboxes_action(pageId, elementId) {
 			else if(cRow.default_playlist_h < 15) cRow.default_playlist_h = 15;
 			else if(cRow.default_playlist_h > 100) cRow.default_playlist_h = 100;
 			if(cRow.default_playlist_h != org_default_playlist_h) {
-				save_misccfg("common");
+				save_config("LineHeight", cRow.default_playlist_h);
 				resize_panels();
 				get_grprow_minimum(p.headerBar.columns[0].w);
 				update_playlist(layout.collapseGroupsByDefault, 2);
@@ -661,7 +663,7 @@ function settings_textboxes_action(pageId, elementId) {
 			break;
 		case 10:
 			track_edit_app = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			save_misccfg("misc");
+			save_config("track_edit_app",track_edit_app);
 			break;
 		}
 		break;
@@ -794,7 +796,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!color_threshold) color_threshold = org_threshold;
 			else if(color_threshold < 1) color_threshold = 1;
 			else if(color_threshold > 10) color_threshold = 10;
-			save_misccfg("common");
+			save_config("color_threshold", color_threshold);
 			window.NotifyOthers("set_corlor_threshold", color_threshold);
 			break;
 		case 10:
@@ -803,7 +805,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!cbkg_chroma) cbkg_chroma = org_chroma;
 			else if(cbkg_chroma < 1) cbkg_chroma = 1;
 			else if(cbkg_chroma > 10) cbkg_chroma = 10;
-			save_misccfg("common");
+			save_config("cbkg_chroma", cbkg_chroma);
 			window.NotifyOthers("set_bgcolor_chroma", cbkg_chroma);
 			break;
 		case 12:
@@ -829,7 +831,7 @@ function settings_textboxes_action(pageId, elementId) {
 			var new_titleadd = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_titleadd != title_add){
 				title_add = new_titleadd;
-				save_misccfg("misc");
+				save_config("title_add", title_add);
 				window.NotifyOthers("titlebar_addinfo", title_add);
 			}
 			break;
@@ -885,7 +887,7 @@ oTextBtn = function(text){
 				if (new_titleadd != title_add){
 					full_repaint();
 					title_add = new_titleadd;
-					save_misccfg("misc");
+					save_config("title_add", title_add);
 					window.NotifyOthers("titlebar_addinfo", title_add);
 				}
 			}
@@ -1728,7 +1730,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 24, "评级数据同时写入文件标签", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "右栏封面信息及属性面板总是跟随光标而非播放 (会使界面颜色跟随封面无效)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "标题栏显示更多音轨信息 |", title_add, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(17, checkbox2x, cSettings.topBarHeight + rh * 2.5, "启用 D2D 渲染 (重启生效)", "drawmode == 1 ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, checkbox2x, cSettings.topBarHeight + rh * 2.5, "使用系统标题栏和边框", "winFrame == 0 ? true : false", "settings_checkboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -2193,7 +2195,7 @@ oPage = function(id, objectName, label, nbrows) {
 						track_edit_app += "; " + _app;
 						p.settings.pages[0].elements[10].inputbox.text = track_edit_app;
 					}
-					save_misccfg("misc");
+					save_config("track_edit_app", track_edit_app);
 					full_repaint();
 				}
 			};
