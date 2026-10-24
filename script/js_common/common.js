@@ -1,5 +1,4 @@
 ﻿//common script
-window.DrawMode = 1;//1-D2D,0-GDI
 
 function RGBA(r, g, b, a) {
 	return ((a << 24) | (r << 16) | (g << 8) | (b));

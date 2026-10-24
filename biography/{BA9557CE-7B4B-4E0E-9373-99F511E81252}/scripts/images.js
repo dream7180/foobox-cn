@@ -290,8 +290,10 @@ class Images {
 	blacklist(clean_artist) {
 		let black_list = [];
 		if (!$.file(this.blackList.file)) return black_list;
-		const list = $.jsonParse(this.blackList.file, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-		return list.blacklist[clean_artist] || black_list;
+		const list = $.jsonParse(this.blackList.file, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		return typeof list === 'object' && !Array.isArray(list) // Regorxxx <- Safecheck against corrupt files ->
+			? list.blacklist[clean_artist] || black_list
+			: black_list;
 	}
 
 	blackListed(v) {
@@ -300,7 +302,11 @@ class Images {
 		if (this.blackList.artist && this.blackList.artist != img.blackList.cur) {
 			img.blackList.item = this.blacklist($.clean(this.blackList.artist).toLowerCase());
 		}
-		return img.blackList.item.includes(v.slice(v.lastIndexOf('_') + 1));
+		// Regorxxx <- Cut default download paths to avoid +256 chars (fix '_' char in folder paths) ->
+		const imgName = v.lastIndexOf('\\') < v.lastIndexOf('_')
+			? v.slice(v.lastIndexOf('_') + 1)
+			: v.slice(v.lastIndexOf('\\') + 1);
+		return img.blackList.item.includes(imgName);
 	}
 
 	blurCheck() {

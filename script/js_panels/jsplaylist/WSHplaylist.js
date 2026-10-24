@@ -2087,6 +2087,8 @@ oList = function(object_name, playlist) {
 		if(properties.selectionmenu){
 			var pl_count = plman.PlaylistCount;
 			_child01.AppendTo(_menu, MF_STRING, "选择...");
+			_child01.AppendMenuItem(MF_STRING, 1200, "重置封面缓存");
+			_child01.AppendMenuSeparator();
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "从播放列表移除");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "移除列表其他项");
 			if(pl_count > 1 && pl_count < 51){
@@ -2136,6 +2138,10 @@ oList = function(object_name, playlist) {
 					var obj_file = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
 				}
 				utils.Run(_apps[ret - 1012], [obj_file]);
+				break;
+			case (ret == 1200):
+				// 刷新所选曲目所在分组的封面缓存（多选自动去重，支持跨分组）
+				reset_cover_from_selection(this.metadblist_selection);
 				break;
 			case (ret == 4000):
 				fb.RunMainMenuCommand("文件/新建播放列表");

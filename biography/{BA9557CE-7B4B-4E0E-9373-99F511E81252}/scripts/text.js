@@ -44,8 +44,6 @@ class Text {
 		ppt.trackHeading = $.clamp(ppt.trackHeading, 0, 2);
 		
 		this.avail = {
-			amalb: -1,
-			amtrk: -1,
 			lfmalb: -1,
 			lfmtrk: -1,
 			wikialb: -1,
@@ -53,12 +51,6 @@ class Text {
 		}
 
 		this.bio = {
-			allmusic: false,
-			am: '',
-			am_w: {
-				hd: 0,
-				nohd: 0
-			},
 			arr: [],
 			born: 'Born: |Geburtstag: |Fecha de nacimiento: |N\\u00e9\\(e\\) le: |Data di nascita: |\\u751f\\u5e74\\u6708\\u65e5: |Urodzony: |Data de nascimento: |\\u0413\\u043e\\u0434 \\u0440\\u043e\\u0436\\u0434\\u0435\\u043d\\u0438\\u044f: |F\\u00f6dd: |Do\\u011fum tarihi: |\\u51fa\\u751f: ',
 			bornIn: 'Born In: |Geboren in: |Lugar de nacimiento: |N\\u00e9\\(e\\) en: |Luogo di nascita: |\\u51fa\\u8eab\\u5730: |Urodzony w: |Local de nascimento: |\\u041c\\u0435\\u0441\\u0442\\u043e \\u0440\\u043e\\u0436\\u0434\\u0435\\u043d\\u0438\\u044f: |F\\u00f6dd: |Do\\u011fum yeri: |\\u751f\\u4e8e: ',
@@ -80,7 +72,6 @@ class Text {
 				nohd: 0
 			},
 			loaded: {
-				am: false,
 				lfm: false,
 				wiki: false,
 				txt: false,
@@ -95,10 +86,9 @@ class Text {
 			readerTag: false,
 			scrollPos: {},
 			source: {
-				am: ppt.sourcebio == 0,
-				lfm: ppt.sourcebio == 1,
-				wiki: ppt.sourcebio == 2,
-				txt: ppt.sourcebio == 3
+				lfm: ppt.sourcebio == 0,
+				wiki: ppt.sourcebio == 1,
+				txt: ppt.sourcebio == 2
 			},
 			sp: 0,
 			subHeading: 0,
@@ -122,15 +112,12 @@ class Text {
 		}
 		
 		this.bio.subhead = {
-			am: [cfg.amDisplayName, `${cfg.amDisplayName} ${this.bio.lang[cfg.lang.ix]}`],
 			lfm: [cfg.lfmDisplayName, `${cfg.lfmDisplayName} ${this.bio.lang[cfg.lang.ix]}`],
 			wiki: [cfg.wikiDisplayName, `${cfg.wikiDisplayName} ${this.bio.lang[cfg.lang.ix]}`],
 			txt: ['textreader', 'textreader']
 		}
 
 		this.done = {
-			amBio: false,
-			amRev: false,
 			lfmBio: false,
 			lfmRev: false,
 			wikiBio: false,
@@ -165,10 +152,6 @@ class Text {
 		}
 
 		this.mod = {
-			amBio: 0,
-			curAmBio: 0,
-			amRev: 0,
-			curAmRev: 0,
 			lfmBio: 0,
 			curLfmBio: 0,
 			lfmRev: 0,
@@ -180,8 +163,6 @@ class Text {
 		}
 
 		this.rating = {
-			am: -1,
-			amStr: '',
 			lfm: -1,
 			lfmStr: '',
 			y: 0
@@ -224,15 +205,6 @@ class Text {
 		}
 
 		this.rev = {
-			amFallback: false,
-			allmusic: true,
-			am: '',
-			am_w: {
-				hd: 0,
-				nohd: 0
-			},
-			amAlb: '',
-			amTrackHeading: true,
 			arr: [],
 			both: 0,
 			checkedTrackSubHead: true,
@@ -256,7 +228,6 @@ class Text {
 			lfmAlb: '',
 			lfmTrackHeading: true,
 			loaded: {
-				am: false,
 				lfm: false,
 				wiki: false,
 				txt: false,
@@ -270,10 +241,9 @@ class Text {
 			releaseDate: 'Release Date: |Ver\\u00f6ffentlichungsdatum: |Fecha De Lanzamiento: |Date De Sortie: |Data Di Pubblicazione: |\\u30ea\\u30ea\\u30fc\\u30b9\\u65e5: |Data Wydania: |Data De Lan\\u00e7amento: |\\u0414\\u0430\\u0442\\u0430 \\u0440\\u0435\\u043b\\u0438\\u0437\\u0430: |Utgivningsdatum: |Yay\\u0131nlanma Tarihi: |\\u53d1\\u884c\\u65e5\\u671f: ',
 			scrollPos: {},
 			source: {
-				am: ppt.sourcerev == 0,
-				lfm: ppt.sourcerev == 1,
-				wiki: ppt.sourcerev == 2,
-				txt: ppt.sourcerev == 3
+				lfm: ppt.sourcerev == 0,
+				wiki: ppt.sourcerev == 1,
+				txt: ppt.sourcerev == 2
 			},
 			subHeading: 0,
 			summaryEnd: 0,
@@ -299,7 +269,6 @@ class Text {
 		}
 
 		this.rev.subhead = {
-			am: [cfg.amDisplayName, `${cfg.amDisplayName} ${this.rev.lang[cfg.lang.ix]}`],
 			lfm: [cfg.lfmDisplayName, `${cfg.lfmDisplayName} ${this.rev.lang[cfg.lang.ix]}`],
 			wiki: [cfg.wikiDisplayName, `${cfg.wikiDisplayName} ${this.rev.lang[cfg.lang.ix]}`],
 			txt: ['textreader', 'textreader']
@@ -394,20 +363,20 @@ class Text {
 					v.font = !this.rev.subHeading || i ? (i < this.rev.summaryEnd ? ui.font.summary : font) : ui.font.subHeadSource;
 					v.h1 = this.line.h.rev;
 					v.h2 = this.line.h.rev + 1;
-					$.source.amLfmWikiTxt.forEach((w, i) => {
-						v[`${w}Line`] = (!v.property ? v.text : v.name) == this.rev.subhead[w][1] && !(this.ratingPos.line && panel.summary.show);
-						if (v[`${w}Line`]) {
-							const v_w = g.CalcTextWidth(v.text + ' ', this.ratingPos.line ? ui.font.main : ui.font.subHeadSource);
-							v[`${w}LineX1`] = i < 2 ? panel.text.l + v_w + (this.rating[w] >= 0 && (this.ratingPos.subHeading || this.ratingPos.line) ? but.rating.w2 : 0) + this.bio.sp : panel.text.l + this.rev[`${w}_w`].nohd + this.bio.sp; // noHd
-							v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);
-						}
-					});
+				$.source.lfmWikiTxt.forEach((w, i) => {
+					v[`${w}Line`] = (!v.property ? v.text : v.name) == this.rev.subhead[w][1] && !(this.ratingPos.line && panel.summary.show);
+					if (v[`${w}Line`]) {
+						const v_w = g.CalcTextWidth(v.text + ' ', this.ratingPos.line ? ui.font.main : ui.font.subHeadSource);
+						v[`${w}LineX1`] = w == 'lfm' ? panel.text.l + v_w + (this.rating[w] >= 0 && (this.ratingPos.subHeading || this.ratingPos.line) ? but.rating.w2 : 0) + this.bio.sp : panel.text.l + this.rev[`${w}_w`].nohd + this.bio.sp; // noHd
+						v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);
+					}
+				});
 					v.offset = 0;
 					v.composersTooltip = this.rev.composersTooltip;
 					v.composers_tt_needed = v.composersTooltip && i < this.rev.summaryEnd && v.text.startsWith('Composers: ');
 					this.formatItemProperties(v, j);
 					v.subHeading = this.rev.subHeading && !i ? this.rev.subHeading : 0;
-					['am', 'lfm'].forEach(w => {
+					['lfm'].forEach(w => {
 						v[`${w}SubHeadingRating`] = this.ratingPos.subHeading && v.text == this.rev.subhead[w][ppt.heading ? 0 : 1] && this.rating[w] >= 0;
 						if (v[`${w}SubHeadingRating`]) v[`${w}SubHeadingRatingX`] = panel.text.l + (ppt.heading ? this.rev[`${w}_w`].hd : this.rev[`${w}_w`].nohd);
 
@@ -457,9 +426,9 @@ class Text {
 	}
 
 	albumFlush() {
-		this.mod.amRev = this.rev.am = this.rev.lfm = this.mod.lfmRev = this.rev.wiki = this.mod.wikiRev = this.rev.txt = '';
-		this.mod.curAmRev = this.mod.curLfmRev = this.mod.curWikiRev = 1;
-		this.rev.checkedTrackSubHead = this.done.amRev = this.done.lfmRev = this.done.wikiRev = false;
+		this.rev.lfm = this.mod.lfmRev = this.rev.wiki = this.mod.wikiRev = this.rev.txt = '';
+		this.mod.curLfmRev = this.mod.curWikiRev = 1;
+		this.rev.checkedTrackSubHead = this.done.lfmRev = this.done.wikiRev = false;
 		this.rev.text = [];
 		but.setScrollBtnsHide();
 	}
@@ -490,131 +459,9 @@ class Text {
 			this.id.tr = name.trackID(panel.id.focus);
 			const new_track = this.id.tr != this.id.curTr;
 			if (new_track) {
-				this.rev.checkedTrackSubHead = this.done.amRev = this.done.lfmRev = this.done.wikiRev = false;
+				this.rev.checkedTrackSubHead = this.done.lfmRev = this.done.wikiRev = false;
 			}
 		}
-	}
-
-	amBio(a) {
-		const aBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', cfg.supCache, a, '', '', 'foAmBio', true).pth;
-		if (!$.file(aBio)) return;
-		this.mod.amBio = $.lastModified(aBio) || 0;
-		if (this.mod.amBio == this.mod.curAmBio) return;
-		this.bio.am = $.open(aBio).trim();
-		this.bio.am = this.bio.am.replace(/, Jr\./g, ' Jr.');
-		this.bio.am = this.formatText('amBio', this.bio.am, panel.summary.genre ? {limit: 6, list: true, key: 'Genre: '} : {}, !panel.summary.other ? {} : {list: true, key: 'Group Members: ', prefix: true, suffix: true}, panel.summary.date ? {key: 'Formed: |Born: '} : {}, panel.summary.date ? {key: 'Died: '} : {}, panel.summary.date ? {key: 'Active: '} : {}).replace(/(?:\s*\r\n){3,}/g, '\r\n\r\n');
-		this.newText = true;
-		this.mod.curAmBio = this.mod.amBio;
-	}
-
-	amRev(a, aa, l, c) {
-		let am_tr_mod = 0;
-		let aRev = '';
-		let foundComp = false;
-		let trackRev = '';
-		let trk = '';
-		let writer = '';
-
-		if (!ppt.classicalMusicMode || panel.alb.ix) {
-			aRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foAmRev', true).pth;
-		} else if (!panel.alb.ix) {
-			aRev = panel.getPth('rev', panel.id.focus, this.artist, this.composition, '', cfg.supCache, a, aa, c, 'foAmRev', true).pth;
-			if ($.file(aRev)) foundComp = true;
-		}
-		this.rev.amFallback = !foundComp;
-		if (!$.file(aRev) && ppt.classicalAlbFallback && !panel.alb.ix && panel.style.inclTrackRev != 2) {
-			aRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foAmRev', true).pth;
-		}
-		this.avail.amalb = $.file(aRev) ? 0 : -1;
-		if (this.avail.amalb == -1) {
-			this.rating.am = -1;
-			but.check();
-			if (!panel.style.inclTrackRev || ppt.classicalMusicMode && !ppt.classicalAlbFallback) {
-				this.rev.amAlb = '';
-				return;
-			}
-		}
-
-		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foAmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-		this.avail.amtrk = this.isTrackRevAvail('am', trackRev[trk]);
-		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) am_tr_mod = trackRev[trk].update;
-
-		this.mod.amRev = ($.lastModified(aRev) || 0) + (am_tr_mod || 0);
-		if (this.mod.amRev == this.mod.curAmRev) return;
-		this.rev.amAlb = '';
-
-		if (panel.style.inclTrackRev != 2 || foundComp) this.rev.amAlb = $.open(aRev).trim();
-		this.rev.amAlb = this.rev.amAlb.replace('Genre: ', 'Album Genres: ');
-		this.newText = true;
-		this.mod.curAmRev = this.mod.amRev;
-		this.rating.am = -1;
-		let b = this.rev.amAlb.indexOf('>> Album rating: ') + 17;
-		const f = this.rev.amAlb.indexOf(' <<');
-		if (panel.style.inclTrackRev != 2 || foundComp) {
-			if (ppt.amRating) {
-				if (b != -1 && f != -1 && f > b) this.rating.am = this.rev.amAlb.substring(b, f);
-				if (!isNaN(this.rating.am) && this.rating.am != 0 && this.rating.am != -1) this.rating.am *= 2;
-				else this.rating.am = -1;
-				this.getRatingStyle('am');
-			} else {
-				this.rating.amStr = '';
-				if (f != -1) this.rev.amAlb = this.rev.amAlb.slice(f + 3);
-			}
-		}
-		this.rev.am = this.rev.amAlb;
-		let needTrackSubHeading = false;
-		if (!ppt.classicalMusicMode || !foundComp) {
-			if (panel.style.inclTrackRev) {
-				if (trackRev && trackRev[trk]) {
-					const o = trackRev[trk];
-					let releaseYear = $.getProp(o, 'date', '');
-					if (releaseYear) releaseYear = `Release Year: ${releaseYear}`;
-					let composer = $.getProp(o, 'composer', []).join('\u200b, ');
-					if (composer) {
-						writer = o.composer.length > 1 ? 'Composers: ' : 'Composer: ';
-						composer = writer + composer;
-					}
-					let wiki = $.getProp(o, 'wiki', '');
-					wiki = this.add([composer], wiki);
-					const showGenres = !ppt.autoOptimiseText || !this.rev.amAlb;
-					if (showGenres) {
-						const get = (item) => {
-							const it2 = $.titlecase(item);
-							const it1 = it2.slice(0, -1);
-							let items = $.getProp(o, item, []).join('\u200b, ');
-							if (items) items = (o[item].length > 1 ? `Track ${it2}: ` : `Track ${it1}: `) + items;
-							return items;
-						}
-						wiki = this.add([get('genres'), get('moods'), get('themes')], wiki)
-					}
-					let author = $.getProp(o, 'author', '');
-					wiki = this.add([releaseYear, author], wiki)
-					if (wiki) {
-						if (ppt.trackHeading == 1 && (this.rev.amAlb || !ppt.heading) || ppt.trackHeading == 2) {
-							this.rev.amTrackHeading = false;
-							if (this.rev.amAlb) {
-								trackRev =  '!\u00a6' + this.tf(ppt.trackSubHeading, ppt.artistView, true) + '\r\n\r\n' + wiki;
-							} else {
-								trackRev = wiki;
-								needTrackSubHeading = true;
-							}
-						} else {
-							this.rev.amTrackHeading = true;
-							trackRev = wiki;
-						}
-						this.rev.am = this.add([trackRev], this.rev.amAlb);
-					} else {
-						this.rev.amTrackHeading = panel.style.inclTrackRev == 2;
-					}
-				} else {
-					this.rev.amTrackHeading = panel.style.inclTrackRev == 2;
-				}
-			}
-		} else this.rev.amTrackHeading = false;
-		this.rev.am = this.formatText('amRev', this.rev.am, panel.summary.genre ? {limit: 6, list: true, key: this.rev.amAlb ? 'Album Genres: ' : 'Track Genres: '} : {}, !panel.summary.other ? {} : {limit: 6, list: true, key: this.rev.amAlb ? 'Album Moods: ' : 'Track Moods: ', prefix: true}, panel.summary.date ? {key: this.rev.amAlb ? 'Release Date: ' : 'Release Year: '} : {}, {str: this.rating.amStr}).replace(/(?:\s*\r\n){3,}/g, '\r\n\r\n');
-		if (needTrackSubHeading) this.rev.am = '!\u00a6' + this.tf(ppt.trackSubHeading, ppt.artistView, true) + '\r\n\r\n' + this.rev.am;
-		if (!this.rev.am) but.check();
 	}
 
 	artCalc() {
@@ -665,7 +512,7 @@ class Text {
 				v.font = !this.bio.subHeading || i ? (i < this.bio.summaryEnd ? ui.font.summary : font) : ui.font.subHeadSource;
 				v.h1 = this.line.h.bio;
 				v.h2 = this.line.h.bio + 1;
-				$.source.amLfmWikiTxt.forEach(w => {
+				$.source.lfmWikiTxt.forEach(w => {
 					v[`${w}Line`] = (!v.property ? v.text : v.name) == this.bio.subhead[w][1];
 					if (v[`${w}Line`]) {
 						v[`${w}LineX1`] = panel.text.l + this.bio[`${w}_w`].nohd + this.bio.sp;
@@ -699,9 +546,9 @@ class Text {
 	}
 
 	artistFlush() {
-		this.done.amBio = this.done.lfmBio = this.done.wikiBio = false;
-		this.mod.amBio = this.bio.am = this.mod.lfmBio = this.bio.lfm = this.mod.wikiBio = this.bio.wiki = this.bio.txt = '';
-		this.mod.curAmBio = this.mod.curLfmBio = this.mod.curWikiBio = '1';
+		this.done.lfmBio = this.done.wikiBio = false;
+		this.mod.lfmBio = this.bio.lfm = this.mod.wikiBio = this.bio.wiki = this.bio.txt = '';
+		this.mod.curLfmBio = this.mod.curWikiBio = '1';
 		this.bio.text = [];
 		but.setScrollBtnsHide();
 	}
@@ -849,11 +696,11 @@ class Text {
 						this.bio.drawn++;
 						const iy = Math.round(item_y + ui.font.main_h / 2);
 						if (!ppt.heading) {
-							$.source.amLfmWikiTxt.forEach(v => {
-								if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
-							});
-						}
-						if (!item.sectionHeading || (!item.property ? i < f - 2 : i < f - 1)) {
+						$.source.lfmWikiTxt.forEach(v => {
+							if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
+						});
+					}
+					if (!item.sectionHeading || (!item.property ? i < f - 2 : i < f - 1)) {
 							if (!item.property) {
 								if (item.dropNegativeShadowLevel) { // nowplaying & lyrics only
 									gr.GdiDrawText(item.text, item.font, ui.col.dropShadow, panel.text.l - item.dropNegativeShadowLevel, item_y + item.offset, panel.text.w, item.h2, item.align);
@@ -888,23 +735,23 @@ class Text {
 						this.rev.drawn++;
 						const iy = Math.round(item_y + ui.font.main_h / 2);
 						switch (true) {
-							case this.ratingPos.subHeading:
-							['am', 'lfm'].forEach(v => {
-								if (item[`${v}SubHeadingRating`]) gr.DrawImage(but.rating.images[this.rating[v]], item[`${v}SubHeadingRatingX`], item_y + this.rating.y + item.offset, but.rating.w1 / 2, but.rating.h1 / 2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
-							});
-							break;
-						case this.ratingPos.line:
-							['am', 'lfm'].forEach(v => {
-								if (item[`${v}LineRating`]) gr.DrawImage(but.rating.images[this.rating[v]], item[`${v}LineRatingX`], item_y + this.rating.y + item.offset, but.rating.w1 / 2, but.rating.h1 / 2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
-							});
-							break;
+						case this.ratingPos.subHeading:
+						['lfm'].forEach(v => {
+							if (item[`${v}SubHeadingRating`]) gr.DrawImage(but.rating.images[this.rating[v]], item[`${v}SubHeadingRatingX`], item_y + this.rating.y + item.offset, but.rating.w1 / 2, but.rating.h1 / 2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
+						});
+						break;
+					case this.ratingPos.line:
+						['lfm'].forEach(v => {
+							if (item[`${v}LineRating`]) gr.DrawImage(but.rating.images[this.rating[v]], item[`${v}LineRatingX`], item_y + this.rating.y + item.offset, but.rating.w1 / 2, but.rating.h1 / 2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
+						});
+						break;
 						}
-						if (!ppt.heading) {
-							$.source.amLfmWikiTxt.forEach(v => {
-								if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
-							});
-						}
-						if (item.songLine) gr.DrawLine(item.songX1, iy, item.songX2, iy, ui.style.l_w, ui.col.centerLine);
+					if (!ppt.heading) {
+						$.source.lfmWikiTxt.forEach(v => {
+							if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
+						});
+					}
+					if (item.songLine) gr.DrawLine(item.songX1, iy, item.songX2, iy, ui.style.l_w, ui.col.centerLine);
 						if (!item.sectionHeading || (!item.property ? i < f - 2 : i < f - 1)) {
 							if (!item.property) {
 								if (item.dropNegativeShadowLevel) { // nowplaying & lyrics only
@@ -936,9 +783,6 @@ class Text {
 		const en = cfg.language == 'EN' || cfg.languageFallback;
 		let items = [];
 		switch (type) {
-			case 'amBio':
-				items = ['Genre: ', 'Group Members: '];
-				break;
 			case 'lfmBio': {
 				const members = 'Members: |Mitglieder: |Miembros: |Membres: |Componenti: |\\u30e1\\u30f3\\u30d0\\u30fc: |Cz\\u0142onkowie: |Membros: |\\u0423\\u0447\\u0430\\u0441\\u0442\\u043d\\u0438\\u043a\\u0438: |Medlemmar: |\\u00dcyeler: |\\u6210\\u5458: ';
 				const topTags = 'Top Tags: ';
@@ -947,10 +791,6 @@ class Text {
 				if (!panel.summary.genre) items.unshift(topTags);
 				break;
 			}
-			case 'amRev':
-				items = ['Album Genres: ', 'Album Moods: ', 'Album Themes: ', 'Composers: ', 'Track Moods: ', 'Track Themes: '];
-				if (this.rev.amAlb || !panel.summary.genre) items.unshift('Track Genres: ');
-				break;
 			case 'lfmRev':
 				items = ['Top Tags: '];
 				if (this.rev.lfmAlb || !panel.summary.genre) items.unshift('Track Tags: ');
@@ -1062,22 +902,8 @@ class Text {
 				let membersFound = false;
 				if (prefix) {
 					$.gr(1, 1, false, g => {
-						sub[n] = s[n].key.replace(/(Album\s|Track\s)Moods: /g, 'Moods: ').replace(/Group Members: /g, 'Members: ') + sub[n];
+						sub[n] = s[n].key.replace(/(Album\s|Track\s)Moods: /g, 'Moods: ') + sub[n];
 						if (ppt.summaryCompact) {
-							if (type == 'amBio') {
-								let tt_needed = false;
-								let members = '';
-								if (/^Members:\s/.test(sub[n])) {
-									membersFound = true;
-									tt_needed = g.CalcTextWidth(sub[n], ui.font.summary, true) > panel.text.w;
-									if (tt_needed ) {
-										members = g.EstimateLineWrap(sub[n], ui.font.summary, panel.text.w - g.CalcTextWidth('... ', ui.font.summary))[0];
-										members = members.replace(/\u2219\s?$/, '') + '...';
-									}
-								}
-								this.bio.membersTooltip = tt_needed ? sub[n] : '';
-								if (tt_needed) sub[n] = members;
-							}
 							if (type == 'wikiRev') {
 								let tt_needed = false;
 								let composers = '';
@@ -1110,8 +936,6 @@ class Text {
 					}
 				}
 				if (sub[n]) sub[n] += '\r\n';
-			} else if (type == 'amBio') {
-				this.bio.membersTooltip = '';
 			} else if (type == 'wikiRev') {
 				this.rev.composersTooltip = '';
 			}
@@ -1148,10 +972,6 @@ class Text {
 						text = item.text;
 					}
 			}
-			if (type == 'amBio') {
-				if (panel.summary.genre && panel.summary.date && panel.summary.popNow && panel.summary.other && !sub[1]) sub[4] = this.checkNewLine(sub, 4);
-			}
-
 			if (type == 'lfmBio' && sub[5]) {
 				sub[5] = this.formatListeners(sub, 5)
 			}
@@ -1183,8 +1003,6 @@ class Text {
 		text = text.replace(/\u200b/g, '');
 	
 		switch (type) {
-			case 'amBio': text = text.replace('Genre: ', 'Genres: '); break;
-			case 'amRev':  text = text.replace(/(Album|Track)\s(Genre|Mood|Theme)(s|):\s/g, '$2$3: '); break;
 			case 'lfmBio': if (cfg.lang.ix > 3) text = text.replace('Top Tags: ', this.topTags[cfg.lang.ix] + ': '); break;
 			case 'lfmRev':
 				if (cfg.lang.ix > 3) text = text.replace('Top Tags: ', this.topTags[cfg.lang.ix] + ': ');
@@ -1198,7 +1016,7 @@ class Text {
 			if (str) {
 				str = str.trim();
 			}
-			const summary = sub[0] + (type != 'amBio' ? str : str) + (sub[0] || str ? '\r\n' : '');
+			const summary = sub[0] + str + (sub[0] || str ? '\r\n' : '');
 			text = summary + '\u00a6End\u00a6' + text.trim();
 		}
 		return text;
@@ -1359,7 +1177,6 @@ class Text {
 						w.titleformat = w.titleformat.replace(/%BIO_ALBUMARTIST%/gi, cfg.tfAlbumArtist).replace(/%BIO_ARTIST%/gi, cfg.tfArtist).replace(/%BIO_ALBUM%/gi, cfg.tfAlbum).replace(/%BIO_TITLE%/gi, cfg.tfTitle)
 						let value = this.formatValue(showEmpty ? $.eval('$trim(' + w.titleformat + ')', panel.id.focus) : $.eval('[$trim(' + w.titleformat + ')]', panel.id.focus));
 						names = names.concat(fields(w.titleformat.toUpperCase()).filter(v => v.trim()));
-						if (typeof w.titleformat == 'string' && w.titleformat.toLowerCase().includes('%album rating allmusic%')) value /= 2;
 						if (value && /like count|dislike count|view count/i.test(w.name)) {
 							value = parseInt(value);
 							value = !isNaN(value) ? value.toLocaleString() : '';
@@ -1608,15 +1425,15 @@ class Text {
 	getSubHeadWidths(txtReaderOnly) {
 		$.gr(1, 1, false, g => {
 			if (!txtReaderOnly) {
-				const items = ['am_w', 'lfm_w', 'wiki_w'];
+				const items = ['lfm_w', 'wiki_w'];
 
-				let subHead = [this.rev.subhead.am[0] + ' ', this.rev.subhead.lfm[0] + ' ', this.rev.subhead.wiki[0] + ' '];
+				let subHead = [this.rev.subhead.lfm[0] + ' ', this.rev.subhead.wiki[0] + ' '];
 				items.forEach((v, i) => this.rev[v].hd = Math.max(g.CalcTextWidth(subHead[i], ui.font.subHeadSource), 1));
 
-				subHead = [this.bio.subhead.am[1] + ' ', this.bio.subhead.lfm[1] + ' ', this.bio.subhead.wiki[1] + ' '];
+				subHead = [this.bio.subhead.lfm[1] + ' ', this.bio.subhead.wiki[1] + ' '];
 				items.forEach((v, i) => this.bio[v].nohd = Math.max(g.CalcTextWidth(subHead[i], ui.font.subHeadSource), 1));
 
-				subHead = [this.rev.subhead.am[1] + ' ', this.rev.subhead.lfm[1] + ' ', this.rev.subhead.wiki[1] + ' '];
+				subHead = [this.rev.subhead.lfm[1] + ' ', this.rev.subhead.wiki[1] + ' '];
 				items.forEach((v, i) => this.rev[v].nohd = Math.max(g.CalcTextWidth(subHead[i], ui.font.subHeadSource), 1));
 
 				this.bio.sp = Math.max(g.CalcTextWidth(' ', ui.font.subHeadSource), 1);
@@ -1639,10 +1456,6 @@ class Text {
 		switch (true) {
 			case ppt.artistView:
 				if (!a) break;
-				if (!this.done.amBio || update) {
-					this.done.amBio = true;
-					this.amBio(a);
-				}
 				if (!this.done.lfmBio || update) {
 					this.done.lfmBio = true;
 					this.lfmBio(a);
@@ -1658,7 +1471,6 @@ class Text {
 				const l = $.clean(this.album);
 				if (!aa || !l && !panel.style.inclTrackRev && !c) {
 					this.resetRevAvailable();
-					this.rating.am = -1;
 					this.rating.lfm = -1;
 					but.check();
 					break;
@@ -1666,10 +1478,6 @@ class Text {
 				if (panel.isRadio(panel.id.focus) && !panel.style.inclTrackRev && !panel.alb.ix) {
 					this.resetRevAvailable();
 					break;
-				}
-				if (!this.done.amRev || update) {
-					this.done.amRev = true;
-					this.amRev(a, aa, l, c);
 				}
 				if (!this.done.lfmRev || update) {
 					this.done.lfmRev = true;
@@ -1686,10 +1494,10 @@ class Text {
 		if (!update || this.newText) {
 			this[n].text = [];
 			const fallbackText = !ppt.heading ? this[n].fallbackText[1] : this[n].fallbackText[0];
-			const types = $.source.amLfmWikiTxt;
-			const types_1 = this.moveArrayItem(types, 0, 3); // first to last
-			const types_2 = this.moveArrayItem(types_1, 0, 3);
-			const types_3 = this.moveArrayItem(types_2, 0, 3);
+			const types = $.source.lfmWikiTxt;
+			const types_1 = this.moveArrayItem(types, 0, 2); // first to last
+			const types_2 = this.moveArrayItem(types_1, 0, 2);
+			const types_3 = this.moveArrayItem(types_2, 0, 2);
 			const source = ppt.artistView ? ppt.sourcebio : ppt.sourcerev;
 
 			this.deactivateTooltip();
@@ -1699,7 +1507,6 @@ class Text {
 				if ((ppt.sourceAll && ppt.sourceHeading || ppt.sourceHeading == 2) && this[n][type] && type == 'lfm') this[n][type] = this[n][type].replace(/Last\.fm: /g, '');
 
 				this[n].loaded = {
-					am: false,
 					lfm: false,
 					wiki: false,
 					txt: false,
@@ -1711,7 +1518,7 @@ class Text {
 						if (!ppt.lockBio) { // get target else fallback source
 							const isMainAvail = this.isMainAvail(n);
 							[type, types_1[source], types_2[source], types_3[source]].some(v => {
-								if (this[n][v] && (v != 'txt' || !isMainAvail)) { // favour amLfmWiki fallback if !prefer textreader/lyrics/props
+								if (this[n][v] && (v != 'txt' || !isMainAvail)) { // favour lfmWiki fallback if !prefer textreader/lyrics/props
 									this[n].text[0] = this[n][v];
 									return this[n].loaded[v] = true;
 								}
@@ -1806,7 +1613,7 @@ class Text {
 			if (ppt.classicalMusicMode) panel.getList();
 			this.heading = ui.show.headingText ?
 			(
-				panel.style.inclTrackRev && (this.rev.loaded.lfm && this.rev.lfmTrackHeading || this.rev.loaded.am && this.rev.amTrackHeading || this.rev.loaded.wiki && this.rev.wikiTrackHeading) ?
+				panel.style.inclTrackRev && (this.rev.loaded.lfm && this.rev.lfmTrackHeading || this.rev.loaded.wiki && this.rev.wikiTrackHeading) ?
 				this.tf(ppt.trkHeading, ppt.artistView, true) : 
 				this.tf(!this.rev.reader || !this.rev.loaded.txt ? (panel.style.inclTrackRev == 2 && !this.isCompositionLoaded() ? ppt.trkHeading : ppt.revHeading) : 
 				this.rev.readerHeading, ppt.artistView)
@@ -1850,7 +1657,7 @@ class Text {
 	}
 
 	isCompositionLoaded() {
-		return !ppt.artistView && ppt.classicalMusicMode && (this.rev.loaded.am && !this.rev.amFallback || this.rev.loaded.wiki && !this.rev.wikiFallback) && !panel.alb.ix;
+		return !ppt.artistView && ppt.classicalMusicMode && (this.rev.loaded.wiki && !this.rev.wikiFallback) && !panel.alb.ix;
 	}
 
 	isLyricsArr(n, v) {
@@ -1858,7 +1665,7 @@ class Text {
 	}
 
 	isMainAvail(n) {
-		return $.source.amLfmWiki.some(v => this[n][v] && ppt[`source${n}`] != 3);
+		return $.source.lfmWiki.some(v => this[n][v] && ppt[`source${n}`] != 2);
 	}
 
 	isSynced(n, lines) {
@@ -1873,7 +1680,6 @@ class Text {
 	isTrackRevAvail(source, o) {
 		if (!o) return -1;
 		switch (source) {
-			case 'am': return (['date', 'wiki'].some(v => $.getProp(o, v, false)) || ['composer', 'genres', 'moods', 'themes'].some(v => $.getProp(o, v, []).length)) ? 0 : -1;
 			case 'lfm': return (['length', 'releases', 'stats', 'wiki'].some(v => $.getProp(o, v, false)) || $.getProp(o, 'tags', []).length) ? 1 : -1;
 			case 'wiki': return (['date', 'length', 'wiki'].some(v => $.getProp(o, v, false)) || ['composer', 'genre'].some(v => $.getProp(o, v, []).length)) ? 2 : -1;
 		}
@@ -1924,7 +1730,8 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		if (typeof trackRev !== 'object' || Array.isArray(trackRev)) { trackRev = {}; } // Regorxxx <- Safecheck against corrupt files ->
 		this.avail.lfmtrk = this.isTrackRevAvail('lfm', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) lfm_tr_mod = trackRev[trk].update;
 
@@ -2040,20 +1847,18 @@ class Text {
 				break
 			}
 		}
-		ppt.sourcebio = $.clamp(ppt.sourcebio, 0 , this.bio.reader ? 3 : 2);
-		ppt.sourcerev = $.clamp(ppt.sourcerev, 0 , this.rev.reader ? 3 : 2);
-		this.bio.source = {
-			am: ppt.sourcebio == 0,
-			lfm: ppt.sourcebio == 1,
-			wiki: ppt.sourcebio == 2,
-			txt: ppt.sourcebio == 3
-		}
-		this.rev.source = {
-			am: ppt.sourcerev == 0,
-			lfm: ppt.sourcerev == 1,
-			wiki: ppt.sourcerev == 2,
-			txt: ppt.sourcerev == 3
-		}
+		ppt.sourcebio = $.clamp(ppt.sourcebio, 0 , this.bio.reader ? 2 : 1);
+		ppt.sourcerev = $.clamp(ppt.sourcerev, 0 , this.rev.reader ? 2 : 1);
+			this.bio.source = {
+				lfm: ppt.sourcebio == 0,
+				wiki: ppt.sourcebio == 1,
+				txt: ppt.sourcebio == 2
+			}
+			this.rev.source = {
+				lfm: ppt.sourcerev == 0,
+				wiki: ppt.sourcerev == 1,
+				txt: ppt.sourcerev == 2
+			}
 		this.bio.readerItem = '';
 		this.rev.readerItem = '';
 		this.reader.items = [];
@@ -2247,7 +2052,7 @@ class Text {
 	}
 
 	resetRevAvailable() {
-		$.source.amLfmWiki.forEach(v => {
+		$.source.lfmWiki.forEach(v => {
 			this.avail[`${v}alb`] = -1;
 			this.avail[`${v}trk`] = -1;
 		});
@@ -2255,7 +2060,7 @@ class Text {
 
 	revPth(n) { 
 		if (ppt.img_only) return ['', '', false, false];
-		const field = n != 'Am' && n != 'Wiki' ? this.album : !ppt.classicalMusicMode || n == 'Am' && this.rev.amFallback || n == 'Wiki' && this.rev.wikiFallback || panel.alb.ix ? this.album : this.composition;
+		const field = n != 'Wiki' ? this.album : !ppt.classicalMusicMode || n == 'Wiki' && this.rev.wikiFallback || panel.alb.ix ? this.album : this.composition;
 		return panel.getPth('rev', panel.id.focus, this.artist, field, '', cfg.supCache, $.clean(this.artist), $.clean(this.albumartist), $.clean(field), `fo${n}Rev`, false);
 	}
 
@@ -2340,8 +2145,7 @@ class Text {
 		this.reader.items.some((v, i) => {
 			if (v.view == n) {
 				if (v.tag) {
-					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', false);
-					//this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', !v.nowPlaying); // Regorxxx <- Fixed text reader not working for selection while playing ->
+					this[n].readerItem = $.eval('[$trim(' + v.pth + ')]', panel.id.focus && !v.nowPlaying); // Regorxxx <- Fixed text reader not working for selection while playing ->
 					if (this[n].readerItem.length) {
 						found = i;
 						return true;
@@ -2439,7 +2243,7 @@ class Text {
 		img.getArtImg();
 		img.getFbImg();
 		this.textUpdate = 0;
-		this.done.amBio = this.done.lfmBio = this.done.amRev = this.done.lfmRev = this.done.wikiRev = false;
+		this.done.lfmBio = this.done.lfmRev = this.done.wikiRev = false;
 	}
 
 	upperCaseFirst(n){
@@ -2615,8 +2419,8 @@ class Text {
 					if (en) {
 						length = $.getProp(o, 'length', '');
 					} else if (panel.summary.other) { // static read
-						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-						if (trackLfmRev && trackLfmRev[trk]) {
+						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+						if (trackLfmRev && typeof trackLfmRev === 'object' && !Array.isArray(trackLfmRev) && trackLfmRev[trk]) { // Regorxxx <- Safecheck against corrupt files ->
 							length = $.getProp(trackLfmRev[trk], 'length', '');
 							if (length) {
 								const ix = cfg.lang.arr.indexOf(lang);

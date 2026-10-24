@@ -620,7 +620,7 @@ class Panel {
 		if (!this.id.lookUp) return;
 		const artist = name.artist(this.id.focus, true) || lg['Artist Unknown'];
 		const albumArtist = (!panel.isRadio(this.id.focus) ? name.albumArtist(this.id.focus, true) : artist) || lg['Artist Unknown'];
-		const composition = isAlbum ? false : ppt.classicalMusicMode && (txt.rev.loaded.am && !txt.rev.amFallback || txt.rev.loaded.wiki && !txt.rev.wikiFallback);
+		const composition = isAlbum ? false : ppt.classicalMusicMode && (txt.rev.loaded.wiki && !txt.rev.wikiFallback);
 		const album = !composition ? name.album(this.id.focus, true) || lg['Album Unknown'] : name.composition(this.id.focus, true) || lg['Composition Unknown'];
 		if (this.lock) {
 			//this.logArtistHistory(artist);
@@ -646,11 +646,12 @@ class Panel {
 			field: '',
 			type: 'Artist'
 		});
-		if (ppt.showSimilarArtists) {
+		if (ppt.showSimilarArtists) { // Regorxxx <- Fallback for similar artist errors
+			let bDone = false;
 			if ($.file(lfmSim)) {
-				const lSim = $.jsonParse(lfmSim, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+				const lSim = $.jsonParse(lfmSim, null, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 				let newStyle = false;
-				if (lSim) {
+				if (lSim && Array.isArray(lSim)) { // Regorxxx <- Safecheck against corrupt files ->
 					if ($.objHasOwnProperty(lSim[0], 'name')) newStyle = true;
 					lSim.shift();
 					$.take(lSim, cfg.menuSimilarNum);
@@ -665,9 +666,11 @@ class Panel {
 							field: '',
 							type: i != arr.length - 1 ? 'similar' : 'similarend'
 						}));
+						bDone = true;
 					}
 				}
-			} else {
+			}
+			if (!bDone) {
 				if ($.file(lfmBio)) {
 					let found = false;
 					sa = tag.getTag(lBio, this.similarArtistsKey).tag;
@@ -1076,14 +1079,16 @@ class Panel {
 	}
 
 	on_notify(info) {
-		const rec = $.jsonParse(info, false);
-		this.style.free.forEach(v => {
-			if (v.name == rec.name) rec.name = rec.name + ' 新';
-		});
-		this.style.free.push(rec);
-		this.sort(this.style.free, 'name');
-		ppt.styleFree = JSON.stringify(this.style.free);
-		this.getStyleNames();
+		const rec = $.jsonParse(info, null);
+		if (rec && typeof rec === 'object' && !Array.isArray(rec)) { // Regorxxx <- Safecheck against corrupt data ->
+			this.style.free.forEach(v => {
+				if (v.name == rec.name) rec.name = rec.name + ' 新';
+			});
+			this.style.free.push(rec);
+			this.sort(this.style.free, 'name');
+			ppt.styleFree = JSON.stringify(this.style.free);
+			this.getStyleNames();
+		}
 	}
 
 	q(n) {

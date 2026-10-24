@@ -344,6 +344,37 @@ function db_keys(table) {
 	} catch (e) { console.log('cover worker db_keys error (table: ' + table + '): ' + e.message); return []; }
 }
 
+// 抓取原生封面（genre_dir 文件或专辑封面），并缩放到 cacheSize
+async function fetch_native_art(msg) {
+	var art = null;
+	if (msg.mode == 'genre_dir') {
+		if (msg.folderPath && msg.dirCoverName) {
+			var dc = msg.dirCoverName.split(';');
+			for (var j = 0; j < dc.length; j++) {
+				var fp = msg.folderPath + dc[j];
+				if (utils.FileExists(fp)) {
+					art = gdi.Image(fp);
+					if (art != null) break;
+				}
+			}
+		} else if (msg.genreImagePath) {
+			art = gdi.Image(msg.genreImagePath);
+		}
+	} else {
+		var result = await utils.GetAlbumArtAsyncV2(0, msg.handle, msg.artId, false);
+		art = result.image;
+	}
+	if (art) {
+		var s = Math.min(msg.cacheSize / art.Width, msg.cacheSize / art.Height);
+		if (s < 1) {
+			var w = Math.floor(art.Width * s);
+			var h = Math.floor(art.Height * s);
+			art = art.Resize(w, h, 2);
+		}
+	}
+	return art;
+}
+
 onmessage = async function (event) {
 	var msg = event.data;
 	switch (msg.cmd) {
@@ -373,36 +404,28 @@ onmessage = async function (event) {
 				var cached = gdi.Image(msg.path);
 				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: cached, fromCache: true });
 			} else {
-				var art = null;
-				if (msg.mode == 'genre_dir') {
-					if (msg.folderPath && msg.dirCoverName) {
-						var dc = msg.dirCoverName.split(';');
-						for (var j = 0; j < dc.length; j++) {
-							var fp = msg.folderPath + dc[j];
-							if (utils.FileExists(fp)) {
-								art = gdi.Image(fp);
-								if (art != null) break;
-							}
-						}
-					} else if (msg.genreImagePath) {
-						art = gdi.Image(msg.genreImagePath);
-					}
-				} else {
-					var result = await utils.GetAlbumArtAsyncV2(0, msg.handle, msg.artId, false);
-					art = result.image;
-				}
-				if (art) {
-					var s = Math.min(msg.cacheSize / art.Width, msg.cacheSize / art.Height);
-					if (s < 1) {
-						var w = Math.floor(art.Width * s);
-						var h = Math.floor(art.Height * s);
-						art = art.Resize(w, h, 2);
-					}
-				}
+				var art = await fetch_native_art(msg);
 				postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: art, fromCache: false });
 			}
 		} catch (e) {
 			postMessage({ cmd: 'cover_image', albumIndex: msg.albumIndex, crc: msg.crc, image: null, fromCache: false });
+		}
+		break;
+	case 'reset_cover':
+		// 右键“刷新本封面缓存”：删除旧缓存（文件+DB记录）→ 重新抓取原生封面 → 保存到缓存
+		try {
+			if (utils.FileExists(msg.path)) { try { utils.RemovePath(msg.path); } catch (e) {} }
+			if (db) { try { db.Exec('DELETE FROM "' + msg.table + '" WHERE crc = ?', [msg.crc]); } catch (e) {} }
+			var art2 = await fetch_native_art(msg);
+			if (art2) {
+				try {
+					art2.SaveAs(msg.path, 'image/jpeg');
+					if (db) db.Exec('INSERT OR IGNORE INTO "' + msg.table + '" (crc) VALUES (?)', [msg.crc]);
+				} catch (e) {}
+			}
+			postMessage({ cmd: 'cover_reset', albumIndex: msg.albumIndex, crc: msg.crc, image: art2 });
+		} catch (e) {
+			postMessage({ cmd: 'cover_reset', albumIndex: msg.albumIndex, crc: msg.crc, image: null });
 		}
 		break;
 	}
@@ -450,6 +473,25 @@ function create_cover_worker() {
 				cover_repaint();
 			}
 			break;
+		case 'cover_reset':
+			// “刷新本封面缓存”完成：更新内存缓存与视图
+			var grpR = (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) ? p.list.groups[msg.albumIndex] : null;
+			if (msg.image) {
+				g_image_cache._cachelist[msg.crc] = msg.image;
+				if (crclist.indexOf(msg.crc) < 0) crclist.push(msg.crc);
+				if (grpR && grpR.cachekey == msg.crc) {
+					grpR.cover_img = msg.image;
+					grpR.load_requested = 1;
+				}
+			} else {
+				delete g_image_cache._cachelist[msg.crc];
+				if (grpR && grpR.cachekey == msg.crc) {
+					grpR.cover_img = images.nocover;
+					grpR.load_requested = 1;
+				}
+			}
+			cover_repaint();
+			break;
 		}
 	};
 	cover_worker.onerror = function (event) {
@@ -484,6 +526,67 @@ function request_cover(albumIndex) {
 		msg.artId = albumart_id;
 	}
 	cover_worker.postMessage(msg);
+}
+
+// 计算单个 handle 所属分组的 cachekey（与 WSHplaylist.js oGroup 构造逻辑一致）
+function get_cachekey_for_handle(handle) {
+	var tf;
+	switch (layout.pattern_idx) {
+	case 0: tf = fb.TitleFormat("alb%album%"); break;
+	case 1: tf = fb.TitleFormat("aa%album artist%-%album%"); break;
+	case 2: tf = fb.TitleFormat("art%album artist%"); break;
+	case 3: tf = fb.TitleFormat("art%artist%"); break;
+	case 4: tf = fb.TitleFormat("gen%genre%"); break;
+	case 5: tf = fb.TitleFormat("$directory_path(%path%)"); break;
+	default: tf = fb.TitleFormat("alb%album%"); break;
+	}
+	return utils.CRC32(tf.EvalWithMetadb(handle));
+}
+
+// 右键菜单“刷新本封面缓存”：按选中曲目算出所属分组（去重），
+// 删除其缓存封面（文件+cache.db记录）后由 worker 重新抓取原生封面并写库
+function reset_cover_from_selection(handleList) {
+	if (!cover_worker || !handleList || handleList.Count == 0) return;
+	var done = [];
+	for (var i = 0; i < handleList.Count; i++) {
+		var handle = handleList[i];
+		var crc = get_cachekey_for_handle(handle);
+		if (done.indexOf(crc) > -1) continue;
+		done.push(crc);
+		// 当前视图内该分组的显示复位（回执到达后重新赋图并重绘）
+		var albumIndex = -1;
+		if (p.list && p.list.groups) {
+			for (var g = 0; g < p.list.groups.length; g++) {
+				if (p.list.groups[g].cachekey == crc) { albumIndex = g; break; }
+			}
+		}
+		if (albumIndex >= 0) {
+			var grp = p.list.groups[albumIndex];
+			grp.cover_img = null;
+			grp.load_requested = 1; // 等待 cover_reset 回执，避免 hit() 并发请求
+		}
+		var msg = {
+			cmd: 'reset_cover',
+			albumIndex: albumIndex,
+			crc: crc,
+			table: get_table_name(cache_subdir),
+			path: cover_cache_folder + cache_subdir + crc + '.jpg',
+			cacheSize: cache_size
+		};
+		if (layout.pattern_idx == 4) {
+			msg.mode = 'genre_dir';
+			msg.genreImagePath = genre_cover_dir + "\\" + GetGenre(fb.TitleFormat("%genre%").EvalWithMetadb(handle)) + ".jpg";
+		} else if (layout.pattern_idx == 5) {
+			msg.mode = 'genre_dir';
+			msg.folderPath = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(handle);
+			msg.dirCoverName = dir_cover_name;
+		} else {
+			msg.mode = 'album';
+			msg.handle = handle;
+			msg.artId = albumart_id;
+		}
+		cover_worker.postMessage(msg);
+	}
 }
 
 image_cache = function() {

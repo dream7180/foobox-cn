@@ -635,14 +635,12 @@ class UserInterface {
 		txt.bio.cur = '';
 		
 		txt.bio.loaded = {
-			am: false,
 			lfm: false,
 			wiki: false,
 			txt: false,
 			ix: -1
 		}
 		txt.rev.loaded = {
-			am: false,
 			lfm: false,
 			wiki: false,
 			txt: false,
@@ -743,7 +741,7 @@ class UserInterface {
 	setStarType() {
 		this.stars = $.value(ppt.star, 1, 1) + 1;
 		if ((!ppt.heading || !ppt.hdBtnShow || ppt.hdPos == 2) && this.stars == 1) this.stars = 2;
-		if (!ppt.amRating && !ppt.lfmRating) this.stars = 0;
+		if (!ppt.lfmRating) this.stars = 0;
 	}
 
 	updateProp(prop, value) {

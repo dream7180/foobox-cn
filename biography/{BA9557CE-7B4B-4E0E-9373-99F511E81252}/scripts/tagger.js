@@ -59,7 +59,7 @@ class Tagger {
 				if ($.file(lfmBio)) {
 					const lBio = $.open(lfmBio);
 					similarArtists[i] = this.getTag(lBio, panel.similarArtistsKey).tag
-					if (similarArtists[i].length > 6) similarArr.push(artist);
+					if (similarArtists[i].length < 6) similarArr.push(artist); // Regorxxx <- Fix similar artists tagging (inverted condition) ->
 				}
 			}
 		}
@@ -205,14 +205,9 @@ class Tagger {
 		let cur_albumArtist = '####';
 		let cur_album = '####';
 		let album = '';
-		const albGenre_am = [];
 		const albGenre_w = [];
 		const albListeners = [];
 		const albTags = [];
-		const amMoods = [];
-		const amRating = [];
-		const amThemes = [];
-		const artGenre_am = [];
 		const artGenre_w = [];
 		const artListeners = [];
 		const artTags = [];
@@ -243,20 +238,20 @@ class Tagger {
 			if (artist != cur_artist) {
 				cur_artist = artist;
 				similarArtists[i] = '';
-				if (cfg.tagEnabled7 || cfg.tagEnabled8 || cfg.tagEnabled9 || cfg.tagEnabled10 && cfg.tagEnabled13 < 7 || force) {
+				if (cfg.tagEnabled2 || cfg.tagEnabled3 || cfg.tagEnabled4 || cfg.tagEnabled5 && cfg.tagEnabled8 < 7 || force) {
 					artTags[i] = '';
 					artListeners[i] = '';
 					locale[i] = '';
 					const lfmBio = panel.cleanPth(cfg.pth.foLfmBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foLfmBio + '.txt';
 					if ($.file(lfmBio)) {
 						const lBio = $.open(lfmBio);
-						if (cfg.tagEnabled7 || force) {
+						if (cfg.tagEnabled2 || force) {
 							artTags[i] = this.getTag(lBio, 'Top Tags: ').tag;
 							if (artTags[i]) artTags[i] = this.lfmTidy(artTags[i]);
 						}
-						if (cfg.tagEnabled8) artListeners[i] = this.getTag(lBio, lkw, false, 1, 'artist').tag;
-						if (cfg.tagEnabled9 || force) locale[i] = this.getTag(lBio, kww).tag;
-						if ((cfg.tagEnabled10 || force) && cfg.tagEnabled13 < 7) {
+						if (cfg.tagEnabled3) artListeners[i] = this.getTag(lBio, lkw, false, 1, 'artist').tag;
+						if (cfg.tagEnabled4 || force) locale[i] = this.getTag(lBio, kww).tag;
+						if ((cfg.tagEnabled5 || force) && cfg.tagEnabled8 < 7) {
 							similarArtists[i] = this.getTag(lBio, panel.similarArtistsKey).tag;
 							if (similarArtists[i].length > 6) {
 								similarArtists[i] = '';
@@ -267,12 +262,12 @@ class Tagger {
 									}
 								});
 							}
-							if (similarArtists[i]) $.take(similarArtists[i], cfg.tagEnabled13);
+							if (similarArtists[i]) $.take(similarArtists[i], cfg.tagEnabled8);
 						}
 					}
 				}
 				if (!similarArtists[i].length) similarArtists[i] = '';
-				if (cfg.tagEnabled12 || !locale[i] && notify || force) {
+				if (cfg.tagEnabled7 || !locale[i] && notify || force) {
 					artGenre_w[i] = '';
 					const wikiBio = panel.cleanPth(cfg.pth.foWikiBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foWikiBio + '.txt';
 					if ($.file(wikiBio)) {
@@ -281,21 +276,8 @@ class Tagger {
 						if (!locale[i] && notify) locale[i] = this.getTag(wBio, kww).tag;
 					}
 				}
-				if (cfg.tagEnabled4 || !locale[i] && notify || force) {
-					artGenre_am[i] = '';
-					const amBio = panel.cleanPth(cfg.pth.foAmBio, !radioStream ? handles[i] : panel.id.focus, !radioStream ? 'tag' : 'notifyRadioStream') + $.clean(artist) + cfg.suffix.foAmBio + '.txt';
-					if ($.file(amBio)) {
-						const aBio = $.open(amBio);
-						artGenre_am[i] = this.getTag(aBio, 'Genre: ').tag;
-						const localeTag = this.getTag(aBio, 'Formed: |Born: ').tag;
-						if (localeTag.length && !/\s*in\s/.test(localeTag[0])) localeTag.shift();
-						if (localeTag.length && /\s*in\s/.test(localeTag[0])) localeTag[0] = localeTag[0].split(/\s*in\s/)[1].trim();
-						if (!locale[i] && notify) locale[i] = localeTag;
-						if (!locale[i] || !locale[i].length) locale[i] = ''; // Regorxxx <- Fix tagging crash ->
-					}
-				}
 				// Regorxxx <- Fix country retrieval if flag is available with other methods
-				if (!locale[i] && (notify || cfg.tagEnabled9 || force)) {
+				if (!locale[i] && (notify || cfg.tagEnabled4 || force)) {
 					let code = (txt.countryCodesDic[artist.toLowerCase()] || '').slice(0, 2);
 					let country = '';
 					if (code) { country = codeToCountry[code] || ''; }
@@ -305,7 +287,6 @@ class Tagger {
 				}
 				// Regorxxx ->
 			} else {
-				artGenre_am[i] = artGenre_am[i - 1];
 				artGenre_w[i] = artGenre_w[i - 1];
 				artListeners[i] = artListeners[i - 1];
 				artTags[i] = artTags[i - 1];
@@ -315,32 +296,7 @@ class Tagger {
 			if (albumArtist + album != cur_albumArtist + cur_album) {
 				cur_albumArtist = albumArtist;
 				cur_album = album;
-				if (cfg.tagEnabled0 || cfg.tagEnabled1 || cfg.tagEnabled2 || cfg.tagEnabled3 || force) {
-					albGenre_am[i] = '';
-					amMoods[i] = '';
-					amRating[i] = '';
-					amThemes[i] = '';
-					let amRev = panel.cleanPth(cfg.pth.foAmRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foAmRev + '.txt';
-					if (amRev.length > 259) {
-						album = $.abbreviate(album);
-						amRev = panel.cleanPth(cfg.pth.foAmRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foAmRev + '.txt';
-					}
-					if ($.file(amRev)) {
-						const aRev = $.open(amRev);
-						if (cfg.tagEnabled0 || force) albGenre_am[i] = this.getTag(aRev, 'Genre: ').tag;
-						if (cfg.tagEnabled1 || force) amMoods[i] = this.getTag(aRev, 'Album Moods: ').tag;
-						if (cfg.tagEnabled2) {
-							const b = aRev.indexOf('>> Album rating: ') + 17;
-							const f = aRev.indexOf(' <<');
-							if (b != -1 && f != -1 && f > b) {
-								amRating[i] = aRev.substring(b, f).trim() * 2;
-								if (amRating[i] == 0) amRating[i] = '';
-							}
-						}
-						if (cfg.tagEnabled3 || force) amThemes[i] = this.getTag(aRev, 'Album Themes: ').tag;
-					}
-				}
-				if (cfg.tagEnabled5 || cfg.tagEnabled6 || force) {
+				if (cfg.tagEnabled0 || cfg.tagEnabled1 || force) {
 					albTags[i] = '';
 					albListeners[i] = '';
 					let lfmRev = panel.cleanPth(cfg.pth.foLfmRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foLfmRev + '.txt';
@@ -350,14 +306,14 @@ class Tagger {
 					}
 					if ($.file(lfmRev)) {
 						const lRev = $.open(lfmRev);
-						if (cfg.tagEnabled5 || force) {
+						if (cfg.tagEnabled0 || force) {
 							albTags[i] = this.getTag(lRev, 'Top Tags: ').tag;
 							if (albTags[i]) albTags[i] = this.lfmTidy(albTags[i]);
 						}
-						if (cfg.tagEnabled6) albListeners[i] = this.getTag(lRev, lkw, false, 1, 'album').tag;
+						if (cfg.tagEnabled1) albListeners[i] = this.getTag(lRev, lkw, false, 1, 'album').tag;
 					}
 				}
-				if (cfg.tagEnabled11 || force) {
+				if (cfg.tagEnabled6 || force) {
 					albGenre_w[i] = '';
 					let wikiRev = panel.cleanPth(cfg.pth.foWikiRev, handles[i], 'tag') + $.clean(albumArtist) + ' - ' + $.clean(album) + cfg.suffix.foWikiRev + '.txt';
 					if (wikiRev.length > 259) {
@@ -370,34 +326,25 @@ class Tagger {
 					}
 				}
 			} else {
-				albGenre_am[i] = albGenre_am[i - 1];
 				albGenre_w[i] = albGenre_w[i - 1];
 				albListeners[i] = albListeners[i - 1];
-				amMoods[i] = amMoods[i - 1];
-				amRating[i] = amRating[i - 1];
-				amThemes[i] = amThemes[i - 1];
 				albTags[i] = albTags[i - 1];
 			}
 		}
 
-		for (let j = 0; j < 13; j++) this[`tagName${j}`] = !notify ? cfg[`tagName${j}`] : cfg[`tagName${j}_internal`].default_value;
+		for (let j = 0; j < 8; j++) this[`tagName${j}`] = !notify ? cfg[`tagName${j}`] : cfg[`tagName${j}_internal`].default_value;
 
 		for (let i = 0; i < handles.Count; i++) {
-			if (!cue[i] && (albGenre_am[i] || amMoods[i] || amRating[i] || amThemes[i] || artGenre_am[i] || albTags[i] || albListeners[i] || artTags[i] || artListeners[i] || locale[i] || similarArtists[i] || albGenre_w[i] || artGenre_w[i])) {
+			if (!cue[i] && (albTags[i] || albListeners[i] || artTags[i] || artListeners[i] || locale[i] || similarArtists[i] || albGenre_w[i] || artGenre_w[i])) {
 				const tg = {};
-				if (albGenre_am[i]) tg[this.tagName0] = albGenre_am[i];
-				if (amMoods[i]) tg[this.tagName1] = amMoods[i];
-				if (amRating[i]) tg[this.tagName2] = amRating[i];
-				if (amThemes[i]) tg[ this.tagName3] = amThemes[i];
-				if (artGenre_am[i]) tg[this.tagName4] = artGenre_am[i];
-				if (albTags[i]) tg[this.tagName5] = albTags[i];
-				if (albListeners[i]) tg[this.tagName6] = albListeners[i];
-				if (artTags[i]) tg[this.tagName7] = artTags[i];
-				if (artListeners[i]) tg[this.tagName8] = artListeners[i];
-				if (locale[i]) tg[this.tagName9] = locale[i];
-				if (similarArtists[i]) tg[this.tagName10] = similarArtists[i];
-				if (albGenre_w[i]) tg[this.tagName11] = albGenre_w[i];
-				if (artGenre_w[i]) tg[this.tagName12] = artGenre_w[i];
+				if (albTags[i]) tg[this.tagName0] = albTags[i];
+				if (albListeners[i]) tg[this.tagName1] = albListeners[i];
+				if (artTags[i]) tg[this.tagName2] = artTags[i];
+				if (artListeners[i]) tg[this.tagName3] = artListeners[i];
+				if (locale[i]) tg[this.tagName4] = locale[i];
+				if (similarArtists[i]) tg[this.tagName5] = similarArtists[i];
+				if (albGenre_w[i]) tg[this.tagName6] = albGenre_w[i];
+				if (artGenre_w[i]) tg[this.tagName7] = artGenre_w[i];
 				tags.push(tg);
 			} else rem.push(i);
 		}

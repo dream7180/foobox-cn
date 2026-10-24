@@ -22,10 +22,9 @@ const files = [
 	'language.js',
 	'panel.js',
 	'server.js',
-	'allmusic.js',
 	'lastfm.js',
 	'wikipedia.js',
-	'names.js',
+	'miscclasses.js',
 	'scrollbar.js',
 	'buttons.js',
 	'menu.js',
@@ -33,14 +32,10 @@ const files = [
 	'lyrics.js',
 	'tagger.js',
 	'resize.js',
-	'library.js',
 	'images.js',
 	'filmstrip.js',
-	'timers.js',
-	'popupbox.js',
-	'initialise.js',
-	'callbacks.js'
-];
+	'initcallbacks.js'
+].filter(Boolean);
 
 if (loadAsync) {
 	readFiles(files).then(() => {

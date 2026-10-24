@@ -47,7 +47,7 @@ class DldLastfmBio {
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = this.searchBio == 3 ? 'https://' + server.lfm.server + '/music/' + encodeURIComponent(this.artist) + '/' + encodeURIComponent(this.itemValue[0]) : this.searchBio == 2 ? 'https://www.last.fm/music/' + encodeURIComponent(this.artist) + '/+albums' : 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.artist) + (this.searchBio ? '/+wiki' : '');
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.artist + this.pth_bio + URL))) return;
+		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.artist + this.pth_bio + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
@@ -93,7 +93,7 @@ class DldLastfmBio {
 						this.itemDate = v.innerText.trim();
 						return true;
 					});
-					$.htmlParse(h3, 'className', 'catalogue-overview-similar-artists-full-width-item-name', v => {
+					$.htmlParse(h3, 'className', 'catalogue-overview-similar-artists-item-name', v => { // Regorxxx <- Fix similar artists retrieval ->
 						this.simArtists.push($.titlecase(v.innerText.trim()))
 					});
 					$.htmlParse(h4, 'className', 'header-metadata-tnew-title', v => {
@@ -292,7 +292,7 @@ class LfmArtImg {
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.dl_ar) + '/+images';
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.dl_ar + this.getNo + this.autoAdd + this.img_folder + URL))) return;
+		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.dl_ar + this.getNo + this.autoAdd + this.img_folder + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
@@ -429,7 +429,7 @@ class LfmAlbum {
 		this.func = null;
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.albumArtist + this.album + this.albm + this.rev + this.rev_img + (cfg.imgRevHQ || !this.rev_img) + this.pth + URL))) return;
+		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.albumArtist + this.album + this.albm + this.rev + this.rev_img + (cfg.imgRevHQ || !this.rev_img) + this.pth + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (!this.getStats && this.rev || !this.rev) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
@@ -611,9 +611,11 @@ class LfmTrack {
 				if (!server.lfm.def_EN && !this.retry) URL += '&lang=' + cfg.language.toLowerCase();
 				URL += '&method=track.getInfo&artist=' + encodeURIComponent(this.artist) + '&track=' + encodeURIComponent(this.track) + '&autocorrect=' + server.auto_corr;
 			} else {
-				this.text = $.jsonParse(this.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-				if (!this.text) this.text = {
-					ids: {}
+				this.text = $.jsonParse(this.pth, null, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+				if (!this.text || typeof this.text !== 'object' || Array.isArray(this.text)) { // Regorxxx <- Safecheck against corrupt files (fixed NEW typo: text -> this.text) ->
+					this.text = {
+						ids: {}
+					};
 				}
 				URL = 'https://' + server.lfm.server + '/music/' + encodeURIComponent(this.artist) + '/_/' + encodeURIComponent(this.track);
 			}
@@ -633,7 +635,7 @@ class LfmTrack {
 		this.func = null;
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
-		if (ppt.multiServer && !this.force && server.urlDone(md5.hashStr(this.artist + this.track + this.pth + URL))) return;
+		if (ppt.multiServer && !this.force && server.urlDone(utils.MD5(this.artist + this.track + this.pth + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (!this.getStats && !this.lfm_done) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
@@ -663,7 +665,9 @@ class LfmTrack {
 					this.wiki = this.wiki.replace(/\n/g, '\r\n').replace(/(\r\n)(\r\n)+/g, '\r\n\r\n').replace(/\[edit\]\s*$/i, '').trim();
 				}
 				const tags = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'track.toptags.tag');
-				this.tags = tags.map( v => $.titlecase(v.name));
+				this.tags = Array.isArray(tags) // Regorxxx <- Safecheck against corrupt files ->
+					? tags.map(v => $.titlecase(v.name))
+					: [];
 				this.tags.length = Math.min(5, this.tags.length);
 				this.length = this.convertDuration($.jsonParse(this.xmlhttp.responseText, '', 'get', 'track.duration'));
 				if (!this.wiki) {
@@ -851,7 +855,7 @@ class LfmSimilarArtists {
 	analyse() {
 		const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'similarartists.artist');
 		let list = [];
-		if ((data.length < this.lmt) && !this.retry) {
+		if ((!Array.isArray(data) || data.length < this.lmt) && !this.retry) { // Regorxxx <- Safecheck against corrupt files ->
 			this.retry = true;
 			return this.search(this.artist, this.done, this.handles, this.lmt, this.pth_sim, this.fn_sim);
 		}
@@ -987,7 +991,7 @@ class DldLastfmGenresWhitelist {
 		if (genres.length > 860) {
 			const pth = `${cfg.storageFolder}lastfm_genre_whitelist.json`;
 			const existingGenres = $.jsonParse(pth, [], 'file-utf8'); // Regorxxx <-- Force UTF-8
-			if (genres.length > existingGenres.length) {
+			if (!Array.isArray(existingGenres) || genres.length > existingGenres.length) { // Regorxxx <- Safecheck against corrupt files ->
 				$.buildPth(pth);
 				$.save(pth, JSON.stringify(genres), true);
 			}

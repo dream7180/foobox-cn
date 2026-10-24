@@ -40,7 +40,6 @@ class Server {
 			server: cfg.language.toLowerCase()
 		};
 		this.url = {
-			am: 'https://www.allmusic.com/search/',
 			lfm: 'https://ws.audioscrobbler.com/2.0/?format=json' + panel.lfm,
 			lfm_sf: 'https://www.songfacts.com/',
 			mb: 'https://musicbrainz.org/ws/2/',
@@ -100,7 +99,7 @@ class Server {
 		if (tr.artist + tr.title == this.id.track_1 && !tr.force && !tr.menu || tr.artist == '' || tr.title == '') track_done = true;
 		else this.id.track_1 = tr.artist + tr.title;
 
-		if ((cfg.dlAmRev || cfg.dlLfmRev || cfg.dlWikiRev) && !track_done) {
+		if ((cfg.dlLfmRev || cfg.dlWikiRev) && !track_done) {
 			if (ppt.showTrackRevOptions) this.getTrack(tr);
 			else window.NotifyOthers('bio_chkTrackRev', tr);
 		}
@@ -108,7 +107,8 @@ class Server {
 
 	done(f, exp) {
 		if (!$.file(this.notFound)) return false;
-		const m = $.jsonParse(this.notFound, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		const m = $.jsonParse(this.notFound, [], 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		if (!Array.isArray(m)) { $.deleteFile(this.notFound, true); return false; } // Regorxxx <- Safecheck against corrupt files
 		const n = Date.now();
 		const r = n - exp;
 		const u = n - panel.d / 28;
@@ -186,8 +186,7 @@ class Server {
 
 	download(force, art, alb, name) {
 		this.getBio(force, art, 0);
-		if (name == 'bio_lookUpItem') this.getBio(force, art, 1); // am bio direct
-		this.getRev(force, art, alb, force == 2 ? true : false);
+		this.getRev(force, art, alb);
 	}
 
 	downloadDynamic() {
@@ -196,11 +195,6 @@ class Server {
 			focus: false,
 			arr: []
 		}, 0);
-		this.getBio(false, {
-			ix: 0,
-			focus: false,
-			arr: []
-		}, 1);
 	}
 
 	format(n) {
@@ -317,18 +311,6 @@ class Server {
 				}
 				break;
 			}
-			case 1: {
-				if (!cfg.dlAmBio || !this.artist) return;
-				if (!stndBio) title = '';
-				const am_bio = panel.getPth('bio', art.focus, this.artist, '', stndBio, supCache, $.clean(this.artist), '', '', 'foAmBio', true, true);
-
-				if (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + this.artist + ' - ' + title, false) && !$.open(am_bio.pth).includes('Custom Biography')) {
-					const dl_am_bio = new DldAllmusicBio;
-					const url = title ? server.url.am + 'songs/' + encodeURIComponent(title + ' ' + this.artist) : server.url.am + 'artists/' + encodeURIComponent(this.artist);
-					dl_am_bio.init(url, 'https://allmusic.com', title, this.artist, am_bio.fo, am_bio.pth, force);
-				}
-				break;
-			}
 		}
 	}
 
@@ -376,15 +358,14 @@ class Server {
 		return r;
 	}
 
-	getRev(force, art, alb, onlyForceLfm) { // also gets bios that depend on rev
+	getRev(force, art, alb) { // also gets bios that depend on rev
 		const stndAlb = !alb.ix || alb.ix + 1 > alb.arr.length;
 		const new_album_id = stndAlb ? $.eval(cfg.tf.albumArtist + cfg.tf.album, alb.focus, true) : alb.arr[alb.ix].artist + alb.arr[alb.ix].album;
 		const new_composition_id = stndAlb ? $.eval(cfg.tf.albumArtist + cfg.tf.composition, alb.focus, true) : '';
 		const new_title_id = name.title(art.focus, true);
 		let supCache = false;
 
-		let title_done = false;
-		if (new_title_id == this.id.title) title_done = true; else this.id.title = new_title_id;
+		if (new_title_id != this.id.title) this.id.title = new_title_id;
 
 		let sameComposition = true;
 		if (cfg.classicalModeEnable && !alb.ix) {
@@ -392,9 +373,6 @@ class Server {
 		}
 
 		if (new_album_id == this.id.album && sameComposition && !force) {
-			if (!title_done) {
-				this.getBio(force, art, 1);
-			}
 			return;
 		}
 		this.id.album = new_album_id;
@@ -405,54 +383,12 @@ class Server {
 		this.albumArtist = stndAlb ? name.albumArtist(alb.focus, true) : alb.arr[alb.ix].artist;
 		this.composition = cfg.classicalModeEnable && stndAlb ? name.composition(alb.focus, true) : '';
 
-		if ((!this.album && !this.composition) || !this.albumArtist) return this.getBio(force, art, 1);
+		if ((!this.album && !this.composition) || !this.albumArtist) return;
 
 		if (!stndAlb) supCache = cfg.supCache && !lib.inLibrary(1, this.albumArtist, this.album);
 		if (stndAlb) {
 			if (this.albm) this.getCover(force, alb);
 		} else if (force && cfg.dlRevImg) this.getRevImg(this.albumArtist, this.album, '', '', force);
-
-		const am_rev = panel.getPth('rev', alb.focus, this.albumArtist, this.album, stndAlb, supCache, $.clean(this.albumArtist), $.clean(this.albumArtist), $.clean(this.album), 'foAmRev', true, true);
-		const artiste = stndAlb ? name.artist(alb.focus, true) : this.albumArtist;
-		const am_bio = panel.getPth('bio', alb.focus, artiste, '', stndAlb, cfg.supCache && !lib.inLibrary(0, artiste), $.clean(artiste), '', '', 'foAmBio', true, true);
-		const va = this.albumArtist.toLowerCase() == cfg.va.toLowerCase() || this.albumArtist.toLowerCase() != artiste.toLowerCase();
-
-		if (this.album) {
-			if (!onlyForceLfm) {
-				const art_upd = cfg.dlAmBio && (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + am_rev.pth, false) && !$.open(am_bio.pth).includes('Custom Biography'));
-				let rev_upd = false;
-				if (cfg.dlAmRev) {
-					rev_upd = force;
-					if (!rev_upd) {
-						rev_upd = !$.file(am_rev.pth) && !this.done('Rev ' + cfg.partialMatch + ' ' + am_rev.pth, this.exp);
-					}
-				}
-				let dn_type = '';
-				if (rev_upd || art_upd) {
-					if (rev_upd && art_upd) dn_type = 'review+biography';
-					else if (rev_upd) dn_type = 'review';
-					else if (art_upd) dn_type = 'biography';
-					const dl_am_rev = new DldAllmusicRev;
-					dl_am_rev.init(server.url.am + 'albums/' + encodeURIComponent(this.album + (!va ? ' ' + this.albumArtist : '')), 'https://allmusic.com', this.album, this.albumArtist, artiste, va, dn_type, am_rev.fo, am_rev.pth, am_bio.fo, am_bio.pth, art, force);
-				}
-			}
-		} else this.getBio(force, art, 1);
-
-		if (cfg.dlAmRev && this.composition && !onlyForceLfm) {
-			const am_comp = panel.getPth('rev', alb.focus, this.albumArtist, this.composition, stndAlb, supCache, $.clean(this.albumArtist), $.clean(this.albumArtist), $.clean(this.composition), 'foAmRev', true, true);	
-			const comp_upd = !alb.ix && (force || !$.file(am_comp.pth) && !this.done('Rev ' + cfg.partialMatch + ' ' + am_comp.pth, this.exp));
-
-			if (comp_upd) {
-				const artUpd = cfg.dlAmBio && (force || this.expired(am_bio.pth, this.exp, 'Bio ' + cfg.partialMatch + ' ' + am_comp.pth, false) && !$.open(am_bio.pth).includes('Custom Biography'));
-				const dn_type = comp_upd && artUpd ? 'composition+biography' : 'composition';
-				const amAlbumArtist = this.albumArtist;
-				const amWork = this.composition;
-				setTimeout(() => {
-				const dl_am_comp = new DldAllmusicRev;
-					dl_am_comp.init(server.url.am + 'compositions/' + encodeURIComponent(amWork + (!va ? ' ' + amAlbumArtist : '')), 'https://allmusic.com', amWork, amAlbumArtist, artiste, va, dn_type, am_rev.fo, am_comp.pth, am_bio.fo, am_bio.pth, art, force);
-				}, 3200); // throttle
-			}
-		}
 
 		if (cfg.dlLfmRev && this.album) {
 			const lfm_rev = panel.getPth('rev', alb.focus, this.albumArtist, this.album, stndAlb, supCache, $.clean(this.albumArtist), $.clean(this.albumArtist), $.clean(this.album), 'foLfmRev', true, true);
@@ -552,23 +488,6 @@ class Server {
 		if (this.id.track_2 == tr.artist + tr.title && !tr.force && !tr.menu) return;
 		this.id.track_2 = tr.artist + tr.title;
 		const trk = tr.title.toLowerCase();
-
-		if (cfg.dlAmRev) {
-			const amTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foAmRev', true, true);
-			const am_bio = panel.getPth('bio', tr.focus, tr.artist, '', true, cfg.supCache && !lib.inLibrary(0, tr.artist), $.clean(tr.artist), '', '', 'foAmBio', true, true);
-			const amText = $.jsonParse(amTracks.pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-			const amArtist = tr.artist;
-			const amTrk = trk;
-
-			let track_upd = !this.done('Rev ' + cfg.partialMatch + ' ' + amTracks.pth + ' ' + trk + ' ' + tr.artist, this.exp * 6);
-			track_upd = track_upd && (!amText || !amText[trk] || !amText[trk].wiki && amText[trk].update < Date.now() - this.exp * 6) || tr.force;
-			if (track_upd) {
-				setTimeout(() => {
-					const dl_am_trk = new DldAllmusicRev;
-					dl_am_trk.init(server.url.am + 'songs/' + encodeURIComponent(amTrk + ' ' + amArtist), 'https://allmusic.com', amTrk, amArtist, amArtist, false, 'track', amTracks.fo, amTracks.pth, am_bio.fo, am_bio.pth, [], tr.force);
-				}, 1600); // throttle
-			}
-		}
 
 		if (cfg.dlLfmRev) {
 			const lfmTracks = panel.getPth('track', tr.focus, tr.artist, 'Track Reviews', '', '', $.clean(tr.artist), '', 'Track Reviews', 'foLfmRev', true, true);
@@ -674,14 +593,17 @@ class Server {
 
 	updateNotFound(f) {
 		if (!$.file(this.notFound)) return;
-		const m = $.jsonParse(this.notFound, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-		for (let k = 0; k < m.length; k++)
-			if (m[k].name == f) return;
-		m.push({
-			'name': f,
-			'time': Date.now()
-		});
-		$.save(this.notFound, JSON.stringify(m, null, 3), true);
+		const m = $.jsonParse(this.notFound, [], 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		// Regorxxx <- Safecheck against corrupt files
+		if (Array.isArray(m)) {
+			for (let k = 0; k < m.length; k++)
+				if (m[k].name == f) return;
+			m.push({
+				'name': f,
+				'time': Date.now()
+			});
+			$.save(this.notFound, JSON.stringify(m, null, 3), true);
+		} else { $.deleteFile(this.notFound, true); }
 	}
 
 	urlDone(n) {

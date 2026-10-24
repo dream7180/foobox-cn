@@ -76,8 +76,6 @@ class Settings {
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
 			foLfmBio: ' [Lastfm Biography]',
-			foAmRev: ' [Allmusic Review]',
-			foAmBio: ' [Allmusic Biography]',
 			foWikiRev: ' [Wikipedia Review]',
 			foWikiBio: ' [Wikipedia Biography]'
 		}
@@ -87,6 +85,15 @@ class Settings {
 
 	init(settings) {
 		const update = this.checkCfg();
+		// migrate old tag settings (0-4 AllMusic removed; shift 5-13 down by 5)
+		if (this.cfg.tagEnabled13 !== undefined) {
+			for (let j = 0; j < 9; j++) {
+				this.cfg[`tagEnabled${j}`] = this.cfg[`tagEnabled${j + 5}`];
+				if (j < 8) this.cfg[`tagName${j}`] = this.cfg[`tagName${j + 5}`];
+			}
+			for (let j = 9; j < 14; j++) delete this.cfg[`tagEnabled${j}`];
+			for (let j = 8; j < 13; j++) delete this.cfg[`tagName${j}`];
+		}
 		this.settingsKeys = settings.map(v => v[3]);
 		settings.forEach(v => {
 			// this.validate(v); debug
@@ -96,8 +103,8 @@ class Settings {
 			delete this.cfg.langLfm;
 			delete this.cfg.langLfmFallback;
 			this.autoCache = 0;
-			this.tagName6 = 'Album Statistics Last.fm';
-			this.tagName8 = 'Artist Statistics Last.fm';
+			this.tagName1 = 'Album Statistics Last.fm';
+			this.tagName3 = 'Artist Statistics Last.fm';
 		}
 		this.autoCacheTime = $.clamp(this.autoCacheTime, 0, 4);
 		this.cacheTime = [0, 28, 14, 7, 1][this.autoCacheTime] * 86400000;
@@ -272,7 +279,7 @@ class Settings {
 				clearTimeout(tmpFileTimer);
 				return;
 			}
-			const pths = ['biography\\allmusic\\', 'biography\\lastfm\\', 'biography\\wikipedia\\', 'review\\allmusic\\', 'review\\lastfm\\', 'review\\wikipedia\\', 'lastfm\\'];
+			const pths = ['biography\\lastfm\\', 'biography\\wikipedia\\', 'review\\lastfm\\', 'review\\wikipedia\\', 'lastfm\\'];
 			const paths = pths.filter(v => $.folder(this.cachePath + v));
 				let i = 0;
 				let fileTimer = setInterval(() => {
@@ -393,8 +400,8 @@ class Settings {
 	}
 
 	parse() {
-		const bioRevItems = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foAmRev', 'foAmBio', 'foWikiRev', 'foWikiBio'];
-		const items = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foLfmSim', 'foAmRev', 'foAmBio', 'foWikiRev', 'foWikiBio', 'foImgCov', 'fnImgCov'];
+		const bioRevItems = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foWikiRev', 'foWikiBio'];
+		const items = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'foImgCov', 'fnImgCov'];
 		const tfIni = ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'];
 		const tfItems = ['albumArtist', 'artist', 'album', 'title', 'composition'];
 		const tfNames = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%', '%BIO_ALBUM%'];
@@ -413,7 +420,7 @@ class Settings {
 		tfItems.forEach(v => this.tf[v] = this.substituteTf(this.tf[v]));
 
 		items.forEach((v, i) => {
-			if (!this.autoCache || i > 7) this.pth[v] = this[v];
+			if (!this.autoCache || i > 5) this.pth[v] = this[v];
 			else {
 				this.pth[v] = this.remap[v] = this[`${v}_internal`].default_value.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
 			}
@@ -428,20 +435,18 @@ class Settings {
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
 			foLfmBio: ' [Lastfm Biography]',
-			foAmRev: ' [Allmusic Review]',
-			foAmBio: ' [Allmusic Biography]',
 			foWikiRev: ' [Wikipedia Review]',
 			foWikiBio: ' [Wikipedia Biography]'
 		}
 
-		const needRevSuffix = [...new Set([this.pth.foLfmRev, this.pth.foAmRev, this.pth.foWikiRev])].length != 3;
+		const needRevSuffix = [...new Set([this.pth.foLfmRev, this.pth.foWikiRev])].length != 2;
 		if (!needRevSuffix) {
-			this.suffix.foLfmRev = this.suffix.foAmRev = this.suffix.foWikiRev = '';
+			this.suffix.foLfmRev = this.suffix.foWikiRev = '';
 		}
 
-		const needBioSuffix = [...new Set([this.pth.foLfmBio, this.pth.foAmBio, this.pth.foWikiBio])].length != 3;
+		const needBioSuffix = [...new Set([this.pth.foLfmBio, this.pth.foWikiBio])].length != 2;
 		if (!needBioSuffix) {
-			this.suffix.foLfmBio = this.suffix.foAmBio = this.suffix.foWikiBio = '';
+			this.suffix.foLfmBio = this.suffix.foWikiBio = '';
 		}
 
 		this.albCovFolder = this.substituteTf(this.expandPath(this.foCycCov));
@@ -452,7 +457,7 @@ class Settings {
 		if (!this.lang.ok) this.language = 'EN';
 		this.menuSimilarNum = $.clamp(this.menuSimilarNum, 0, 10);
 		this.lfmSim = this.dlLfmSim;
-		if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled10 || this.tagEnabled13 < 7)) this.lfmSim = false;
+		if (this.lfmSim && this.menuSimilarNum < 7 && (!this.tagEnabled5 || this.tagEnabled8 < 7)) this.lfmSim = false;
 		if (this.local) {
 			this.pth.foLfmSim = this.pth.foLfmSim.replace('{BA9557CE-7B4B-4E0E-9373-99F511E81252}', '{F5E9D9EB-42AD-4A47-B8EE-C9877A8E7851}').replace('biography-cache', 'find-&-play-cache');
 			this.lfmSim = false;
@@ -466,7 +471,7 @@ class Settings {
 		this.fuzzyMatchTrack = $.clamp(this.fuzzyMatchTrack, 0, 100);
 		this.fuzzyMatchComposition = $.clamp(this.fuzzyMatchComposition, 0, 100);
 		this.partialMatch = this.partialMatchEnabled + '-' + this.fuzzyMatchReview + '-' + this.fuzzyMatchTrack + '-' + this.fuzzyMatchComposition;
-		this.tagEnabled13 = $.clamp(this.tagEnabled13, 1, 6);
+		this.tagEnabled8 = $.clamp(this.tagEnabled8, 1, 6);
 		
 		if (this.autoCache) {
 			this.remap['foImgRev'] = this['foImgRev_internal'].default_value.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
@@ -572,13 +577,11 @@ class Settings {
 			this.language = this.lang.arr[this.lang.ix];
 		} else this.toggle('languageFallback');
 		txt.bio.subhead = {
-			am: [this.amDisplayName, `${this.amDisplayName} ${txt.bio.lang[this.lang.ix]}`],
 			lfm: [this.lfmDisplayName, `${this.lfmDisplayName} ${txt.bio.lang[this.lang.ix]}`],
 			wiki: [this.wikiDisplayName, `${this.wikiDisplayName} ${txt.bio.lang[this.lang.ix]}`],
 			txt: ['', '']
 		}
 		txt.rev.subhead = {
-			am: [this.amDisplayName, `${this.amDisplayName} ${txt.rev.lang[this.lang.ix]}`],
 			lfm: [this.lfmDisplayName, `${this.lfmDisplayName} ${txt.rev.lang[this.lang.ix]}`],
 			wiki: [this.wikiDisplayName, `${this.wikiDisplayName} ${txt.rev.lang[this.lang.ix]}`],
 			txt: ['', '']
@@ -591,14 +594,12 @@ class Settings {
 		txt.bio.cur = '';
 		
 		txt.bio.loaded = {
-			am: false,
 			lfm: false,
 			wiki: false,
 			txt: false,
 			ix: -1
 		}
 		txt.rev.loaded = {
-			am: false,
 			lfm: false,
 			wiki: false,
 			txt: false,
@@ -623,10 +624,10 @@ class Settings {
 
 	setTag(i, handles) {
 		switch (true) {
-			case i && i < 14:
+			case i && i < 9:
 				this.toggle(`tagEnabled${i - 1}`);
 				break;
-			case i == 14: {
+			case i == 9: {
 				const cur = $.jsonParse(ppt.get('Biography Dialog Box'), {});
 				ppt.set('Biography Dialog Box', JSON.stringify({
 					w: cur.w,
@@ -640,15 +641,15 @@ class Settings {
 				this.open();
 				break;
 			}
-			case i == 15: {
+			case i == 10: {
 				if (!this.taggerConfirm) {
-					if (this.tagEnabled10 && this.tagEnabled13 < 7) tag.check(handles);
+					if (this.tagEnabled5 && this.tagEnabled8 < 7) tag.check(handles);
 					else tag.write(handles);
 					break;
-				}			
+				}
 				const continue_confirmation = (status, confirmed) => {
 					if (confirmed) {
-						if (this.tagEnabled10 && this.tagEnabled13 < 7) tag.check(handles);
+						if (this.tagEnabled5 && this.tagEnabled8 < 7) tag.check(handles);
 						else tag.write(handles);
 					}
 				}
@@ -659,7 +660,7 @@ class Settings {
 				break;
 			}
 		}
-		if (i < 12) window.NotifyOthers('bio_refresh', 'bio_refresh');
+		if (i < 9) window.NotifyOthers('bio_refresh', 'bio_refresh');
 	}
 
 	updateCfg(new_cfg) {
@@ -671,8 +672,6 @@ class Settings {
 const cfg = new Settings(ppt.serverName);
 
 let settings = [
-	['Album Review [Allmusic] Auto-Download', false, 'boolean', 'dlAmRev'], // description (setting[0]) is for info only otherwise it's unused [update from orig_ini is no longer supported]
-	['Biography [Allmusic] Auto-Download', false, 'boolean', 'dlAmBio'],
 	['Album Review [Lastfm] Auto-Download', false, 'boolean', 'dlLfmRev'],
 	['Biography [Lastfm] Auto-Download', true, 'boolean', 'dlLfmBio'],
 	['Album Review [Wikipedia] Auto-Download', false, 'boolean', 'dlWikiRev'],
@@ -693,8 +692,6 @@ let settings = [
 	['Lastfm & Wikipedia Language Fallback To English', false, 'boolean', 'languageFallback'],
 	['Wikipedia English Genres', true, 'boolean', 'wikipediaEnGenres'],
 
-	['Album Review [Allmusic] Folder', '%profile%\\yttm\\review\\allmusic\\$lower($cut(%BIO_ALBUMARTIST%,1))', 'text', 'foAmRev'],
-	['Biography [Allmusic] Folder', '%profile%\\yttm\\biography\\allmusic\\$lower($cut(%BIO_ARTIST%,1))', 'text', 'foAmBio'],
 	['Album Review [Lastfm] Folder', '%profile%\\yttm\\review\\lastfm\\$lower($cut(%BIO_ALBUMARTIST%,1))', 'text', 'foLfmRev'],
 	['Biography [Lastfm] Folder', '%profile%\\yttm\\biography\\lastfm\\$lower($cut(%BIO_ARTIST%,1))', 'text', 'foLfmBio'],
 	['Album Review [Wikipedia] Folder', '%profile%\\yttm\\review\\wikipedia\\$lower($cut(%BIO_ALBUMARTIST%,1))', 'text', 'foWikiRev'],
@@ -727,40 +724,29 @@ let settings = [
 	['Similar Artists: Number to Display(0-10)', 6, 'num', 'menuSimilarNum'],
 	['Various Artists', 'Various Artists', 'text', 'va'],
 
-	['Site Display Name AllMusic', 'AllMusic', 'text', 'amDisplayName'],
 	['Site Display Name Last.fm', 'Last.fm', 'text', 'lfmDisplayName'],
 	['Site Display Name Wikipedia', 'Wikipedia', 'text', 'wikiDisplayName'],
 
-	['Write Tag: Album Genre AllMusic', true, 'boolean', 'tagEnabled0'],
-	['Write Tag: Album Mood AllMusic', true, 'boolean', 'tagEnabled1'],
-	['Write Tag: Album Rating AllMusic', true, 'boolean', 'tagEnabled2'],
-	['Write Tag: Album Theme AllMusic', true, 'boolean', 'tagEnabled3'],
-	['Write Tag: Artist Genre AllMusic', true, 'boolean', 'tagEnabled4'],
-	['Write Tag: Album Genre Last.fm', true, 'boolean', 'tagEnabled5'],
-	['Write Tag: Album Statistics Last.fm', false, 'boolean', 'tagEnabled6'],
-	['Write Tag: Artist Genre Last.fm', true, 'boolean', 'tagEnabled7'],
-	['Write Tag: Artist Statistics Last.fm', false, 'boolean', 'tagEnabled8'],
-	['Write Tag: Locale Last.fm', true, 'boolean', 'tagEnabled9'],
-	['Write Tag: Similar Artists Last.fm', true, 'boolean', 'tagEnabled10'],
-	['Write Tag: Album Genre Wikipedia', true, 'boolean', 'tagEnabled11'],
-	['Write Tag: Artist Genre Wikipedia', true, 'boolean', 'tagEnabled12'],
-	['Write Tag: Similar Artists Last.fm: Number to Write (0-100)', 5, 'num', 'tagEnabled13'],
+	['Write Tag: Album Genre Last.fm', true, 'boolean', 'tagEnabled0'],
+	['Write Tag: Album Statistics Last.fm', false, 'boolean', 'tagEnabled1'],
+	['Write Tag: Artist Genre Last.fm', true, 'boolean', 'tagEnabled2'],
+	['Write Tag: Artist Statistics Last.fm', false, 'boolean', 'tagEnabled3'],
+	['Write Tag: Locale Last.fm', true, 'boolean', 'tagEnabled4'],
+	['Write Tag: Similar Artists Last.fm', true, 'boolean', 'tagEnabled5'],
+	['Write Tag: Album Genre Wikipedia', true, 'boolean', 'tagEnabled6'],
+	['Write Tag: Artist Genre Wikipedia', true, 'boolean', 'tagEnabled7'],
+	['Write Tag: Similar Artists Last.fm: Number to Write (0-100)', 5, 'num', 'tagEnabled8'],
 	['Notify Tags: Current Track', false, 'boolean', 'notifyTags'],
 
-	['Tag Name: Album Genre AllMusic', 'Album Genre AllMusic', 'text', 'tagName0'],
-	['Tag Name: Album Mood AllMusic', 'Album Mood AllMusic', 'text', 'tagName1'],
-	['Tag Name: Album Rating AllMusic', 'Album Rating AllMusic', 'text', 'tagName2'],
-	['Tag Name: Album Theme AllMusic', 'Album Theme AllMusic', 'text', 'tagName3'],
-	['Tag Name: Artist Genre AllMusic', 'Artist Genre AllMusic', 'text', 'tagName4'],
-	['Tag Name: Album Genre Last.fm', 'Album Genre Last.fm', 'text', 'tagName5'],
-	['Tag Name: Album Statistics Last.fm', 'Album Statistics Last.fm', 'text', 'tagName6'],
-	['Tag Name: Artist Genre Last.fm', 'Artist Genre Last.fm', 'text', 'tagName7'],
-	['Tag Name: Artist Statistics Last.fm', 'Artist Statistics Last.fm', 'text', 'tagName8'],
-	['Tag Name: Locale Last.fm', 'Locale Last.fm', 'text', 'tagName9'],
-	['Tag Name: Similar Artists Last.fm', 'Similar Artists Last.fm', 'text', 'tagName10'],
-	
-	['Tag Name: Album Genre Wikipedia', 'Album Genre Wikipedia', 'text', 'tagName11'],
-	['Tag Name: Artist Genre Wikipedia', 'Artist Genre Wikipedia', 'text', 'tagName12'],
+	['Tag Name: Album Genre Last.fm', 'Album Genre Last.fm', 'text', 'tagName0'],
+	['Tag Name: Album Statistics Last.fm', 'Album Statistics Last.fm', 'text', 'tagName1'],
+	['Tag Name: Artist Genre Last.fm', 'Artist Genre Last.fm', 'text', 'tagName2'],
+	['Tag Name: Artist Statistics Last.fm', 'Artist Statistics Last.fm', 'text', 'tagName3'],
+	['Tag Name: Locale Last.fm', 'Locale Last.fm', 'text', 'tagName4'],
+	['Tag Name: Similar Artists Last.fm', 'Similar Artists Last.fm', 'text', 'tagName5'],
+
+	['Tag Name: Album Genre Wikipedia', 'Album Genre Wikipedia', 'text', 'tagName6'],
+	['Tag Name: Artist Genre Wikipedia', 'Artist Genre Wikipedia', 'text', 'tagName7'],
 
 	['Tagger Show Confirm PopUp Box', true, 'boolean', 'taggerConfirm'],
 	['Tagger Last.fm Genre Use Whitelist', 1, 'num', 'useWhitelist'],
@@ -820,7 +806,7 @@ let item_properties =
 		"properties": [
 			"此组项目不可配置：项目自动扩展。它只能通过设置为 false 来删除、移动或隐藏。不要更改组名称。",
 			"用于替代分组（an alternative grouping）。它将按字母顺序显示所有元数据，而不是默认使用的分组。",
-			"要使用，将 show 设置为 true。如果使用，最好将上述元数据，Popularity，AllMusic，Last.fm 和维基百科组的 show 设置为 false。"
+			"要使用，将 show 设置为 true。如果使用，最好将上述元数据，Popularity，Last.fm 和维基百科组的 show 设置为 false。"
 		]
 	},
 	"人气": {
@@ -829,16 +815,6 @@ let item_properties =
 			{"name": "艺术家", "titleformat": "[$meta(artist statistics last.fm,5[score])]"},
 			{"name": "专辑", "titleformat": "[$meta(album statistics last.fm,5[score])]"},
 			{"name": "单曲", "titleformat": "[$meta(track statistics last.fm,5[score])]"}
-		]
-	},
-	"AllMusic": {
-		"show": true,
-		"properties": [
-			{"name": "Artist genre", "titleformat": "[%artist genre allmusic%]"},
-			{"name": "Album genre", "titleformat": "[%album genre allmusic%]"},
-			{"name": "Album mood", "titleformat": "[%album mood allmusic%]"},
-			{"name": "Album theme", "titleformat": "[%album theme allmusic%]"},
-			{"name": "Album rating", "titleformat": "[%album rating allmusic%]"}
 		]
 	},
 	"Last.fm": {
@@ -916,7 +892,7 @@ let item_properties =
 
 let item_properties_alternative_grouping = item_properties
 .replace(/("元数据\*":\s{\s*?"show":\s)false/, '$1' + true)
-.replace(/(("元数据"|"人气"|"AllMusic"|"Last.fm"|"维基百科"):\s{\s*?"show":\s)true/g, '$1' + false);
+.replace(/(("元数据"|"人气"|"Last.fm"|"维基百科"):\s{\s*?"show":\s)true/g, '$1' + false);
 
 let nowplaying = `艺术家: %BIO_ARTIST%$crlf()
 $crlf()

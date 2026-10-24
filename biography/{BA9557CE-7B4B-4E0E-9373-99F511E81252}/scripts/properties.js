@@ -162,8 +162,6 @@ let properties = [
 	['Filmstrip Size 0-1', 0.15, 'filmStripSize'],
 	['Filmstrip Show', true, 'showFilmStrip'],
 	['Filmstrip Show Auto', true, 'autoFilm'],
-	['Filmstrip Use Image Padding', 0, 'filmImagePadding'],
-	['Filmstrip Use Text Padding', 0, 'filmTextPadding'],
 
 	['Font Size', 16, 'baseFontSize'],
 	['Freestyle Custom', JSON.stringify([]), 'styleFree'],
@@ -171,7 +169,6 @@ let properties = [
 	['Heading Hide-0 Show-1', 1, 'heading'],
 	['Heading Always Full Width', false, 'fullWidthHeading'],
 	['Heading Button Hide-0 Left-1 Right-2', 2, 'src'],
-	['Heading Center', false, 'hdCenter'],
 	['Heading Button Position Left-0 Right-1 Center-2', 0, 'hdPos'],
 	['Heading Button Show', true, 'hdBtnShow'],
 	['Heading Button Show Label', 1, 'hdShowBtnLabel'],
@@ -181,7 +178,6 @@ let properties = [
 	['Heading Padding Button', 0, 'hdBtnPad'],
 	['Heading Padding Bottom Line', 0, 'hdLinePad'],
 	['Heading Padding', 0, 'hdPad'],
-	['Heading Position', 0, 'hdRight'],
 	['Heading Show Button Background', true, 'hdShowBtnBg'],
 	['Heading Show Button Red Lfm', false, 'hdShowRedLfm'],
 	['Heading Show Title', true, 'hdShowTitle'],
@@ -289,9 +285,7 @@ let properties = [
 	['Prefer Focus', false, 'focus'],
 
 	['Rating Position Prefer Heading-0 Text-1', 0, 'star'],
-	['Rating Show AllMusic', true, 'amRating'],
 	['Rating Show Last.fm', true, 'lfmRating'],
-	['Rating Text Name AllMusic', 'Album rating', 'amRatingName'],
 	['Rating Text Name Last.fm', 'Album rating', 'lfmRatingName'],
 	['Rating Text Position Auto-0 Embed-1 Own Line-2', 0, 'ratingTextPos'],
 
@@ -327,8 +321,8 @@ let properties = [
 	['Show Top Albums', true, 'showTopAlbums'],
 
 	['Source All', false, 'sourceAll'],
-	['Source Bio 0-Am 1-Lfm 2-Wiki 3-Text', 1, 'sourcebio'],
-	['Source Rev 0-Am 1-Lfm 2-Wiki 3-Text', 3, 'sourcerev'],
+	['Source Bio 0-Lfm 1-Wiki 2-Text', 0, 'sourcebio'],
+	['Source Rev 0-Lfm 1-Wiki 2-Text', 2, 'sourcerev'],
 
 	['Statistics Show Last.fm Metacritic Score', true, 'score'],
 	['Statistics Show Last.fm Scrobbles & Listeners', true, 'stats'],
@@ -429,7 +423,7 @@ let properties = [
 const ppt = new PanelProperties;
 ppt.init('auto', properties);
 properties = undefined;
-
+/*
 if (ppt.get('Update Properties', true)) { // ~22.7.22
 	ppt.nmTxtReader7 = '项目属性';
 	ppt.pthTxtReader7 = '%storage_folder%\\item_properties.json';
@@ -442,15 +436,15 @@ if (ppt.get('Update Properties', true)) { // ~22.7.22
 	ppt.set('Update Properties', false);
 }
 
-if (ppt.get('Reset Track Review', true)) {
-	ppt.inclTrackRev = 0;
-	ppt.set('Reset Track Review', false);
-}
-
 if (ppt.get('Remove Old Properties', true)) {
 	const oldProperties = ['Allmusic Alb', 'Allmusic Bio', 'Both Bio', 'Both Rev', 'Heading', 'Heading BtnName Biography [AllMusic]', 'Heading BtnName Biography [Last.fm]', 'Heading BtnName Biography [Wikipedia]', 'Heading BtnName Review [AllMusic]', 'Heading BtnName Review [Last.fm]', 'Heading BtnName Review [Wikipedia]', 'Heading Title Format Album Review [AllMusic]', 'Heading Title Format Album Review [Last.fm]', 'Heading Title Format Biography [AllMusic]', 'Heading Title Format Biography [Last.fm]', 'Heading Title Format Track Review [AllMusic]', 'Heading Title Format Track Review [Last.fm]', 'Layout Dual Image+Text', 'Image Seeker Dots', 'Subheading [Source] Text Biography [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Biography [Last.fm]: Heading|No Heading', 'Subheading [Source] Text Biography [Wikipedia]: Heading|No Heading', 'Subheading [Source] Text Review [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Review [Last.fm]: Heading|No Heading', 'Subheading Source Hide-0 Show-1', 'Subheading [Source] Text Review [Wikipedia]: Heading|No Heading', 'Subheading [Track Review] Title Format [AllMusic]', 'Subheading [Track Review] Title Format [Last.fm]', 'Summary First', 'Tagger Last.fm Genre Find>Replace', 'Tagger Last.fm Genre Number Clean Up', 'Tagger Last.fm Genre Run Find>Replace', 'Tagger Last.fm Genre Strip Artist+Album Names', 'Text Album + Track Auto Optimise', 'Text Reader Source 0 Name', 'Text Reader Source 1 Name', 'Text Reader Source 2 Name', 'Text Reader Source 3 Name', 'Text Reader Source 4 Name', 'Text Reader Source 5 Name', 'Text Reader Source 6 Name', 'Text Reader Source 7 Name', 'Text Reader Source 1 (field or full path)', 'Text Reader Source 2 (field or full path)', 'Text Reader Source 3 (field or full path)', 'Text Reader Source 4 (field or full path)', 'Text Reader Source 5 (field or full path)', 'Text Reader Source 6 (field or full path)', 'Text Reader Source 7 (field or full path)', 'Text Reader Source 8 (field or full path)', 'Text Reader Source 1 Lyrics', 'Text Reader Source 2 Lyrics', 'Text Reader Source 3 Lyrics', 'Text Reader Source 4 Lyrics', 'Text Reader Source 5 Lyrics', 'Text Reader Source 6 Lyrics','Text Reader Source 7 Lyrics', 'Text Reader Source 8 Lyrics'];
 	oldProperties.forEach(v => window.SetProperty(v, null));
 	ppt.set('Remove Old Properties', false);
 }
 
+if (ppt.get('Reset Track Review', true)) {
+	ppt.inclTrackRev = 0;
+	ppt.set('Reset Track Review', false);
+}
+*/
 window.SetProperty('Scrollbar Type Default-0 Styled-1 Windows-2', null);

@@ -1,10 +1,10 @@
 body { color: WINDOWTEXT; background-color: THREEDFACE; } 
-input { font:caption; border: 1px solid #7A7A7A; width: 100%; } 
+input { font:caption; font-family:"Microsoft YaHei UI","Microsoft YaHei","Segoe UI",sans-serif; border: 1px solid #7A7A7A; width: 100%; }
 input:focus { outline: none !important; border:1px solid #0078D7; } 
 input:hover:focus { outline: none !important; border:1px solid #0078D7; } 
 input:hover { outline: none !important; border:1px solid #000000; } 
-label { font:caption; } 
-button { font:caption; background: #E1E1E1; color:ButtonText; border: 1px solid #ADADAD; margin: 5px; padding: 5px; width: 90px; } 
+label { font:caption; font-family:"Microsoft YaHei UI","Microsoft YaHei","Segoe UI",sans-serif; }
+button { font:caption; font-family:"Microsoft YaHei UI","Microsoft YaHei","Segoe UI",sans-serif; background: #E1E1E1; color:ButtonText; border: 1px solid #ADADAD; margin: 5px; padding: 5px; width: 90px; }
 button:focus { outline: none !important; border:2px solid #0078D7; padding: 4px; } 
 button:hover { background: #e5f1fb; outline: none !important; border:1px solid #0078D7; padding: 5px; }div { overflow: hidden; } 
 button:focus:hover { background: #e5f1fb; outline: none !important; border:2px solid #0078D7; padding: 4px; }';span { display:block; overflow: hidden; padding-right:10px; } 

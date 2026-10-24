@@ -2,7 +2,7 @@
 	<html>
 	<head>
 	<title>简介: 设置</title>
-	<meta http-equiv="x-ua-compatible" content="IE=8"/>
+	<meta http-equiv="x-ua-compatible" content="IE=edge"/>
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<style type="text/css">
 
@@ -136,10 +136,17 @@
 	.inp_label4 {display:inline-block; width:21%;}
 	.inp_label5 {vertical-align:middle; padding-left:0.46em;}
 	.inp_label6 {display:block; margin:0 0 0.31em 0;}
-	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0; z-index:2;}
-	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right;}
+	/* Regorxxx <- Fix dead OK/Apply/Cancel buttons: the two full-width .btn_cnt
+	   containers overlap; under IE=edge hit-testing the later #btn_cnt_left
+	   swallows clicks across the whole row. Keep the paint order (gray bar above
+	   via z-index:2 on #btn_cnt_right) but lift every button (position:relative +
+	   z-index:3) above both containers so all buttons stay clickable -> */
+	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;}
+	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right; z-index:2;}
 	#btn_cnt_left {text-align:left;}
 	#btn_cnt_center {text-align:center;}
+	.btn_cnt button {position:relative; z-index:3;}
+	/* Regorxxx -> */
 	#mainMargin {margin: 0 2%}
 
 	table {width: 100%; text-align:center; border-collapse:collapse; border:1px solid Gainsboro; empty-cells:show;}
@@ -150,7 +157,7 @@
 
 	.dropbtn {white-space:nowrap; width:100%; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
 	.dropbtn:after {font-family: FontAwesome; content: "\f107"; padding-left:0.5em; padding-right:0.19em;}
-	.dropdown {margin-top: 10px; position:static; display:inline-block;}
+	.dropdown {margin-top: 10px; position: relative; display: inline-block;} /* Regorxxx <- Fix dropdown layout -> */
 	.dropdown-content {display:none; position:absolute; background-color:#f9f9f9; min-width:10em; white-space:nowrap; box-shadow:0 8px 1.01em 0 rgba(0,0,0,0.2); z-index:1;}
  	.dropdown-content a {padding:0.13em 5px; color:black; text-decoration:none; display:block;}
 	.dropdown-content a:hover {background-color:#f1f1f1;}
@@ -277,7 +284,7 @@
 				<div class="info6"><b>主边距（像素）</b></div>
 				<table id="imageMarginTable" class="table" style="width:1%; border:none"></table>
 				<table id="textMarginTable" class="table" style="margin-top:1.01em; width:1%; border:none"></table>
-				<div id="metrics"style="padding:1.01em 0 0;"></div>
+				<div id="metrics" style="padding:1.01em 0 0;"></div>
 				<div id="metrics2"></div>
 				<div class="div_text6">文本</div>
 				<div id="textStyle"></div>
@@ -320,7 +327,7 @@
 				<span style="margin:1em 0 0.7em 0;" class="dropdown"><a id="summaryStyle_dropdown" class="dropbtn" style="display:inline-block; width:auto;" href="#" onclick="toggle('summaryFont');"></a>
 				<span id="summaryFont" class="dropdown-content"></span>
 				</span>
-				<div class="info3"><i>*区域设置控制 last.fm 和维基百科。Allmusic 区域设置是日期不可或缺的一部分。</i></div>
+				<div class="info3"><i>*区域设置控制 last.fm 和维基百科。</i></div>
 			</div>
 		</div>
 		</div>
@@ -482,7 +489,7 @@
 				<div style="clear:both;"></div>
 				<div id="cusTextPreview"></div>
 				<div class="row" style="margin-top:0.7em; padding-top:0.31em; background-color:#E8E8E8; border-bottom: 1px solid #D8D8D8;">
-				<div class="column5"style="padding-top:0.31em;">歌词：</div>
+				<div class="column5" style="padding-top:0.31em;">歌词：</div>
 				<div class="column25">
 					<div id="downloadLyrics"></div>
 				</div>
@@ -505,8 +512,8 @@
 					</span>
 				</div>
 				</div>
-				<div class="row"style="padding-top:0.31em; background-color:#E8E8E8; border-bottom: 1px solid #D8D8D8;">
-				<div class="column30"style="padding-top:0.31em;">项目属性：</div>
+				<div class="row" style="padding-top:0.31em; background-color:#E8E8E8; border-bottom: 1px solid #D8D8D8;">
+				<div class="column30" style="padding-top:0.31em;">项目属性：</div>
 				<div class="column14">
 					<div id="rowStripes"></div>
 				</div>
@@ -517,8 +524,8 @@
 					<div id="fieldWidth"></div>
 				</div>
 				</div>
-				<div class="row"style="padding-top:0.31em; background-color:#E8E8E8;">
-				<div class="column30"style="padding-top:0.31em;">正在播放：</div>
+				<div class="row" style="padding-top:0.31em; background-color:#E8E8E8;">
+				<div class="column30" style="padding-top:0.31em;">正在播放：</div>
 				<div class="column14">
 					<div id="npVCenter"></div>
 				</div>
@@ -605,7 +612,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			</div>
 					
 			<div class="column50">
-				<div class="div_text6"class>杂项</div>
+				<div class="div_text6">杂项</div>
 				<div class="info2"><b>主题模糊</b></div>
 				<div id="themeBlur"></div>
 				<div class="info2"><b>图像：平滑过渡级别</b></div>
@@ -632,7 +639,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 </div>
 			<div style="clear:both;"></div>
 			<div class="div_text11">古典音乐扩展</div>
-			<div class="info4">将 Allmusic 和维基百科评价的自动下载扩展到作品。Last.fm 不适用。在下方启用并设置标签。要显示，每个面板，请使用来源>文本子菜单。
+			<div class="info4">将维基百科评价的自动下载扩展到作品。Last.fm 不适用。在下方启用并设置标签。要显示，每个面板，请使用来源>文本子菜单。
 如果愿意，可以通过更改上面的 %BIO_ALBUMARTIST% 来使用作曲家，因此 $meta(composer,0) 是第一项。</div>
 			<div id="classicalMode"></div>
 			<div id="classicalModeTitleformat"></div>
@@ -658,11 +665,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			</div>
 			</div>
 			<div style="clear:both;"></div>
-			<span style="margin-top:0;" class="alignLeft1">AllMusic</span>
-			<span id="savefolder0" style="margin-top:0;" class="alignRight1">保存文件夹</span>
-			<div style="clear:both;"></div>
-			<div id="allmusic"></div>
-			<span class="alignLeft1">Last.fm</span>
+			<span style="margin-top:0;" class="alignLeft1">Last.fm</span>
 			<span id="savefolder1" class="alignRight1">保存文件夹</span>
 			<div style="clear:both;"></div>
 			<div id="lastfm"></div>
@@ -753,10 +756,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 		<div id="tagger" class="tabcontent">
 		<div class="row">
 			<div class="column46">
-			<span class="alignLH">AllMusic 标签</span>
-			<span class="alignRH">标签名称</span>
-			<div style="clear:both;"></div>
-			<div id="tagAllmusic"></div>
 			<span class="alignLH">Last.fm 标签</span>
 			<span class="alignRH">标签名称</span>
 			<div style="clear:both;"></div>
@@ -835,7 +834,7 @@ info is an object:
 				<div id="miscl"></div>
 				<div id="fuzzyLevel"></div>
 			<div class="info8">
-部分匹配设置适用于 AllMusic 和 维基百科。Last.fm 匹配由网站提供。</div>
+部分匹配设置适用于维基百科。Last.fm 匹配由网站提供。</div>
 			<div class="info5">
 如果专辑版本信息在它自己的标签中，则不需要专辑名称自动清理。如果启用，在网络搜索之前，将根据需要从专辑名称中删除关键字，例如："Deluxe Version", "[2011 - Remaster]", "Expanded Edition" 等等。如果在专辑名称中使用此类短语，可以改善搜索结果。</div>
 			<div id="pad" class="pad"></div>
@@ -1130,7 +1129,7 @@ info is an object:
 				var covLabels = ['自动下载 [Last.fm 最佳质量]', '保存文件夹', '保存文件名', '检查自定义路径', '自定义路径 1', '自定义路径 2', '自定义路径 3'];
 				var cusScrollLabels = ['行数 (0 = 页面)', '最大平滑持续时间（毫秒）', '最大触摸持续时间（毫秒）', '触摸灵敏度 0-10'];
 				var cusTextLabels = ['文本、歌词和项目属性：支持标签或完整路径。每个视图显示检索到的第一个结果。', '预览', '同步最新下载', '滚动同步歌词', '滚动非同步歌词'];
-				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
+				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
 				var dropShadowLevelLabels = [0, 1, 2, 3];
 				var filmStripLabels = ['齐平', '对齐图像', '应用图像边距','对齐文本', '应用文本边距', ]
 				var filterLabels = ['KB 最大尺寸', 'KB 最小尺寸', 'PX 最小分辨率', '最少数量（最高优先级）'];
@@ -1151,7 +1150,7 @@ info is an object:
 				var metricsLabels = ['图像和文本之间的间距', 'x 字高 = 行高 (1-4)'];
 				var miscLabels = ['专辑名称自动清理', '专辑评论高品质', '显示控制台消息', '搜索：包括部分匹配项。匹配级别 (%)：', '自动更新间隔（天：最小 28）', '相似艺术家：菜单上的个数（0-10）', '群星'];
 				var overlayLabels = ['渐变', '平面', '带边框平面', '圆形', '带边框圆形', '强度 % [Shift + 滚轮]', '渐变级别 %', '边框宽度（像素）'];
-				var ratingLabels = ['AllMusic', 'Last.fm', '首选标题', '首选文本', 'AllMusic', 'Last.fm'];
+				var ratingLabels = ['Last.fm', '首选标题', '首选文本', 'Last.fm'];
 				var ratingTextPosLabels = ['自动', '嵌入', '自成一行'];
 				var reflPosLabels = ['自动位置', '上', '右', '下', '左', '强度 % [主图像上 Shift + 滚轮]', '尺寸 %', '渐变级别 %'];
 				var sbarColLabels = ['灰色', '混合'];
@@ -1161,9 +1160,9 @@ info is an object:
 				var scrollbarLabels = ['滑块宽度', '滑道宽度（0 = 自动）', '箭头宽度', '箭头填充 (+/-)', '滑块最小高度', '自定义图标*', '自定义图标字体名称', '自定义图标偏移 (%)', '首选全高滚动条'];
 				var scrollLabels = ['尺寸跟随系统', '紧凑圆角', '平滑滚动', '触摸控制'];
 				var seekerLabels = ['计数', '导航条', '长条', '圆点'];
-				var siteNameLabels = ['AllMusic', 'Last.fm', '维基百科'];
+				var siteNameLabels = ['Last.fm', '维基百科'];
 				var summaryLabels = ['流派', '发行日期', '区域*', '现在热门 (Last.fm)', '最新发布（维基百科）', '其它'];
-				var tagLabel = ['专辑流派', '专辑喜爱', '专辑等级', '专辑主题', '艺术家流派', '专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '当前音轨', '在写入文件标签之前显示确认弹出窗口'];
+				var tagLabel = ['专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '当前音轨', '在写入文件标签之前显示确认弹出窗口'];
 				var textStyleLabels = ['顶部对齐', '展开列表', '如果显示多个项目，自动优化'];
 				var tfLabels = ['简介', '评论', '标题', '歌词', '标题'];
 				var tfServLabels = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%', '作品标签'];
@@ -1185,9 +1184,9 @@ info is an object:
 						type: ['float', 'float', 'float', 'float']
 					},
 					display: {
-						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'amRatingName', 'lfmRatingName'],
-						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'float', 'text', 'text']
-						
+						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'lfmRatingName'],
+						type: ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'float', 'text']
+
 					},
 					headings: {
 						name: ['bioHeading', 'revHeading', 'trkHeading', 'lyricHeading', 'trackSubHeading', 'hdPad', 'hdLinePad', 'hdBtnPad'],
@@ -1214,8 +1213,8 @@ info is an object:
 						type : ['text', 'text', 'text', 'text', 'text']
 					},
 					download: {
-						name: ['foAmRev', 'foAmBio', 'foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'supFind', 'supReplace'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
+						name: ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'supFind', 'supReplace'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
 					},
 					photo: {
 						name: ['photoNum', 'photoLimit', 'foCycPhoto'],
@@ -1226,12 +1225,12 @@ info is an object:
 						type : ['text', 'text', 'text', 'text', 'text', 'text']
 					},
 					tagger: {
-						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagName8', 'tagName9', 'tagName10', 'tagEnabled13', 'tagName11', 'tagName12', 'customGenres', 'translate'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text', 'text', 'text']
+						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagEnabled8', 'customGenres', 'translate'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text']
 					},
 					misc: {
-						name: ['amDisplayName', 'lfmDisplayName', 'wikiDisplayName', 'exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
-						type : ['text', 'text', 'text', 'int', 'int', 'text', 'int', 'int', 'int']
+						name: ['lfmDisplayName', 'wikiDisplayName', 'exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
+						type : ['text', 'text', 'int', 'int', 'text', 'int', 'int', 'int']
 					},
 					all: {}
 				}
@@ -1239,17 +1238,17 @@ info is an object:
 				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.download.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
 				var box = {
 					behaviour: ['dblClickToggle', 'sameStyle', 'sbarWinMetrics', 'sbarGripRounded', 'smooth', 'touchControl'],
-					display: ['topAlign', 'expandLists', 'autoOptimiseText', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightImgBor', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightSummary', 'highlightText', 'colLineDark', 'amRating', 'lfmRating', 'summaryGenre', 'summaryDate', 'summaryLocale', 'summaryPopNow', 'summaryLatest', 'summaryOther'],
+					display: ['topAlign', 'expandLists', 'autoOptimiseText', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightImgBor', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightSummary', 'highlightText', 'colLineDark', 'lfmRating', 'summaryGenre', 'summaryDate', 'summaryLocale', 'summaryPopNow', 'summaryLatest', 'summaryOther'],
 					headings: ['hdShowTitle', 'hdBtnShow', 'fullWidthHeading', 'hdShowBtnBg', 'hdShowRedLfm', 'bioFlagShow', 'revFlagShow'],
 					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
 					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', /*'lyricsTxtReader3', */'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', /*'lyricsTxtReader7', */'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
 					custom: ['custFontUse', 'custHeadFontUse', 'textUse', 'text_hUse', 'headingBtnUse', 'headingTextUse', 'starsUse', 'summaryUse', 'rectOvUse', 'rectOvBorUse', 'bgUse', 'lineUse', 'bgTransUse', 'frameUse'],
 					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate'],
 					title_format: ['classicalModeEnable'],
-					download: ['languageFallback', 'wikipediaEnGenres', 'dlAmRev', 'dlAmBio', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio', 'supCache'],
+					download: ['languageFallback', 'wikipediaEnGenres', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio', 'supCache'],
 					photo: ['photoAutoAdd'],
 					cover: ['dlLfmCov', 'cusCov'],
-					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'tagEnabled8', 'tagEnabled9', 'tagEnabled10', 'tagEnabled11', 'tagEnabled12', 'notifyTags', 'taggerConfirm'],
+					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'notifyTags', 'taggerConfirm'],
 					misc: ['albStrip', 'imgRevHQ', 'showConsoleMessages', 'partialMatchEnabled']
 				}
 				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.textreader, box.custom, box.advanced, box.title_format, box.download, box.photo, box.cover, box.tagger, box.misc);
@@ -1553,12 +1552,12 @@ info is an object:
 					for (i = 5; i < 7; i++) {window.themeStyle.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="theme_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="theme_checkbox'+i+'" class="checkbox_label">'+themeLabels[i]+'</label></div>');}
 					for (i = 0; i < 9; i++) {window.highlight.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="highlight_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="highlight_checkbox'+i+'" class="checkbox_label">'+highlightLabels[i]+'</label></div>');}
 					window.lines.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lines_checkbox" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="lines_checkbox" class="checkbox_label">深色</label></div>');
-					for (i = 0; i < 2; i++) {window.rating1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="rating_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="rating_checkbox'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
-					for (i = 2; i < 4; i++) {window.rating2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="star'+i+'" name="star" style="'+cbox+'" type="radio" /><label for="star'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
+					i = 0; window.rating1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="rating_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="rating_checkbox'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');
+					for (i = 1; i < 3; i++) {window.rating2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="star'+i+'" name="star" style="'+cbox+'" type="radio" /><label for="star'+i+'" class="checkbox_label">'+ratingLabels[i]+'</label></div>');}
 
 					window.rating_dropdown.innerHTML = '文本位置：' + ratingTextPosLabels[ppt['ratingTextPos_internal'].value];
 					for (i = 0; i < 3; i++) {window.ratingTextPos.insertAdjacentHTML('beforeend', '<a onclick="ratingTextPosn(' + i + ');">'+ratingTextPosLabels[i]+'</a>');}
-					for (i = 4; i < 6; i++) {window.rating3.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="ratingName_container'+i+'" name="display_input" style="padding:0; margin:0;" class="input70" /><label for="ratingName_container'+i+'" class="inp_label2">'+ratingLabels[i]+'</label></div>');}
+					for (i = 3; i < 4; i++) {window.rating3.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="ratingName_container'+i+'" name="display_input" style="padding:0; margin:0;" class="input70" /><label for="ratingName_container'+i+'" class="inp_label2">'+ratingLabels[i]+'</label></div>');}
 
 					for (i = 0; i < 6; i++) {window.summary.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="summary_checkbox'+i+'" name="display_checkbox" style="'+cbox+'" type="checkbox" /><label for="summary_checkbox'+i+'" class="checkbox_label">'+summaryLabels[i]+'</label></div>');}
 					window.summaryStyle_dropdown.innerHTML = '摘要字体样式：' + headingFontLabels[ppt['summaryStyle_internal'].value];
@@ -1713,14 +1712,11 @@ info is an object:
 					for (i = 0; i < 6; i++) {window.cacheTime.insertAdjacentHTML('beforeend', '<a id="cacheProp'+i+'" onclick="setCacheTime(' + i + ');">'+cacheLabels[i]+'</a>');}
 					window.cacheProp5.style.borderTop = "1px solid Gainsboro";
 					window.fallback.insertAdjacentHTML('beforeend', '<div class="input_cnt3" style="padding:0;"><input id="lang_checkbox0" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox0" style="padding-right:0.75em;" class="checkbox_label">回退到英语服务器&nbsp</label><input id="lang_checkbox1" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox1" class="checkbox_label">维基百科流派：英语</label></div>');
-					for (i = 2; i < 4; i++) {
-						window.allmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
-					}
-					for (i = 4; i < 9; i++) {
+					for (i = 2; i < 7; i++) {
 						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
 					}
-					window.dnld_checkbox8.parentNode.style.display = 'none'; // similar artists: now auto
-					for (i = 9; i < 11; i++) {
+					window.dnld_checkbox6.parentNode.style.display = 'none'; // similar artists: now auto
+					for (i = 7; i < 9; i++) {
 						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
 					}
 
@@ -1737,22 +1733,19 @@ info is an object:
 					for (i = 3; i < 6; i++) {
 						window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container'+i+'" name="cover_input" class="input82" /><label for="custom_container'+i+'" class="inp_label3">'+covLabels[i + 1]+'</label></div>');
 					}
-					for (i = 0; i < 5; i++) {
-						window.tagAllmusic.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
-					}
-					for (i = 5; i < 11; i++) {
+					for (i = 0; i < 6; i++) {
 						window.tagLastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
 					}
-					for (i = 11; i < 13; i++) {
+					for (i = 6; i < 8; i++) {
 						window.tagWikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
 					}
-					i = 13; window.similarArtists.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tag_checkbox'+i+'" class="inp_label3">相似艺术家数量 1-6</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
-					i = 14; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
-					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
+					i = 8; window.similarArtists.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tag_checkbox'+i+'" class="inp_label3">相似艺术家数量 1-6</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
+					i = 9; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
+					i = 10; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
 					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
 					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
 					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">转化：</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
-					for (i = 0; i < 3; i++) {
+					for (i = 0; i < 2; i++) {
 						window.siteNames.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="siteNames_container'+i+'" name="misc_input" style="padding:0;" class="input21" /><label for="siteNames_container'+i+'" class="inp_label2">'+siteNameLabels[i]+'</label></div>');
 					}
 					for (i = 0; i < 4; i++) {
@@ -2035,8 +2028,32 @@ info is an object:
 			}
 			
 			function toggle(item) {
-				if (window[item].style.display == 'block') { window[item].style.display = 'none'; }
-				else { window[item].style.display = 'block' }
+				var el = window[item];
+				if (el.style.display == 'block') {
+					el.style.display = 'none';
+					el.style.position = '';
+					el.style.top = '';
+					el.style.left = '';
+				}
+				else {
+					// Regorxxx <- Anchor dropdown to its button inside the dialog window:
+					// fixed positioning takes it out of the page scroll flow, so opening a
+					// menu never adds scrollbars or shifts layout. Flip up only when the
+					// window itself has no room below the button ->
+					el.style.position = 'fixed';
+					el.style.display = 'block';
+					try {
+						var btn = el.parentNode.getBoundingClientRect();
+						var mw = el.offsetWidth, mh = el.offsetHeight;
+						var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+						var top = btn.bottom + 2, left = btn.left;
+						if (top + mh > vh - 2) top = Math.max(2, btn.top - mh - 2);
+						if (left + mw > vw - 2) left = Math.max(2, vw - mw - 2);
+						el.style.top = top + 'px';
+						el.style.left = left + 'px';
+					} catch (e) {}
+					// Regorxxx ->
+				}
 			}
 
 			var h = [
@@ -2068,7 +2085,12 @@ info is an object:
 			function hide() {
 				var id = document.activeElement.id;
 				for (i = 0; i < h.length; i++) {
-					if (id != h[i][0]) window[h[i][1]].style.display = 'none';
+					if (id != h[i][0]) {
+						window[h[i][1]].style.display = 'none';
+						window[h[i][1]].style.position = ''; // Regorxxx <- Reset inline anchor styles ->
+						window[h[i][1]].style.top = '';
+						window[h[i][1]].style.left = '';
+					}
 				}
 			}
 

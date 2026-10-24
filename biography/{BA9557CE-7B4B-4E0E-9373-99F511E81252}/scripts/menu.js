@@ -74,7 +74,7 @@ class MenuManager {
 	}
 
 	get(v) {
-		if (v instanceof Function) return v(); 
+		if (typeof v === 'function') return v();
 		return v;
 	}
 
@@ -109,7 +109,7 @@ class MenuManager {
 
 	run(idx) {
 		const v = this.func[idx];
-		if (v instanceof Function) v(); 
+		if (typeof v === 'function') v();
 	}
 }
 
@@ -151,12 +151,10 @@ class MenuItems {
 			origIndex: 0
 		};
 		this.path = {
-			am: [],
 			blackList: '',
 			img: false,
 			lfm: [],
 			open: [],
-			tracksAm: [],
 			tracksLfm: [],
 			tracksWiki: [],
 			txt: [],
@@ -194,7 +192,7 @@ class MenuItems {
 				bMenu.newMenu({
 					menuName: lg['More...']
 				});
-				for (let i = 0; i < 8; i++) bMenu.newItem({
+				for (let i = 0; i < 6; i++) bMenu.newItem({
 					menuName: lg['More...'],
 					str: this.getlookUpStr(i, 1, artist),
 					func: () => this.lookUpArtistItems(i),
@@ -221,7 +219,7 @@ class MenuItems {
 				bMenu.newMenu({
 					menuName: lg['More...']
 				});
-				for (let i = 0; i < 8; i++) bMenu.newItem({
+				for (let i = 0; i < 5; i++) bMenu.newItem({
 					menuName: lg['More...'],
 					str: this.getlookUpStr(i, 2, artist),
 					func: () => this.lookUpAlbumItems(i),
@@ -257,7 +255,7 @@ class MenuItems {
 			func: () => this.toggle(i, b, true),
 			flags: txt[n][this.types[i]] ? MF_STRING : MF_GRAYED,
 			checkRadio: i == txt[n].loaded.ix,
-			separator: txt[n].reader ? i == 3 && separator : i == 2 && separator
+			separator: txt[n].reader ? i == 2 && separator : i == 1 && separator
 		}));
 
 		if (ppt.showTrackRevOptions && !ppt.artistView && panel.stndItem() && !txt.isCompositionLoaded()) {
@@ -313,7 +311,7 @@ class MenuItems {
 
 		for (let i = 0; i < 5; i++) menu.newItem({
 			menuName: lg['Text'],
-			str: [lg['Auto-fallback'], lg['Static'], lg['Amalgamate'], lg['Show track review options on load menu'], lg['Prefer composition reviews (allmusic && wikipedia)']][i],
+			str: [lg['Auto-fallback'], lg['Static'], lg['Amalgamate'], lg['Show track review options on load menu'], lg['Prefer composition reviews (wikipedia)']][i],
 			func: () => this.setTextType(i, b),
 			flags: !i && ppt.sourceAll || i == 1 && ppt.sourceAll ? MF_GRAYED : MF_STRING,
 			checkItem: i == 2 && ppt.sourceAll || i == 3 && ppt.showTrackRevOptions || i == 4 && ppt.classicalMusicMode,
@@ -379,12 +377,12 @@ class MenuItems {
 				appendTo: lg['Sources'],
 				separator: ppt.menuShowPaste == 2 || ppt.menuShowPaste && this.shift
 			});
-			for (let i = 0; i < 5; i++) menu.newItem({
+			for (let i = 0; i < 4; i++) menu.newItem({
 				menuName: lg['Paste text from clipboard'],
-				str: [ppt.artistView ? lg['Biography [allmusic location]'] : lg['Review [allmusic location]'], ppt.artistView ? lg['Biography [last.fm location]'] : lg['Review [last.fm location]'], ppt.artistView ? lg['Biography [wikipedia location]'] : lg['Review [wikipedia location]'], lg['Open last edited'], lg['Undo']][i],
+				str: [ppt.artistView ? lg['Biography [last.fm location]'] : lg['Review [last.fm location]'], ppt.artistView ? lg['Biography [wikipedia location]'] : lg['Review [wikipedia location]'], lg['Open last edited'], lg['Undo']][i],
 				func: () => this.setPaste(i),
-				flags: !i && !this.path.am[2] || i == 1 && !this.path.lfm[2]  || i == 2 && !this.path.wiki[2] || i == 3 && !this.undo.path || i == 4 && this.undo.text == '#!#' ? MF_GRAYED : MF_STRING,
-				separator: i == 2 || i == 3
+				flags: !i && !this.path.lfm[2] || i == 1 && !this.path.wiki[2] || i == 2 && !this.undo.path || i == 3 && this.undo.text == '#!#' ? MF_GRAYED : MF_STRING,
+				separator: i == 1 || i == 2
 			});
 		}
 
@@ -530,13 +528,13 @@ class MenuItems {
 				flags: this.handles.Count ? MF_STRING : MF_GRAYED,
 				separator: ppt.menuShowTagger == 2 || ppt.menuShowTagger && this.shift
 			});
-			for (let i = 0; i < 13 + 4; i++) menu.newItem({
+			for (let i = 0; i < 8 + 4; i++) menu.newItem({
 				menuName: lg['Tagger'],
 				str: this.getTaggerStr(i),
 				func: () => cfg.setTag(i, this.handles),
-				flags: !i || i == 13 + 1 && !this.tags ? MF_GRAYED : MF_STRING,
-				checkItem: i && i < 13 + 1 && cfg[`tagEnabled${i - 1}`],
-				separator: !i || i == 5 || i == 11 || i == 13
+				flags: !i || i == 8 + 1 && !this.tags ? MF_GRAYED : MF_STRING,
+				checkItem: i && i < 8 + 1 && cfg[`tagEnabled${i - 1}`],
+				separator: !i || i == 6 || i == 8
 			});
 		}
 
@@ -545,11 +543,11 @@ class MenuItems {
 				menuName: lg['Missing data'],
 				separator: ppt.menuShowMissingData == 2 || ppt.menuShowMissingData && this.shift
 			});
-			[lg['Album review [allmusic]'], lg['Album review [last.fm]'], lg['Album review [wikipedia]'], lg['Biography [allmusic]'], lg['Biography [last.fm]'], lg['Biography [wikipedia]'], lg['Photos [last.fm]']].forEach((v, i) => menu.newItem({
+			[lg['Album review [last.fm]'], lg['Album review [wikipedia]'], lg['Biography [last.fm]'], lg['Biography [wikipedia]'], lg['Photos [last.fm]']].forEach((v, i) => menu.newItem({
 				menuName: lg['Missing data'],
 				str: v,
 				func: () => this.checkMissingData(i),
-				separator: i == 2 || i == 5
+				separator: i == 1 || i == 3
 			}));
 		}
 
@@ -564,24 +562,18 @@ class MenuItems {
 	checkMissingData(i) {
 		switch (i) {
 			case 0:
-				this.missingRev('foAmRev', 'AllMusic', '专辑评论');
-				break;
-			case 1:
 				this.missingRev('foLfmRev', 'Last.fm', '专辑评论');
 				break;
-			case 2:
+			case 1:
 				this.missingRev('foWikiRev', '维基百科', '专辑评论');
 				break;
-			case 3:
-				this.missingBio('foAmBio', 'AllMusic', '简介');
-				break;
-			case 4:
+			case 2:
 				this.missingBio('foLfmBio', 'Last.fm', '简介');
 				break;
-			case 5:
+			case 3:
 				this.missingBio('foWikiBio', '维基百科', '简介');
 				break;
-			case 6:
+			case 4:
 				this.missingArtImg('foImgArt', 'Last.fm', '照片');
 				break;
 		}
@@ -609,7 +601,9 @@ class MenuItems {
 		this.img.artist = imgInfo.artist;
 		this.path.img = imgInfo.imgPth;
 		this.img.isLfm = imgInfo.blk && this.path.img;
-		this.img.name = this.img.isLfm ? this.path.img.slice(this.path.img.lastIndexOf('_') + 1) : this.path.img.slice(this.path.img.lastIndexOf('\\') + 1); // needed for init
+		this.img.name = this.img.isLfm && this.path.img.lastIndexOf('\\') < this.path.img.lastIndexOf('_') // Regorxxx <- Fix '_' char in folder paths
+			? this.path.img.slice(this.path.img.lastIndexOf('_') + 1)
+			: this.path.img.slice(this.path.img.lastIndexOf('\\') + 1); // needed for init
 		this.img.blacklist = [];
 		this.path.blackList = `${cfg.storageFolder}blacklist_image.json`;
 
@@ -619,7 +613,8 @@ class MenuItems {
 
 		if ($.file(this.path.blackList)) {
 			this.img.artistClean = $.clean(this.img.artist).toLowerCase();
-			this.img.list = $.jsonParse(this.path.blackList, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+			this.img.list = $.jsonParse(this.path.blackList, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+			if (!this.img.list || typeof this.img.list !== 'object' || Array.isArray(this.img.list)) { this.img.list = {}; } // Regorxxx <- Safecheck against corrupt files ->
 			this.img.blacklist = this.img.list.blacklist[this.img.artistClean] || [];
 		}
 	
@@ -637,18 +632,18 @@ class MenuItems {
 	getlookUpStr(i, j, artist) {
 		return [
 			[lg['Manual cycle: wheel over button'], lg['Auto cycle items'], popUpBox.ok ? lg['Options...'] : lg['Options: see console'], lg['Reload']][i],
-			[lg['Show similar artists'], lg['Show more tags (circle button if present)'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i],
-			[lg['Show top albums'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...'], lg['Allmusic: '] + artist + lg['...']][i]
+			[lg['Show similar artists'], lg['Show more tags (circle button if present)'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...']][i],
+			[lg['Show top albums'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...']][i]
 		][j];
 	}
 	
 	getOpenFlag() {
-		return this.path.img || this.path.am[3] || this.path.lfm[3] || this.path.wiki[3] || this.path.txt[3] || this.path.tracksAm[3] || this.path.tracksLfm[3] || this.path.tracksWiki[3] ? MF_STRING : MF_GRAYED;
+		return this.path.img || this.path.lfm[3] || this.path.wiki[3] || this.path.txt[3] || this.path.tracksLfm[3] || this.path.tracksWiki[3] ? MF_STRING : MF_GRAYED;
 	}
 
 	getOpenName() {
-		const fo = [this.path.img, this.path.am[3], this.path.lfm[3], this.path.wiki[3], this.path.tracksAm[3], this.path.tracksLfm[3], this.path.tracksWiki[3], this.path.txt[3]];
-		this.openName = [lg['Image '] + '\t' + lg['Alt+Click'], ppt.artistView ? lg['Biography [allmusic]'] : lg['Review [allmusic]'], ppt.artistView ? lg['Biography [last.fm]'] : lg['Review [last.fm]'], ppt.artistView ? lg['Biography [wikipedia]'] : lg['Review [wikipedia]'], ppt.artistView ? '' : lg['Tracks [allmusic]'], ppt.artistView ? '' : lg['Tracks [last.fm]'], ppt.artistView ? '' : lg['Tracks [wikipedia]'], ppt.artistView ? txt.bio.subhead.txt[0] : txt.rev.subhead.txt[0]];
+		const fo = [this.path.img, this.path.lfm[3], this.path.wiki[3], this.path.tracksLfm[3], this.path.tracksWiki[3], this.path.txt[3]];
+		this.openName = [lg['Image '] + '\t' + lg['Alt+Click'], ppt.artistView ? lg['Biography [last.fm]'] : lg['Review [last.fm]'], ppt.artistView ? lg['Biography [wikipedia]'] : lg['Review [wikipedia]'], ppt.artistView ? '' : lg['Tracks [last.fm]'], ppt.artistView ? '' : lg['Tracks [wikipedia]'], ppt.artistView ? txt.bio.subhead.txt[0] : txt.rev.subhead.txt[0]];
 		let i = this.openName.length;
 		while (i--)
 			if (!fo[i]) {
@@ -661,15 +656,15 @@ class MenuItems {
 	getSourceNames() {
 		const b = ppt.artistView ? 'Bio' : 'Rev';
 		const n = b.toLowerCase();
-		this.types = !txt[n].reader ? $.source.amLfmWiki : $.source.amLfmWikiTxt;
-		this.sources = [lg['Allmusic'], lg['Last.fm'], lg['Wikipedia']];
+		this.types = !txt[n].reader ? $.source.lfmWiki : $.source.lfmWikiTxt;
+		this.sources = [lg['Last.fm'], lg['Wikipedia']];
 		this.sources = this.sources.map(v => v + (ppt.artistView ? ' 简介' : ' 评论'));
 		if (txt[n].reader) this.sources.push(txt[n].subhead.txt[0] || '');
-		if (!panel.stndItem() && (txt.reader[n].lyrics || txt.reader[n].props)) this.sources[3] += ' // 当前音轨';
+		if (!panel.stndItem() && (txt.reader[n].lyrics || txt.reader[n].props)) this.sources[2] += ' // 当前音轨';
 	}
 
 	getTaggerStr(i) {
-		return !i ? lg['Write existing file info to tags: '] : i == 13 + 1 ? lg['All tagger settings...'] : i == 13 + 2 ? (cfg.taggerConfirm ? lg['Tag files...'] : `${lg['Tag']} ${this.handles.Count} ${this.handles.Count > 1 ? lg['tracks'] : lg['track']}...`) + (this.tags ? '' : lg[' N/A no tags enabled']) + (cfg.tagEnabled5 || cfg.tagEnabled7 ? tag.genres.length > 700 || !cfg.useWhitelist ? '' : lg[' WARNING: last.fm genre whitelist not found or invalid [try force update - needs internet connection]'] : '') : i == 13 + 3 ? lg['Cancel'] : i == 11 ? cfg[`tagName${i - 1}`] + (cfg[`tagEnabled${i - 1}`] ? ' (' + cfg[`tagEnabled${i + 2}`] + ')' : '') : cfg[`tagName${i - 1}`];
+		return !i ? lg['Write existing file info to tags: '] : i == 8 + 1 ? lg['All tagger settings...'] : i == 8 + 2 ? (cfg.taggerConfirm ? lg['Tag files...'] : `${lg['Tag']} ${this.handles.Count} ${this.handles.Count > 1 ? lg['tracks'] : lg['track']}...`) + (this.tags ? '' : lg[' N/A no tags enabled']) + (cfg.tagEnabled0 || cfg.tagEnabled2 ? tag.genres.length > 700 || !cfg.useWhitelist ? '' : lg[' WARNING: last.fm genre whitelist not found or invalid [try force update - needs internet connection]'] : '') : i == 8 + 3 ? lg['Cancel'] : i == 6 ? cfg[`tagName${i - 1}`] + (cfg[`tagEnabled${i - 1}`] ? ' (' + cfg.tagEnabled8 + ')' : '') : cfg[`tagName${i - 1}`];
 	}
 
 	images(v) {
@@ -679,7 +674,7 @@ class MenuItems {
 	isRevAvail() {
 		const type = ['alb', 'trk'];
 		type.forEach(w => {
-			this[`${w}Avail`] = $.source.amLfmWiki.some(v => {
+			this[`${w}Avail`] = $.source.lfmWiki.some(v => {
 				return ppt.lockBio ? txt.rev.loaded.ix == txt.avail[`${v}${w}`] : txt.avail[`${v}${w}`] != -1;
 			});
 		});
@@ -695,7 +690,7 @@ class MenuItems {
 				img.get = false;
 				txt.get = 0;
 				let force = false;
-				if (ppt.sourcerev == 3) {
+				if (ppt.sourcerev == 2) {
 					ppt.sourcerev = 0;
 					this.setSource('Rev');
 				}
@@ -705,8 +700,8 @@ class MenuItems {
 					txt.albumFlush();
 					force = true;
 				}
-				if (panel.alb.list[panel.alb.ix].composition && ppt.sourcerev != 0 && ppt.sourcerev != 2) {
-					ppt.sourcerev = txt.rev.am ? 0 : txt.rev.wiki ? 2 : txt.rev.am;
+				if (panel.alb.list[panel.alb.ix].composition && ppt.sourcerev != 0 && ppt.sourcerev != 1) {
+					ppt.sourcerev = txt.rev.wiki ? 1 : 0;
 					this.setSource('Rev');
 				}
 				txt.getItem(false, panel.art.ix, panel.alb.ix, force);
@@ -745,14 +740,13 @@ class MenuItems {
 				const artist = panel.art.list.length ? panel.art.list[0].name : name.artist(panel.id.focus);
 				const brArr = ['', '/+similar', '/+albums'];
 				if (i < 5) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 4], true);
-				else $.browser('https://www.allmusic.com/search/artists/' + encodeURIComponent(artist), true);
 				break;
 			}
 		}
 		if (i < 2) {
 			img.get = false;
 			txt.get = 0;
-			if (ppt.sourcerev == 3) {
+			if (ppt.sourcerev == 2) {
 				ppt.sourcerev = 0;
 				this.setSource('Rev');
 			}
@@ -777,8 +771,8 @@ class MenuItems {
 				panel.art.ix = i;
 				img.get = false;
 				txt.get = 0;
-				if (ppt.sourcebio == 3) {
-					ppt.sourcebio = 1;
+				if (ppt.sourcebio == 2) {
+					ppt.sourcebio = 0;
 					this.setSource('Bio');
 				}
 				txt.getItem(false, panel.art.ix, panel.alb.ix);
@@ -821,14 +815,13 @@ class MenuItems {
 				const artist = panel.art.list.length ? panel.art.list[0].name : name.artist(panel.id.focus);
 				const brArr = ['', '/+similar', '/+albums'];
 				if (i < 6) $.browser('https://www.last.fm/' + (cfg.language == 'EN' ? '' : cfg.language.toLowerCase() + '/') + 'music/' + encodeURIComponent(artist) + brArr[i - 5], true);
-				else $.browser('https://www.allmusic.com/search/artists/' + encodeURIComponent(artist), true);
 				break;
 			}
 		}
 		if (i < 3) {
 			filmStrip.logScrollPos();
-			if (ppt.sourcebio == 3) {
-				ppt.sourcebio = 1;
+			if (ppt.sourcebio == 2) {
+				ppt.sourcebio = 0;
 				this.setSource('Bio');
 			}
 			img.get = false;
@@ -968,16 +961,16 @@ class MenuItems {
 		this.img.artist = imgInfo.artist;
 		this.path.img = imgInfo.imgPth;
 		this.img.isLfm = imgInfo.blk && this.path.img;
-		this.img.name = this.img.isLfm ? this.path.img.slice(this.path.img.lastIndexOf('_') + 1) : this.path.img.slice(this.path.img.lastIndexOf('\\') + 1);
+		this.img.name = this.img.isLfm && this.path.img.lastIndexOf('\\') < this.path.img.lastIndexOf('_') // Regorxxx <- Fix '_' char in folder paths
+			? this.path.img.slice(this.path.img.lastIndexOf('_') + 1)
+			: this.path.img.slice(this.path.img.lastIndexOf('\\') + 1);
 		this.isRevAvail();
-		this.path.am = ppt.artistView ? txt.bioPth('Am') : txt.revPth('Am');
 		this.path.lfm = ppt.artistView ? txt.bioPth('Lfm') : txt.revPth('Lfm');
 		this.path.txt = ppt.artistView ? txt.txtBioPth() : txt.txtRevPth();
 		this.path.wiki = ppt.artistView ? txt.bioPth('Wiki') : txt.revPth('Wiki');
-		this.path.tracksAm = ppt.artistView ? '' : txt.trackPth('Am');
 		this.path.tracksLfm = ppt.artistView ? '' : txt.trackPth('Lfm');
 		this.path.tracksWiki = ppt.artistView ? '' : txt.trackPth('Wiki');
-		this.path.open = [this.path.img, this.path.am[1], this.path.lfm[1], this.path.wiki[1], this.path.tracksAm[1], this.path.tracksLfm[1], this.path.tracksWiki[1], this.path.txt[1]];
+		this.path.open = [this.path.img, this.path.lfm[1], this.path.wiki[1], this.path.tracksLfm[1], this.path.tracksWiki[1], this.path.txt[1]];
 		this.getOpenName();
 		this.getBlacklistImageItems();
 		if (ppt.menuShowTagger == 2 || ppt.menuShowTagger && this.shift) this.handles = plman.GetPlaylistSelectedItems(plman.ActivePlaylist);
@@ -1128,18 +1121,18 @@ class MenuItems {
 
 	setPaste(i) {
 		switch (i) {
-			case 0: case 1: case 2: {
+			case 0: case 1: {
 				const n = ppt.artistView ? 'bio' : 'rev';
-				const s = $.source.amLfmWiki[i];
+				const s = $.source.lfmWiki[i];
 				this.undo.folder = this.path[s][0];
 				this.undo.path = this.path[s][1];
 				this.undo.text = $.open(this.undo.path);
 				$.buildPth(this.undo.folder);
 				$.save(this.undo.path, this.docTxt + '\r\n\r\n自定义 ' + (ppt.artistView ? '简介' : '评论'), true);
 				const b = ppt.artistView ? 'Bio' : 'Rev';
-				const pth = txt[`${n}Pth`](['Am', 'Lfm', 'Wiki'][i]);
+				const pth = txt[`${n}Pth`](['Lfm', 'Wiki'][i]);
 				if (this.path[s][1] == pth[1]) {
-					ppt[`source${b}`] = 0;
+					ppt[`source${b}`] = i;
 					txt[n].source[s] = true;
 				}
 				window.NotifyOthers('bio_getText', 'bio_getText');
@@ -1147,14 +1140,14 @@ class MenuItems {
 				if (ppt.text_only) txt.paint();
 				break;
 			}
-			case 3: {
+			case 2: {
 				const open = (c, w) => {
 					if (!$.run(c, w)) fb.ShowPopupMessage('无法启动默认文本编辑器。', '简介');
 				};
 				open('"' + this.undo.path, 1);
 				break;
 			}
-			case 4:
+			case 3:
 				if (!this.undo.text.length && $.file(this.undo.path)) {
 					fso.DeleteFile(this.undo.path);
 					window.NotifyOthers('bio_reload', 'bio_reload');
@@ -1203,8 +1196,8 @@ class MenuItems {
 
 	setSource(b, n) {
 		n = n || b.toLowerCase();
-		$.source.amLfmWikiTxt.forEach((v, i) => txt[n].source[v] = ppt[`source${n}`] == i);
-		$.source.amLfmWiki.forEach(v => {if (txt[n].source[v]) txt.done[`${v}${b}`] = false});
+		$.source.lfmWikiTxt.forEach((v, i) => txt[n].source[v] = ppt[`source${n}`] == i);
+		$.source.lfmWiki.forEach(v => {if (txt[n].source[v]) txt.done[`${v}${b}`] = false});
 		txt[n].source.ix = ppt[`source${n}`];
 	}
 
@@ -1240,7 +1233,7 @@ class MenuItems {
 	setTextType(i, b) {
 		switch (i) {
 			case 0:
-			case 1: this.toggle(4, b); break;
+			case 1: this.toggle(3, b); break;
 			case 2: txt.bio.scrollPos = {}; txt.rev.scrollPos = {}; ppt.toggle('sourceAll'); txt.refresh(1); break;
 			case 3:
 				ppt.toggle('showTrackRevOptions');
@@ -1265,7 +1258,7 @@ class MenuItems {
 
 	tagsEnabled() {
 		this.tags = false;
-		for (let i = 0; i < 13; i++)
+		for (let i = 0; i < 8; i++)
 			if (cfg[`tagEnabled${i}`]) {
 				this.tags = true;
 				break;
@@ -1275,28 +1268,26 @@ class MenuItems {
 	toggle(i, b, fix, direction) {
 		const n = b.toLowerCase();
 		if (i === ppt[`source${n}`]) return;
-		if (i == 4) {
+		if (i == 3) {
 			ppt.toggle('lockBio');
 		} else {
 		if (i === '') i = ppt[`source${n}`];
 			if (fix) {
 				ppt[`source${n}`] = i;
 			} else if (ppt.lockBio && !ppt.sourceAll) {
-				const limit = txt[n].reader ? 3 : 2;
+				const limit = txt[n].reader ? 2 : 1;
 				direction == 1 ? ppt[`source${n}`] = i == limit ? 0 : ++i : ppt[`source${n}`] = i == 0 ? limit : --i;
 			} else {
 				if (txt[n].reader) {
 					switch (txt[n].loaded.ix) {
-						case 0: ppt[`source${n}`] = direction == 1 ? (txt[n].lfm ? 1 : txt[n].wiki ? 2 : txt[n].txt ? 3 : 0) : (txt[n].txt ? 3 : txt[n].wiki ? 2 : txt[n].lfm ? 1 : 0); break;
-						case 1: ppt[`source${n}`] = direction == 1 ? (txt[n].wiki ? 2 : txt[n].txt ? 3 : txt[n].am ? 0 : 1) : (txt[n].am ? 0 : txt[n].txt ? 3 : txt[n].wiki ? 2 : 1); break;
-						case 2: ppt[`source${n}`] = direction == 1 ? (txt[n].txt ? 3 : txt[n].am ? 0 : txt[n].lfm ? 1 : 2) : (txt[n].lfm ? 1 : txt[n].am ? 0 : txt[n].txt ? 3 : 2); break;
-						case 3: ppt[`source${n}`] = direction == 1 ? (txt[n].am ? 0 : txt[n].lfm ? 1 : txt[n].wiki ? 2 : 3) : (txt[n].wiki ? 2 : txt[n].lfm ? 1 : txt[n].am ? 0 : 3); break;
+						case 0: ppt[`source${n}`] = direction == 1 ? (txt[n].wiki ? 1 : txt[n].txt ? 2 : 0) : (txt[n].txt ? 2 : txt[n].wiki ? 1 : 0); break;
+						case 1: ppt[`source${n}`] = direction == 1 ? (txt[n].txt ? 2 : txt[n].lfm ? 0 : 1) : (txt[n].lfm ? 0 : txt[n].txt ? 2 : 1); break;
+						case 2: ppt[`source${n}`] = direction == 1 ? (txt[n].lfm ? 0 : txt[n].wiki ? 1 : 2) : (txt[n].wiki ? 1 : txt[n].lfm ? 0 : 2); break;
 						}
 				} else {
 					switch (txt[n].loaded.ix) {
-						case 0: ppt[`source${n}`] = direction == 1 ? (txt[n].lfm ? 1 : txt[n].wiki ? 2 : 0) : (txt[n].wiki ? 2 : txt[n].lfm ? 1 : 0); break;
-						case 1: ppt[`source${n}`] = direction == 1 ? (txt[n].wiki ? 2 : txt[n].am ? 0 : 1) : (txt[n].am ? 0 : txt[n].wiki ? 2 : 1); break;
-						case 2: ppt[`source${n}`] = direction == 1 ? (txt[n].am ? 0 : txt[n].lfm ? 1 : 2) : (txt[n].lfm ? 1 : txt[n].am ? 0 : 2); break;
+						case 0: ppt[`source${n}`] = direction == 1 ? (txt[n].wiki ? 1 : 0) : (txt[n].wiki ? 1 : 0); break;
+						case 1: ppt[`source${n}`] = direction == 1 ? (txt[n].lfm ? 0 : 1) : (txt[n].lfm ? 0 : 1); break;
 					}
 				}
 			}
@@ -1321,8 +1312,8 @@ class MenuItems {
 				if (i < 0) i = panel.art.uniq.length - 1;
 				else if (i >= panel.art.uniq.length) i = 0;
 				filmStrip.logScrollPos();
-				if (ppt.sourcebio == 3) {
-					ppt.sourcebio = 1;
+				if (ppt.sourcebio == 2) {
+					ppt.sourcebio = 0;
 					this.setSource('Bio');
 				}
 				panel.art.ix = panel.art.uniq[i].ix;
@@ -1336,7 +1327,7 @@ class MenuItems {
 				if (i < 0) i = panel.alb.uniq.length - 1;
 				else if (i >= panel.alb.uniq.length) i = 0;
 				filmStrip.logScrollPos();
-				if (ppt.sourcerev == 3) {
+				if (ppt.sourcerev == 2) {
 					ppt.sourcerev = 0;
 					this.setSource('Rev');
 				}

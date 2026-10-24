@@ -97,7 +97,9 @@ class DldWikipedia {
 				this.ar_mbid = $.eval('$trim($if3(%musicbrainz_artistid%,%musicbrainz artist id%,))', this.focus);
 				if (!this.ar_mbid || this.ar_mbid.length != 36) {
 					const related_artists = $.jsonParse(`${cfg.storageFolder.replace('{BA9557CE-7B4B-4E0E-9373-99F511E81252}', '{F5E9D9EB-42AD-4A47-B8EE-C9877A8E7851}')}related_artists.json`, {}, 'file');
-					this.ar_mbid = related_artists[this.artist.toUpperCase()]; // f&p says if it's a tag read
+					if (typeof related_artists === 'object' && !Array.isArray(related_artists)) { // Regorxxx <- Safecheck against corrupt files (fixed NEW typo: || -> &&) ->
+						this.ar_mbid = related_artists[this.artist.toUpperCase()]; // f&p says if it's a tag read
+					}
 				}
 				if ((!this.ar_mbid || this.ar_mbid.length != 36) && !this.force) this.ar_mbid = server.artistMbid[this.artist];
 				if (!this.ar_mbid || this.ar_mbid.length != 36) this.ar_mbid = '';
@@ -186,7 +188,7 @@ class DldWikipedia {
 				switch (this.aridType) {
 					case 0: case 1: { // recording or release-group match
 						const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', !this.aridType ? 'recordings' : 'release-groups');
-						if (!data.length) {
+						if (!Array.isArray(data) || !data.length) { // Regorxxx <- Safecheck against corrupt files ->
 							this.aridType = !this.aridType && this.album ? 1 : 2;
 							return this.search(0);
 						}
@@ -240,7 +242,7 @@ class DldWikipedia {
 					}
 					case 2: { // artist name match: type 0: only accepted if single name match: others try wikipedia direct as can validate then
 						const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'artists');
-						if (!data.length) {
+						if (!Array.isArray(data) || !data.length) { // Regorxxx <- Safecheck against corrupt files ->
 							if (this.doFallbackSearch()) return;
 							if (this.type || !$.file(this.pth)) return $.trace('维基百科: ' + this.artist + ': 在 musicbrainz 上名称不匹配', true);
 						}
@@ -275,7 +277,8 @@ class DldWikipedia {
 				break;
 			case 1: { // extractMbArtistLinks
 				let data;
-				data = $.jsonParse(this.xmlhttp.responseText, []);
+				data = $.jsonParse(this.xmlhttp.responseText, {});
+				if (typeof data !== 'object' || Array.isArray(data)) { data = {}; } // Regorxxx <- Safecheck against corrupt files ->
 				this.related_artist = data.name != this.artist ? data.name : ''; // name could differ if related_artist or tag mbid; needed for direct en wikipedia validation
 				if (!this.type) {
 					this.genres = data['genres'].filter(v => v.count > 0).sort((a, b) => b.count - a.count);
@@ -288,6 +291,7 @@ class DldWikipedia {
 				this.saveCountryCode(countryCode, this.force);
 
 				data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'relations');
+				if (!Array.isArray(data)) { data = []; } // Regorxxx <- Safecheck against corrupt files ->
 				this.wikidata = '';
 				this.wikititle = '';
 				let wikidataCount = 0;
@@ -332,6 +336,7 @@ class DldWikipedia {
 			}
 			case 2: { // getItemMbid
 				let data = $.jsonParse(this.xmlhttp.responseText, [], 'get', this.type != 2 && this.type != 4 ? 'release-groups' : 'works');
+				if (!Array.isArray(data)) { data = []; } // Regorxxx <- Safecheck against corrupt files ->
 				let list = [];
 				const filteredList = []; // check work disambiguation
 				const ar = $.strip(this.related_artist || this.artist);
@@ -379,12 +384,14 @@ class DldWikipedia {
 				let data;
 				if (this.type != 4) {
 					data = $.jsonParse(this.xmlhttp.responseText, []);
+					if (typeof data !== 'object' || Array.isArray(data)) { data = {}; } // Regorxxx <- Safecheck against corrupt files ->
 					this.genres = data['genres'].filter(v => v.count > 0).sort((a, b) => b.count - a.count);
 					$.take(this.genres, 5);
 					this.genres = this.genres.map(v => $.titlecase(v.name));
 				}
 
 				data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'relations');
+				if (!Array.isArray(data)) { data = []; } // Regorxxx <- Safecheck against corrupt files ->
 				this.wikidata = '';
 				data.forEach(v => { // occasionally > 1 link: no obvious discriminators: use earliest: more likely to be main one (less likely to be a video etc)
 					if (v.type == 'wikidata') {
@@ -422,7 +429,8 @@ class DldWikipedia {
 				break;
 			}
 			case 4:	{ // parseWikidata
-				const data = $.jsonParse(this.xmlhttp.responseText, {});
+				let data = $.jsonParse(this.xmlhttp.responseText, {});
+				if (typeof data !== 'object' || Array.isArray(data)) { data = {}; } // Regorxxx <- Safecheck against corrupt files ->
 				if (this.alwaysCheckArtistInWiki && this.type || !this.artistValidated && (this.type == 2 || this.type == 4 || this.fallBackDone)) this.artistValidated = this.wikidataArtist ? this.xmlhttp.responseText.includes(`${this.wikidataArtist}`) : false;
 				const wikititles = server.getObjKeyValue(data, 'title');
 				const wikiurls = server.getObjKeyValue(data, 'url');
@@ -459,7 +467,8 @@ class DldWikipedia {
 				break;
 			}
 			case 5:	{ // parseWikipediaResponse
-				const data = $.jsonParse(this.xmlhttp.responseText, {});
+				let data = $.jsonParse(this.xmlhttp.responseText, {});
+				if (typeof data !== 'object' || Array.isArray(data)) { data = {}; } // Regorxxx <- Safecheck against corrupt files ->
 				this.wiki = server.getObjKeyValue(data, 'extract')[0] || '';
 				const needArtistCheck = this.alwaysCheckArtistInWiki && this.type || this.type == 2 || this.type == 4 || this.fallBackDone;
 				
@@ -480,7 +489,8 @@ class DldWikipedia {
 				break;
 			}
 			case 6: { // artistWorks
-				const response = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'works');
+				let response = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'works');
+				if (!Array.isArray(response)) { response = []; } // Regorxxx <- Safecheck against corrupt files ->
 				if (!this.offset) this.releases = $.jsonParse(this.xmlhttp.responseText, 0, 'get', 'work-count');
 				let list = [];
 				response.forEach(v => {
@@ -500,7 +510,8 @@ class DldWikipedia {
 				return this.search(2);
 			}
 			case 7: { // directSearch
-				const data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'query.search');
+				let data = $.jsonParse(this.xmlhttp.responseText, [], 'get', 'query.search');
+				if (!Array.isArray(data)) { data = []; } // Regorxxx <- Safecheck against corrupt files ->
 				const al = '\\balbum\\b|\\bep\\b';
 				const tr = '\\bsong\\b|\\bsingle\\b|\\binstrumental\\b';
 				const disambig = ['', al, '', tr, tr][this.type];
@@ -527,8 +538,9 @@ class DldWikipedia {
 				this.save();
 				break;
 			}
-			case 8: {			
-				const json = $.jsonParse(this.xmlhttp.responseText, {}, 'get', 'query.pages');
+			case 8: {
+				let json = $.jsonParse(this.xmlhttp.responseText, {}, 'get', 'query.pages');
+				if (typeof json !== 'object' || Array.isArray(json)) { json = {}; } // Regorxxx <- Safecheck against corrupt files ->
 				const key = Object.keys(json);
 				if (!key.length) {this.save(); break;}
 				let source = infobox.cleanText($.getProp(json, `${key[0]}.revisions.0.slots.main.*`, ''), this.site);
@@ -592,7 +604,7 @@ class DldWikipedia {
 
 	get(URL, force) {
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.artist + this.title + this.type + this.pth + cfg.partialMatch + URL))) return;
+		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.artist + this.title + this.type + this.pth + cfg.partialMatch + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
@@ -691,7 +703,8 @@ class DldWikipedia {
 				server.res();
 			}
 		} else {
-			const text = $.jsonParse(this.pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+			let text = $.jsonParse(this.pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+			if (typeof text !== 'object' || Array.isArray(text)) { text = {}; } // Regorxxx <- Safecheck against corrupt files ->
 			if (this.fo) {
 				$.buildPth(this.fo);
 				if (this.site == 'en') {

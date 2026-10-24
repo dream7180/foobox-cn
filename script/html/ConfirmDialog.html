@@ -1,12 +1,13 @@
 ﻿<!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="x-ua-compatible" content="IE=8"/>
+        <meta http-equiv="x-ua-compatible" content="IE=edge"/>
         <link rel="stylesheet" type="text/css" href="styles.css">
         <style type="text/css">
 			html,body{padding:0;margin:0}		
             .container {
 				font:caption;
+				font-family:"Microsoft YaHei UI","Microsoft YaHei","Segoe UI",sans-serif;
 				padding: 10px 10px;
 				word-wrap: break-word;
 				white-space: pre-wrap; 
@@ -32,6 +33,56 @@
             .button_cancel { display:inline-block; } 
         </style>
         <title></title>
+        <script>
+            // Embedded MSHTML renders explicit px at 96dpi without DPI scaling.
+            // Primary: the host panel passes window.DPI as the last dialogArguments
+            // element (96 = 100%; some forks report a scale multiplier instead).
+            // Fallback: if no DPI argument is available, measure a caption-font probe.
+            // FONT_BASE: px at 96dpi; tweak to adjust the overall dialog font.
+            (function () {
+                var FONT_BASE = 12;
+                function addStyle(fs) {
+                    try {
+                        var st = document.createElement('style');
+                        st.type = 'text/css';
+                        var rule = 'body,input,label,button,textarea,select,.container {font-size:' + fs + 'px !important;}';
+                        if (st.styleSheet) { st.styleSheet.cssText = rule; } else { st.appendChild(document.createTextNode(rule)); }
+                        document.getElementsByTagName('head')[0].appendChild(st);
+                    } catch (e) {}
+                }
+                function applyDpi(dpi) {
+                    if (typeof dpi !== 'number' || dpi <= 0) return false;
+                    var scale = dpi < 10 ? dpi : dpi / 96;
+                    addStyle(Math.round(FONT_BASE * scale));
+                    return true;
+                }
+                function probe() {
+                    try {
+                        var el = document.createElement('span');
+                        el.style.cssText = 'font:caption;position:absolute;visibility:hidden;white-space:nowrap;';
+                        el.appendChild(document.createTextNode('Hg'));
+                        (document.body || document.documentElement).appendChild(el);
+                        var capH = el.offsetHeight || 0;
+                        if (el.parentNode) { el.parentNode.removeChild(el); }
+                        if (capH > 0) { addStyle(Math.round(capH * 0.5)); return true; }
+                    } catch (e) {}
+                    return false;
+                }
+                var applied = false;
+                try {
+                    var args = window.external.dialogArguments.toArray();
+                    if (args && args.length > 5) { applied = applyDpi(args[5]); }
+                } catch (e) {}
+                if (!applied) {
+                    applied = probe();
+                    if (document.attachEvent) {
+                        document.attachEvent('onreadystatechange', function () {
+                            if (!applied && (document.readyState == 'interactive' || document.readyState == 'complete')) { applied = probe(); }
+                        });
+                    }
+                }
+            })();
+        </script>
     </head>
     <body>
         <div id="div_text" class="container"></div>

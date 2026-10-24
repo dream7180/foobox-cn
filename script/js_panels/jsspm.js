@@ -21,8 +21,8 @@ var plIco = {
 var brw = null;
 var isScrolling = false;
 
-// --- Playlist Group 扩展变量（虚拟分组） ---
-// 安全解析属性 JSON：属性不存在/被清空/格式非法时回退默认值，避免顶层 JSON.parse 抛错
+// --- Playlist Group 虚拟分组 ---
+// 安全解析 JSON 属性，非法/为空时回退默认值
 function parsePropJson(name, fallback) {
 	var val = window.GetProperty(name, fallback);
 	if (typeof val !== "string" || val.trim() === "") val = fallback;
@@ -32,7 +32,7 @@ function parsePropJson(name, fallback) {
 		return JSON.parse(fallback);
 	}
 }
-// [静态白名单] 永远处于一级目录，不会被吸入任何分组！
+// 白名单：永远不参与分组的播放列表名
 var nonGrouped = [];
 // 虚拟分组列表：[{id, name, collapsed}]
 var Groups = [];
@@ -50,11 +50,17 @@ function getGroupMemberIndices(groupId) {
 	}
 	return indices;
 }
-// 辅助函数：获取分组成员数量
 function getGroupMemberCount(groupId) {
 	return getGroupMemberIndices(groupId).length;
 }
-// 辅助函数：按 GUID 查找播放列表当前索引（播放列表增删后索引会漂移，GUID 查址稳定可靠）
+// 分组在 GroupMap 中是否还有成员
+function groupHasMembers(groupId) {
+	for (var guid in GroupMap) {
+		if (GroupMap[guid] === groupId) return true;
+	}
+	return false;
+}
+// 按 GUID 查找播放列表当前索引（索引会漂移，GUID 稳定）
 function findPlIndexByGuid(guid) {
 	for (var i = 0; i < plman.PlaylistCount; i++) {
 		if (plman.GetGUID(i) === guid) return i;
@@ -62,40 +68,35 @@ function findPlIndexByGuid(guid) {
 	return -1;
 }
 
-// 公共函数：切换分组折叠状态（复用鼠标点击逻辑）
+// 切换分组折叠状态（键盘 Enter 路径复用）
 function toggleGroupCollapse(groupRow) {
-	// --- [修改] 使用 GUID 作为折叠状态键 ---
 	var g_row = groupRow;
 	for (var gi = 0; gi < Groups.length; gi++) {
 		if (Groups[gi].id === g_row.groupId) { Groups[gi].collapsed = !Groups[gi].collapsed; break; }
 	}
 	save_gdata();
 	
-	// 视口锚定：记录组头行的可视位置 + 组头之后的第一行内容标识，
-	// 折叠/展开后把它滚回原可视位置，避免列表跳回顶部
+	// 视口锚定：折叠/展开后把组头滚回原可视位置，避免列表跳回顶部
 	var anchorTopOffset = brw.rows[cPlaylistManager.drag_group_rowId].y - brw.y;
 	var nextContentId = null;
 	if (!brw.rows[cPlaylistManager.drag_group_rowId].isExpanded) {
-		// 即将展开（当前存储的是折叠后状态）：锚定组头自身即可
 		nextContentId = { type: "group", id: g_row.groupId };
 	} else {
-		// 即将折叠：锚定组头之后第一个内容行
 		for (var nc = cPlaylistManager.drag_group_rowId + 1; nc < brw.rows.length; nc++) {
 			var ncRow = brw.rows[nc];
 			if (ncRow.isVGroup) { nextContentId = { type: "group", id: ncRow.groupId }; break; }
 			if (ncRow.idx >= 0) { nextContentId = { type: "pl", guid: plman.GetGUID(ncRow.idx) }; break; }
 		}
 	}
-	// 重置所有拖拽状态
 	brw.actionRows.splice(0, brw.actionRows.length);
 	brw.activeRow = -1;
 	cPlaylistManager.drag_clicked = false;
 	cPlaylistManager.drag_is_group = false;
 	cPlaylistManager.drag_group_rowId = -1;
 	cPlaylistManager.drag_target_id = -1;
-	cPlaylistManager.drag_moved = false; // 必须重置
+	cPlaylistManager.drag_moved = false;
 	brw.populate(true, false);
-	// 按锚定行恢复滚动（锚定行不可得时仍需 check_scroll 收敛，防折叠后旧 scroll 越界）
+	// 按锚定行恢复滚动；找不到锚定行时用 check_scroll 收敛
 	var restoreRow = -1;
 	if (nextContentId) {
 		for (var rr = 0; rr < brw.rows.length; rr++) {
@@ -114,14 +115,11 @@ function toggleGroupCollapse(groupRow) {
 	brw.repaint();
 }
 
-// 辅助函数：顺序变动（MovePlaylist）后，按 GUID 把 actionRows/activeRow 重新解析到新行号。
-// actionRows 存的是 UI 行号而不是 plman 索引，列表一移动，旧行号就指向了别的列表，
-// 高亮会错位（例：选 2/3/4 拖到 6 后 → 行号 1/2/3 上是 5/6/2，选中看起来变成 5/6/2）。
-// movePlan: [{guid, origIdx}] —— 本次被移动的项（按新顺序遍历行集，故结果自然有序）
-// keepActiveRow = true 时不动 activeRow（外部变更场景：光标应留在原处，不该跳到选中块）
+// 顺序变动后按 GUID 把 actionRows/activeRow 重新解析到新行号（actionRows 存的是 UI 行号，
+// 列表一移动旧行号就指向别的列表，高亮会错位）。movePlan: [{guid, origIdx}]；
+// keepActiveRow = true 时不动 activeRow（外部变更时光标留在原处）。
 function remapSelectionByGuids(movePlan, keepActiveRow) {
 	if (!movePlan || movePlan.length === 0) return;
-	// 先建 GUID 集合：避免 rows × movePlan 的二重循环（全选时会退化成上万次 GetGUID）
 	var guidSet = {};
 	for (var m = 0; m < movePlan.length; m++) guidSet[movePlan[m].guid] = true;
 	var newRows = [];
@@ -131,8 +129,7 @@ function remapSelectionByGuids(movePlan, keepActiveRow) {
 		var guid = plman.GetGUID(r.idx);
 		if (guidSet.hasOwnProperty(guid) && guidSet[guid]) newRows.push(i);
 	}
-	// 选中项已全部不在当前行集（被删除 / 折叠 / 过滤掉）：必须清空，
-	// 否则残留的旧行号会越界，后续 this.rows[actionRows[i]].xxx 直接崩溃
+	// 选中项已全部不在行集：必须清空，否则残留行号会越界
 	if (newRows.length === 0) {
 		brw.actionRows.splice(0, brw.actionRows.length);
 		if (brw.activeRow >= brw.rows.length) brw.activeRow = brw.rows.length - 1;
@@ -143,8 +140,7 @@ function remapSelectionByGuids(movePlan, keepActiveRow) {
 	if (!keepActiveRow) brw.activeRow = newRows[0];
 }
 
-// 辅助函数：行集重建【之前】快照当前选中项的 GUID，配合 remapSelectionByGuids 使用。
-// 用于外部变更（on_playlists_changed、过滤）导致行集重排的场景。
+// 行集重建前快照选中项 GUID，配合 remapSelectionByGuids 在重建后还原选中
 function snapshotSelectionGuids() {
 	var out = [];
 	var seen = {};
@@ -159,10 +155,7 @@ function snapshotSelectionGuids() {
 	return out;
 }
 
-// 辅助函数：停掉拖拽边缘自动滚动定时器。
-// 它只在 move 分支"鼠标回到列表行上"和 up 分支末尾被清除，而分组拖拽 / 拖入分组
-// 这两条分支会提前 return 跳过清除；又因为它们都把 drag_moved 置回 false，
-// 松手后 move 分支的清除块再也进不去 —— 结果就是列表一直自动滚到顶/底才停。
+// 停掉拖拽边缘自动滚动定时器（分组拖拽/拖入分组分支会提前 return，需单独清理）
 function stopAutoScrollTimer() {
 	if (timers.movePlaylist) {
 		window.ClearInterval(timers.movePlaylist);
@@ -170,11 +163,7 @@ function stopAutoScrollTimer() {
 	}
 }
 
-// 辅助函数：清掉 GroupMap / independent_lists 里已不存在的播放列表 GUID。
-// 在别处（foobar2000 主界面、其它面板）删除列表后，这些映射会变成脏数据：
-// 分组显示"3 项"实际只有 2 项、空分组不消失。原来只在脚本启动时清一次，
-// 运行中删除会残留到下次重载；现在 on_playlists_changed 也会调用。
-// 只在确实发现脏数据时才写盘，避免每次变更都做无用 I/O。
+// 清掉已删除播放列表残留的 GUID 映射（启动和 on_playlists_changed 时调用）
 function purgeDeadGuids() {
 	var validGuids = {};
 	for (var vi = 0; vi < plman.PlaylistCount; vi++) {
@@ -193,9 +182,7 @@ function purgeDeadGuids() {
 	return mapChanged;
 }
 
-// 辅助函数：按 GUID 查址批量删除 actionRows 选中的播放列表（跳过分组头）。
-// 不能用 "行号 idx - i" 做偏移：选中项不连续或夹有分组头时偏移会算错；
-// 且 RemovePlaylistSwitch 会触发行集重建，边删边取行号会错乱误删
+// 按 GUID 查址批量删除选中播放列表（行号偏移在选中项不连续/夹分组头时会算错）
 function removeActionRowsByGuid() {
 	var delGuids = [];
 	for (var i = 0; i < brw.actionRows.length; i++) {
@@ -219,6 +206,7 @@ var g_dragndrop_y = -1;
 var g_dragndrop_trackId = -1;
 var g_dragndrop_rowId = -1;
 var g_dragndrop_targetPlaylistId = -1;
+var g_dragndrop_bottom = false;
 //
 var ww = 0, wh = 0;
 var m_x = 0, m_y = 0;
@@ -230,6 +218,9 @@ var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
 var g_color_highlight = 0;
 var c_default_hl = 0;
+var g_color_normal_bg_default = 0, g_color_selected_bg_default = 0;
+var g_color_bt_overlay = 0, g_scroll_color = 0, g_color_topbar = 0, g_color_draghover = 0;
+var g_track_size = 0, g_fnico1 = null;
 var g_first_populate_launched = false;
 //
 var repaintforced = false, repaint_main = true, repaint_main1 = true, repaint_main2 = true;
@@ -238,7 +229,7 @@ var scroll_ = 0, scroll = 0, scroll_prev = 0;
 var g_start_ = 0, g_end_ = 0;
 var radiom3u = [], radioname = [];
 
-ppt = {
+var ppt = {
 	defaultRowHeight: Number(common_cfg_map.LineHeight),
 	rowHeight: 0,
 	rowScrollStep: Number(common_cfg_map.ScrollStep),
@@ -252,27 +243,23 @@ ppt = {
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
-common_cfg_map = {};
+var common_cfg_map = {};
 var rowScrollStep_org = ppt.rowScrollStep;
 
-// --- [修改] 增加分组拖拽状态变量 ---
-cPlaylistManager = {
+var cPlaylistManager = {
 	drag_clicked: false,
 	drag_droped: false,
 	drag_target_id: -1,
-	// 新增分组拖拽状态
 	drag_is_group: false,
 	drag_group_rowId: -1,
 	drag_start_x: 0,
 	drag_start_y: 0,
-    // 新增：拖拽进入分组相关
     drag_into_group: false,
     drag_into_group_rowId: -1,
-	// 新增：用于指示高亮线在上方还是下方
     drag_above: false
 };
 
-cTouch = {
+var cTouch = {
 	down: false,
 	y_start: 0,
 	y_end: 0,
@@ -286,7 +273,7 @@ cTouch = {
 	delta: 0
 };
 
-cFilterBox = {
+var cFilterBox = {
 	enabled: window.GetProperty("_PROPERTY: Enable Filter Box", true),
 	x: 14,
 	y: 4,
@@ -294,14 +281,14 @@ cFilterBox = {
 	h: 20
 };
 
-cSearchBox = {
+var cSearchBox = {
 	x: 11,
 	y: 3,
 	w: 106,
 	h: 22
 };
 
-cScrollBar = {
+var cScrollBar = {
 	visible: true,
 	width: 12,
 	minCursorHeight: 25,
@@ -310,9 +297,9 @@ cScrollBar = {
 	timerCounter: -1
 };
 
-images = {};
+var images = {};
 
-blink = {
+var blink = {
 	x: 0,
 	y: 0,
 	totaltracks: 0,
@@ -321,12 +308,11 @@ blink = {
 	timer: false
 };
 
-timers = {
+var timers = {
 	mouseDown: false,
 	movePlaylist: false
 };
 
-// --- [新增] 名称唯一性检查 ---
 function isPlaylistNameTaken(name, excludeIdx) {
     var total = plman.PlaylistCount;
     for (var i = 0; i < total; i++) {
@@ -336,7 +322,6 @@ function isPlaylistNameTaken(name, excludeIdx) {
     return false;
 }
 
-// --- [新增] 生成唯一的分组名称 ---
 function getUniqueGroupName(baseName) {
     baseName = baseName || "新分组";
     function isGroupNameTaken(name) {
@@ -354,7 +339,6 @@ function getUniqueGroupName(baseName) {
     }
 }
 
-// --- [新增] 生成唯一的普通列表名称（不含分组前缀） ---
 function getUniquePlaylistName(baseName, excludeIdx) {
     baseName = baseName || "拖入的项目";
     if (!isPlaylistNameTaken(baseName, excludeIdx)) return baseName;
@@ -368,7 +352,7 @@ function getUniquePlaylistName(baseName, excludeIdx) {
 
 //=================================================// Extra functions for playlist manager panel
  function renamePlaylist(autopl_pending) {
-	// 安全防线：如果输入框ID越界或行数据不存在，直接中止
+	// 输入框越界保护
 	if (brw.inputboxID === -1 || !brw.rows[brw.inputboxID]) {
 		brw.inputboxID = -1;
 		return;
@@ -384,7 +368,6 @@ function getUniquePlaylistName(baseName, excludeIdx) {
 		let typed_text = brw.inputbox.text;
 
 		if (isVGroup) {
-			// 虚拟分组重命名：更新 Groups 数组
 			var groupId = brw.rows[brw.inputboxID].groupId;
 			for (var gi = 0; gi < Groups.length; gi++) {
 				if (Groups[gi].id === groupId) { Groups[gi].name = typed_text; break; }
@@ -393,7 +376,6 @@ function getUniquePlaylistName(baseName, excludeIdx) {
 			brw.rows[brw.inputboxID].name = typed_text;
 			brw.rows[brw.inputboxID].raw_name = typed_text;
 		} else {
-			// 普通列表重命名
 			let finalName = typed_text;
 			let oldName = brw.rows[brw.inputboxID].raw_name;
 			brw.rows[brw.inputboxID].raw_name = finalName;
@@ -409,7 +391,6 @@ function getUniquePlaylistName(baseName, excludeIdx) {
 }
 
 function DeletePlaylist(){
-    // --- [新增] 判断选中项是否全部为分组，以调整提示文字 ---
     var allGroups = true;
     for (var i = 0; i < brw.actionRows.length; i++) {
         if (!brw.rows[brw.actionRows[i]].isGroup) {
@@ -420,7 +401,6 @@ function DeletePlaylist(){
     var itemType = allGroups ? "分组" : "播放列表";
     var title = allGroups ? "删除分组" : "删除播放列表";
 
-    // --- [修改] 构建列表名称时，分组使用去掉前缀的显示名称 ---
     var parsed_tabname = "";
     for (var i = 0; i < brw.actionRows.length; i++) {
         if (i > 20) {
@@ -428,14 +408,13 @@ function DeletePlaylist(){
             break;
         }
         var row = brw.rows[brw.actionRows[i]];
-        var displayName = row.name; // row.name 已经去掉前缀，普通列表就是原名
+        var displayName = row.name;
         if (i == 0) parsed_tabname += displayName;
         else parsed_tabname += ", " + displayName;
     }
 
-    // --- [修改] 弹窗前 rows 尚有效，先把选中项解析为稳定标识（分组 ID / 列表 GUID），
-    // 回调中按标识操作：避免 RemovePlaylistSwitch 触发行集重建导致后续循环行号错乱误删，
-    // 也避免 "idx - i" 偏移在选中项不连续或夹有分组头时算出错误索引 ---
+    // 弹窗前先把选中项解析为稳定标识（分组 ID / 列表 GUID），
+    // 避免 RemovePlaylistSwitch 触发行集重建后行号错乱误删
     var pendingGroupIds = [];
     var pendingPlGuids = [];
     for (var i = 0; i < brw.actionRows.length; i++) {
@@ -471,7 +450,6 @@ function DeletePlaylist(){
                 if (cidx >= 0) { plman.RemovePlaylistSwitch(cidx); removedAnyPlaylist = true; }
             }
             if (pendingGroupIds.length > 0 && !removedAnyPlaylist) {
-                // 只删虚拟分组时不触发 on_playlists_changed，必须手动刷新 UI
                 brw.populate(true);
             }
             brw.actionRows = [];
@@ -484,18 +462,20 @@ function DeletePlaylist(){
 }
 
 function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
+	// window.DPI（96 = 100%）传给弹窗做字号换算；个别分支可能返回倍率（1.5），弹窗内自行兼容
+	var dpi = 96;
+	try { if (typeof window.DPI === 'number' && window.DPI > 0) dpi = window.DPI; } catch (e) {}
 	utils.ShowHtmlDialog(window.ID, `file://${fb.ProfilePath}foobox\\script\\html\\ConfirmDialog.html`, {
-		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],
+		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback, dpi],
 	});
 }
 
-// --- [修改] 简化 moveGroup，复用 getBlockCount ---
 function moveGroup(rowId, direction) {
     if (brw.is_moving_group) return;
     var group = brw.rows[rowId];
     if (!group || !group.isGroup) return;
     var members = getGroupMemberIndices(group.groupId);
-    // ===== 空分组：无成员可移，改走锚点路径（上移=锚到上一块之前，下移=锚到下一块之后）=====
+    // 空分组：无成员可移，改走锚点路径
     if (members.length === 0) {
         var emptyTarget = -1;
         if (direction === "up") {
@@ -553,8 +533,7 @@ function moveGroup(rowId, direction) {
     brw.is_moving_group = false;
 }
 
-// --- [新增] 空分组/无成员目标行的锚点解析：用相邻真实列表换算 plman 插入索引 ---
-// 与 resolveTarget 的空分组口径一致：useAbove → 插到锚上行之后或锚下行之前
+// 空分组的插入锚点：用相邻真实列表换算 plman 插入索引（与 resolveTarget 口径一致）
 function findAnchorPlIdx(rowId, useAbove) {
     var anchorAbove = -1;
     var anchorBelow = -1;
@@ -570,7 +549,7 @@ function findAnchorPlIdx(rowId, useAbove) {
     return (anchorBelow !== -1) ? anchorBelow : (anchorAbove !== -1 ? (anchorAbove + 1) : plman.PlaylistCount);
 }
 
-// --- [新增] 将分组移动到目标行位置（用于拖拽） ---
+// 将分组（整块或空分组锚点）移动到目标行位置（用于拖拽）
 function moveGroupTo(groupRowId, targetRowId) {
     if (brw.is_moving_group) return;
     var group = brw.rows[groupRowId];
@@ -580,17 +559,13 @@ function moveGroupTo(groupRowId, targetRowId) {
     brw.is_moving_group = true;
     var members = getGroupMemberIndices(group.groupId);
 
-    // ===== 空分组：无成员可移动，改为更新渲染锚点（拖到哪就锚到落点旁的列表） =====
+    // 空分组：更新渲染锚点（锚到落点旁的列表）
     if (members.length === 0) {
         var targetRow0 = brw.rows[targetRowId];
         var anchorGuid = null;
         var anchorPos = (targetRowId < groupRowId) ? "above" : "below";
         if (targetRow0.isVGroup) {
-            // 目标是分组头：锚定到块外最近列表，方向与渲染端的块边界换算配合保证落点正确
-            // - 移到目标分组之前（above 语义）：锚上方最近列表的下方（渲染在其后 = 目标分组块之前）
-            // - 移到目标分组之后（below 语义）：锚下方最近列表：
-            //     若它是目标分组自己的成员（展开非空）→ 锚下方（渲染换算到成员块尾后）
-            //     否则（独立列表/下方其他分组首成员）→ 锚上方
+            // 目标是分组头：锚到块外最近列表，方向与渲染端的块边界换算配合保证落点正确
             var anchorRow0 = -1;
             if (targetRowId < groupRowId) {
                 for (var s0 = targetRowId - 1; s0 >= 0; s0--) {
@@ -643,16 +618,14 @@ function moveGroupTo(groupRowId, targetRowId) {
                 targetPlaylistIdx = targetMembers[targetMembers.length - 1] + 1;
             }
         } else {
-            // 目标是空分组：用相邻真实列表换算插入索引，避免 NaN
             targetPlaylistIdx = findAnchorPlIdx(targetRowId, targetRowId < groupRowId);
         }
     } else {
         if (targetRowId < groupRowId) {
             targetPlaylistIdx = targetRow.idx;
         } else {
-            // 向下拖 = 插到目标行之后：取下一行的 idx 作为插入位。
-            // 下一行若是虚拟分组头（idx 恒为 -1），直接取会让落点变负 → 676 行保护失效、
-            // 679 行 "-1 < current_start" 恒真 → 整块被搬到列表最前。此处按分组成员块换算。
+            // 向下拖 = 插到目标行之后；下一行是分组头（idx=-1）时须按分组成员块换算，
+            // 直接取 idx 会得到 -1，导致整块被搬到列表最前
             var nextRow = (targetRowId + 1 < brw.rows.length) ? brw.rows[targetRowId + 1] : null;
             if (nextRow && !nextRow.isGroup && nextRow.idx >= 0) {
                 targetPlaylistIdx = nextRow.idx;
@@ -687,8 +660,7 @@ function moveGroupTo(groupRowId, targetRowId) {
     brw.is_moving_group = false;
 }
 
-// --- [新增] 分组失去最后一个成员时，按其当前渲染位置设置锚点，避免掉到末尾 ---
-// excludeGuids：本次被移走的列表 GUID（锚点跳过它们，让空分组留在原位而非跟随移动）
+// 分组失去最后一个成员时按当前渲染位置补锚点（excludeGuids 为刚移走的 GUID，避免分组跟随移动）
 function setAnchorForGroupOnEmpty(groupRowId, excludeGuids) {
     var row = brw.rows[groupRowId];
     if (!row || !row.isGroup) return;
@@ -714,7 +686,6 @@ function setAnchorForGroupOnEmpty(groupRowId, excludeGuids) {
     }
 }
 
-// --- [新增] 设置/清除分组锚点并持久化 ---
 function setGroupAnchor(groupId, guid, pos) {
     for (var i = 0; i < Groups.length; i++) {
         if (Groups[i].id === groupId) {
@@ -726,7 +697,7 @@ function setGroupAnchor(groupId, guid, pos) {
     }
 }
 
-// --- [修正] 将多个列表移动到目标分组，保持原顺序 ---
+// 将多个列表移动到目标分组，保持原顺序
 function movePlaylistsToGroup(rowIds, targetGroupRowId) {
     if (brw.is_moving_group) return;
     if (!rowIds || rowIds.length === 0) return;
@@ -735,15 +706,13 @@ function movePlaylistsToGroup(rowIds, targetGroupRowId) {
     if (!targetGroup || !targetGroup.isGroup) return;
     var targetGroupId = targetGroup.groupId;
 
-    // ========== Step 1: 在修改 GroupMap 之前，先确定插入锚点 ==========
-    // （关键！写 GroupMap 后再 getGroupMemberIndices 会把待移动项也算入成员，导致锚点错误）
-    var origMembers = getGroupMemberIndices(targetGroupId); // 原有成员，不含本次待入组
+    // Step 1: 必须在写 GroupMap 之前确定插入锚点（否则待移动项会被算入成员）
+    var origMembers = getGroupMemberIndices(targetGroupId);
     var insertPos;
     if (origMembers.length > 0) {
         insertPos = origMembers[origMembers.length - 1] + 1; // 现有成员块末尾的下一个位置
     } else {
-        // 空分组：寻找相邻锚点
-        // 优先用"分组行下面最近的真实列表"作为插入位置（below）；若无就用"上面最近列表 +1"；再无就末尾
+        // 空分组：优先锚下方最近真实列表，其次上方列表 +1，再无则末尾
         var anchorBelow = -1;
         for (var s2 = targetGroupRowId + 1; s2 < brw.rows.length; s2++) {
             var r2 = brw.rows[s2];
@@ -759,14 +728,14 @@ function movePlaylistsToGroup(rowIds, targetGroupRowId) {
         else insertPos = plman.PlaylistCount;
     }
 
-    // ========== Step 2: 收集被移动项 GUID，清理 independent_lists ==========
+    // Step 2: 收集被移动项
     var moveItems = [];
     var needSaveIndep = false;
     var srcGroupIds = []; // 被移动项的原分组（入组后源分组可能清空）
     for (var i = 0; i < rowIds.length; i++) {
         var row = brw.rows[rowIds[i]];
         if (!row || row.isGroup || row.idx < 0) continue;
-        // Hard Constraint:  永远不进入任何分组
+        // 白名单列表永远不进分组
         if (nonGrouped.indexOf(row.name) > -1) {fb.ShowPopupMessage("操作未完成或被调整\n-------------------------\n该播放列表被保留，不能移入分组.", "提示");continue;}
         var guid = plman.GetGUID(row.idx);
         var srcGroupId = GroupMap[guid];
@@ -777,22 +746,18 @@ function movePlaylistsToGroup(rowIds, targetGroupRowId) {
     }
     if (moveItems.length === 0) return;
 
-    // ========== Step 3: 写 GroupMap（必须在锚点之后）==========
+    // Step 3: 写 GroupMap（必须在确定锚点之后）
     var movedGuidsArr = [];
     for (var i = 0; i < moveItems.length; i++) {
         GroupMap[moveItems[i].guid] = targetGroupId;
         movedGuidsArr.push(moveItems[i].guid);
     }
 	save_gdata();
-    // 入组导致源分组清空：按当前渲染位置补锚点（保持空分组原位）
+    // 源分组被清空：按当前渲染位置补锚点，保持空分组原位
     if (srcGroupIds.length > 0) {
         for (var eg = 0; eg < srcGroupIds.length; eg++) {
             var egId = srcGroupIds[eg];
-            var stillHas = false;
-            for (var gmKey in GroupMap) {
-                if (GroupMap[gmKey] === egId) { stillHas = true; break; }
-            }
-            if (!stillHas) {
+            if (!groupHasMembers(egId)) {
                 var egRow = -1;
                 for (var er = 0; er < brw.rows.length; er++) {
                     if (brw.rows[er].isVGroup && brw.rows[er].groupId === egId) { egRow = er; break; }
@@ -801,26 +766,23 @@ function movePlaylistsToGroup(rowIds, targetGroupRowId) {
             }
         }
     }
-    // 目标分组原先为空：获得成员后清除锚点（锚点仅对空分组生效）
+    // 目标分组原先为空：获得成员后清除锚点
     if (origMembers.length === 0) {
         setGroupAnchor(targetGroupId, null, null);
     }
 
-    // ========== Step 4: 按 GUID 稳查 plman idx，逐个 MovePlaylist（保持原顺序）==========
+    // Step 4: 按 GUID 逐个 MovePlaylist（保持原顺序）
     brw.is_moving_group = true;
     for (var j = 0; j < moveItems.length; j++) {
-        var currentIdx = -1;
-        for (var k = 0; k < plman.PlaylistCount; k++) {
-            if (plman.GetGUID(k) === moveItems[j].guid) { currentIdx = k; break; }
-        }
+        var currentIdx = findPlIndexByGuid(moveItems[j].guid);
         if (currentIdx === -1) continue;
         var tgt = insertPos;
-        // 修正：源在目标之前（currentIdx < tgt）→ 弹出后目标会前移，所以真正的目的地是 tgt - 1
+        // 源在目标之前：弹出后目标前移一位
         if (currentIdx < tgt) tgt = tgt - 1;
         if (currentIdx !== tgt && tgt >= 0 && tgt <= plman.PlaylistCount) {
             plman.MovePlaylist(currentIdx, tgt);
         }
-        insertPos = tgt + 1; // 下一个插入到本次之后，保持连续
+        insertPos = tgt + 1;
     }
     brw.populate(true);
     brw.actionRows = [];
@@ -828,7 +790,7 @@ function movePlaylistsToGroup(rowIds, targetGroupRowId) {
     brw.is_moving_group = false;
 }
 
-// --- [修正] 将多个列表移出分组，保持原顺序（升序） ---
+// 将多个列表移出分组，保持原顺序
 function movePlaylistsOutOfGroup(rowIds) {
     if (brw.is_moving_group) return;
     if (!rowIds || rowIds.length === 0) return;
@@ -842,11 +804,10 @@ function movePlaylistsOutOfGroup(rowIds) {
         }
     }
     if (moveItems.length === 0) return;
-    // rowIds 是点击顺序（Ctrl 多选时先点下面的就排在前面），直接用会让出组后的
-    // 末尾块次序被打乱。这里按 UI 行号升序还原"原来的上下次序"。
+    // rowIds 是点击顺序，按 UI 行号升序还原原本次序，避免出组后块序被打乱
     moveItems.sort(function (a, b) { return a.rowId - b.rowId; });
     brw.is_moving_group = true;
-    // 记录源分组：出组后若清空，按当前渲染位置补锚点（保持分组原位）
+    // 记录源分组：出组后若清空则补锚点，保持分组原位
     var emptiedGroupIds = [];
     var movedGuids = [];
     for (var i = 0; i < moveItems.length; i++) {
@@ -858,15 +819,11 @@ function movePlaylistsOutOfGroup(rowIds) {
         delete GroupMap[moveItems[i].guid];
     }
 	save_gdata();
-    // 出组导致源分组清空：补锚点（行结构仍是出组前的，邻居查找准确）
+    // 源分组被清空：补锚点（此时行结构仍是出组前的，邻居查找准确）
     if (emptiedGroupIds.length > 0) {
         for (var eg = 0; eg < emptiedGroupIds.length; eg++) {
             var egId = emptiedGroupIds[eg];
-            var stillHas = false;
-            for (var gmKey in GroupMap) {
-                if (GroupMap[gmKey] === egId) { stillHas = true; break; }
-            }
-            if (!stillHas) {
+            if (!groupHasMembers(egId)) {
                 var egRow = -1;
                 for (var er = 0; er < brw.rows.length; er++) {
                     if (brw.rows[er].isVGroup && brw.rows[er].groupId === egId) { egRow = er; break; }
@@ -875,10 +832,8 @@ function movePlaylistsOutOfGroup(rowIds) {
             }
         }
     }
-    // 将列表移动到末尾
-    // 循环内不重建行集：这里只读 plman 索引与 GUID，完全不消费 brw.rows；
-    // 且 MovePlaylist 本身会触发 on_playlists_changed（那里已经重建过一次），
-    // 循环结束后还有 populate(true) 兜底。留着只会让行集被重复重建 N 次。
+    // 移到末尾；循环内不重建行集（MovePlaylist 会触发 on_playlists_changed，
+    // 循环结束后还有 populate(true) 兜底）
     for (var j = 0; j < moveItems.length; j++) {
         var currentIdx = findPlIndexByGuid(moveItems[j].guid);
         if (currentIdx === -1) continue;
@@ -890,7 +845,7 @@ function movePlaylistsOutOfGroup(rowIds) {
     brw.is_moving_group = false;
 }
 
-// --- [修正] 排序分组内的子列表（使用播放列表 API） ---
+// 排序分组内的子列表
 function sortGroupChildren(groupRowId, sortType) {
     if (brw.is_moving_group) return;
     var groupRow = brw.rows[groupRowId];
@@ -922,13 +877,9 @@ function sortGroupChildren(groupRowId, sortType) {
     for (var i = 0; i < children.length; i++) {
         var currentMembers = getGroupMemberIndices(groupRow.groupId);
         var insertPos = currentMembers[0] + i;
-        var currentIdx = -1;
-        for (var k = 0; k < plman.PlaylistCount; k++) {
-            if (plman.GetGUID(k) === children[i].guid) { currentIdx = k; break; }
-        }
+        var currentIdx = findPlIndexByGuid(children[i].guid);
         if (currentIdx === -1) continue;
         if (currentIdx !== insertPos) plman.MovePlaylist(currentIdx, insertPos);
-        brw.populate(false);
     }
     brw.populate(true);
     brw.actionRows = [];
@@ -937,11 +888,11 @@ function sortGroupChildren(groupRowId, sortType) {
 }
 
 //==============Objects======================================================
-oPlaylist = function(idx, rowId, name) {
+var oPlaylist = function(idx, rowId, name) {
 	this.idx = idx;
 	this.rowId = rowId;
-	this.raw_name = name; // 保留原始名称
-	
+	this.raw_name = name;
+
 	this.isGroup = false; // 虚拟群头由 init_groups 设置
 	this.isVGroup = false;
 	this.name = name;
@@ -1055,7 +1006,6 @@ oBrowser = function() {
 			if (!toAdd) continue;
 
 			if (groupId) {
-				// 分组成员
 				if (!seenGroups[groupId]) {
 					var grp = null;
 					for (var g = 0; g < Groups.length; g++) {
@@ -1066,7 +1016,6 @@ oBrowser = function() {
 						header.isGroup = true;
 						header.isVGroup = true;
 						header.groupId = grp.id;
-						// 过滤时群内内容强制展开，方便用户看到命中的成员
 						header.isExpanded = hasFilter ? true : !grp.collapsed;
 						header.level = 0;
 						header.groupTrackCount = 0;
@@ -1089,17 +1038,14 @@ oBrowser = function() {
 				this.rows.push(p);
 				rowId++;
 			} else {
-				// 独立列表
 				var p = new oPlaylist(i, rowId, name);
 				p.level = 0;
 				this.rows.push(p);
 				rowId++;
 			}
 		}
-		// 空分组按锚点渲染：anchor = { guid: 目标列表 GUID, pos: "above"|"below" }
-		// - 优先锚定到与其相邻的独立列表（拖拽落点旁的行）
-		// - 无锚点或锚点列表已不存在 → 兜底追加到末尾（行为同旧版）
-		// - 锚点列表是分组成员 → 跟随该分组整体渲染（视觉上仍在分组头附近）
+		// 空分组按锚点渲染：anchor = { guid, pos: "above"|"below" }；
+		// 无锚点或锚点列表已不存在时兜底追加到末尾
 		for (var g = 0; g < Groups.length; g++) {
 			if (!seenGroups[Groups[g].id]) {
 				if (hasFilter && !groupMatchesFilter[Groups[g].id]) continue;
@@ -1114,7 +1060,6 @@ oBrowser = function() {
 				header.raw_name = Groups[g].name;
 				var anchor = Groups[g].anchor;
 				if (anchor && anchor.guid) {
-					// 查找锚点列表当前所在的行位置（可能作为分组成员渲染在某群头下）
 					var anchorRow = -1;
 					var anchorIsGroupMember = false;
 					for (var ar = 0; ar < this.rows.length; ar++) {
@@ -1128,9 +1073,8 @@ oBrowser = function() {
 					if (anchorRow !== -1) {
 					var insertAt;
 					if (anchorIsGroupMember) {
-						// 锚点是分组成员：渲染位置换算到该分组块边界（above→块首前，below→块尾后）
+						// 锚点是分组成员：换算到该分组块边界（above→块首前，below→块尾后）
 						if (anchor.pos === "below") {
-							// 找到该分组成员块的最后一行，插到其后
 							var lastMemberRow = anchorRow;
 							for (var mm = anchorRow + 1; mm < this.rows.length; mm++) {
 								if (this.rows[mm].isGroup || this.rows[mm].level === 0) break;
@@ -1138,7 +1082,6 @@ oBrowser = function() {
 							}
 							insertAt = lastMemberRow + 1;
 						} else {
-							// 找到该分组的群头行，插到其前
 							var headerRow = anchorRow;
 							for (var hh = anchorRow - 1; hh >= 0; hh--) {
 								if (this.rows[hh].isGroup) { headerRow = hh; break; }
@@ -1180,8 +1123,7 @@ oBrowser = function() {
 
 	this.populate = function(repaint_now, reset_scroll) {
 		this.init_groups();
-		// 行集刚重建：把 activeRow 收敛回合法范围，否则列表被删后
-		// this.rows[activeRow] 取到 undefined，后续访问属性就崩
+		// 行集重建后把 activeRow 收敛回合法范围，防止取到 undefined
 		if (this.activeRow >= this.rows.length) this.activeRow = this.rows.length - 1;
 		if (this.activeRow < -1) this.activeRow = -1;
 		if (reset_scroll) scroll = scroll_ = 0;
@@ -1190,9 +1132,7 @@ oBrowser = function() {
 	};
 
 	 this.getRowIdFromIdx = function(idx) {
-		// 核心修正：移除 8.13 的过滤框长度为0短路语句。
-		// 在分组功能下，UI行数不再总等于播放列表序号，必须强制全局遍历，否则折叠后点击必发生乱序错位。
-		//if(g_filterbox.inputbox.text.length == 0) return idx;
+		// 分组模式下 UI 行号不等于播放列表序号，必须全局遍历
 		var total = this.rows.length;
 		var rowId = -1;
 		if (plman.PlaylistCount > 0) {
@@ -1285,13 +1225,15 @@ oBrowser = function() {
 				var aw = this.w + cScrollBar.width;
 				var ah = ppt.rowHeight;
 				var rh = g_font.Size * 2;
+				// 次要文字颜色：只依赖配色，整帧算一次即可
+				var track_color_base = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 				for (var i = g_start_; i <= g_end_; i++) {
 					ay = Math.floor(this.y + (i * ah) - scroll_);
 					this.rows[i].x = ax;
 					this.rows[i].y = ay;
 					if (ay > this.y - ppt.headerBarHeight - ah && ay < this.y + this.h) {
 						// row bg
-						var track_color_txt = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
+						var track_color_txt = track_color_base;
 						if(ppt.showGrid) gr.DrawLine(ax, ay + ah, aw, ay + ah, 1, g_color_line);
 						
 						// active playlist row bg
@@ -1304,7 +1246,7 @@ oBrowser = function() {
 							gr.FillSolidRect(ax, ay, aw, ah, g_color_selected_bg &0x75ffffff);
 						}
 						
-						// 动态判断当前行是否应该高亮 (包括折叠的分组内有正在播放的列表时)
+						// 播放行高亮（含折叠分组内有正在播放列表的情况）
 						var is_playing_row = fb.IsPlaying && (
 							(this.rows[i].idx >= 0 && this.rows[i].idx == plman.PlayingPlaylist) ||
 							(this.rows[i].isGroup && !this.rows[i].isExpanded && this.rows[i].containsPlaying)
@@ -1327,11 +1269,9 @@ oBrowser = function() {
 						};
 						// target location mark
 						if (cPlaylistManager.drag_target_id == i && !this.rows[i].islocked) {
-							// 只有处于拖拽状态时才绘制高亮线
 							if (cPlaylistManager.drag_is_group || cPlaylistManager.drag_clicked || cPlaylistManager.drag_moved) {
 								var isAbove = false;
 								if (cPlaylistManager.drag_is_group) {
-									// 拖拽整个分组：比较目标行与源行的前后关系来定线上/下
 									var srcRow = cPlaylistManager.drag_group_rowId;
 									if (srcRow >= 0 && srcRow < this.rows.length) {
 										isAbove = (cPlaylistManager.drag_target_id < srcRow);
@@ -1339,10 +1279,8 @@ oBrowser = function() {
 										isAbove = false;
 									}
 								} else {
-									// 统一锚定：不管目标行是普通列表还是分组，线的顶/底端一律按"目标相对源的整体前后"
-									// - 目标在源之前（行号 < 源锚）→ 线画在目标顶端（above）
-									// - 目标在源之后（行号 > 源锚）→ 线画在目标底端（below）
-									// 这样线在整个目标对象范围内保持恒定，跨普通行 ↔ 分组行边界时不跳变
+									// 统一锚定：线端只按"目标相对源的整体前后"决定，
+									// 跨普通行与分组行边界时不跳变，且与落位算法一致
 									var srcAnchor = -1;
 									if (this.actionRows && this.actionRows.length > 0) {
 										srcAnchor = this.actionRows[0];
@@ -1350,8 +1288,7 @@ oBrowser = function() {
 									if (srcAnchor >= 0) {
 										isAbove = (cPlaylistManager.drag_target_id < srcAnchor);
 									} else {
-										// 没有源锚（极个别情况），fallback 到鼠标热区判定保持一致
-										isAbove = cPlaylistManager.drag_above;
+										isAbove = cPlaylistManager.drag_above; // 无源锚时回退鼠标热区判定
 									}
 								}
 								var lineY = isAbove ? ay + 1 : ay + ppt.rowHeight - 2;
@@ -1371,43 +1308,33 @@ oBrowser = function() {
 							};
 						};
 						
-						// =====
-						// text & Font Icons adapted for Groups
-						// =====
 						var playlist_icon = playlistName2icon(this.rows[i].name, this.rows[i].isAutoPlaylist);
-						
+
 						var font = is_playing_row ? g_font_b : g_font;
 						var name_color = is_playing_row ? g_color_playing_txt : g_color_normal_txt;
 						var track_color = is_playing_row ? g_color_playing_txt : track_color_txt;
 
-						// 精准计算图标的 X 坐标，实现树状缩进
 						var icon_x = ax + this.paddingLeft;
-						var list_font = font; // 独立变量，不污染原版 font 计算体系
-						
+						var list_font = font;
+
 						if (this.rows[i].isGroup) {
 							var fold_icon = this.rows[i].isExpanded ? "\uEA4E" : "\uEA6E";
-							// 分组使用 remixicon 字体 (g_fnico1) 渲染指定的折叠箭头
 							gr.GdiDrawText(fold_icon, g_fnico1, name_color, icon_x + 4 * zdpi, ay, rh, ah, lc_txt);
-							list_font = g_font_b; 
+							list_font = g_font_b;
 						} else {
 							if (this.rows[i].level === 1) {
-								// 子列表图标向右缩进 16px
-								icon_x += 16 * zdpi; 
+								icon_x += 16 * zdpi;
 								if (!is_playing_row) name_color = track_color_txt;
 							}
-							// 渲染原有的 remixicon 字体图标
 							gr.GdiDrawText(playlist_icon, g_fnico1, name_color, icon_x, ay, rh, ah, cc_txt);
 						}
 
-						// 文字和输入框跟随缩进的图标进行排布
 						var tx = icon_x + rh + 4 * zdpi;
 
-						// fields (分组读取专属合计量，单列表读取实际量)
+						// 分组行显示组内合计曲数，列表行显示自身曲数
 						var track_total = this.rows[i].isGroup ? this.rows[i].groupTrackCount : plman.PlaylistItemCount(this.rows[i].idx);
-						track_total = track_total.toString(); // 强制转为字符串，确保系统渲染稳定
-						
-						// 修复核心：原版的精髓是用大一圈的 font 测算宽度，完美留出安全边距防截断！
-						var track_total_w = gr.CalcTextWidth(track_total, font); 
+						track_total = track_total.toString();
+						var track_total_w = gr.CalcTextWidth(track_total, font);
 						
 						if (this.inputboxID == i) {
 							this.inputbox.draw(gr, tx + 2, ay + 5);
@@ -1427,7 +1354,6 @@ oBrowser = function() {
 				if (filter_text.length > 0) {
 					var str_filter = process_string(filter_text);
 					var count = 0;
-					// 预计算命中的分组 id
 					var gMatch = {};
 					for (var gi = 0; gi < Groups.length; gi++) {
 						gMatch[Groups[gi].id] = match(Groups[gi].name, str_filter);
@@ -1494,20 +1420,17 @@ oBrowser = function() {
 						this.inputboxID = -1;
 					}
 					
-					// --- [修改] 点击分组：不立即折叠，而是记录拖拽状态，在 up 中判断 ---
+					// 点击分组：down 只记录拖拽状态，up 中再判断点击或拖拽
 					if (this.rows[this.activeRow].isGroup) {
-						// 准备拖拽，但不在 down 中折叠
 						cPlaylistManager.drag_clicked = true;
 						cPlaylistManager.drag_is_group = true;
 						cPlaylistManager.drag_group_rowId = this.activeRow;
 						cPlaylistManager.drag_start_x = x;
 						cPlaylistManager.drag_start_y = y;
-						// 清空选择状态
 						this.actionRows.splice(0, this.actionRows.length);
 						this.repaint();
 						return;
 					}
-					// -----------------------------
 
 					if(utils.IsKeyPressed(VK_CONTROL)){
 						var cid = this.getRowIdFromIdx(plman.ActivePlaylist);
@@ -1543,7 +1466,6 @@ oBrowser = function() {
 						if (!this.up) {
 							// set dragged item to reorder list
 							cPlaylistManager.drag_clicked = true;
-							// 记录按下点：move 里据此判断是否真正拖拽（与分组的 dist < 5 同一口径）
 							cPlaylistManager.drag_start_x = x;
 							cPlaylistManager.drag_start_y = y;
 						};
@@ -1573,118 +1495,61 @@ oBrowser = function() {
 			if (this.down) {
 				// ---- 分组拖拽处理 ----
 				if (cPlaylistManager.drag_is_group) {
-					// 计算鼠标移动距离，判断是点击还是拖拽
 					var dist = Math.sqrt(
 						Math.pow(x - cPlaylistManager.drag_start_x, 2) +
 						Math.pow(y - cPlaylistManager.drag_start_y, 2)
 					);
 					if (dist < 5) {
-					// 点击：折叠/展开
-					// --- [修改] 使用 GUID 作为折叠状态键 ---
-					var g_row = this.rows[cPlaylistManager.drag_group_rowId];
-					for (var gi = 0; gi < Groups.length; gi++) {
-						if (Groups[gi].id === g_row.groupId) { Groups[gi].collapsed = !Groups[gi].collapsed; break; }
-					}
-					save_gdata();
-					// 视口锚定：记录组头行的可视位置 + 组头之后的第一行内容标识，
-					// 折叠/展开后把它滚回原可视位置，避免列表跳回顶部
-					var anchorTopOffset = this.rows[cPlaylistManager.drag_group_rowId].y - this.y;
-					var nextContentId = null;
-					if (!this.rows[cPlaylistManager.drag_group_rowId].isExpanded) {
-						// 即将展开（当前存储的是折叠后状态）：锚定组头自身即可
-						nextContentId = { type: "group", id: g_row.groupId };
+						// 点击：折叠/展开（与键盘 Enter 路径复用同一逻辑）
+						toggleGroupCollapse(this.rows[cPlaylistManager.drag_group_rowId]);
+						return;
 					} else {
-						// 即将折叠：锚定组头之后第一个内容行
-						for (var nc = cPlaylistManager.drag_group_rowId + 1; nc < this.rows.length; nc++) {
-							var ncRow = this.rows[nc];
-							if (ncRow.isVGroup) { nextContentId = { type: "group", id: ncRow.groupId }; break; }
-							if (ncRow.idx >= 0) { nextContentId = { type: "pl", guid: plman.GetGUID(ncRow.idx) }; break; }
+						// 拖拽：移动分组到目标位置
+						var targetRowId = cPlaylistManager.drag_target_id;
+						if (targetRowId >= 0 && targetRowId < this.rows.length) {
+							var groupRowId = cPlaylistManager.drag_group_rowId;
+							if (targetRowId !== groupRowId) {
+								moveGroupTo(groupRowId, targetRowId);
+							}
 						}
+						cPlaylistManager.drag_clicked = false;
+						cPlaylistManager.drag_is_group = false;
+						cPlaylistManager.drag_group_rowId = -1;
+						cPlaylistManager.drag_target_id = -1;
+						cPlaylistManager.drag_into_group = false;
+						cPlaylistManager.drag_into_group_rowId = -1;
+						cPlaylistManager.drag_moved = false;
+						stopAutoScrollTimer();
+						brw.repaint();
+						return;
 					}
-					// 重置所有拖拽状态
-					this.actionRows.splice(0, this.actionRows.length);
-					this.activeRow = -1;
-					cPlaylistManager.drag_clicked = false;
-					cPlaylistManager.drag_is_group = false;
-					cPlaylistManager.drag_group_rowId = -1;
-					cPlaylistManager.drag_target_id = -1;
-					cPlaylistManager.drag_moved = false; // 必须重置
-					this.populate(true, false);
-					// 按锚定行恢复滚动（锚定行不可得时仍需 check_scroll 收敛，防折叠后旧 scroll 越界）
-					var restoreRow = -1;
-					if (nextContentId) {
-						for (var rr = 0; rr < this.rows.length; rr++) {
-							var rrRow = this.rows[rr];
-							if (nextContentId.type === "group" && rrRow.isVGroup && rrRow.groupId === nextContentId.id) { restoreRow = rr; break; }
-							if (nextContentId.type === "pl" && !rrRow.isGroup && rrRow.idx >= 0 && plman.GetGUID(rrRow.idx) === nextContentId.guid) { restoreRow = rr; break; }
-						}
-					}
-					if (restoreRow !== -1) {
-						scroll = check_scroll(restoreRow * ppt.rowHeight - anchorTopOffset);
-					} else {
-						scroll = check_scroll(scroll);
-					}
-					scroll_ = scroll;
-					this.scrollbar.updateScrollbar();
-					this.repaint();
-					return;
-				} else {
-					// 拖拽：移动分组到目标位置
-					var targetRowId = cPlaylistManager.drag_target_id;
-					if (targetRowId >= 0 && targetRowId < this.rows.length) {
-						var groupRowId = cPlaylistManager.drag_group_rowId;
-						if (targetRowId !== groupRowId) {
-							moveGroupTo(groupRowId, targetRowId);
-						}
-					}
-					// 重置所有拖拽状态
-					cPlaylistManager.drag_clicked = false;
-					cPlaylistManager.drag_is_group = false;
-					cPlaylistManager.drag_group_rowId = -1;
-					cPlaylistManager.drag_target_id = -1;
-					cPlaylistManager.drag_into_group = false;
-					cPlaylistManager.drag_into_group_rowId = -1;
-					cPlaylistManager.drag_moved = false; // 必须重置
-					stopAutoScrollTimer(); // 提前 return 会跳过 up 分支末尾的清除
-					brw.repaint();
-					return;
-				}
 				}
 				// ---- 分组拖拽处理结束 ----
 
-                // ---- 处理拖拽列表进入分组 ----
-                if (cPlaylistManager.drag_into_group) {
-                    var groupRowId = cPlaylistManager.drag_into_group_rowId;
-                    if (groupRowId >= 0 && groupRowId < this.rows.length) {
-                        var rowsToMove = (this.actionRows.length > 0) ? this.actionRows : [this.activeRow];
-                        var filtered = [];
-                        for (var i = 0; i < rowsToMove.length; i++) {
-                            var r = this.rows[rowsToMove[i]];
-                            if (!r.isGroup) {
-                                filtered.push(rowsToMove[i]);
-                            }
-                        }
-                        if (filtered.length > 0) {
-                            movePlaylistsToGroup(filtered, groupRowId);
-                        }
-                    }
-                    // 重置状态
-                    cPlaylistManager.drag_into_group = false;
-                    cPlaylistManager.drag_into_group_rowId = -1;
-                    cPlaylistManager.drag_clicked = false;
-                    cPlaylistManager.drag_moved = false;
-                    cPlaylistManager.drag_target_id = -1;
-                    brw.repaint();
-                    // 终止后续处理（不执行原有的拖放排序等）
-                    this.down = false;
-                    if (cPlaylistManager.drag_moved) window.SetCursor(IDC_ARROW);
-                    cPlaylistManager.drag_clicked = false;
-                    cPlaylistManager.drag_moved = false;
-                    cPlaylistManager.drag_target_id = -1;
-                    stopAutoScrollTimer(); // 提前 return 会跳过 up 分支末尾的清除
-                    return; // 跳出 case "up"
-                }
-                // ---- 结束 ----
+				// ---- 处理拖拽列表进入分组 ----
+				if (cPlaylistManager.drag_into_group) {
+					var groupRowId = cPlaylistManager.drag_into_group_rowId;
+					if (groupRowId >= 0 && groupRowId < this.rows.length) {
+						var rowsToMove = (this.actionRows.length > 0) ? this.actionRows : [this.activeRow];
+						var filtered = [];
+						for (var i = 0; i < rowsToMove.length; i++) {
+							var r = this.rows[rowsToMove[i]];
+							if (r && !r.isGroup) filtered.push(rowsToMove[i]);
+						}
+						if (filtered.length > 0) movePlaylistsToGroup(filtered, groupRowId);
+					}
+					// 重置状态并终止后续处理（不执行原有的拖放排序等）
+					cPlaylistManager.drag_into_group = false;
+					cPlaylistManager.drag_into_group_rowId = -1;
+					cPlaylistManager.drag_clicked = false;
+					cPlaylistManager.drag_moved = false;
+					cPlaylistManager.drag_target_id = -1;
+					brw.repaint();
+					this.down = false;
+					stopAutoScrollTimer();
+					return;
+				}
+				// ---- 结束 ----
 
 				// scrollbar
 				if (cScrollBar.visible) {
@@ -1696,11 +1561,10 @@ oBrowser = function() {
 					var pl_idx = total;
 					plman.CreatePlaylist(pl_idx, "");
 					plman.ActivePlaylist = pl_idx;
-					// 动态获取安全行号，防止分组折叠导致越界
 					var real_id = this.getRowIdFromIdx(pl_idx);
 					if (real_id !== -1) this.callRename(real_id, pl_idx);
 				};
-				
+
 				if (this.buttonClicked && this.new_menu.checkstate("up", x, y) == ButtonStates.hover) {
 					this.context_menu(Math.round(ww - 2*brw.images.topbar_btn.Width), ppt.SearchBarHeight - 3*zdpi, null, true);
 					this.new_menu.state = ButtonStates.normal;
@@ -1712,10 +1576,10 @@ oBrowser = function() {
 					this.inputbox.check("up", x, y);
 				} else {
 					// drop playlist switch
-					if(this.actionRows.indexOf(this.activeRow) > -1) {
-						if((!utils.IsKeyPressed(VK_SHIFT) && !utils.IsKeyPressed(VK_CONTROL)) || !cPlaylistManager.drag_clicked) {
+					if (this.actionRows.indexOf(this.activeRow) > -1) {
+						if ((!utils.IsKeyPressed(VK_SHIFT) && !utils.IsKeyPressed(VK_CONTROL)) || !cPlaylistManager.drag_clicked) {
 							this.actionRows.splice(0, this.actionRows.length);
-							if(!this.rows[this.activeRow].islocked) this.actionRows.push(this.activeRow);
+							if (!this.rows[this.activeRow].islocked) this.actionRows.push(this.activeRow);
 							if (this.rows[this.activeRow].idx >= 0 && plman.ActivePlaylist != this.rows[this.activeRow].idx) {
 								plman.ActivePlaylist = this.rows[this.activeRow].idx;
 							};
@@ -1726,8 +1590,8 @@ oBrowser = function() {
 					if (cPlaylistManager.drag_target_id > (ppt.lockReservedPlaylist ? 0 : -1)) {
 						if (this.actionRows.indexOf(cPlaylistManager.drag_target_id) < 0) {
 							cPlaylistManager.drag_droped = true;
-							// ===== 修复：根据目标位置上下文直接判断是否出组（在 MovePlaylist 之前） =====
-							var targetIsRoot = false; // 目标是否为根级位置（level=0）
+							// 先判断目标位置是否根级（决定出组/入组映射，须在 MovePlaylist 之前）
+							var targetIsRoot = false;
 							var tgtId = cPlaylistManager.drag_target_id;
 							if (tgtId >= 0 && tgtId < this.rows.length) {
 								var tgtRow = this.rows[tgtId];
@@ -1743,60 +1607,46 @@ oBrowser = function() {
 								targetIsRoot = true;
 							}
 
-							var movedItems = [];
-						var needSaveGroup = false;
-						var needSaveIndep = false;
-						var emptiedGroupIds = []; // 本次拖到根级而失去成员的分组 id
-						var movedGuidsForAnchor = [];
-						for (var i = 0; i < this.actionRows.length; i++) {
-							var row = this.rows[this.actionRows[i]];
-							if (row.idx < 0 || row.isGroup) continue; // 跳过虚拟群头
-							var guid = plman.GetGUID(row.idx);
-							var wasInGroup = (row.level > 0); // 原来是分组成员
+							var needSaveGroup = false;
+							var emptiedGroupIds = []; // 本次拖到根级而失去成员的分组 id
+							var movedGuidsForAnchor = [];
+							for (var i = 0; i < this.actionRows.length; i++) {
+								var row = this.rows[this.actionRows[i]];
+								if (row.idx < 0 || row.isGroup) continue; // 跳过虚拟群头
+								var guid = plman.GetGUID(row.idx);
+								var wasInGroup = (row.level > 0); // 原来是分组成员
 
-							if (targetIsRoot && wasInGroup) {
-								// 从分组拖到根级位置：清除 GroupMap 映射 + 加入 independent_lists（GUID）
-								// 记录源分组，若因此清空则补锚点（保持分组原位而非掉到末尾）
-								var srcGroupId = GroupMap[guid];
-								if (srcGroupId && emptiedGroupIds.indexOf(srcGroupId) === -1) {
-									emptiedGroupIds.push(srcGroupId);
-								}
-								movedGuidsForAnchor.push(guid);
-								delete GroupMap[guid];
-								needSaveGroup = true;
-							} else if (!targetIsRoot && !wasInGroup) {
-								// 独立列表拖进分组内部（拖到某 level=1 行的位置）：
-								// Hard Constraint: ROOT_PLAYLISTS 永远不进入任何分组
-								if (nonGrouped.indexOf(row.name) > -1) {
-									// 跳过，保持独立
-									fb.ShowPopupMessage("操作未完成或被调整\n-------------------------\n该播放列表被保留，不能移入分组.", "提示");
-								} else {
-									// 根据目标行的分组归属加入 GroupMap，并从 independent_lists 移除
-									var tgtRowLocal = tgtId >= 0 && tgtId < this.rows.length ? this.rows[tgtId] : null;
-									if (tgtRowLocal && !tgtRowLocal.isGroup && tgtRowLocal.level > 0 && tgtRowLocal.groupId) {
-										GroupMap[guid] = tgtRowLocal.groupId;
-										needSaveGroup = true;
+								if (targetIsRoot && wasInGroup) {
+									// 从分组拖到根级：清除映射；源分组若被清空则补锚点
+									var srcGroupId = GroupMap[guid];
+									if (srcGroupId && emptiedGroupIds.indexOf(srcGroupId) === -1) {
+										emptiedGroupIds.push(srcGroupId);
+									}
+									movedGuidsForAnchor.push(guid);
+									delete GroupMap[guid];
+									needSaveGroup = true;
+								} else if (!targetIsRoot && !wasInGroup) {
+									// 独立列表拖进分组内部（白名单列表除外）
+									if (nonGrouped.indexOf(row.name) > -1) {
+										fb.ShowPopupMessage("操作未完成或被调整\n-------------------------\n该播放列表被保留，不能移入分组.", "提示");
+									} else {
+										var tgtRowLocal = tgtId >= 0 && tgtId < this.rows.length ? this.rows[tgtId] : null;
+										if (tgtRowLocal && !tgtRowLocal.isGroup && tgtRowLocal.level > 0 && tgtRowLocal.groupId) {
+											GroupMap[guid] = tgtRowLocal.groupId;
+											needSaveGroup = true;
+										}
 									}
 								}
 							}
-								movedItems.push({ idx: row.idx, guid: guid });
-							}
-							if (needSaveGroup/* || needSaveIndep*/) {
+							if (needSaveGroup) {
 								save_gdata();
 							}
-							// 保存被移动行 GUID，供移动后保护末尾根级位置用
-							var movedGuidsForRoot = targetIsRoot ? movedItems.slice() : [];
-							// =====================================================================
 
-							// ===== 关键修复：把 drag_target_id（UI行号）解析成真实的 plman 目标索引 =====
-							// 虚拟分组行 idx === -1，直接传给 MovePlaylist 会失效！
-							// calcInsertIdx 契约（见 project_memory）：
-							//   group above = 分组成员块首 idx；group below = 成员块尾 idx + 1
-							//   普通列表 above = 列表 idx；普通列表 below = 列表 idx + 1
-							//   末尾/越界 = plman.PlaylistCount
+							// 把 drag_target_id（UI 行号）解析成 plman 目标索引：
+							// 分组 above = 成员块首；分组 below = 块尾+1；
+							// 列表 above = idx；below = idx+1；末尾/越界 = PlaylistCount
 							(function resolveTarget(){
 								var tId = cPlaylistManager.drag_target_id;
-								// 越界或末尾：追加到最后
 								if (tId < 0 || tId >= brw.rows.length) {
 									cPlaylistManager.drag_target_plidx = plman.PlaylistCount;
 									return;
@@ -1804,9 +1654,8 @@ oBrowser = function() {
 								var tRow = brw.rows[tId];
 								if (!tRow) { cPlaylistManager.drag_target_plidx = plman.PlaylistCount; return; }
 								if (tRow.isGroup) {
-									// 虚拟分组：落位锚点 useAbove 与绘制端的画线端采用同一口径（目标相对源的整体前后），
-									// 保证"眼睛看到的线在哪一端"和"释放后落下的位置"严格一致。
-									// 三段式热区仍保留语义：上1/4 和 下1/4 → 插入模式；中2/4 → 拖入分组
+									// 虚拟分组：useAbove 与绘制端画线同一口径，保证所见即所得；
+									// 上1/4、下1/4 热区 = 插入模式，中 2/4 = 拖入分组
 									var members = getGroupMemberIndices(tRow.groupId);
 									// 统一锚定源：拖的是分组块用 drag_group_rowId，否则用 actionRows[0]
 									var srcAnchor2 = -1;
@@ -1824,7 +1673,6 @@ oBrowser = function() {
 									if (members.length > 0) {
 										cPlaylistManager.drag_target_plidx = useAbove ? members[0] : (members[members.length - 1] + 1);
 									} else {
-										// 空分组：用相邻真实列表作锚
 										var anchorAbove = -1;
 										var anchorBelow = -1;
 										for (var s = tId - 1; s >= 0; s--) {
@@ -1842,9 +1690,7 @@ oBrowser = function() {
 										}
 									}
 								} else {
-									// 普通真实列表：用"drag_target_id 与 actionRows[0] 相对大小"推断方向（和绘制端一致，保持视觉-落位同步）
-									//   drag_target_id < actionRows[0] → 目标在源之前 → 插到目标行之上（above）
-									//   drag_target_id > actionRows[0] → 目标在源之后 → 插到目标行之下（below）
+									// 普通列表：按与源锚的相对前后推断插入方向（与绘制端一致）
 									var inferredAbove = true;
 									if (brw.actionRows.length > 0) {
 										var firstSrcRow = brw.actionRows[0];
@@ -1856,17 +1702,14 @@ oBrowser = function() {
 							})();
 							var origDragTargetPlidx = cPlaylistManager.drag_target_plidx;
 
-							// ===== 执行移动（稳定 GUID 版）=====
-							// 先收集所有真实源的 GUID 和原始 plman idx
+							// 执行移动：先收集源的 GUID 与原始 plman idx
 							var movePlan = [];
 							for (var i = 0; i < this.actionRows.length; i++) {
 								var row = this.rows[this.actionRows[i]];
 								if (!row || row.idx < 0 || row.isGroup) continue;
 								movePlan.push({ guid: plman.GetGUID(row.idx), origIdx: row.idx });
 							}
-							// 排序：目标位置在源之前（origIdx > origDragTargetPlidx）→ 按 origIdx 升序处理
-							//       目标位置在源之后（origIdx < origDragTargetPlidx）→ 按 origIdx 降序处理
-							// 避免移动过程中目标位置相对于未处理元素漂移
+							// 目标在源之前按 origIdx 升序处理，之后按降序，避免移动中目标位置漂移
 							var targetBeforeAll = movePlan.every(function (m) { return m.origIdx > origDragTargetPlidx; });
 							var targetAfterAll = movePlan.every(function (m) { return m.origIdx < origDragTargetPlidx; });
 							if (targetBeforeAll) {
@@ -1874,48 +1717,38 @@ oBrowser = function() {
 							} else if (targetAfterAll) {
 								movePlan.sort(function (a, b) { return b.origIdx - a.origIdx; });
 							}
-							// 逐个移动：每次重查 GUID 找当前 plman idx，移到当前目标位置
+							// 逐个移动：每次按 GUID 重查当前 plman idx
 							var currentTarget = origDragTargetPlidx;
 							for (var ii = 0; ii < movePlan.length; ii++) {
-								var curSrcIdx = -1;
-								for (var jj = 0; jj < plman.PlaylistCount; jj++) {
-									if (plman.GetGUID(jj) === movePlan[ii].guid) { curSrcIdx = jj; break; }
-								}
+								var curSrcIdx = findPlIndexByGuid(movePlan[ii].guid);
 								if (curSrcIdx === -1) continue;
-								// 源在目标之前（curSrcIdx < currentTarget）→ 弹出源会让锚点前移一位，插入位 = 锚点 - 1
+								// 源在目标之前：弹出后锚点前移一位
 								var movingUp = (curSrcIdx < currentTarget);
 								var tgt = movingUp ? currentTarget - 1 : currentTarget;
 								if (curSrcIdx !== tgt && tgt >= 0 && tgt <= plman.PlaylistCount) {
 									plman.MovePlaylist(curSrcIdx, tgt);
 								}
-								// 锚点推进方向必须与 movePlan 的处理顺序一致，否则多选块会被逐个倒插成逆序：
-								// 降序（目标在所有源之后）→ 逐个插到上一个元素之前，锚点 = 本次插入位
-								// 升序（目标在所有源之前）→ 逐个插到上一个元素之后，锚点 = 本次插入位 + 1
+								// 锚点推进方向须与处理顺序一致，否则多选块会被倒插成逆序
 								currentTarget = movingUp ? tgt : tgt + 1;
 							}
-						// 出组导致源分组清空：按当前渲染位置补锚点，让空分组留在原位
-						// （必须在 populate 之前调用：此时行结构还是移动前的，邻居查找准确）
-						if (emptiedGroupIds.length > 0) {
-							for (var eg = 0; eg < emptiedGroupIds.length; eg++) {
-								var egId = emptiedGroupIds[eg];
-								var stillHas = false;
-								for (var gmKey in GroupMap) {
-									if (GroupMap[gmKey] === egId) { stillHas = true; break; }
-								}
-								if (!stillHas) {
-									var egRow = -1;
-									for (var er = 0; er < this.rows.length; er++) {
-										if (this.rows[er].isVGroup && this.rows[er].groupId === egId) { egRow = er; break; }
+							// 源分组被清空：populate 前补锚点（此时行结构未变，邻居查找准确）
+							if (emptiedGroupIds.length > 0) {
+								for (var eg = 0; eg < emptiedGroupIds.length; eg++) {
+									var egId = emptiedGroupIds[eg];
+									if (!groupHasMembers(egId)) {
+										var egRow = -1;
+										for (var er = 0; er < this.rows.length; er++) {
+											if (this.rows[er].isVGroup && this.rows[er].groupId === egId) { egRow = er; break; }
+										}
+										if (egRow !== -1) setAnchorForGroupOnEmpty(egRow, movedGuidsForAnchor);
 									}
-									if (egRow !== -1) setAnchorForGroupOnEmpty(egRow, movedGuidsForAnchor);
 								}
 							}
-						}
-						// 最终刷新显示
-						brw.populate(true);
-						// 修复：行集重建后按 GUID 重新定位选中项，避免高亮错位到占位列表上
-						remapSelectionByGuids(movePlan);
-						brw.repaint();
+							// 最终刷新显示
+							brw.populate(true);
+							// 行集重建后按 GUID 重新定位选中项，避免高亮错位
+							remapSelectionByGuids(movePlan);
+							brw.repaint();
 						}
 					}
 				};
@@ -1952,19 +1785,19 @@ oBrowser = function() {
 				this.inputbox.check("move", x, y);
 			}
 			else {
-			if (cPlaylistManager.drag_clicked) {
-				// 拖拽阈值：与分组拖拽的 dist < 5 判定保持同一口径，
-				// 否则按下后手抖 1px 就会被当作重排（原来 move 一下就置 drag_moved）
-				var ddx = x - cPlaylistManager.drag_start_x;
-				var ddy = y - cPlaylistManager.drag_start_y;
-				if (Math.sqrt(ddx * ddx + ddy * ddy) >= 5) {
-					cPlaylistManager.drag_moved = true;
-				}
-			};
+				if (cPlaylistManager.drag_clicked) {
+					// 拖拽阈值：与分组拖拽的 dist < 5 判定保持同一口径，
+					// 否则按下后手抖 1px 就会被当作重排（原来 move 一下就置 drag_moved）
+					var ddx = x - cPlaylistManager.drag_start_x;
+					var ddy = y - cPlaylistManager.drag_start_y;
+					if (Math.sqrt(ddx * ddx + ddy * ddy) >= 5) {
+						cPlaylistManager.drag_moved = true;
+					}
+				};
 				if (cPlaylistManager.drag_moved) {
 					if (this.activeRow > -1) {
-					stopAutoScrollTimer();
-						// --- [新增] 检测是否拖拽到分组上方（加入分组） -分组行区域划分：上1/4、中2/4、下1/4 ---
+						stopAutoScrollTimer();
+						// 分组行区域划分：上1/4、中2/4、下1/4
 						var targetRow = this.rows[this.activeRow];
 						var isGroup = targetRow && targetRow.isGroup;
 						if (isGroup) {
@@ -1994,7 +1827,7 @@ oBrowser = function() {
 								cPlaylistManager.drag_target_id = this.activeRow;
 							}
 							// rowsCount 为 0 时 rows[-1] 是 undefined，取 .y 会抛异常并挂掉面板
-					else if (this.rowsCount > 0 && y > this.rows[this.rowsCount - 1].y + ppt.rowHeight && y < this.rows[this.rowsCount - 1].y + ppt.rowHeight * 2) {
+							else if (this.rowsCount > 0 && y > this.rows[this.rowsCount - 1].y + ppt.rowHeight && y < this.rows[this.rowsCount - 1].y + ppt.rowHeight * 2) {
 								cPlaylistManager.drag_target_id = this.rowsCount;
 								cPlaylistManager.drag_above = false;
 							}
@@ -2009,25 +1842,23 @@ oBrowser = function() {
 						cPlaylistManager.drag_above = false;
 						if (y < this.y) {
 							if (!timers.movePlaylist) {
-									timers.movePlaylist = window.SetInterval(function() {
-										scroll -= ppt.rowHeight;
-										scroll = check_scroll(scroll);
-										// 修正：drag_target_id=-1 表示无目标，不映射为 0；this.rowsCount 捕获为局部变量
-										var rowsCount = brw.rowsCount;
-										cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > -1 ? cPlaylistManager.drag_target_id - 1 : -1;
-									}, 100);
-								}
+								timers.movePlaylist = window.SetInterval(function() {
+									scroll -= ppt.rowHeight;
+									scroll = check_scroll(scroll);
+									var rowsCount = brw.rowsCount;
+									cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > -1 ? cPlaylistManager.drag_target_id - 1 : -1;
+								}, 100);
+							}
 						}
 						else if (y > this.y + this.h) {
 							if (!timers.movePlaylist) {
-									timers.movePlaylist = window.SetInterval(function() {
-										scroll += ppt.rowHeight;
-										scroll = check_scroll(scroll);
-										// 修正：this.rowsCount 捕获为局部变量
-										var rowsCount = brw.rowsCount;
-										cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id < rowsCount - 1 ? cPlaylistManager.drag_target_id + 1 : rowsCount - 1;
-									}, 100);
-								}
+								timers.movePlaylist = window.SetInterval(function() {
+									scroll += ppt.rowHeight;
+									scroll = check_scroll(scroll);
+									var rowsCount = brw.rowsCount;
+									cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id < rowsCount - 1 ? cPlaylistManager.drag_target_id + 1 : rowsCount - 1;
+								}, 100);
+							}
 						};
 					};
 					brw.repaint();
@@ -2076,19 +1907,17 @@ oBrowser = function() {
 			if (cScrollBar.visible) {
 				this.scrollbar && this.scrollbar.on_mouse(event, 0, 0);
 			};
-		// --- 重置所有拖拽状态，防止残留 ---
-		cPlaylistManager.drag_target_id = -1;
-		cPlaylistManager.drag_is_group = false;
-		cPlaylistManager.drag_clicked = false;
-		cPlaylistManager.drag_moved = false;
-		cPlaylistManager.drag_group_rowId = -1;
-		// 这三个漏掉会导致：拖出面板再拖回来松手时，用残留的旧分组执行 movePlaylistsToGroup
-		cPlaylistManager.drag_into_group = false;
-		cPlaylistManager.drag_into_group_rowId = -1;
-		cPlaylistManager.drag_above = false;
-		// 边缘自动滚动定时器：拖出面板时不会被 up 分支清掉，会一直滚
+			// 重置所有拖拽状态，防止残留
+			cPlaylistManager.drag_target_id = -1;
+			cPlaylistManager.drag_is_group = false;
+			cPlaylistManager.drag_clicked = false;
+			cPlaylistManager.drag_moved = false;
+			cPlaylistManager.drag_group_rowId = -1;
+			cPlaylistManager.drag_into_group = false;
+			cPlaylistManager.drag_into_group_rowId = -1;
+			cPlaylistManager.drag_above = false;
 			stopAutoScrollTimer();
-		break;
+			break;
 		case "drag_over":
 			if (this.rows.length > 0) {
 				if (y > brw.y) {
@@ -2259,13 +2088,12 @@ oBrowser = function() {
 			_menu.AppendMenuItem(this.rows[id].islocked ? MF_DISABLED : MF_STRING, 11, "重命名");
 			_menu.AppendMenuItem(MF_STRING, 12, "复制");
             
-            // --- 分组与独立状态菜单 ---
+			// --- 分组与独立状态菜单 ---
 			if (this.rows[id].isGroup) {
 				_menu.AppendMenuSeparator();
 				_menu.AppendMenuItem(MF_STRING, 100, "分组列表 上移");
 				_menu.AppendMenuItem(MF_STRING, 101, "分组列表 下移");
 				_menu.AppendMenuSeparator();
-				// 添加排序子菜单
 				var sortSubMenu = window.CreatePopupMenu();
 				sortSubMenu.AppendMenuItem(MF_STRING, 104, "按名称排序 (A→Z)");
 				sortSubMenu.AppendMenuItem(MF_STRING, 105, "按名称排序 (Z→A)");
@@ -2282,9 +2110,8 @@ oBrowser = function() {
 			}
 			_menu.AppendMenuSeparator();
 
-			// --- [新增] 多选加入分组 / 移出分组 ---
+			// 多选加入 / 移出分组
 			var selectedRows = (this.actionRows.length > 0) ? this.actionRows : [id];
-			// 检查选中的行是否包含分组（分组不可移动）
 			var hasGroup = false;
 			var hasSub = false;
 			for (var ri = 0; ri < selectedRows.length; ri++) {
@@ -2293,17 +2120,14 @@ oBrowser = function() {
 				if (r.level > 0) hasSub = true;
 			}
 			if (!hasGroup) {
-				// 如果选中的都是非分组列表
-				// 先添加“移出分组”选项（如果选中的列表中有子列表）
 				if (hasSub) {
 				_menu.AppendMenuItem(MF_STRING, 102, "移出分组");
 			}
-				// 添加“移到分组”子菜单，列出所有分组
+				// 添加"移到分组"子菜单，列出所有分组
 				var groupMenu = window.CreatePopupMenu();
 				var groupCount = 0;
 				for (var gi = 0; gi < this.rows.length; gi++) {
 					if (this.rows[gi].isGroup) {
-						// 使用 getBlockCount 计算实际子列表数量，不受折叠影响
 						var subCount = getGroupMemberCount(this.rows[gi].groupId);
 						var displayName = this.rows[gi].name + " [" + subCount + "]";
 						groupMenu.AppendMenuItem(MF_STRING, 500 + gi, displayName);
@@ -2315,7 +2139,6 @@ oBrowser = function() {
 					groupMenu.AppendMenuItem(MF_STRING, 103, "新建分组并移入");
 					groupMenu.AppendTo(_menu, MF_STRING, "移到分组");
 				} else {
-					// 如果没有分组，只显示"新建分组并移入"
 					_menu.AppendMenuItem(MF_STRING, 103, "新建分组并移入");
 				}
 			}
@@ -2332,7 +2155,6 @@ oBrowser = function() {
 				if (grpMembers.length > 0) {
 					pl_idx = grpMembers[grpMembers.length - 1] + 1;
 				} else {
-					// 空分组：优先插到分组下方第一个真实列表之前，否则上方最近真实列表之后，否则列表末尾
 					var anchorBelow = -1;
 					for (var gmi = id + 1; gmi < this.rowsCount; gmi++) {
 						if (!this.rows[gmi].isGroup && this.rows[gmi].idx >= 0) { anchorBelow = this.rows[gmi].idx; break; }
@@ -2384,7 +2206,6 @@ oBrowser = function() {
 				_radiolist.AppendMenuItem(MF_STRING, 200 + i, radioname[i]);
 			}
 		}
-		
 		// --- 文件操作菜单：仅当空白处或非分组列表时显示 ---
 		if (add_mode || (this.rows[id] && !this.rows[id].isGroup)) {
 			_menu.AppendMenuSeparator();
@@ -2514,7 +2335,7 @@ oBrowser = function() {
 		case (idx == 112): {
 			var uniqueName = getUniqueGroupName("新分组");
 			var newGroupId = "grp_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
-			// 新建空分组：若从某行右键发起，锚定到该行相邻列表（贴近操作位置；空白区发起则无锚点，按旧版落末尾）
+			// 从某行右键发起时空分组锚定到该行，空白区发起则落末尾
 			if (id >= 0 && id < this.rows.length) {
 				var selfRow112 = this.rows[id];
 				if (selfRow112 && !selfRow112.isGroup && selfRow112.idx >= 0) {
@@ -2528,9 +2349,8 @@ oBrowser = function() {
 			save_gdata();
 			var selSnap102 = snapshotSelectionGuids();
 			brw.populate(false);
-			// 插入分组头会把后面的行号整体推后，选中必须按 GUID 还原，否则错位到别的列表上
+			// 插入分组头会推后行号，选中须按 GUID 还原
 			remapSelectionByGuids(selSnap102, true);
-			// 查找新分组行号
 			var real_id = -1;
 			for (var k = 0; k < brw.rows.length; k++) {
 				if (brw.rows[k].isVGroup && brw.rows[k].groupId === newGroupId) { real_id = k; break; }
@@ -2636,24 +2456,17 @@ oBrowser = function() {
 			// 将列表移动到一起（参照 movePlaylistsToGroup 的正确逻辑：修正偏移 + 更新 insertPos）
 			if (moveGuids.length > 0) {
 				// 先按 plman 当前索引升序排序，保证移动后保持原有相对顺序
-				var guidIdxPairs = [];
-				for (var j = 0; j < moveGuids.length; j++) {
-					for (var k = 0; k < plman.PlaylistCount; k++) {
-						if (plman.GetGUID(k) === moveGuids[j]) {
-							guidIdxPairs.push({ guid: moveGuids[j], idx: k });
-							break;
-						}
-					}
-				}
+                var guidIdxPairs = [];
+                for (var j = 0; j < moveGuids.length; j++) {
+                    var pidx103 = findPlIndexByGuid(moveGuids[j]);
+                    if (pidx103 !== -1) guidIdxPairs.push({ guid: moveGuids[j], idx: pidx103 });
+                }
 				guidIdxPairs.sort(function(a, b) { return a.idx - b.idx; });
 				// 逐个移动到末尾，保持连续
 				var insertPos = plman.PlaylistCount;
-				for (var j = 0; j < guidIdxPairs.length; j++) {
-					var currentIdx = -1;
-					for (var k = 0; k < plman.PlaylistCount; k++) {
-						if (plman.GetGUID(k) === guidIdxPairs[j].guid) { currentIdx = k; break; }
-					}
-					if (currentIdx === -1) continue;
+                for (var j = 0; j < guidIdxPairs.length; j++) {
+                    var currentIdx = findPlIndexByGuid(guidIdxPairs[j].guid);
+                    if (currentIdx === -1) continue;
 					var tgt = insertPos;
 					if (currentIdx < tgt) tgt = tgt - 1;
 					if (currentIdx !== tgt && tgt >= 0 && tgt <= plman.PlaylistCount) {
@@ -2718,7 +2531,7 @@ oBrowser = function() {
 		}
 		for(var d = 0; d < dupGuids.length; d++){
 			var cidx = findPlIndexByGuid(dupGuids[d]);
-			if (cidx >= 0) plman.DuplicatePlaylist(cidx, plman.GetPlaylistName(cidx) + " (复件)");
+			if (cidx >= 0) plman.DuplicatePlaylist(cidx, getUniquePlaylistName(plman.GetPlaylistName(cidx) + " (复件)"));
 		}
 		brw.actionRows.splice(0, brw.actionRows.length);
 		break;
@@ -2842,7 +2655,7 @@ oBrowser = function() {
 				var ngName = ngArr[ni].replace(/^\s+|\s+$/g, "");
 				if (ngName.length > 0 && ngNew.indexOf(ngName) < 0) ngNew.push(ngName);
 			}
-			if (ngNew.indexOf("Library") < 0) ngNew.push("Library");
+			if (ngNew.indexOf("媒体库") < 0) ngNew.push("媒体库");
 			nonGrouped = ngNew;
 			save_gdata();
 			try { utils.RemovePath(ngFile); } catch(e) {}
@@ -3407,7 +3220,6 @@ function on_playlists_changed() {
 	if (!selfDriven) {
 	(function fixGroupContinuity(){
 		try {
-			var seenGroupFirstIdx = {};   // groupId -> 第一次出现的 plman idx
 			var groupMembers = {};        // groupId -> [idx...]  按遍历顺序收集
 			for (var i = 0; i < plman.PlaylistCount; i++) {
 				var grp = GroupMap[plman.GetGUID(i)];
@@ -3433,12 +3245,9 @@ function on_playlists_changed() {
 					guids.push(plman.GetGUID(arr[kk]));
 				}
 				// 逐个移动到 anchor + offset
-				for (var kk = 0; kk < guids.length; kk++) {
-					var curIdx = -1;
-					for (var jj = 0; jj < plman.PlaylistCount; jj++) {
-						if (plman.GetGUID(jj) === guids[kk]) { curIdx = jj; break; }
-					}
-					if (curIdx === -1) continue;
+                for (var kk = 0; kk < guids.length; kk++) {
+                    var curIdx = findPlIndexByGuid(guids[kk]);
+                    if (curIdx === -1) continue;
 					var dest = anchor + kk;
 					if (curIdx !== dest) {
 						plman.MovePlaylist(curIdx, dest);
@@ -3492,9 +3301,10 @@ function on_focus(is_focused) {
 
 //====== Custom functions ======//
 function get_gdata(){
+	let _nongrp = ["媒体库", "媒体库视图", "默认列表", "搜索结果", "媒体库视图(正在播放)"];
 	// 一次性打开 pm.db 并读取 groups、radio 两张表（整个面板只读这一次）
 	if (!utils.FileExists(pm_db_path)) {
-		nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
+		nonGrouped = _nongrp;
 		return;
 	}
 	try {
@@ -3508,14 +3318,14 @@ function get_gdata(){
 			Groups = JSON.parse(gmap.Groups);
 			GroupMap = JSON.parse(gmap.GroupMap);
 		} else {
-			nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
+			nonGrouped = _nongrp;
 		}
 		// radio 表：按 idx 保序，缓存起来供 on_init 使用
 		var rrows = db.Query('SELECT name, url FROM "radio" ORDER BY idx');
 		for (var j = 0; j < rrows.length; j++) pm_radio_rows.push({ name: rrows[j].name, url: rrows[j].url });
 	} catch (e) {
 		console.log('jsspm: read pm.db failed: ' + e.message);
-		nonGrouped = ["Library", "Library View", "Default Playlist", "Search result", "Library View (playing)"];
+		nonGrouped = _nongrp;
 	}
 }
 
@@ -3560,8 +3370,9 @@ function match(input, str) {
 };
 
 function process_string(str) {
-	str_ = [];
+	var str_ = [];
 	str = str.toLowerCase();
+	var temp;
 	while (str != (temp = str.replace("  ", " ")))
 	str = temp;
 	var str = str.split(" ").sort();
@@ -3574,6 +3385,7 @@ function process_string(str) {
 function checkMediaLibrayPlaylist() {
 	// check if library playlist is present
 	var isMediaLibraryFound = false;
+	var mediaLibraryIndex = -1;
 	var total = plman.PlaylistCount;
 	for (var i = 0; i < total; i++) {
 		if (plman.GetPlaylistName(i) == "媒体库") {
@@ -3748,7 +3560,8 @@ function on_drag_drop(action, x, y, mask) {
 			action.ToSelect = false;
 			action.Effect = 1;
 		}
-		if(brw.rows[brw.activeRow].isGroup) drop_done = false;
+		// 拖到空白区时 activeRow 为 -1，rows[-1] 是 undefined，必须先判边界
+		if (brw.activeRow > -1 && brw.rows[brw.activeRow] && brw.rows[brw.activeRow].isGroup) drop_done = false;
 		if (drop_done) {
 			if (!blink.timer) {
 				blink.x = x;

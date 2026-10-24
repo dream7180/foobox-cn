@@ -1,4 +1,5 @@
 ﻿//common script
+window.DrawMode = 1;//1-D2D,0-GDI
 var cfgexist = 1;
 var common_cfg_map = {};
 function assignDefault() {

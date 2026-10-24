@@ -52,20 +52,15 @@ class Buttons {
 		}
 
 		this.src = {
-			amBio: '',
-			amRev: '',
-			allmusic: 0,
 			bahn: 'Bahnschrift SemiBold SemiConden',
 			bahnInstalled: utils.CheckFont('Bahnschrift SemiBold SemiConden'),
 			col: {},
 			font: gdi.Font('Segoe UI Symbol', 12, 1),
 			h: 19,
 			icon: false,
-			item_w: {
-				amBio: 30,
-				amRev: 30,
-				lfmBio: 30,
-				lfmRev: 30,
+		item_w: {
+			lfmBio: 30,
+			lfmRev: 30,
 				space: 4,
 				spaceIconFont: 4,
 				txtBio: 30,
@@ -120,17 +115,17 @@ class Buttons {
 		if (!refresh) {
 			(ppt.sbarShow != 1 || !this.scr.init) && !txt.lyricsDisplayed() ? this.setScrollBtnsHide() : this.setScrollBtnsHide(true, 'both');
 		}
-		this.rating.show = ui.stars == 1 && !ppt.artistView && (txt.rev.loaded.am && txt.rating.am != -1 || txt.rev.loaded.lfm && txt.rating.lfm != -1);
+		this.rating.show = ui.stars == 1 && !ppt.artistView && (txt.rev.loaded.lfm && txt.rating.lfm != -1);
 		this.src.name = ui.show.btnBg ? ' ' : '';
 		switch (true) {
 			case !ppt.artistView: {
 				const ix = txt.rev.loaded.ix == -1 ? ppt.sourcerev : txt.rev.loaded.ix;
-				this.src.name += [this.src.amRev, this.src.lfmRev, this.src.wikiRev, this.src.txtRev][ix];
+				this.src.name += [this.src.lfmRev, this.src.wikiRev, this.src.txtRev][ix];
 				break;
 			}
 			case ppt.artistView: {
 				const ix = txt.bio.loaded.ix == -1 ? ppt.sourcebio : txt.bio.loaded.ix;
-				this.src.name += [this.src.amBio, this.src.lfmBio, this.src.wikiBio, this.src.txtBio][ix];
+				this.src.name += [this.src.lfmBio, this.src.wikiBio, this.src.txtBio][ix];
 				break;
 			}
 		}
@@ -141,7 +136,7 @@ class Buttons {
 		if (!this.src.visible) this.src.w = 0;
 		else {
 			this.src.name_w = 0;
-			if (this.rating.show) this.src.name_w = txt.rev.loaded.am ? this.src.item_w.amRev : this.src.item_w.lfmRev;
+			if (this.rating.show) this.src.name_w = this.src.item_w.lfmRev;
 			this.src.name_w = this.src.name_w + this.src.item_w.space * (ui.show.btnBg ? (this.src.name_w ? 2 : 1) : 0);
 			this.src.w = 0;
 			switch (true) {
@@ -150,16 +145,16 @@ class Buttons {
 					break;
 				case this.src.text:
 					switch (true) {
-						case !ppt.artistView: {
-							const ix = txt.rev.loaded.ix == -1 ? ppt.sourcerev : txt.rev.loaded.ix;
-							this.src.w = [this.src.item_w.amRev, this.src.item_w.lfmRev, this.src.item_w.wikiRev, this.src.item_w.txtRev][ix];
-							break;
-						}
-						case ppt.artistView: {
-							const ix = txt.bio.loaded.ix == -1 ? ppt.sourcebio : txt.bio.loaded.ix;
-							this.src.w = [this.src.item_w.amBio, this.src.item_w.lfmBio, this.src.item_w.wikiBio, this.src.item_w.txtBio][ix];
-							break
-						}
+					case !ppt.artistView: {
+						const ix = txt.rev.loaded.ix == -1 ? ppt.sourcerev : txt.rev.loaded.ix;
+						this.src.w = [this.src.item_w.lfmRev, this.src.item_w.wikiRev, this.src.item_w.txtRev][ix];
+						break;
+					}
+					case ppt.artistView: {
+						const ix = txt.bio.loaded.ix == -1 ? ppt.sourcebio : txt.bio.loaded.ix;
+						this.src.w = [this.src.item_w.lfmBio, this.src.item_w.wikiBio, this.src.item_w.txtBio][ix];
+						break
+					}
 					}
 					this.src.w += this.src.item_w.space * (ui.show.btnBg ? 2 : 0);
 					break;
@@ -241,11 +236,9 @@ class Buttons {
 		this.src.fontSize = $.clamp(Math.round(hs * 0.47) + (ppt.zoomHeadBtn - 100) / 10, Math.min(fs, hs), Math.max(fs, hs));
 		if (this.src.fontSize != srcFontSize || force) this.src.font = gdi.Font('Segoe UI', this.src.fontSize, 1);
 		$.gr(1, 1, false, g => {
-			this.src.h = g.CalcTextHeight('allmusic', this.src.font);
+			this.src.h = g.CalcTextHeight('lastfm', this.src.font);
 			switch (this.src.icon) {
 				case 0:
-					this.src.amBio = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
-					this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					this.src.lfmBio = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					this.src.lfmRev = cfg.lfmDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					this.src.wikiBio = cfg.wikiDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
@@ -253,8 +246,6 @@ class Buttons {
 					this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					this.src.txtRev = (txt.rev.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					if (!ui.show.btnLabel) {
-						this.src.amBio = '';
-						this.src.amRev = '';
 						this.src.lfmBio = '';
 						this.src.lfmRev = '';
 						this.src.wikiBio = '';
@@ -263,11 +254,10 @@ class Buttons {
 						this.src.txtRev = '';
 					}
 					$.gr(1, 1, false, g => {
-						['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font, true))
+						['space', 'lfmRev', 'wikiRev', 'txtRev', 'lfmBio', 'wikiBio', 'txtBio'].forEach(v => this.src.item_w[v] = g.CalcTextWidth(this.src[v], this.src.font, true))
 					});
 					break;
 				case 1: {
-					this.src.amBio = this.src.amRev = cfg.amDisplayName.toLowerCase() + (!ppt.sourceAll ? '' : '... ');
 					this.src.lfmBio = this.src.lfmRev = '\uF202' + (!ppt.sourceAll ? '' : '... ');
 					this.src.wikiBio = this.src.wikiRev = '\uF266' + (!ppt.sourceAll ? '' : '... ');
 					this.src.txtBio = (txt.bio.subhead.txt[0] || '').toLowerCase() + (!ppt.sourceAll ? '' : '... ');
@@ -277,10 +267,10 @@ class Buttons {
 						this.src.iconFont = gdi.Font('FontAwesome', Math.round(this.src.fontSize * (this.src.bahnInstalled ? 1.09 : 1.16)), 0);
 					}
 					const alt_w = [];
-					alt_w[9] = ' ';
-					const fonts = [this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont];
-					['space', 'amRev', 'lfmRev', 'wikiRev', 'txtRev', 'amBio', 'lfmBio', 'wikiBio', 'txtBio', 'spaceIconFont'].forEach((v, i) => {
-						this.src.item_w[v] = g.CalcTextWidth(i < 9 ? this.src[v] : alt_w[i], fonts[i], true);
+					alt_w[7] = ' ';
+					const fonts = [this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont, this.src.iconFont, this.src.font, this.src.iconFont];
+					['space', 'lfmRev', 'wikiRev', 'txtRev', 'lfmBio', 'wikiBio', 'txtBio', 'spaceIconFont'].forEach((v, i) => {
+						this.src.item_w[v] = g.CalcTextWidth(i < 7 ? this.src[v] : alt_w[i], fonts[i], true);
 					});
 					this.src.item_w.space = Math.max(this.src.item_w.space, this.src.item_w.spaceIconFont);
 					const n = ppt.artistView ? 'bio' : 'rev';
@@ -294,7 +284,7 @@ class Buttons {
 			this.setRatingImages(Math.round(ui.font.main_h / 1.75) * 5, Math.round(ui.font.main_h / 1.75), ui.col.starOn, ui.col.starOff, ui.col.starBor, false);
 		}
 		if (ui.stars == 1 && ui.show.btnRedLastfm) this.setRatingImages(Math.round(this.src.h / 1.5) * 5, Math.round(this.src.h / 1.5), RGBA(225, 225, 245, 255), RGBA(225, 225, 245, 60), ui.col.starBor, true);
-		this.src.pxShift = /[gjpqy]/.test(this.src.amRev + this.src.lfmRev + this.src.wikiRev + this.src.txtRev + this.src.amBio + this.src.lfmBio + this.src.wikiBio + this.src.txtBio);
+		this.src.pxShift = /[gjpqy]/.test(this.src.lfmRev + this.src.wikiRev + this.src.txtRev + this.src.lfmBio + this.src.wikiBio + this.src.txtBio);
 	}
 
 	draw(gr) {
@@ -333,7 +323,7 @@ class Buttons {
 		let n = ppt.artistView ? 'Bio' : 'Rev';
 		if (ppt.lockBio && !ppt.sourceAll) return true;
 		n = ppt.artistView ? 'bio' : 'rev';
-		const types = txt[n].reader && panel.stndItem() ? $.source.amLfmWikiTxt : $.source.amLfmWiki;
+		const types = txt[n].reader && panel.stndItem() ? $.source.lfmWikiTxt : $.source.lfmWiki;
 		let found = 0;
 		return types.some(type => {
 			if (txt[n][type]) found++;
@@ -815,7 +805,7 @@ class Btn {
 				const o = Math.floor(w / 2);
 				but.flag.w = Math.round(but.flag.h * flag.Width / flag.Height);
 				but.flag.sp = Math.round(but.flag.h * 0.75 + but.flag.w);
-				gr.DrawImage(flag, but.flag.x, but.flag.y, but.flag.w, but.flag.h, 0, 0, flag.Width, flag.Height, '', 212);
+				gr.DrawImage(flag, but.flag.x, but.flag.y, but.flag.w, but.flag.h, 0, 0, flag.Width, flag.Height, 0, 212);
 				gr.DrawRect(but.flag.x + o, but.flag.y + o, but.flag.w - w, but.flag.h - w + 1, w, ui.col.imgBor);
 			}
 			gr.SetInterpolationMode(0);
@@ -855,15 +845,15 @@ class Btn {
 				break;
 			case 1: {
 				let iconFont = false;
-				if (!ppt.lockBio || ppt.sourceAll) iconFont = txt[n].loaded.ix == 1 || txt[n].loaded.ix == 2;
-				else iconFont = ppt[`source${n}`] == 1 || ppt[`source${n}`] == 2;
+				if (!ppt.lockBio || ppt.sourceAll) iconFont = txt[n].loaded.ix == 0 || txt[n].loaded.ix == 1;
+				else iconFont = ppt[`source${n}`] == 0 || ppt[`source${n}`] == 1;
 				gr.GdiDrawText(but.src.name, !iconFont ? but.src.font : but.src.iconFont, col, dx2, this.p1 + (!iconFont ? 0 : but.src.y), but.src.w, but.src.h, !but.rating.show ? txt.cc : txt.c[0]);
 				break;
 			}
 		}
 		if (but.rating.show) {
-			const rating = txt.rev.loaded.am ? txt.rating.am : txt.rating.lfm;
-			const ratingImg = !ui.show.btnRedLastfm || txt.rev.loaded.am ? but.rating.images[rating] : but.rating.imagesLfm[rating];
+			const rating = txt.rating.lfm;
+			const ratingImg = !ui.show.btnRedLastfm ? but.rating.images[rating] : but.rating.imagesLfm[rating];
 			if (ratingImg) gr.DrawImage(ratingImg, !ppt.hdPos ? this.x + this.w - spacer - but.rating.w2 - (ui.show.btnBg ? but.src.item_w.space : 0) : dx2 + but.src.name_w, this.p1 + (Math.round(but.src.h - but.rating.h2) / 2), but.rating.w2, but.rating.h2, 0, 0, but.rating.w1, but.rating.h1, 0, 255);
 		}
 	}
