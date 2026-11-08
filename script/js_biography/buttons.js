@@ -15,6 +15,10 @@ class Buttons {
 			h: Math.round(ui.font.heading_h * 0.56),
 			sp: 0 // heading offset; keep numeric when no flag is available (otherwise h_x/h_w become NaN)
 		}
+		this.hdW = {
+			key: '',
+			w: 0
+		} // cached heading text width (drawHeading runs on every paint)
 		this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
 
 		this.lookUp = {
@@ -23,7 +27,7 @@ class Buttons {
 			gap: 9,
 			img: null,
 			imgLock: null,
-			pos: 1,
+			pos: 0,
 			x: 0,
 			y: 0,
 			w: 12,
@@ -49,7 +53,7 @@ class Buttons {
 			iconFontName: 'Segoe UI Symbol',
 			iconFontStyle: 0,
 			init: true,
-			pad: $.clamp(ppt.sbarButPad / 100, -0.5, 0.3)
+			pad: 0
 		}
 
 		this.src = {
@@ -237,7 +241,7 @@ class Buttons {
 		const hs = ui.font.heading.Size;
 		const fs = ui.stars != 1 ? (this.src.icon ? (this.src.bahnInstalled ? 12 : 11) : 10) * $.scale : 12 * $.scale;
 		const srcFontSize = this.src.fontSize; 
-		this.src.fontSize = $.clamp(Math.round(hs * 0.47) + (ppt.zoomHeadBtn - 100) / 10, Math.min(fs, hs), Math.max(fs, hs));
+		this.src.fontSize = $.clamp(Math.round(hs * 0.65) + (ppt.zoomHeadBtn - 100) / 10, Math.min(fs, hs), Math.max(fs, hs));
 		if (this.src.fontSize != srcFontSize || force) this.src.font = gdi.Font('Segoe UI', this.src.fontSize, 1);
 		$.gr(1, 1, false, g => {
 			this.src.h = g.CalcTextHeight('lastfm', this.src.font);
@@ -458,12 +462,10 @@ class Buttons {
 				if (ui.font.heading_h >= 28 && ui.font.heading_h % 2 == 0) this.flag.y++;
 			} else this.flag.sp = 0;
 		} else delete this.btns.heading;
-		if (panel.id.lookUp) {
-			this.btns.lookUp = new Btn(this.lookUp.x, this.lookUp.y, this.lookUp.w, this.lookUp.h, 7, this.lookUp.p1, this.lookUp.p2, '', {
-				normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
-				hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
-			}, !panel.id.lookUp, '', () => bMenu.load(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => '单击：查找...\r\n' + (!panel.id.lyricsSource && !panel.id.nowplayingSource ? '中键单击：' + (!panel.lock ? '锁定：停止音轨变化更新' : '解锁') + '...' : '启用歌词或正在播放来源，锁定不可用'), true, 'lookUp');
-		} else delete this.btns.lookUp;
+		this.btns.lookUp = new Btn(this.lookUp.x, this.lookUp.y, this.lookUp.w, this.lookUp.h, 7, this.lookUp.p1, this.lookUp.p2, '', {
+			normal: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 100 : 50),
+			hover: RGBA(this.lookUp.col[0], this.lookUp.col[1], this.lookUp.col[2], this.lookUp.pos == 2 ? 200 : this.alpha[1])
+		}, false, '', () => bMenu.load(this.lookUp.x + this.lookUp.p1, this.lookUp.y + this.lookUp.h), () => '单击：查找...\r\n' + (!panel.id.lyricsSource && !panel.id.nowplayingSource ? '中键单击：' + (!panel.lock ? '锁定：停止音轨变化更新' : '解锁') + '...' : '启用歌词或正在播放来源，锁定不可用'), true, 'lookUp');
 		if (ppt.summaryShow) {
 			const hide = txt[n].loaded.txt && (txt.reader[n].lyrics || txt.reader[n].props || txt.reader[n].nowplaying) || ppt.img_only;
 			this.btns.summary = new Btn(panel.text.l, panel.text.t, panel.text.w, 
@@ -521,7 +523,6 @@ class Buttons {
 		this.lookUp.font = gdi.Font('FontAwesome', 15 * this.lookUp.scale / 100, 0);
 		this.lookUp.fontLock = gdi.Font('FontAwesome', 14 * this.lookUp.scale / 100, 0);
 		ppt.zoomHeadBtn = 100;
-		ppt.zoomTooltip = 100;
 		ui.getFont();
 		this.createStars();
 		this.createImages('lookUp');
@@ -541,12 +542,20 @@ class Buttons {
 	}
 
 	setLookUpPos() {
-		this.lookUp.pos = ppt.hdLine == 2 && ppt.hdPos == 2 ? 0 : ppt.heading ? panel.id.lookUp : 0;
-		this.lookUp.x = [0, 1 * $.scale, (!ppt.heading || ppt.img_only ? panel.w - 1 * $.scale - this.lookUp.sz - 1 : panel.heading.x + panel.heading.w - this.lookUp.sz) - 9 * $.scale][this.lookUp.pos];
-		this.lookUp.y = [0, 0, !ppt.heading || ppt.img_only ? 0 : panel.text.t - ui.heading.h + (ui.font.heading_h - this.lookUp.sz) / 2][this.lookUp.pos];
-		this.lookUp.w = [12, this.lookUp.sz * 1.5, panel.w - this.lookUp.x][this.lookUp.pos];
-		this.lookUp.h = [12, this.lookUp.sz * 1.5, Math.max(ui.font.heading_h, this.lookUp.sz)][this.lookUp.pos];
-		this.lookUp.p1 = [12, this.lookUp.sz + 1, this.lookUp.sz + 1 + 9 * $.scale][this.lookUp.pos];
+		this.lookUp.pos = (ppt.hdLine == 2 && ppt.hdPos == 2) || !ppt.heading ? 0 : 2;
+		if (this.lookUp.pos) {
+			this.lookUp.x = (ppt.img_only ? panel.w - 1 * $.scale - this.lookUp.sz - 1 : panel.heading.x + panel.heading.w - this.lookUp.sz) - 9 * $.scale;
+			this.lookUp.y = ppt.img_only ? 0 : panel.text.t - ui.heading.h + (ui.font.heading_h - this.lookUp.sz) / 2;
+			this.lookUp.w = panel.w - this.lookUp.x;
+			this.lookUp.h = Math.max(ui.font.heading_h, this.lookUp.sz);
+			this.lookUp.p1 = this.lookUp.sz + 1 + 9 * $.scale;
+		} else {
+			this.lookUp.x = 0;
+			this.lookUp.y = 0;
+			this.lookUp.w = 12;
+			this.lookUp.h = 12;
+			this.lookUp.p1 = 12;
+		}
 		this.lookUp.p2 = this.lookUp.sz + 1;
 	}
 
@@ -613,29 +622,17 @@ class Buttons {
 		if (ppt.sbarType == 3) {
 			this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
 			this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
+		} else if (ppt.sbarButType == 1) {
+			this.scr.arrow = 0;
 		} else {
-			switch (ppt.sbarButType) {
-				case 0:
-					this.scr.iconFontName = 'Segoe UI Symbol';
-					this.scr.iconFontStyle = 0;
-					if (!ui.sbar.type) {
-						this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
-						this.scr.pad = ui.sbar.but_w < Math.round(15 * $.scale) ? -0.3 : -0.22;
-					} else {
-						this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
-						this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
-					}
-					break;
-				case 1:
-					this.scr.arrow = 0;
-					break;
-				case 2:
-					this.scr.iconFontName = ppt.butCustIconFont;
-					this.scr.iconFontStyle = 0;
-					this.scr.arrow = ppt.arrowSymbol.charAt().trim();
-					if (!this.scr.arrow.length) this.scr.arrow = 0;
-					this.scr.pad = $.clamp(ppt.sbarButPad / 100, -0.5, 0.3);
-					break;
+			this.scr.iconFontName = 'Segoe UI Symbol';
+			this.scr.iconFontStyle = 0;
+			if (!ui.sbar.type) {
+				this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
+				this.scr.pad = ui.sbar.but_w < Math.round(15 * $.scale) ? -0.3 : -0.22;
+			} else {
+				this.scr.arrow = ui.sbar.but_w < Math.round(14 * $.scale) ? '\uE018' : '\uE0A0';
+				this.scr.pad = ui.sbar.but_w < Math.round(14 * $.scale) ? -0.26 : -0.22;
 			}
 		}
 	}
@@ -775,6 +772,13 @@ class Btn {
 			}
 		} else dh = txt.na + txt.heading;
 		dh = dh.trim();
+		const hdW = but.hdW; // drawHeading is a Btn method, the cache lives on the Buttons instance
+		const hdKey = `${ui.font.heading.Name}|${ui.font.heading.Size}|${ui.font.heading.Style}|${dh}`;
+		if (hdW.key !== hdKey) {
+			hdW.key = hdKey;
+			hdW.w = dh ? gr.CalcTextWidth(dh, ui.font.heading) : 0;
+		}
+		const dh_text_w = hdW.w;
 
 		switch (true) {
 			case ppt.hdLine == 1:
@@ -783,7 +787,7 @@ class Btn {
 			case ppt.hdLine == 2:
 				if (ppt.hdPos != 2) {
 					const src_w = but.src.w + (but.lookUp.pos == 2 ? but.lookUp.sz + (ppt.hdBtnShow || ppt.hdPos == 1 ? 10 * $.scale : 0) : 0);
-					let dh_w = gr.CalcTextWidth(dh, ui.font.heading) + but.src.item_w.space * (ppt.hdPos != 1 || dh ? 2 : 0) + (ppt.hdPos == 1 && but.lookUp.pos == 2 ? but.lookUp.sz + 10 * $.scale : 0);
+					let dh_w = dh_text_w + but.src.item_w.space * (ppt.hdPos != 1 || dh ? 2 : 0) + (ppt.hdPos == 1 && but.lookUp.pos == 2 ? but.lookUp.sz + 10 * $.scale : 0);
 					if (!ppt.hdPos && dh_w < dw - src_w - but.src.item_w.space * (ppt.hdPos != 2 || !but.src.visible ? 3 : 1)) {
 						gr.DrawLine(this.x + dh_w + (flag ? but.flag.sp : 0), Math.round(this.y + this.h / 2), this.x + dw - src_w - but.src.item_w.space * 3, Math.round(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
 					}
@@ -794,7 +798,7 @@ class Btn {
 						dx1 += spacer;
 					}
 				} else {
-					let dh_w = gr.CalcTextWidth(dh, ui.font.heading) + but.src.item_w.space * 4;
+					let dh_w = dh_text_w + but.src.item_w.space * 4;
 					let ln_l = (dw - dh_w) / 2;
 					if (ln_l > 1) {
 						gr.DrawLine(this.x, Math.ceil(this.y + this.h / 2), this.x + ln_l, Math.ceil(this.y + this.h / 2), ui.style.l_w, ui.col.centerLine);
@@ -817,14 +821,14 @@ class Btn {
 			const h_x = (ppt.hdPos != 2 ? dx1 : this.x) + but.flag.sp;
 			const h_w = (ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer) - but.flag.sp;
 			gr.GdiDrawText(dh, ui.font.heading, ui.col.headingText, h_x, this.y, h_w, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
-			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? (!flag || !txt[n].flagCountry ? dh : `${txt[n].flagCountry} | ${dh}`): '';
+			but.tooltip.name = dh_text_w > h_w ? (!flag || !txt[n].flagCountry ? dh : `${txt[n].flagCountry} | ${dh}`): '';
 			but.tooltip.x = h_x;
 			but.tooltip.w = h_w;
 		} else {
 			const h_x = (ppt.hdPos != 2 ? dx1 : this.x);
 			const h_w = ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer;
 			gr.GdiDrawText(dh, ui.font.heading, ui.col.headingText, (ppt.hdPos != 2 ? dx1 : this.x), this.y, ppt.hdPos != 2 ? this.w - spacer - but.src.w - (!ppt.hdPos ? 10 : 0) : this.w - spacer, this.h, ppt.hdPos != 2 ? txt.c[ppt.hdPos] : txt.cc);
-			but.tooltip.name = gr.CalcTextWidth(dh, ui.font.heading) > h_w ? dh : '';
+			but.tooltip.name = dh_text_w > h_w ? dh : '';
 			but.tooltip.x = h_x;
 			but.tooltip.w = h_w;
 		}

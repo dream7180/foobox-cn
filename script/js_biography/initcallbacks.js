@@ -57,8 +57,8 @@ function on_colours_changed() {
 		lyrics.transBot = {}
 		lyrics.transTop = {}
 	}
-	txt.rev.cur = '';
-	txt.bio.cur = '';
+	txt.rev.cur = -1;
+	txt.bio.cur = -1;
 	txt.albCalc();
 	txt.artCalc();
 	txt.paint();
@@ -85,8 +85,7 @@ function on_get_album_art_done(handle, art_id, image, image_path) {
 
 function on_item_focus_change() {
 	if (fb.IsPlaying && !panel.id.focus) return;
-	if (panel.id.lookUp) panel.getList(true, true);
-	else if (!panel.updateNeeded()) return;
+	panel.getList(true, true);
 	if (panel.block()) {
 		img.get = true;
 		txt.get = 1;
@@ -321,8 +320,8 @@ function on_notify_data(name, info) {
 			if(!c_h) c_h = ui.dui ? window.GetColourDUI(2) : window.GetColourCUI(2);
 			if(!c_bg) c_bg = ui.dui ? window.GetColourDUI(1) : window.GetColourCUI(3);
 			ui.getColours(c_h, c_bg);
-			txt.rev.cur = '';
-			txt.bio.cur = '';
+			txt.rev.cur = -1;
+			txt.bio.cur = -1;
 			txt.albCalc();
 			txt.artCalc();
 			txt.paint();
@@ -410,14 +409,17 @@ function on_playlist_switch() {
 }
 
 function on_script_unload() {
-	['dl', 'img', 'lyrics', 'sim1', 'sim2', 'source', 'transition', 'tt', 'zSearch'].forEach(v => timer.clear(timer[v])); // clear all timers to avoid callbacks firing after unload
+	['dl', 'img', 'lyrics', 'sim1', 'sim2', 'size', 'source', 'transition', 'tt', 'zSearch'].forEach(v => timer.clear(timer[v])); // clear all timers to avoid callbacks firing after unload
 	[...XMLHttpRequests].forEach((request) => request.abort()); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 	but.on_script_unload();
+	panelCfg.flush(); // 把还没写盘的属性改动落进 panel.cfg
 	txt.deactivateTooltip();
 }
 
+const SIZE_GAP = 100; // a full re-layout costs 10-60 ms; never run it more often than this while resizing
+let sizePassAt = 0;
+
 function on_size() {
-	txt.repaint = false;
 	panel.w = window.Width;
 	panel.h = window.Height;
 	if (!window.IsVisible && ui.pss.installed) {
@@ -426,16 +428,39 @@ function on_size() {
 	}
 	ui.pss.checkOnSize = false;
 	if (!panel.w || !panel.h) return;
-	ui.getParams();
+	panel.setStyle(); // geometry only: cheap, so the panel follows the drag frame by frame
+	if (!panel.sized) { // first pass: nothing on screen yet, lay out synchronously
+		panel.sized = true;
+		sizePassAt = Date.now();
+		resizePanel();
+		return;
+	}
+	// A window drag fires dozens of WM_SIZE messages. Instead of queueing one heavy pass
+	// per message, run the first one at once and the following ones at most every
+	// SIZE_GAP ms: the panel stays alive during the drag and the last message is still
+	// honoured, because a queued pass reads panel.w/h when it actually runs.
+	if (timer.size.id) return;
+	const wait = Math.max(0, SIZE_GAP - (Date.now() - sizePassAt));
+	timer.size.id = setTimeout(() => {
+		timer.size.id = null;
+		sizePassAt = Date.now();
+		resizePanel();
+	}, wait);
+}
 
+function resizePanel() {
+	timer.clear(timer.size);
+	txt.repaint = false; // hold text painting until the new geometry is in place
+	ui.getParams();
 	txt.deactivateTooltip();
 	panel.calcText = true;
 	txt.on_size();
-
 	img.on_size();
 	filmStrip.on_size();
+	img.refreshFilmID(); // film strip geometry is final now, keep the cached image entry valid
 	txt.repaint = true;
 	img.art.displayedOtherPanel = null;
+	window.Repaint();
 }
 
 // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available

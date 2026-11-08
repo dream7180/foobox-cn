@@ -1,5 +1,5 @@
 ﻿// foobox https://github.com/dream7180; JSSB http://br3tt.deviantart.com
-window.DefinePanel('JS Smooth Browser', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '20151114-1630-340', features: {drag_n_drop: true} });
+window.DefinePanel('JS Smooth Browser', {author: 'Br3tt, dreamawake, always_beta(cn)', version: '2026', features: {drag_n_drop: true} });
 include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
@@ -11,7 +11,7 @@ var zdpi = 1;
 var dark_mode = 0;
 //}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
-var CACHE_FOLDER = fb.ProfilePath + "foobox\\data";
+var CACHE_FOLDER = fb.ProfilePath + "foobox\\data\\albumart_cache";
 var sys_scrollbar = cfg_map.sys_scrollbar;
 cfg_map = {};
 var g_fsize;
@@ -245,7 +245,7 @@ function create_cover_worker() {
 	cover_worker.onerror = function (event) {
 		console.log('Cover worker error: ' + event.message);
 	};
-	cover_worker.postMessage({ cmd: 'init', dbPath: CACHE_FOLDER + '\\albumart.db', tables: cover_tables });
+	cover_worker.postMessage({ cmd: 'init', dbPath: fb.ProfilePath + 'foobox\\data\\albumart.db', tables: cover_tables });
 }
 
 images = {

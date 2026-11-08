@@ -1,9 +1,15 @@
 ﻿//foobox https://github.com/dream7180
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
+var mpinfo;
+var mpinfo = {
+	names: [],
+	icos: [],
+	active: 0
+};
+window.NotifyOthers("fetch_subpanels", mpinfo);
 include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\js_common\\guiext.js');
-
 var time_length = 0;
 var zdpi, dark_mode;
 var c_background, c_btmbg, c_font, c_seekoverlay, c_default_hl, c_shadow, c_shadow_h, c_tip_bg, c_seek_bg;
@@ -30,26 +36,11 @@ var fbver = Number(fb.Version.substr(0, 1));
 var lib_albumlist = 1;
 var lib_tooltip = "专辑列表";
 var active_p, active_pid;
-var allpanels = ['list', 'brw', 'bio', 'vis', 'video'];
 var panel = {
 	p: [],
 	ico: [],
 	tip: [],
-	tipx: 0,
-	icos: {
-		"list": "\uF011",
-		"brw": "\uF158",
-		"bio": "\uF2EF",
-		"vis": "\uEA96",
-		"video": "\uEF7F"
-	},
-	tips: {
-		"list": "播放列表",
-		"brw": "封面浏览器",
-		"bio": "简介",
-		"vis": "可视化",
-		"video": "视频"
-	}
+	tipx: 0
 }
 
 var devIcos = {
@@ -116,7 +107,7 @@ var oSwitchbar = function() {
 	this.h_space = z(38);
 	this.x = 5;
 	this.y = 5;
-	this.w = this.h_space*(panel.p.length - 1) + this.btw + 2;
+	this.w = this.h_space*(panel.ico.length - 1) + this.btw + 2;
 	this.h = this.btw + z(2);
 	this.hover_tab = 0;
 	this.tab_old = this.hover_tab;
@@ -189,22 +180,29 @@ var oSwitchbar = function() {
 		g_switchbar.tip_timer = false;
 	}
 	this.switch_panel = function(id) {
-		if(active_pid == panel.p.length - 1){
+		if(active_pid == panel.ico.length - 1){
 			window.NotifyOthers("foobox_setting", 0);
 			if(id == 1) {
 				active_pid = 0;
 				return;
-			} else if(active_pid == 0 && id == panel.p.length){
+			} else if(active_pid == 0 && id == panel.ico.length){
 				window.NotifyOthers("foobox_setting", 1);
-				active_pid = panel.p.length - 1;
+				active_pid = panel.ico.length - 1;
 				return;
 			}			
 		}
 		active_p.Show(false);
-		if(id == panel.p.length) {
+		if(id == panel.ico.length) {
 			window.NotifyOthers("foobox_setting", 1);
 			active_p = panel.p[0];
-		} else active_p = panel.p[id - 1];
+		} else {
+			if(id == 1) active_p = panel.p[0];
+			//else if(panel.tip[id - 1] == "自定义") active_p = panel.p[2];
+			else{
+				active_p = panel.p[1];
+				window.NotifyOthers("show_subpanel", id - 2);
+			}
+		}
 		active_pid = id - 1;
 		active_p.Show(true);
 		set_panel();
@@ -219,7 +217,7 @@ var oSwitchbar = function() {
 			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.btw, z4, z4, c_shadow_h);
 		}
 		gr.SetSmoothingMode(0);
-		for (let i = 0; i < panel.p.length; i++){
+		for (let i = 0; i < panel.ico.length; i++){
 			gr.GdiDrawText(panel.ico[i], g_fnico1, c_normal, this.x + this.h_space*i, ico_y, this.btw, this.btw, cc_txt);
 		}
 	}
@@ -229,20 +227,37 @@ var oSwitchbar = function() {
 }
 
 function get_panel() {
-	for(let i = 0; i < allpanels.length; i++){
-		let _p = null;
-		try {_p = window.GetPanel(allpanels[i]);}catch(e){}
-		if(_p) {
-			panel.p.push(_p);
-			panel.ico.push(panel.icos[allpanels[i]]);
-			panel.tip.push(panel.tips[allpanels[i]]);
-			let id = panel.p.length - 1;
-			panel.p[id].ShowCaption = false;
-			if(!panel.p[id].Hidden) {active_p = panel.p[id]; active_pid = id;}
-		}
+	panel.p.push(window.GetPanel("list"));
+	panel.ico.push("\uF011");
+	panel.tip.push("播放列表");
+	panel.p[0].ShowCaption = false;
+	if(!panel.p[0].Hidden) {active_p = panel.p[0]; active_pid = 0;}
+	panel.p.push(window.GetPanel("multip"));
+	panel.ico.push("\uF158");
+	panel.tip.push("封面浏览器");
+	for(let i = 0; i < mpinfo.names.length; i++){
+		panel.ico.push(mpinfo.icos[i]);
+		panel.tip.push(mpinfo.names[i]);
 	}
+	panel.p[1].ShowCaption = false;
+	if(!panel.p[1].Hidden) {
+		active_p = panel.p[1]; 
+		active_pid = 1 + mpinfo.active;
+	}
+	/*let _p = null;
+	try {_p = window.GetPanel("custom");}catch(e){}
+	if(_p) {
+		panel.p.push(_p);
+		panel.ico.push("\uEA96");
+		panel.tip.push("自定义");
+		let id = panel.p.length - 1;
+		panel.p[2].ShowCaption = false;
+		if(!panel.p[2].Hidden){
+			active_p = panel.p[2];
+			active_pid = panel.ico.length - 1;
+		}
+	}*/
 	if(!active_p) active_p = panel.p[0];
-	panel.p.push("settings");
 	panel.ico.push("\uF0E4");
 	panel.tip.push("设置");
 }

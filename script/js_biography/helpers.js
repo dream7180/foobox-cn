@@ -1,16 +1,17 @@
 ﻿'use strict';
 
-const requiredVersionStr = '1.5.2';
-
-function is_compatible(requiredVersionStr) {
-	const requiredVersion = requiredVersionStr.split('.');
-	const currentVersion = utils.Version.split('.');
-	if (currentVersion.length > 3) currentVersion.length = 3;
-	for (let i = 0; i < currentVersion.length; ++i)
-		if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i];
-	return true;
-}
-if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`简介最低组件版本需要 v${requiredVersionStr}. 当前组件版本是 v${utils.Version}.`);
+// SMP 版本检查已停用，保留原代码文本备查（需要时去掉注释即可恢复）
+// const requiredVersionStr = '1.5.2';
+//
+// function is_compatible(requiredVersionStr) {
+// 	const requiredVersion = requiredVersionStr.split('.');
+// 	const currentVersion = utils.Version.split('.');
+// 	if (currentVersion.length > 3) currentVersion.length = 3;
+// 	for (let i = 0; i < currentVersion.length; ++i)
+// 		if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i];
+// 	return true;
+// }
+// if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`简介最低组件版本需要 v${requiredVersionStr}. 当前组件版本是 v${utils.Version}.`);
 
 const doc = new ActiveXObject('htmlfile');
 const fso = new ActiveXObject('Scripting.FileSystemObject');
@@ -344,7 +345,7 @@ save(fn, text, bom) {
 			// Regorxxx <- No file saved on long paths > 255 chars
 			const success = utils.WriteTextFile(fn, text, bom);
 			if (!success && fn.length >= 256) {
-				fb.ShowPopupMessage('脚本尝试保在多于 256 字符的路径上存文件导致 Windows 系统出错.\n\nPath:\n' + fn + '\n\n要避免问题，可便携模式安装 foobar2000 于简短的路径上或在此配置文件里修改缓存路径 \'biography.cfg\'.')
+				fb.ShowPopupMessage('脚本尝试保在多于 256 字符的路径上存文件导致 Windows 系统出错.\n\nPath:\n' + fn + '\n\n要避免问题，可便携模式安装 foobar2000 于简短的路径上或在此配置文件里修改缓存路径 \'server.cfg\'.')
 			}
 			// Regorxxx ->
 		} catch (e) {
@@ -455,6 +456,9 @@ save(fn, text, bom) {
 }
 
 const $ = new Helpers;
+
+// 简介面板数据目录（server.cfg / panel.cfg 等文本配置都放这里）
+const bioDataPth = fb.ProfilePath + 'foobox\\data\\biography\\';
 
 function RGB(r, g, b) {
 	return 0xff000000 | r << 16 | g << 8 | b;

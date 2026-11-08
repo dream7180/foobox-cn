@@ -53,7 +53,8 @@ class Text {
 			arr: [],
 			born: 'Born: |Geburtstag: |Fecha de nacimiento: |N\\u00e9\\(e\\) le: |Data di nascita: |\\u751f\\u5e74\\u6708\\u65e5: |Urodzony: |Data de nascimento: |\\u0413\\u043e\\u0434 \\u0440\\u043e\\u0436\\u0434\\u0435\\u043d\\u0438\\u044f: |F\\u00f6dd: |Do\\u011fum tarihi: |\\u51fa\\u751f: ',
 			bornIn: 'Born In: |Geboren in: |Lugar de nacimiento: |N\\u00e9\\(e\\) en: |Luogo di nascita: |\\u51fa\\u8eab\\u5730: |Urodzony w: |Local de nascimento: |\\u041c\\u0435\\u0441\\u0442\\u043e \\u0440\\u043e\\u0436\\u0434\\u0435\\u043d\\u0438\\u044f: |F\\u00f6dd: |Do\\u011fum yeri: |\\u751f\\u4e8e: ',
-			cur: '',
+			cur: -1,
+			ver: 0,
 			cur_ix: -1,
 			died: 'Died: |Gestorben: |Fallecido: |D\\u00e9c\\u00e9d\\u00e9(e) le: |Data di morte: |\\u6ca1\\u5e74: |Zmar\\u0142: |Data de falecimento: |\\u0414\\u0430\\u0442\\u0430 \\u0441\\u043c\\u0435\\u0440\\u0442\\u0438: |D\\u00f6d: |\\u00d6l\\u00fcm tarihi: |\\u901d\\u4e16:',
 			drawn: 0,
@@ -208,7 +209,8 @@ class Text {
 			both: 0,
 			checkedTrackSubHead: true,
 			composersTooltip: '',
-			cur: '',
+			cur: -1,
+			ver: 0,
 			cur_ix: -1,
 			drawn: 0,
 			fallbackText: ['未找到任何内容', '没有要显示的评论'],
@@ -289,12 +291,18 @@ class Text {
 		return text;
 	}
 
+	srcKeys() { // cached property-name tuples for the review sources, rebuilt once
+		if (!this.srcKeyList) this.srcKeyList = $.source.lfmWikiTxt.map(w => [w, `${w}Line`, `${w}LineX1`, `${w}LineX2`, `${w}_w`]);
+		return this.srcKeyList;
+	}
+
 	albCalc() {
 		if (!this.rev.text.length || ppt.img_only || this.lyricsDisplayed()) return;
 		let font = !(this.reader.rev.txtLyrics || this.rev.loaded.txt && this.reader.rev.nowplaying) || ppt.sourceAll ? ui.font.main : ui.font.lyrics;
 		let j = 0;
 		this.line.h.rev = this.rev.loaded.txt && !ppt.sourceAll && this.reader.rev.props ? ui.font.main_h + 1 * $.scale : !this.reader.rev.txtLyrics || ppt.sourceAll ? ui.font.main_h : ui.font.lyrics_h + 4 * $.scale;
 		this.rev.arr = [];
+		const srcKeys = this.srcKeys();
 
 		$.gr(1, 1, false, g => {
 			for (let k = 0; k < this.rev.text.length; k++) {
@@ -349,29 +357,24 @@ class Text {
 					v.font = !this.rev.subHeading || i ? (i < this.rev.summaryEnd ? ui.font.summary : font) : ui.font.subHeadSource;
 					v.h1 = this.line.h.rev;
 					v.h2 = this.line.h.rev + 1;
-				$.source.lfmWikiTxt.forEach((w, i) => {
-					v[`${w}Line`] = (!v.property ? v.text : v.name) == this.rev.subhead[w][1] && !(this.ratingPos.line && panel.summary.show);
-					if (v[`${w}Line`]) {
-						const v_w = g.CalcTextWidth(v.text + ' ', this.ratingPos.line ? ui.font.main : ui.font.subHeadSource);
-						v[`${w}LineX1`] = w == 'lfm' ? panel.text.l + v_w + (this.rating[w] >= 0 && (this.ratingPos.subHeading || this.ratingPos.line) ? but.rating.w2 : 0) + this.bio.sp : panel.text.l + this.rev[`${w}_w`].nohd + this.bio.sp; // noHd
-						v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);
+					for (let x = 0; x < srcKeys.length; x++) {
+						const s = srcKeys[x];
+						v[s[1]] = (!v.property ? v.text : v.name) == this.rev.subhead[s[0]][1] && !(this.ratingPos.line && panel.summary.show);
+						if (v[s[1]]) {
+							const v_w = g.CalcTextWidth(v.text + ' ', this.ratingPos.line ? ui.font.main : ui.font.subHeadSource);
+							v[s[2]] = s[0] == 'lfm' ? panel.text.l + v_w + (this.rating[s[0]] >= 0 && (this.ratingPos.subHeading || this.ratingPos.line) ? but.rating.w2 : 0) + this.bio.sp : panel.text.l + this.rev[s[4]].nohd + this.bio.sp; // noHd
+							v[s[3]] = Math.max(v[s[2]], panel.text.l + panel.text.w);
+						}
 					}
-				});
 					v.offset = 0;
 					v.composersTooltip = this.rev.composersTooltip;
 					v.composers_tt_needed = v.composersTooltip && i < this.rev.summaryEnd && v.text.startsWith('Composers: ');
 					this.formatItemProperties(v, j);
 					v.subHeading = this.rev.subHeading && !i ? this.rev.subHeading : 0;
-					['lfm'].forEach(w => {
-						v[`${w}SubHeadingRating`] = this.ratingPos.subHeading && v.text == this.rev.subhead[w][ppt.heading ? 0 : 1] && this.rating[w] >= 0;
-						if (v[`${w}SubHeadingRating`]) v[`${w}SubHeadingRatingX`] = panel.text.l + (ppt.heading ? this.rev[`${w}_w`].hd : this.rev[`${w}_w`].nohd);
-
-						v[`${w}LineRating`] = this.ratingPos.line && this.rating[w] >= 0 && v.text == this.rev.subhead[w][ppt.heading ? 0 : 1];
-						if(v[`${w}LineRating`]) {
-							const v_w = g.CalcTextWidth(v.text + ' ', ui.font.main);
-							v[`${w}LineRatingX`] = panel.text.l + v_w;
-						}
-					});
+					v.lfmSubHeadingRating = this.ratingPos.subHeading && v.text == this.rev.subhead.lfm[ppt.heading ? 0 : 1] && this.rating.lfm >= 0;
+					if (v.lfmSubHeadingRating) v.lfmSubHeadingRatingX = panel.text.l + (ppt.heading ? this.rev.lfm_w.hd : this.rev.lfm_w.nohd);
+					v.lfmLineRating = this.ratingPos.line && this.rating.lfm >= 0 && v.text == this.rev.subhead.lfm[ppt.heading ? 0 : 1];
+					if (v.lfmLineRating) v.lfmLineRatingX = panel.text.l + g.CalcTextWidth(v.text + ' ', ui.font.main);
 					if (v.text.startsWith('!\u00a6')) {
 						v.col = ui.col.track;
 						v.font = ui.font.subHeadTrack;
@@ -416,6 +419,7 @@ class Text {
 		this.mod.curLfmRev = this.mod.curWikiRev = 1;
 		this.rev.checkedTrackSubHead = this.done.lfmRev = this.done.wikiRev = false;
 		this.rev.text = [];
+		this.rev.ver++;
 		but.setScrollBtnsHide();
 	}
 
@@ -456,6 +460,7 @@ class Text {
 		let j = 0;
 		this.line.h.bio = this.bio.loaded.txt && !ppt.sourceAll && this.reader.bio.props ? ui.font.main_h + 1 * $.scale : !this.reader.bio.txtLyrics || ppt.sourceAll ? ui.font.main_h : ui.font.lyrics_h + 4 * $.scale;
 		this.bio.arr = [];
+		const srcKeys = this.srcKeys();
 
 		this.bio.text.forEach(v => {
 			let l = [];
@@ -498,13 +503,14 @@ class Text {
 				v.font = !this.bio.subHeading || i ? (i < this.bio.summaryEnd ? ui.font.summary : font) : ui.font.subHeadSource;
 				v.h1 = this.line.h.bio;
 				v.h2 = this.line.h.bio + 1;
-				$.source.lfmWikiTxt.forEach(w => {
-					v[`${w}Line`] = (!v.property ? v.text : v.name) == this.bio.subhead[w][1];
-					if (v[`${w}Line`]) {
-						v[`${w}LineX1`] = panel.text.l + this.bio[`${w}_w`].nohd + this.bio.sp;
-						v[`${w}LineX2`] = Math.max(v[`${w}LineX1`], panel.text.l + panel.text.w);
+				for (let x = 0; x < srcKeys.length; x++) {
+					const s = srcKeys[x];
+					v[s[1]] = (!v.property ? v.text : v.name) == this.bio.subhead[s[0]][1];
+					if (v[s[1]]) {
+						v[s[2]] = panel.text.l + this.bio[s[4]].nohd + this.bio.sp;
+						v[s[3]] = Math.max(v[s[2]], panel.text.l + panel.text.w);
 					}
-				});
+				}
 				v.offset = 0;
 				v.membersTooltip = this.bio.membersTooltip;
 				v.members_tt_needed = v.membersTooltip && i < this.bio.summaryEnd && v.text.startsWith('Members: ');
@@ -536,6 +542,7 @@ class Text {
 		this.mod.lfmBio = this.bio.lfm = this.mod.wikiBio = this.bio.wiki = this.bio.txt = '';
 		this.mod.curLfmBio = this.mod.curWikiBio = '1';
 		this.bio.text = [];
+		this.bio.ver++;
 		but.setScrollBtnsHide();
 	}
 
@@ -552,7 +559,7 @@ class Text {
 
 	bioPth(n) {
 		if (ppt.img_only) return ['', '', false, false];
-		return panel.getPth('bio', panel.id.focus, this.artist, '', '', cfg.supCache, $.clean(this.artist), '', '', `fo${n}Bio`, false);
+		return panel.getPth('bio', panel.id.focus, this.artist, '', '', $.clean(this.artist), '', '', `fo${n}Bio`, false);
 	}
 
 	checkAbb(str) {
@@ -625,15 +632,14 @@ class Text {
 	}
 
 	checkTooltip(item, x1, needed1, w1, x2, needed2, w2, y) {
-		item.tt = {
-			needed1: needed1,
-			x1: x1,
-			w1: w1,
-			needed2: needed2,
-			x2: x2,
-			w2: w2,
-			y: y
-		}
+		const tt = item.tt || (item.tt = {}); // reused between frames, one object per line instead of one per paint
+		tt.needed1 = needed1;
+		tt.x1 = x1;
+		tt.w1 = w1;
+		tt.needed2 = needed2;
+		tt.x2 = x2;
+		tt.w2 = w2;
+		tt.y = y;
 	}
 
 	deactivateTooltip() {
@@ -647,6 +653,7 @@ class Text {
 	}
 
 	draw(gr) {
+		const srcKeys = this.srcKeys(); // hoisted out of the per-line loop
 		if (!ppt.img_only) {
 			this.getTxtFallback();
 			if (ppt.typeOverlay && ppt.style > 3 && !ppt.img_only && !ppt.text_only) {
@@ -682,10 +689,11 @@ class Text {
 						this.bio.drawn++;
 						const iy = Math.round(item_y + ui.font.main_h / 2);
 						if (!ppt.heading) {
-						$.source.lfmWikiTxt.forEach(v => {
-							if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
-						});
-					}
+							for (let x = 0; x < srcKeys.length; x++) {
+								const s = srcKeys[x];
+								if (item[s[1]]) gr.DrawLine(item[s[2]], iy, item[s[3]], iy, ui.style.l_w, ui.col.centerLine);
+							}
+						}
 					if (!item.sectionHeading || (!item.property ? i < f - 2 : i < f - 1)) {
 							if (!item.property) {
 								if (item.dropNegativeShadowLevel) { // nowplaying & lyrics only
@@ -733,9 +741,10 @@ class Text {
 						break;
 						}
 					if (!ppt.heading) {
-						$.source.lfmWikiTxt.forEach(v => {
-							if (item[`${v}Line`]) gr.DrawLine(item[`${v}LineX1`], iy, item[`${v}LineX2`], iy, ui.style.l_w, ui.col.centerLine);
-						});
+						for (let x = 0; x < srcKeys.length; x++) {
+							const s = srcKeys[x];
+							if (item[s[1]]) gr.DrawLine(item[s[2]], iy, item[s[3]], iy, ui.style.l_w, ui.col.centerLine);
+						}
 					}
 					if (item.songLine) gr.DrawLine(item.songX1, iy, item.songX2, iy, ui.style.l_w, ui.col.centerLine);
 						if (!item.sectionHeading || (!item.property ? i < f - 2 : i < f - 1)) {
@@ -1466,6 +1475,7 @@ class Text {
 
 		if (!update || this.newText) {
 			this[n].text = [];
+			this[n].ver++; // invalidates the cached line layout, replaces a full JSON.stringify compare
 			const fallbackText = !ppt.heading ? this[n].fallbackText[1] : this[n].fallbackText[0];
 			const types = $.source.lfmWikiTxt;
 			const types_1 = this.moveArrayItem(types, 0, 2); // first to last
@@ -1556,13 +1566,11 @@ class Text {
 			}
 			if (caller != 'playbackTime') img.setCrop(true); // stop nowplaying time trigger
 			if (ppt.artistView) {
-				const bioText = JSON.stringify(this.bio.text);
-				if (bioText != this.bio.cur || p_calc) this.artCalc();
-				this.bio.cur = bioText;
+				if (this.bio.ver != this.bio.cur || p_calc) this.artCalc(); // version bump instead of a full text compare
+				this.bio.cur = this.bio.ver;
 			} else {
-				const revText = JSON.stringify(this.rev.text);
-				if (revText != this.rev.cur || p_calc) this.albCalc();
-				this.rev.cur = revText;
+				if (this.rev.ver != this.rev.cur || p_calc) this.albCalc();
+				this.rev.cur = this.rev.ver;
 			}
 			if (ppt.text_only && !ui.style.isBlur || panel.alb.ix && panel.style.inclTrackRev) this.paint();
 		}
@@ -1662,7 +1670,7 @@ class Text {
 	}
 
 	lfmBio(a) {
-		const lBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', cfg.supCache, a, '', '', 'foLfmBio', true).pth;
+		const lBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', a, '', '', 'foLfmBio', true).pth;
 		if (!$.file(lBio)) return;
 		this.mod.lfmBio = $.lastModified(lBio) || 0;
 		if (this.mod.lfmBio == this.mod.curLfmBio) return;
@@ -1690,7 +1698,7 @@ class Text {
 		let trackLength = '';
 		let trackRev = '';
 		let trk = '';
-		const lRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foLfmRev', true).pth;
+		const lRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', a, aa, l, 'foLfmRev', true).pth;
 		this.avail.lfmalb = $.file(lRev) ? 1 : -1;
 		if (this.avail.lfmalb == -1) {
 			this.rating.lfm = -1;
@@ -1702,7 +1710,7 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		if (typeof trackRev !== 'object' || Array.isArray(trackRev)) { trackRev = {}; } // Regorxxx <- Safecheck against corrupt files ->
 		this.avail.lfmtrk = this.isTrackRevAvail('lfm', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) lfm_tr_mod = trackRev[trk].update;
@@ -1931,8 +1939,8 @@ class Text {
 	on_size() {
 		this.albumFlush();
 		this.artistFlush();
-		this.bio.cur = '';
-		this.rev.cur = '';
+		this.bio.cur = -1;
+		this.rev.cur = -1;
 		this.getText(false);
 		panel.getList(true);
 		but.refresh(true);
@@ -1953,8 +1961,8 @@ class Text {
 				img.clearCache();
 				this.albumFlush();
 				this.artistFlush();
-				this.rev.cur = '';
-				this.bio.cur = '';
+				this.rev.cur = -1;
+				this.bio.cur = -1;
 				this.getText(true);
 				but.refresh();
 				img.getImages();
@@ -1970,8 +1978,8 @@ class Text {
 				this.albumFlush();
 				this.artistFlush();
 				if (!ppt.img_only) img.clearCache();
-				this.rev.cur = '';
-				this.bio.cur = '';
+				this.rev.cur = -1;
+				this.bio.cur = -1;
 				this.getText(true);
 				but.refresh(true);
 				img.getImages();
@@ -1983,8 +1991,8 @@ class Text {
 				if (!ppt.img_only) img.clearCache();
 				this.albumFlush();
 				this.artistFlush();
-				this.rev.cur = '';
-				this.bio.cur = '';
+				this.rev.cur = -1;
+				this.bio.cur = -1;
 				this.reader.w.nameCol = 10;
 				this.reader.w.valueCol = 10;
 				this.getText(true);
@@ -2006,10 +2014,10 @@ class Text {
 					img.getItem(panel.art.ix, panel.alb.ix);
 				}
 				if (ppt.artistView) {
-					this.rev.cur = '';
+					this.rev.cur = -1;
 					this.artCalc();
 				} else {
-					this.bio.cur = '';
+					this.bio.cur = -1;
 					this.albCalc();
 				}
 				break;
@@ -2026,7 +2034,7 @@ class Text {
 	revPth(n) { 
 		if (ppt.img_only) return ['', '', false, false];
 		const field = n != 'Wiki' ? this.album : !ppt.classicalMusicMode || n == 'Wiki' && this.rev.wikiFallback || panel.alb.ix ? this.album : this.composition;
-		return panel.getPth('rev', panel.id.focus, this.artist, field, '', cfg.supCache, $.clean(this.artist), $.clean(this.albumartist), $.clean(field), `fo${n}Rev`, false);
+		return panel.getPth('rev', panel.id.focus, this.artist, field, '', $.clean(this.artist), $.clean(this.albumartist), $.clean(field), `fo${n}Rev`, false);
 	}
 
 	scrollbar_type() {
@@ -2086,7 +2094,7 @@ class Text {
 
 	trackPth(n) {
 		if (ppt.img_only || ppt.artistView) return ['', '', false, false];
-		return panel.getPth('track', panel.id.focus, this.artist, 'Track Reviews', '', '', $.clean(this.artist), '', 'Track Reviews', `fo${n}Rev`, false);
+		return panel.getPth('track', panel.id.focus, this.artist, 'Track Reviews', '', $.clean(this.artist), '', 'Track Reviews', `fo${n}Rev`, false);
 	}
 
 	txtBioPth() {
@@ -2216,8 +2224,8 @@ class Text {
 	}
 
 	wikiBio(a) {
-		const wBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', cfg.supCache, a, '', '', 'foWikiBio', true).pth;
-		const lBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', cfg.supCache, a, '', '', 'foLfmBio', true).pth;
+		const wBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', a, '', '', 'foWikiBio', true).pth;
+		const lBio = panel.getPth('bio', panel.id.focus, this.artist, '', '', a, '', '', 'foLfmBio', true).pth;
 		if (!$.file(wBio) && !$.file(lBio)) return;
 		this.mod.wikiBio = ($.lastModified(wBio) || 0) + (panel.summary.show ? ($.lastModified(lBio) || 0) : 0);
 		if (this.mod.wikiBio == this.mod.curWikiBio) return;
@@ -2280,17 +2288,17 @@ class Text {
 		let writer = '';
 		
 		if (!ppt.classicalMusicMode || panel.alb.ix) {
-			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foWikiRev', true).pth;
+			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', a, aa, l, 'foWikiRev', true).pth;
 		} else if (!panel.alb.ix) {
-			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.composition, '', cfg.supCache, a, aa, c, 'foWikiRev', true).pth;
+			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.composition, '', a, aa, c, 'foWikiRev', true).pth;
 			if ($.file(wRev)) foundComp = true;
 		}
 		this.rev.wikiFallback = !foundComp;
 		if (!$.file(wRev) && ppt.classicalAlbFallback && !panel.alb.ix && panel.style.inclTrackRev != 2) {
-			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foWikiRev', true).pth;
+			wRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', a, aa, l, 'foWikiRev', true).pth;
 		}
 		this.avail.wikialb = $.file(wRev) ? 2 : -1;
-		const lRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', cfg.supCache, a, aa, l, 'foLfmRev', true).pth;
+		const lRev = panel.getPth('rev', panel.id.focus, this.artist, this.album, '', a, aa, l, 'foLfmRev', true).pth;
 		if (this.avail.wikialb == -1 && !$.file(lRev)) {
 			but.check();
 			if (!panel.style.inclTrackRev || ppt.classicalMusicMode && !ppt.classicalAlbFallback) {
@@ -2300,7 +2308,7 @@ class Text {
 		}
 
 		trk = this.track.toLowerCase();
-		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foWikiRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		trackRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', $.clean(this.trackartist), '', 'Track Reviews', 'foWikiRev', true).pth, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.avail.wikitrk = this.isTrackRevAvail('wiki', trackRev[trk]);
 		if (panel.style.inclTrackRev && trackRev[trk] && trackRev[trk].update) wiki_tr_mod = trackRev[trk].update;
 
@@ -2384,7 +2392,7 @@ class Text {
 					if (en) {
 						length = $.getProp(o, 'length', '');
 					} else if (panel.summary.other) { // static read
-						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+						const trackLfmRev = $.jsonParse(panel.getPth('track', panel.id.focus, this.trackartist, 'Track Reviews', '', $.clean(this.trackartist), '', 'Track Reviews', 'foLfmRev', true).pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 						if (trackLfmRev && typeof trackLfmRev === 'object' && !Array.isArray(trackLfmRev) && trackLfmRev[trk]) { // Regorxxx <- Safecheck against corrupt files ->
 							length = $.getProp(trackLfmRev[trk], 'length', '');
 							if (length) {

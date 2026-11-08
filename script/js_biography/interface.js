@@ -75,8 +75,6 @@ class UserInterface {
 			w: 11
 		}			
 
-		if (!ppt.butCustIconFont.length) ppt.butCustIconFont = 'Segoe UI Symbol';
-
 		this.show = {
 			btnBg: ppt.hdShowBtnBg,
 			btnLabel: ppt.hdShowBtnLabel,
@@ -519,7 +517,6 @@ class UserInterface {
 			}
 		}
 		if (!lyrics && panel.id.lyricsSource) lyrics = new Lyrics;
-		panel.id.lookUp = ppt.lookUp;
 
 		this.show = {
 			btnBg: ppt.hdShowBtnBg,
@@ -552,7 +549,6 @@ class UserInterface {
 		};
 
 		img.mask.reflection = false;
-		if (!ppt.butCustIconFont.length) ppt.butCustIconFont = 'Segoe UI Symbol';
 		this.getColours();
 		this.blur.level = ppt.theme == 2 ? 91.05 - $.clamp(ppt.blurTemp, 1.05, 90) : $.clamp(ppt.blurTemp * 2, 0, 254);
 		img.mask.reset = true;
@@ -592,8 +588,8 @@ class UserInterface {
 		txt.albumReset(true);
 		txt.albumFlush();
 		txt.artistFlush();
-		txt.rev.cur = '';
-		txt.bio.cur = '';
+		txt.rev.cur = -1;
+		txt.bio.cur = -1;
 		
 		txt.bio.loaded = {
 			lfm: false,
@@ -667,17 +663,9 @@ class UserInterface {
 		}
 		this.sbar.arrowPad = ppt.sbarPad;
 		ppt.sbarWidth = $.clamp(ppt.sbarWidth, 0, 400);
-		ppt.sbarBase_w = $.clamp(ppt.sbarBase_w, 0, 400);
-
-		if (ppt.sbarWidth != ppt.sbarBase_w) {
-			ppt.sbarArrowWidth = Math.min(ppt.sbarArrowWidth, ppt.sbarWidth, 400);
-		} else {
-			ppt.sbarArrowWidth = $.clamp(ppt.sbarArrowWidth, 0, 400);
-			ppt.sbarWidth = $.clamp(ppt.sbarWidth, ppt.sbarArrowWidth, 400);
-		}
-		ppt.sbarBase_w = ppt.sbarWidth;
-		this.sbar.w = ppt.sbarBase_w;
-		this.sbar.but_w = ppt.sbarArrowWidth;
+		ppt.sbarArrowWidth = $.clamp(ppt.sbarArrowWidth, 0, 400);
+		this.sbar.w = ppt.sbarWidth;
+		this.sbar.but_w = this.sbar.w ? Math.min(ppt.sbarArrowWidth, this.sbar.w) : ppt.sbarArrowWidth;
 		let themed_w = 21;
 		try {
 			themed_w = utils.GetSystemMetrics(2);
@@ -690,7 +678,7 @@ class UserInterface {
 		if (!ppt.sbarShow) this.sbar.w = 0;
 		this.sbar.but_h = this.sbar.w + (ppt.sbarType != 2 ? 1 : 0);
 		if (ppt.sbarType != 2) {
-			if (ppt.sbarButType || !this.sbar.type && this.sbar.but_w < Math.round(15 * $.scale)) this.sbar.but_w += 1;
+			if (ppt.sbarButType == 1 || !this.sbar.type && this.sbar.but_w < Math.round(15 * $.scale)) this.sbar.but_w += 1;
 			else if (this.sbar.type == 1 && this.sbar.but_w < Math.round(14 * $.scale)) this.sbar.arrowPad += 1;
 		}
 		const sp = this.sbar.type == 2 || this.sbar.w - this.sbar.but_w > 4 ? 0 : Math.round(1 * $.scale);

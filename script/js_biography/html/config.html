@@ -92,7 +92,7 @@
 	}
 
 	/* 绝对定位容器若给固定高度，会变成透明遮罩盖住下方"保存文件夹"输入框：IE 不支持 pointer-events，只能靠尺寸/显隐解决 */
-	.cacheInfo {position:absolute; width:25%; height:auto; left:33%; top:14.4%; padding-left:0.5em;}
+	.cacheInfo {position:absolute; width:auto; height:auto; left:33%; right:0; top:14.4%; padding-left:0.5em;}
 	.pad {height:1.57em;}
 	.padMedium {height:10em;}
 	.top {display:block; margin-top:1.57em;}
@@ -144,6 +144,9 @@
 		display:inline-block; vertical-align:middle;
 	}
 	.input99 {display:inline-block; vertical-align:middle; width:98%; border:none !important; background:none;}
+	/* 缓存根路径：块级左对齐（与"根路径"标签左缘齐），宽度由 fitCacheRoot() 按右侧参照文字实测设定；
+	   border-box 让脚本给的 px 宽就是外框宽，右端才能精确对齐 */
+	.inputRoot {display:block; box-sizing:border-box; width:60%;}
 
 	.inp_label1 {display:block; margin:0.31em 0;}
 	.inp_label2 {padding-left:0.46em;}
@@ -259,7 +262,7 @@
 			<div class="column50">
 				<div class="div_text6">布局</div>
 				<div id="layout"></div>
-				<div class="div_text6">查找按钮</div>
+				<div class="div_text6">可用内容</div>
 				<div id="look_up"></div>
 				<div class="div_text12">滚动</div>
 				<span class="info3">滚动条：</span>
@@ -431,8 +434,8 @@
 			<div class="column31">
 				<div class="div_text6">主图像</div>
 				<div id="mainImage"></div>
-					<div class="div_text9">过滤</div>
-					<div class="info2"><i>适用于 Last.fm 照片下载文件夹</i></div>
+					<div class="div_text9">图像过滤</div>
+					<div class="info2"><i>适用于艺术家照片文件夹（自定义 / Last.fm 下载）</i></div>
 					<div class="info5"><b>类型</b></div>
 					<div id="input_cntf1"></div>
 					<div class="info5"><b>大小</b></div>
@@ -473,7 +476,7 @@
 				</span>
 				<div id="reflectionMetrics"></div>
 				<div class="div_text9">默认图像</div>
-				<div class="info2">默认图像通常在 fb2k 参数选项>显示中设置。它们也可以在面板属性 ("Stub...") 中设置，首先检查该属性。如果两者都未设置，则使用简介样式的默认图像。</div>
+				<div class="info2">默认图像要在 fb2k 参数选项>显示 中设置。若未设置，则使用简介样式的默认图像。</div>
 		</div>
 		</div>
 		</div>
@@ -629,7 +632,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				<div id="cusScroll"></div>
 				<div class="info2"><b>滚动条</b></div>
 				<div id="scrollbar"></div>
-				<div class="info2" style="padding-right:15%"><i>*在 “面板设置>行为>滚动>箭头” 下选择自定义滚动条图标（如果设置了 Windows 滚动条，则不适用）。确保字体支持图标。</i></div>
 			</div>
 					
 			<div class="column50">
@@ -640,6 +642,8 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				<div id="smoothTransLevel"></div>
 				<div class="info2"><b>播放列表交互（跟随所选项目）</b></div>
 				<div id="loadDelay"></div>
+				<div class="info2"><b>Last.fm 统计</b></div>
+				<div id="statsShow"></div>
 		</div>
 
 		</div>
@@ -653,7 +657,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div class="info8">
 这些变量用于搜索，并应在保存文件夹路径和标题中使用，以确保功能正确。
 
-包含非标准格式的艺术家姓名和歌曲标题的高级电台解析器位于 foo_uie_jsplitter\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}。它是用户可配置的（在文本编辑器中打开）。
+包含非标准格式的艺术家姓名和歌曲标题的高级电台解析器位于 %profile%\foobox\data\biography。它是用户可配置的（在文本编辑器中打开）。
 </div>
 			<div style="clear:both;"></div>
 			<div class="div_text11">古典音乐扩展</div>
@@ -672,7 +676,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div class="div_text1">自动下载</div>
 			</div>
 			<div class="column25">
-			<div id="cacheLocation" class="div_text1">缓存位置</div>
+			<div id="cacheLocation" class="div_text1">保存位置</div>
 			<a id="hide_folders" href="#" onclick="showSaveFolders();return false;">隐藏文件夹</a>
 			</div>
 			<div class="column40">
@@ -693,17 +697,14 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div id="wikipedia"></div>
 			<div id="savefolder3" class="info7">文件名是自动生成的</div>
 			<div style="clear:both;"></div>
-			<div id="supplCache0" class="div_text10">补充缓存</div>
-			<div id="supplemental"></div>
-			<div id="supplCache1" class="info4">查找项目（如相似艺术家和热门专辑）可以单独保存。查找和替换应用于上面的保存文件夹。预览显示 Last.fm 传记的结果。</div>
-			<div style="clear:both;"></div>
 			<div id="savePreview" class="div_text3">预览</div>
 			<div id="prev"></div>
 			<div style="clear:both;"></div>
 			<div id="cacheInfo" class="cacheInfo">
 			<div id="cache0"></div>
 			<div id="cache1"></div>
-			<a id="save_folders" style="display:block; padding-top:1em;" href="#" onclick="showSaveFolders();return false;">配置自定义缓存</a>
+			<div id="cacheRootBox"></div>
+			<a id="save_folders" style="display:block; padding-top:1em;" href="#" onclick="showSaveFolders();return false;">详细保存路径</a>
 			</div>
 			<div id="pad" class="pad"></div>
 		</div>
@@ -720,9 +721,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div class="div_text7">每位艺术家限制</div>
 			<div id="photo_limit"></div>
 			<div class="info10">限制是为与自动添加新的使用而设计的。如果设置了，新的图像会取代旧的。多余的部分被转移到照片回收器。0 = 无限制。</div>
-						<div class="div_text7">自定义加载文件夹</div>
-			<div id="artCusImgFolder"></div>
-			<div class="info4">艺术家照片的替代加载文件夹（仅加载：此处不保存任何图像）。在菜单>来源>照片启用。如果启用，则首先检查自定义文件夹。如果未找到图像，则选中 Last.fm 照片下载文件夹。</div>
 			<div id="pad" class="pad"></div>
 			<div style="padding:1.25em 0;"><a id="setSize" href="#" onclick="showPhotoSyntax();return false;">在其它专辑封面查看器和播放列表中显示下载的艺术家照片</a></div>
 			<div id="photo_help" style="display: none;">
@@ -754,9 +752,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			<div class="info4">音乐文件的封面通常通过 fb2k（参数选项>显示）或从保存的位置获得。</div>
 			<div id="cov"></div>
 			<div style="clear:both;"></div>
-			<div class="div_text3">封面：循环文件夹</div>
-			<div id="covCycleFolder"></div>
-			<div class="info4">允许在专辑视图中循环浏览图像的文件夹。默认加载艺术家照片。在菜单>来源>封面选择。</div>
 			<div class="div_text3">封面：自定义路径</div>
 			<div id="covCustom"></div>
 			<div class="info4">大多数用户不需要此功能，因为封面是由 fb2k（参数选项>显示）或从保存位置自动加载的。如果需要，请启用。使用完整路径减去扩展名。</div>
@@ -816,9 +811,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 		<div style="clear:both;"></div>
 
 		<div id="misc" class="tabcontent">
-				<div class="div_text3">网站显示名称</div>
-				<div id="siteNames"></div>
-				<div class="div_text1" style="padding:1.25em 0 0.15em;">杂项</div>
+				<div class="div_text1">&nbsp;</div><!-- 标题已去掉，保留这行占位以维持下方元素的位置 -->
 				<div id="miscellaneous"></div>
 				<div id="miscl"></div>
 				<div id="fuzzyLevel"></div>
@@ -931,6 +924,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				var barH = window.btn_cnt_right ? window.btn_cnt_right.offsetHeight : 0;
 				var h = Math.round(document.documentElement.clientHeight - top - barH);
 				cur.style.height = (h > 60 ? h : 60) + "px";
+				fitCacheRoot(); // 页面切换 / 窗口缩放后按新的参照位置重算根路径编辑框宽度
 			}
 
 			function openPage(pageName,elmnt,color) {
@@ -983,16 +977,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			function getPreview(id, value) {
 				var ev;
 				if (cur.page == "title_format" || cur.page == "download" || cur.page == "cover" || cur.page == "textreader" && id.slice(-1) < 8) {
-					var sFind = null;
-					var sReplace = null;
-					if (id == 'dld_container11') {
-						sFind = value;
-						sReplace = document.getElementById('dld_container12').value;
-					}
-					if (id == 'dld_container12') {
-						sFind = document.getElementById('dld_container11').value;
-						sReplace = value;
-					}
 					var tf = /tf_/.test(id);
 					var excludeStream = id == 'cov_container0';
 					var tfAll = '';
@@ -1000,7 +984,8 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 						tfAll += document.getElementById('tf_container' + i).value;
 						if (i < 4) tfAll += '~#~'
 					}
-					ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
+					// 面板重载（如缓存模式变化）后回调对象会失效，调用会抛"未指明的错误"：失败时不再弹脚本错误，预览留空
+					try { ev = tf_callback && tf_callback(value, tfAll, excludeStream); } catch (e) { ev = ''; }
 					if (tf) ev = ev.slice(0, -1);
 					if (cur.page == "title_format" && document.getElementById("tf_preview") && id != "tf_preview") document.getElementById("tf_preview").value = ev;
 					if (cur.page == "download" && document.getElementById("dld_preview") && id != "dld_preview") document.getElementById("dld_preview").value = ev;
@@ -1012,7 +997,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					var t_id = id.slice(-1);
 					var artistType = t_id < 2;
 					var trackType = t_id > 1;
-					ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
+					try { ev = tf_callback && tf_callback(value, null, null, artistType, trackType); } catch (e) { ev = ''; }
 					if (document.getElementById("tf_heading_preview") && id != "tf_heading_preview") document.getElementById("tf_heading_preview").value = ev;
 				}
 			}
@@ -1023,10 +1008,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 
 				var el = document.activeElement;
 				var id = el.id;
-				if (/scrollbar_container6/.test(id)) {
-					window.scrollbar_container5.style.fontFamily = window.scrollbar_container6.value;
-				}
-				
+
 				var previewable = /tf_|dld_|cov_|cusText_/.test(id);
 				if (previewable) {
 					getPreview(id, el.value);
@@ -1128,7 +1110,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				var covLabels = ['自动下载 [Last.fm 最佳质量]', '保存文件夹', '保存文件名', '检查自定义路径', '自定义路径'];
 				var cusScrollLabels = ['行数 (0 = 页面)', '最大平滑持续时间（毫秒）', '最大触摸持续时间（毫秒）', '触摸灵敏度 0-10'];
 				var cusTextLabels = ['文本、歌词和项目属性：支持标签或完整路径。每个视图显示检索到的第一个结果。', '预览', '同步最新下载', '滚动同步歌词', '滚动非同步歌词'];
-				var dlLabels = ['自定义', '默认（包数据）', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介', '启用'];
+				var dlLabels = ['自定义', '默认', '评论', '简介', '照片', '专辑评论', '相似艺术家', '评论', '简介'];
 				var dropShadowLevelLabels = [0, 1, 2, 3];
 				var filmStripLabels = ['齐平', '对齐图像', '应用图像边距','对齐文本', '应用文本边距', ]
 				var filterLabels = ['KB 最大尺寸', 'KB 最小尺寸', 'PX 最小分辨率', '最少数量（最高优先级）'];
@@ -1142,7 +1124,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				var highlightLabels = ['按钮', '标题', '横线', '图像边框', '叠加边框', '等级图标', '副标题', '摘要', '文本'];
 				var langLabels = ['英语', '德语', '西班牙语', '法语', '意大利语', '日语', '波兰语', '葡萄牙语', '俄语', '瑞典语', '土耳其语', '\u7b80\u4f53\u4e2d\u6587'];
 				var layoutLabels = ['双击切换', '艺术家和专辑视图布局相同'];
-				var lookupLabels = ['隐藏', '左上角', '首选标题', '自动循环时间（秒；最小 30）'];
+				var lookUpCycleTimeLabel = '自动循环时间（秒；最小 30）';
 				var lineLabels = ['无', '底部', '居中'];
 				var lyricsScrollMethodLabels = ['滚动时间平均值（毫秒）', '最大滚动时间（毫秒）'];
 				var mainImgLabels = ['悬停时放大', '平滑过渡', '自动循环时间（秒）'];
@@ -1153,13 +1135,12 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				var ratingTextPosLabels = ['自动', '嵌入', '自成一行'];
 				var reflPosLabels = ['自动位置', '上', '右', '下', '左', '强度 % [主图像上 Shift + 滚轮]', '尺寸 %', '渐变级别 %'];
 				var sbarColLabels = ['灰色', '混合'];
-				var sbarIconLabels = ['箭头', '三角', '自定义'];
+				var sbarIconLabels = ['箭头', '三角'];
 				var sbarShowLabels = ['隐藏', '自动', '显示'];
 				var sbarTypeLabels = ['默认', '风格', 'Windows 浅色模式', 'Windows 深色模式'];
-				var scrollbarLabels = ['滑块宽度', '滑道宽度（0 = 自动）', '箭头宽度', '箭头填充 (+/-)', '滑块最小高度', '自定义图标*', '自定义图标字体名称', '自定义图标偏移 (%)', '首选全高滚动条'];
+				var scrollbarLabels = ['滑块宽度', '滑道宽度（0 = 自动）', '箭头宽度', '箭头填充 (+/-)', '滑块最小高度', '首选全高滚动条'];
 				var scrollLabels = ['尺寸跟随系统', '紧凑圆角', '平滑滚动', '触摸控制'];
 				var seekerLabels = ['计数', '导航条', '长条', '圆点'];
-				var siteNameLabels = ['Last.fm', '维基百科'];
 				var summaryLabels = ['流派', '发行日期', '区域*', '现在热门 (Last.fm)', '最新发布（维基百科）', '其它'];
 				var tagLabel = ['专辑流派', '专辑播放统计', '艺术家流派', '艺术家播放统计', '区域', '相似艺术家', '专辑流派', '艺术家流派', '', '在写入文件标签之前显示确认弹出窗口'];
 				var textStyleLabels = ['顶部对齐', '展开列表', '如果显示多个项目，自动优化'];
@@ -1204,47 +1185,46 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
 					},
 					advanced: {
-						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'arrowSymbol', 'butCustIconFont', 'sbarButPad', 'blurTemp', 'blurAlpha', 'transLevel', 'focusLoadRate'],
-						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'text', 'text', 'float', 'float', 'float', 'float', 'float']
+						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'blurTemp', 'blurAlpha', 'transLevel', 'focusLoadRate'],
+						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float']
 					},
 					title_format: {
 						name: ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'],
 						type : ['text', 'text', 'text', 'text', 'text']
 					},
-					download: {
-						name: ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'supFind', 'supReplace'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
-					},
+					// 7 项详细保存路径为只读显示（由根路径自动派生，不写入配置）：
+					// 不进 input.all / 可编辑输入列表，仅按 dld_container2-8 顺序给显示循环提供名字
+					download_ro: ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio'],
 					photo: {
-						name: ['photoNum', 'photoLimit', 'foCycPhoto'],
-						type : ['int', 'int', 'text']
+						name: ['photoNum', 'photoLimit'],
+						type : ['int', 'int']
 					},
 					cover: {
-						name: ['foImgCov', 'fnImgCov', 'foCycCov', 'cusCov0'],
-						type : ['text', 'text', 'text', 'text']
+						name: ['foImgCov', 'fnImgCov', 'cusCov0'],
+						type : ['text', 'text', 'text']
 					},
-					tagger: {
-						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagEnabled8', 'customGenres', 'translate'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text']
+					tagger: { // 顺序必须与页面上 tagger_input 的 DOM 顺序一致：tagName0-5、相似艺术家数量、维基两行、自定义流派、转化
+						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagEnabled8', 'tagName6', 'tagName7', 'customGenres', 'translate'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text', 'text', 'text']
 					},
 					misc: {
-						name: ['lfmDisplayName', 'wikiDisplayName', 'exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
-						type : ['text', 'text', 'int', 'int', 'text', 'int', 'int', 'int']
+						name: ['exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
+						type : ['int', 'int', 'text', 'int', 'int', 'int']
 					},
 					all: {}
 				}
-				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.textreader.name, input.custom.name, input.advanced.name, input.title_format.name, input.download.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
-				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.download.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
+				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.textreader.name, input.custom.name, input.advanced.name, input.title_format.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
+				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
 				var box = {
 					behaviour: ['dblClickToggle', 'sameStyle', 'sbarWinMetrics', 'sbarGripRounded', 'smooth', 'touchControl'],
 					display: ['topAlign', 'expandLists', 'autoOptimiseText', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightImgBor', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightSummary', 'highlightText', 'colLineDark', 'lfmRating', 'summaryGenre', 'summaryDate', 'summaryLocale', 'summaryPopNow', 'summaryLatest', 'summaryOther'],
 					headings: ['hdShowTitle', 'hdBtnShow', 'fullWidthHeading', 'hdShowBtnBg', 'hdShowRedLfm', 'bioFlagShow', 'revFlagShow'],
-					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
-					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', /*'lyricsTxtReader3', */'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', /*'lyricsTxtReader7', */'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
+					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'imgFilterBothPx', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
+					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', 'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', 'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
 					custom: ['custFontUse', 'custHeadFontUse', 'textUse', 'text_hUse', 'headingBtnUse', 'headingTextUse', 'starsUse', 'summaryUse', 'rectOvUse', 'rectOvBorUse', 'bgUse', 'lineUse', 'bgTransUse', 'frameUse'],
-					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate'],
+					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate', 'stats'],
 					title_format: ['classicalModeEnable'],
-					download: ['languageFallback', 'wikipediaEnGenres', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio', 'supCache'],
+					download: ['languageFallback', 'wikipediaEnGenres', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio'],
 					photo: ['photoAutoAdd'],
 					cover: ['dlLfmCov', 'cusCov'],
 					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'taggerConfirm'],
@@ -1252,7 +1232,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				}
 				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.textreader, box.custom, box.advanced, box.title_format, box.download, box.photo, box.cover, box.tagger, box.misc);
 				var radio = {
-					behaviour: ['lookUp', 'menuShowPaste', 'menuShowTagger', 'menuShowMissingData'],
+					behaviour: ['menuShowPaste', 'menuShowTagger', 'menuShowMissingData'],
 					display: ['star'],
 					headings: ['hdPos', 'hdShowBtnLabel', 'hdLine'],
 					image: ['imgSeekerDots', 'artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'],
@@ -1517,8 +1497,10 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					window.sbarCol_dropdown.innerHTML = sbarColLabels[ppt['sbarCol_internal'].value];
 					for (i = 0; i < 2; i++) {window.sbarCol.insertAdjacentHTML('beforeend', '<a onclick="setSbarCol(' + i + ');">'+sbarColLabels[i]+'</a>');}
 					sbar_col_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
-					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[ppt['sbarButType_internal'].value];
-					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
+					var sbarIconIx = Math.min(ppt['sbarButType_internal'].value, sbarIconLabels.length - 1);
+					ppt['sbarButType_internal'].value = sbarIconIx;
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[sbarIconIx];
+					for (i = 0; i < 2; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
 					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
 					for (i = 0; i < 4; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
 
@@ -1526,8 +1508,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}
 					for (i = 5; i < 8; i++) {window.overlayMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="overlayMetrics_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input3" /><label for="overlayMetrics_container'+i+'" class="inp_label2">'+overlayLabels[i]+'</label></div>');}
 					generateTable('menu');
-					for (i = 0; i < 3; i++) {window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lookUp'+i+'" name="lookUp" style="'+cbox+'" type="radio" /><label for="lookUp'+i+'" id="lookUpState'+i+'" class="checkbox_label">'+lookupLabels[i]+'</label></div>');}
-					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookupLabels[i]+'</label></div>');
+					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookUpCycleTimeLabel+'</label></div>');
 				}
 
 				function setDisplay() {
@@ -1614,6 +1595,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					var cboxMargin = "width:" + cbox_w + "px; height:" + cbox_h + "px; margin-right:5px;"
 					window.input_cntf1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="f_checkbox1" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="f_checkbox1" class="checkbox_label">仅 Last.fm 照片</label></div>');
 					for (i = 0; i < 3; i++) {window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');}
+					window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="filterBoth_checkbox" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="filterBoth_checkbox" class="checkbox_label">宽、高都需达到下限</label></div>');
 					i = 3; window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'; visibility:hidden;" name="image_checkbox_hidden" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');
 					generateTable('imageFormat');
 					
@@ -1674,15 +1656,13 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				function setAdvanced() {
 					for (i = 0; i < 4; i++) {window.cusScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scroll_container'+i+'" name="advanced_input" class="input35" /><label for="scroll_container'+i+'" class="inp_label2">'+cusScrollLabels[i]+'</label></div>');}
 					for (i = 0; i < 5; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
-					var fFamily = ppt['butCustIconFont_internal'].value;
-					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" style="font-family:'+fFamily+'" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');
-					for (i = 6; i < 8; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
-					i = 8; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
+					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
 					i = 0; window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="themeBlur_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="themeBlur_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
 					for (i = 1; i < 3; i++) {window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="themeBlur_container'+i+'" name="advanced_input" class="input35" /><label for="themeBlur_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');}
 					i = 3; window.smoothTransLevel.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="smoothing_container'+i+'" name="advanced_input" class="input3" /><label for="smoothing_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
 					i = 4; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="loadDelay_container'+i+'" name="advanced_input" class="input3" /><label for="loadDelay_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
 					i = 5; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="loadDelay_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="loadDelay_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
+					i = 6; window.statsShow.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="stats_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="stats_checkbox'+i+'" class="checkbox_label">显示 Last.fm 统计（听众 / 播放次数）</label></div>');
 					}
 
 				function setServer() {
@@ -1694,25 +1674,24 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					i = 0; window.classicalMode.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="t_checkbox'+i+'" name="tf_checkbox" type="checkbox" /><label for="t_checkbox'+i+'" class="checkbox_label">启用</label></div>');
 					i = 4; window.classicalModeTitleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt6"><label for="tf_container'+i+'" class="inp_label1">'+tfServLabels[i]+'</label><input id="tf_container'+i+'" name="title_format_input" class="input98" /></div>');
 
-					i = 0; window.cache0.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
-					i = 1; window.cache1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
+					// 默认在上、自定义在下：DOM 索引即属性值，所以 0=默认、1=自定义
+					i = 0; window.cache0.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[1]+'</label></div>');
+					i = 1; window.cache1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[0]+'</label></div>');
+					window.cacheRootBox.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cacheRoot" class="inp_label1">根路径</label><input id="cacheRoot" name="cacheRoot" class="inputRoot" /></div>');
+					setCacheRoot();
 					window.fallback.insertAdjacentHTML('beforeend', '<div class="input_cnt3" style="padding:0;"><input id="lang_checkbox0" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox0" style="padding-right:0.75em;" class="checkbox_label">回退到英语服务器&nbsp</label><input id="lang_checkbox1" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox1" class="checkbox_label">维基百科流派：英语</label></div>');
 					for (i = 2; i < 7; i++) {
-						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_ro" class="input82" readonly /></div>');
 					}
 					for (i = 7; i < 9; i++) {
-						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_ro" class="input82" readonly /></div>');
 					}
-
-					window.supplemental.insertAdjacentHTML('beforeend', '<div class="row"><div class="column19"><input id="dnld_checkbox11" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox11" class="checkbox_label">'+dlLabels[i]+'</label></div><div class="column40"><label for="dld_container11" class="inp_label3">查找内容：</label><input id="dld_container11" name="download_input" class="input76" /></div><div class="column40"><label for="dld_container12" class="inp_label3">替换为：</label><input id="dld_container12" name="download_input" class="input76" /></div></div>');
 
 					window.photo_num.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container0" name="photo_input" class="input98" /></div>');
 					window.photo_limit.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container1" name="photo_input" class="input98" /></div>');
-					window.artCusImgFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container2" name="photo_input" class="input98" /></div>')
 					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox0" name="cover_checkbox" type="checkbox" /><label for="input_checkbox0" class="checkbox_label">'+covLabels[0]+'</label></div>')
 					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cov_container0" class="inp_label3">'+covLabels[1]+'</label><input id="cov_container0" name="cover_input" class="input82" /></div>')
 					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><label for="tf_cov_container" class="inp_label3">'+covLabels[2]+'</label><input id="tf_cov_container" name="cover_input" class="input82" /></div>')
-					window.covCycleFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container2" name="cover_input" class="input82" /></div>')
 					window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox1" name="cover_checkbox" type="checkbox" /><label for="input_checkbox1" class="checkbox_label">'+covLabels[3]+'</label></div>')
 					i = 3; window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container3" name="cover_input" class="input82" /><label for="cov_container3" class="inp_label3">'+covLabels[4]+'</label></div>');
 					for (i = 0; i < 6; i++) {
@@ -1726,9 +1705,6 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
 					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
 					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">转化：</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
-					for (i = 0; i < 2; i++) {
-						window.siteNames.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="siteNames_container'+i+'" name="misc_input" style="padding:0;" class="input21" /><label for="siteNames_container'+i+'" class="inp_label2">'+siteNameLabels[i]+'</label></div>');
-					}
 					for (i = 0; i < 4; i++) {
 						window.miscl.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="misc_checkbox'+i+'" name="misc_checkbox" type="checkbox" /><label for="misc_checkbox'+i+'" class="checkbox_label">'+miscLabels[i]+'</label></div>');
 					}
@@ -1762,6 +1738,11 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				setRadioBtns('all', 'value');
 				setInputs('all', 'value');
 				setCheckboxStates();
+				// 基准改为"初始化完成时的状态"：初始化本身会把提示文本等归一化，那不应当算作改动
+				// （面板传来的原始字符串只用于首次判断，之后一切以本对话框的实际状态为准）
+				getValues();
+				parsed_args[0] = JSON.stringify(ppt);
+				parsed_args[1] = JSON.stringify(cfg);
 				document.getElementById("btn_apply").disabled = true;
 			}
 
@@ -1773,44 +1754,93 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				setPthHints();
 			}
 
-			// 路径类设置留空时，用"当前实际使用的路径"作为灰色提示（placeholder，不会写进配置）
+			// 缓存根路径编辑框：留空或仍等于默认路径时显示默认值，取值时按空处理
+			function setCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				if (!el) return;
+				var val = cfg['cacheRoot_internal'] ? cfg['cacheRoot_internal'].value : '';
+				var hint = val ? '' : (cfg.dispCacheRoot || ''); // 已自定义时不能把值当默认文本，否则会被清空
+				el.__pthHint = hint;
+				el.title = '默认路径：' + (cfg.cacheRootDefaultDisp || hint);
+				el.value = val || hint;
+				// 记下打开设置页时实际使用的根，之后根路径改动都跟它比较
+				cacheRootShown = (val || cfg.dispCacheRoot || '').replace(/[\\/]+$/, '');
+			}
+
+			// 当前生效的缓存根路径（显示用，不带尾斜杠）：选"默认"时根路径框内容不生效，用内置默认
+			function currentCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				var typed = el ? pthValue(el).replace(/[\\/]+$/, '') : '';
+				if (window.autoCache0 && window.autoCache0.checked) typed = '';
+				return typed || (cfg.cacheRootDefaultDisp || '').replace(/[\\/]+$/, '');
+			}
+
+			// 选中"默认"时把根路径框复位成内置默认：之后再改选"自定义"看到的就是默认路径，
+			// 不会把上一次用过的自定义目录重新填回来
+			function resetCacheRootToDefault() {
+				var def = (cfg.cacheRootDefaultDisp || '').replace(/[\\/]+$/, '');
+				var el = document.getElementById('cacheRoot');
+				if (el) {
+					el.__pthHint = def;
+					el.title = '默认路径：' + def;
+					el.value = def;
+					cacheRootShown = def;
+				}
+				if (!cfg.tails) return;
+				var i, node;
+				for (i = 0; i < input.download_ro.length; i++) { // 7 项详细路径：还原为默认根 + 内置尾部
+					node = document.getElementById('dld_container' + (i + 2));
+					if (node) setPthField(node, def + '\\' + cfg.tails[input.download_ro[i]], '当前使用路径：');
+				}
+
+			}
+
+			var cacheRootShown; // 不带初值：本行初始化语句晚于启动块执行，赋值会把 setCacheRoot 记下的根冲掉
+
+			// 根路径编辑框改动后：7 项详细路径与照片的循环文件夹跟着新根刷新（详细路径为只读显示，全部由根派生）
+			function syncCacheRoot() {
+				var root = currentCacheRoot();
+				var from = cacheRootShown || (cfg.dispCacheRoot || '').replace(/[\\/]+$/, '');
+				if (!root || root === from || !cfg.tails) return;
+				var i, node;
+				for (i = 0; i < input.download_ro.length; i++) {
+					node = document.getElementById('dld_container' + (i + 2));
+					if (node) setPthField(node, root + '\\' + cfg.tails[input.download_ro[i]], '当前使用路径：');
+				}
+				cacheRootShown = root;
+			}
+
+			function setPthField(el, val, tip) {
+				el.__pthHint = val;
+				el.title = (tip || '默认路径：') + val;
+				el.value = val;
+			}
+
+			// 根路径编辑框右端与右上"维基百科流派：英语"文字右端对齐：宽度实测设定，窗口缩放 / 切换页面时重算
+			function fitCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				var lab = document.querySelector ? document.querySelector('label[for="lang_checkbox1"]') : null;
+				if (!el || !lab) return;
+				var r = el.getBoundingClientRect();
+				if (!r.width && !r.height) return; // 隐藏（选中"默认"或不在本页）时不量
+				var w = Math.round(lab.getBoundingClientRect().right - r.left);
+				if (w > 80) el.style.width = w + 'px';
+			}
+
+			// 7 项详细路径为只读显示框（可选中复制，不可编辑）：一律按"当前根路径 + 内置尾部"现算，
+			// 由根路径自动分配，不读也不写配置；真正改动根路径即可整体生效
 			function setPthHints() {
-				if (!cfg.dispPth) return;
-				var names = input.download.name;
-				for (var k = 0; k < names.length; k++) {
-					var el = document.getElementById('dld_container' + (k < 7 ? k + 2 : k + 4));
-					if (!el || !cfg.dispPth[names[k]]) continue;
-					bindPthHint(el, cfg.dispPth[names[k]]);
+				if (!cfg.tails) return;
+				var root = currentCacheRoot();
+				for (var k = 0; k < input.download_ro.length; k++) {
+					var el = document.getElementById('dld_container' + (k + 2));
+					if (el) setPthField(el, root + '\\' + cfg.tails[input.download_ro[k]], '当前使用路径：');
 				}
 			}
 
-			// 灰色提示可以复制：聚焦时把提示实化成真实文本；离开时若内容仍是提示原文（无实际编辑），再还原成灰色提示
-			function bindPthHint(el, hint) {
-				el.__pthHint = hint;
-				el.placeholder = hint;
-				el.title = '默认路径：' + hint;
-				if (el.__pthBound) return;
-				el.__pthBound = true;
-				el.__pthLive = false; // true = 当前文本只是"提示原文"，用户还没改过
-				el.onfocus = function () {
-					if (this.value === '' && this.__pthHint) {
-						this.value = this.__pthHint; // 实化，可选中复制
-						this.placeholder = '';
-						this.__pthLive = true;
-						var self = this;
-						setTimeout(function () { if (self.__pthLive) { try { self.select(); } catch (e) {} } }, 0); // 等 mouseup 之后全选，直接 Ctrl+C 即可
-					}
-				};
-				el.onblur = function () {
-					if (this.__pthLive && this.value === this.__pthHint) this.value = ''; // 没改动 -> 虚化回去
-					if (this.value === '') this.placeholder = this.__pthHint;             // 空值始终显示灰色提示
-					this.__pthLive = false;
-				};
-			}
-
-			// 取值时把"仍是提示原文"的内容当作空，避免把提示文字当成自定义路径存进配置
+			// 取值时把"仍是默认路径原文"的内容当作空，避免把默认路径当成自定义路径存进配置
 			function pthValue(el) {
-				return el.__pthLive && el.value === el.__pthHint ? '' : el.value;
+				return el.__pthHint && el.value === el.__pthHint ? '' : el.value;
 			}
 
 			function setCheckboxStates() {
@@ -1853,7 +1883,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				window.whitelistInfo.style.display = window.useWhitelist1.checked ? "block" : "none";
 				window.lfmGenreTag.style.display = window.useWhitelist1.checked ? "block" : "none";
 
-				var dnld = document.querySelectorAll("[id^='dld_container'], [id=savePreview], [id=preview_cnt], [id=supplCache0], [id=supplCache1], [id=supplemental], [id^='savefolder']");
+				var dnld = document.querySelectorAll("[id^='dld_container'], [id=savePreview], [id=preview_cnt], [id^='savefolder']");
 				for (i = 0; i < dnld.length; i++) {
 					dnld[i].style.display = cur.displaySaveFolders ? "block" : "none";
 				}
@@ -1862,15 +1892,10 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				window.cache0.style.display = cur.displaySaveFolders ? "none" : "block";
 				window.cache1.style.display = cur.displaySaveFolders ? "none" : "block";
 				window.cacheInfo.style.display = cur.displaySaveFolders ? "none" : "block"; // 编辑自定义路径时整块隐藏，避免透明容器遮挡输入框
-				window.save_folders.style.display = cur.displaySaveFolders || window.autoCache1.checked ? "none" : "block";
+				window.save_folders.style.display = cur.displaySaveFolders ? "none" : "block"; // 详细路径只读显示：两种模式下都可点开查看
+				window.cacheRootBox.style.display = cur.displaySaveFolders || window.autoCache0.checked ? "none" : "block"; // 根路径只在选中"自定义"时显示
 				window.hide_folders.style.display = cur.displaySaveFolders ? "block" : "none";
-			
-				var showsupplCacheOption = false;
-				if (!showsupplCacheOption) {
-					window.supplCache0.style.display = "none";
-					window.supplCache1.style.display = "none";
-					window.supplemental.style.display = "none";
-				}
+				fitCacheRoot(); // 根路径刚由隐藏变显示时也要量一次宽度
 			}
 
 			function setLanguage(n) {
@@ -1905,8 +1930,14 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			}
 
 			function getValues() {
+				var rootEl = document.getElementById('cacheRoot');
+				// 选"默认"时不保存根路径：改回默认后不应记住上一次用过的自定义目录
+				if (rootEl && cfg['cacheRoot_internal']) cfg['cacheRoot_internal'].value = window.autoCache0 && window.autoCache0.checked ? '' : pthValue(rootEl);
 				var inputs = document.querySelectorAll("[name$='_input']");
 				for (i = 0; i < inputs.length; i++) {
+					// 仍显示默认提示文本 → 用户没动过这一项，保留配置里的原值
+					// （照片循环文件夹在自定义根路径后显示的是新根路径，旧默认值不能因此被写成空值）
+					if (inputs[i].__pthHint && inputs[i].value === inputs[i].__pthHint) continue;
 					(ppt[input.all.name[i] + '_internal'] || cfg[input.all.name[i] + '_internal']).value = input.all.type[i] == 'text' ? pthValue(inputs[i]) : input.all.type[i] == 'int' ? parseInt(inputs[i].value) : parseFloat(inputs[i].value);
 				}
 
@@ -1945,6 +1976,9 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				if (new_ppt || new_cfg || new_cur) {
 					sendCallback(new_ppt, new_cfg, '' , new_cur);
 				}
+				// 应用生效后（"默认"已被真正保存）才把根路径框复位为内置默认：
+				// 只点选不应用的话，切回"自定义"仍显示原来的自定义路径
+				if (new_cfg && window.autoCache0.checked) resetCacheRootToDefault();
 				close_window();
 			}
 
@@ -1954,6 +1988,9 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 				var new_cfg = JSON.stringify(cfg);
 				if (new_ppt == parsed_args[0]) new_ppt = ''; else parsed_args[0] = new_ppt;
 				if (new_cfg == parsed_args[1]) new_cfg = ''; else parsed_args[1] = new_cfg;
+				// 应用生效后（"默认"已被真正保存）才把根路径框复位为内置默认：
+				// 只点选不应用的话，切回"自定义"仍显示原来的自定义路径
+				if (new_cfg && window.autoCache0.checked) resetCacheRootToDefault();
 				if (new_ppt || new_cfg) {
 					sendCallback(new_ppt, new_cfg);
 				}
@@ -1994,7 +2031,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			}
 
 			window.btn_reset.onclick = function () {
-				var msg = cur.tab == 'PanelCfg' ? '将面板设置重置为默认值\n继续？' : '将服务器设置重置为默认值\n\n原始 ('+  cfg.cfgBaseName +'.cfg ) 将备份\n\n继续？';
+				var msg = cur.tab == 'PanelCfg' ? '将面板设置重置为默认值\n继续？' : '将服务器设置重置为默认值\n\n继续？';
 				if (window.confirm(msg)) {
 					var new_cur = JSON.stringify(cur);
 					if (new_cur == parsed_args[2]) new_cur = '';
@@ -2033,6 +2070,7 @@ Ctrl+滚轮 可用于改变文本或按钮的大小 [重置：菜单>布局>重�
 			}
 			
 			function showSaveFolders() {
+				if (!cur.displaySaveFolders) syncCacheRoot(); // 打开详细设置前，先把根路径的改动带进各项详细路径
 				cur.displaySaveFolders = !cur.displaySaveFolders;
 			}
 			

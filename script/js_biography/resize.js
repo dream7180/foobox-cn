@@ -106,26 +106,29 @@ class ResizeHandler {
 			}
 		}
 		if (!this.down || !this.sf) return;
+		const base = filmStrip.dragSize != null ? filmStrip.dragSize : ppt.filmStripSize;
+		let size;
 		switch (ppt.filmStripPos) {
 			case 0:
-				ppt.filmStripSize = (ppt.filmStripSize * panel.h + y - this.y_start) / panel.h;
-				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
+				size = (base * panel.h + y - this.y_start) / panel.h;
+				size = $.clamp(parseFloat(size.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
 				break;
 			case 1:
-				ppt.filmStripSize = (ppt.filmStripSize * panel.w + this.x_start - x) / panel.w;
-				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
+				size = (base * panel.w + this.x_start - x) / panel.w;
+				size = $.clamp(parseFloat(size.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
 				break;
 			case 2:
-				ppt.filmStripSize = (ppt.filmStripSize * panel.h + this.y_start - y) / panel.h;
-				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
+				size = (base * panel.h + this.y_start - y) / panel.h;
+				size = $.clamp(parseFloat(size.toFixed(15)), 0.02, filmStrip.max_sz / panel.h);
 				break;
 			case 3:
-				ppt.filmStripSize = (ppt.filmStripSize * panel.w + x - this.x_start) / panel.w;
-				ppt.filmStripSize = $.clamp(parseFloat(ppt.filmStripSize.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
+				size = (base * panel.w + x - this.x_start) / panel.w;
+				size = $.clamp(parseFloat(size.toFixed(15)), 0.02, filmStrip.max_sz / panel.w);
 				break;
 		}
+		filmStrip.dragSize = size; // written to ppt once, on mouse up: no SetProperty per mouse move
 		filmStrip.logScrollPos();
-		filmStrip.setSize();
+		filmStrip.setSize(true); // border bitmaps are rebuilt on mouse up only
 		window.Repaint();
 		this.updFilm = true;
 		this.x_start = x;
@@ -136,6 +139,7 @@ class ResizeHandler {
 		panel.style.new = false;
 		if (!vk.k('ctrl')) return;
 		this.down = true;
+		filmStrip.dragSize = null; // a new drag always starts from the committed size
 		this.updFilm = false;
 		this.init_x = x;
 		this.init_y = y;
@@ -149,6 +153,10 @@ class ResizeHandler {
 		if (!this.down || !this.focus) return;
 		window.SetCursor(32512);
 		this.down = false;
+		if (filmStrip.dragSize != null) { // commit the dragged film strip size once
+			ppt.filmStripSize = filmStrip.dragSize;
+			filmStrip.dragSize = null;
+		}
 		img.mask.reset = true;
 		if (ppt.style > 3) {
 			const obj = ppt.style == 4 || ppt.style == 5 ? panel.style.overlay : panel.style.free[ppt.style - 6];
@@ -189,6 +197,7 @@ class ResizeHandler {
 			}
 		}
 		filmStrip.clearCache();
+		if (this.updFilm) filmStrip.setSize(); // recreate the border bitmaps at the final size
 		if (panel.style.showFilmStrip && ppt.filmStripOverlay) filmStrip.set(ppt.filmStripPos);
 		txt.refresh(this.updFilm ? 0 : 3);
 		filmStrip.paint();

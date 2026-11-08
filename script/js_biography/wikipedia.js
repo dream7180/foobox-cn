@@ -96,7 +96,7 @@ class DldWikipedia {
 			} else {
 				this.ar_mbid = $.eval('$trim($if3(%musicbrainz_artistid%,%musicbrainz artist id%,))', this.focus);
 				if (!this.ar_mbid || this.ar_mbid.length != 36) {
-					const related_artists = $.jsonParse(`${cfg.storageFolder.replace('{BA9557CE-7B4B-4E0E-9373-99F511E81252}', '{F5E9D9EB-42AD-4A47-B8EE-C9877A8E7851}')}related_artists.json`, {}, 'file');
+					const related_artists = $.jsonParse(`${cfg.storageFolder}related_artists.json`, {}, 'file');
 					if (typeof related_artists === 'object' && !Array.isArray(related_artists)) { // Regorxxx <- Safecheck against corrupt files (fixed NEW typo: || -> &&) ->
 						this.ar_mbid = related_artists[this.artist.toUpperCase()]; // f&p says if it's a tag read
 					}
@@ -606,7 +606,7 @@ class DldWikipedia {
 		this.func = this.analyse;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
-		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
+		this.xmlhttp.setRequestHeader('User-Agent', 'foobox (https://dream7180.github.io)');
 		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
 		if (!this.timer) {
 			const a = this.xmlhttp;

@@ -10,6 +10,7 @@ class Images {
 		this.cur_handle = null;
 		this.get = true;
 		this.init = true;
+		this.master = null; // decoded source of the visible image, reused on resize
 		this.nh = 10;
 		this.nw = 10;
 		this.removed = 0;
@@ -25,11 +26,9 @@ class Images {
 			displayedOtherPanel: null,
 			done: false,
 			folder: '',
-			folderSup: '',
 			images: [],
 			ix: 0,
 			list: [],
-			cusPhotoLocation: false,
 			validate: []
 		}
 
@@ -52,7 +51,9 @@ class Images {
 			cycle_ix: 0,
 			done: '',
 			folder: '',
-			folderSameAsArt: cfg.albCovFolder.toUpperCase() == cfg.pth.foImgArt.toUpperCase(),
+			// getter：每次都取当前 cfg 值。缓存模式 / 根路径变化后不再整体 Reload 面板，若在初始化时
+			// 捕获一次，这个标志在切换后就会过期
+			get folderSameAsArt() { return cfg.albCovFolder.toUpperCase() == cfg.pth.foImgArt.toUpperCase(); },
 			ix: 0,
 			images: [],
 			list: [],
@@ -115,12 +116,10 @@ class Images {
 
 		this.stub = {
 			0: {
-				panel: false,
 				path: '',
 				user: null
 			},
 			1: {
-				panel: false,
 				path: '',
 				user: null
 			},
@@ -129,12 +128,10 @@ class Images {
 				user: null
 			},
 			3: {
-				panel: false,
 				path: '',
 				user: null
 			},
 			4: {
-				panel: false,
 				path: '',
 				user: null
 			},
@@ -189,15 +186,6 @@ class Images {
 			return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		}
 
-		['Front', 'Back', 'Disc', 'Icon', 'Art'].forEach((v, i) => {
-			const f = cfg.expandPath(ppt[`panel${v}Stub`]);
-			if ($.file(f)) {
-				this.stub[i].panel = true;
-				this.stub[i].path = f;
-				this.stub[i].user = gdi.Image(this.stub[i].path);
-			}
-		});
-
 		for (let i = 0; i < 5; i++) {
 			if (!this.stub[i].user) {
 				const pth = i != 4 ? 'cov' : 'art';
@@ -251,18 +239,7 @@ class Images {
 		this.artist = name.artist(panel.id.focus);
 		const new_artist = this.artist && this.artist != this.cur_artist || !this.artist || ppt.covBlur && ui.style.isBlur && this.id.blur != this.id.curBlur || force;
 		if (new_artist) {
-			this.art.folderSup = '';
-			let files = [];
-			if (ppt.cycPhotoLocation == 1) {
-				this.art.folder = !panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.artCusImgFolder, panel.id.focus) : panel.cleanPth(cfg.remap.foCycPhoto, panel.id.focus, 'remap', this.artist, '', 1);
-				files = utils.Glob(this.art.folder + '*');
-			}
-			if (files.length && files.some(v => /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)))) {
-				this.art.cusPhotoLocation = true;
-			} else {
-				this.art.folder = !panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
-				this.art.cusPhotoLocation = false;
-			}
+			this.art.folder = !panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 			this.clearArtCache(true);
 			if (ppt.cycPhoto) this.art.done = false;
 			if (!this.art.images.length) {
@@ -279,6 +256,7 @@ class Images {
 			if (!image) {
 				this.art.images.splice(this.art.ix, 1);
 				if (this.art.images.length > 1) this.changePhoto(1);
+				else this.loadArtImage(); // 已无可用图片：回退 fb2k 艺术家图 / 占位图
 				filmStrip.check('imgUpd');
 				return;
 			}
@@ -390,6 +368,26 @@ class Images {
 
 	cache() {
 		return ppt.artistView ? art : cov;
+	}
+
+	resizeCur() { // re-process the visible image from its decoded master (no disk access)
+		const m = this.master;
+		const ca = this.cache();
+		if (!m || !m.image || !ca.pth || m.key !== ca.pth || m.type !== ca.type) return false;
+		this.clearCache();
+		const start = Date.now();
+		const o = ca.cache[m.key] = {};
+		o.img = this.cur = this.process(m.image.Clone(0, 0, m.image.Width, m.image.Height), ca.type, o);
+		o.filmID = filmStrip.id();
+		o.time = Date.now() - start;
+		ca.pth = m.key;
+		return true;
+	}
+
+	refreshFilmID() { // the film strip geometry is final only after filmStrip.on_size()
+		const ca = this.cache();
+		const o = ca.cache[ca.pth];
+		if (o && o.img) o.filmID = filmStrip.id();
 	}
 
 	changeCov(incr) {
@@ -684,7 +682,6 @@ class Images {
 
 	getArtImages() {
 		let allFiles = this.art.folder ? utils.Glob(this.art.folder + '*') : [];
-		if (!allFiles.length && this.art.folderSup) allFiles = utils.Glob(this.art.folderSup + '*');
 		if (allFiles.length == this.art.allFilesLength) return;
 		let newArr = false;
 		if (!this.art.images.length) {
@@ -734,11 +731,25 @@ class Images {
 		let sh_img = null;
 		if (this.style.border > 1 && !this.style.reflection) {
 			imgb = 15 + dpiCorr;
-			sh_img = $.gr(Math.floor(w + bor_w2 + imb), Math.floor(h + bor_w2 + imb), true, g => !this.style.circular ? g.FillSolidRect(imgo, imgo, w + bor_w2 - imgb, h + bor_w2 - imgb, RGBA(0, 0, 0, 185)) : g.FillEllipse(imgo, imgo, w + bor_w2 - imgb, h + bor_w2 - imgb, RGBA(0, 0, 0, 185)));
-			sh_img.StackBlur(12);
+			// Build the shadow at a reduced size and let DrawImage scale it back up: a blurred
+			// soft edge looks the same, at a fraction of the StackBlur cost.
+			const bw = Math.floor(w + bor_w2 + imb);
+			const bh = Math.floor(h + bor_w2 + imb);
+			const f = Math.min(1, 500 / Math.max(bw, bh));
+			sh_img = $.gr(Math.max(Math.round(bw * f), 4), Math.max(Math.round(bh * f), 4), true, g => {
+				const o = imgo * f;
+				const sw = (w + bor_w2) * f - imgb * f;
+				const sh = (h + bor_w2) * f - imgb * f;
+				!this.style.circular ? g.FillSolidRect(o, o, sw, sh, RGBA(0, 0, 0, 185)) : g.FillEllipse(o, o, sw, sh, RGBA(0, 0, 0, 185));
+			});
+			sh_img.StackBlur(Math.max(1, Math.round(12 * f)));
 		}
 		let bor_img = $.gr(Math.floor(w + bor_w2 + imgb), Math.floor(h + bor_w2 + imgb), true, g => {
-			if (this.style.border > 1 && !this.style.reflection) g.DrawImage(sh_img, 0, 0, Math.floor(w + bor_w2 + imgb), Math.floor(h + bor_w2 + imgb), 0, 0, sh_img.Width, sh_img.Height);
+			if (this.style.border > 1 && !this.style.reflection) {
+				g.SetInterpolationMode(2); // the shadow is built small and scaled up, keep the soft edge smooth
+				g.DrawImage(sh_img, 0, 0, Math.floor(w + bor_w2 + imgb), Math.floor(h + bor_w2 + imgb), 0, 0, sh_img.Width, sh_img.Height);
+				g.SetInterpolationMode(0);
+			}
 			if (this.style.border == 1 || this.style.border == 3) {
 				if (!this.style.circular) g.FillSolidRect(0, 0, w + bor_w2, h + bor_w2, !ppt.highlightImgBor ? RGB(255, 255, 255) : ui.col.text_h);
 				else {
@@ -820,13 +831,13 @@ class Images {
 				return;
 			}
 			else {
-				const pth = panel.getPth('img', panel.id.focus, a, l, '', cfg.supCache);
-				if (this.chkPths(pth.pe, pth.fe, 0)) return;
-				if (pth.fe != this.cov.done && cfg.dlRevImg) {
-					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
-					const fn_cov = pth_cov + pth.fe;
+				const pth = panel.getPth('img', panel.id.focus, a, l);
+				if (this.chkPths([pth.pth], pth.fn, 0)) return;
+				if (pth.fn != this.cov.done && cfg.dlRevImg) {
+					const pth_cov = pth.pth;
+					const fn_cov = pth_cov + pth.fn;
 					server.getRevImg(a, l, pth_cov, fn_cov, false);
-					this.cov.done = pth.fe;
+					this.cov.done = pth.fn;
 				}
 				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
 				return;
@@ -848,7 +859,7 @@ class Images {
 		const handle = $.handle(panel.id.focus);
 		if (handle) {
 			let id = ppt.artistView ? 4 : ppt.covType;
-			if (!ppt.loadCovAllFb || forceStnd || ppt.artistView) this.getImg(handle, id, this.stub[id].panel ? false : !ppt.covType || ppt.artistView ? false : true);
+			if (!ppt.loadCovAllFb || forceStnd || ppt.artistView) this.getImg(handle, id, (!ppt.covType || ppt.artistView) ? false : true);
 			else {
 				id = this.cov.selFiltered[0];
 				let image = null;
@@ -909,8 +920,6 @@ class Images {
 					if (new_artist) {
 						this.counter = 0;
 						this.art.folder = panel.lock || panel.isRadio(panel.id.focus) ? panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1) : stndBio ? panel.cleanPth(cfg.pth.foImgArt, panel.id.focus) : panel.cleanPth(cfg.remap.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
-						this.art.folderSup = '';
-						if (!stndBio && cfg.supCache && !$.folder(this.art.folder)) this.art.folderSup = panel.cleanPth(cfg.sup.foImgArt, panel.id.focus, 'remap', this.artist, '', 1);
 						this.clearArtCache(true);
 						this.art.done = false;
 						if (!this.art.images.length) this.art.allFilesLength = 0;
@@ -968,7 +977,6 @@ class Images {
 
 	images(v) {
 		if (!$.file(v)) return false;
-		if (this.art.cusPhotoLocation) return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		const fileSize = utils.GetFileSize(v);
 		return (name.isLfmImg(fso.GetFileName(v), this.artist) || !ppt.imgFilterLfm && /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
 	}
@@ -1071,13 +1079,13 @@ class Images {
 			case 1: { // !stndAlb inLib !fbImg: chkCov save pths: if !found getRevImg else load stub || metadb
 				a = panel.alb.list[panel.alb.ix].artist;
 				l = panel.alb.list[panel.alb.ix].album;
-				const pth = panel.getPth('img', panel.id.focus, a, l, '', cfg.supCache);
-				if (this.chkPths(pth.pe, pth.fe, 0)) return;
-				if (pth.fe != this.cov.done && cfg.dlRevImg) {
-					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
-					const fn_cov = pth_cov + pth.fe;
+				const pth = panel.getPth('img', panel.id.focus, a, l);
+				if (this.chkPths([pth.pth], pth.fn, 0)) return;
+				if (pth.fn != this.cov.done && cfg.dlRevImg) {
+					const pth_cov = pth.pth;
+					const fn_cov = pth_cov + pth.fn;
 					server.getRevImg(a, l, pth_cov, fn_cov, false);
-					this.cov.done = pth.fe;
+					this.cov.done = pth.fn;
 				}
 				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
 				return;
@@ -1087,7 +1095,7 @@ class Images {
 
 	loadArtImage() {
 		if (this.art.images.length && ppt.cycPhoto) this.loadImg(art, this.art.images[this.art.ix], true, this.art.ix);
-		else if (!this.init) this.getFbImg();
+		else if (!this.init) this.getFbImg(); // 来源文件夹无图（或来源即 fb2k 单张图）：取 fb2k 艺术家图，再无图由 getFbImg 落到占位图
 	}
 
 	loadCycCov(handle, art_id, image, image_path) { // stndAlb
@@ -1301,12 +1309,13 @@ class Images {
 		}
 		if (ppt.text_only && !ui.style.isBlur && !ppt.showFilmStrip) return this.init = false;
 		filmStrip.logScrollPos();
-		this.clearCache();
+		const kept = !this.init && this.resizeCur(); // same image, new size: reuse the decoded master
+		if (!kept) this.clearCache();
 		if (ppt.artistView) {
 			if (this.init) this.artistReset();
-			this.getArtImg();
+			if (!kept) this.getArtImg();
 		} else {
-			this.getFbImg();
+			if (!kept) this.getFbImg();
 			if (this.init) {
 				this.id.albCyc = '';
 				this.id.curAlbCyc = '';
@@ -1330,9 +1339,16 @@ class Images {
 		timer.clear(timer.transition);
 		timer.transition.id = setInterval(() => {
 			this.style.alpha = Math.min(this.style.alpha *= this.transition.incr, 255);
-			txt.paint();
+			this.paintImg();
 			if (this.style.alpha == 255) timer.clear(timer.transition);
 		}, 12);
+	}
+
+	paintImg() { // the fade only changes the image alpha, so repaint that box instead of the panel
+		const c = this.cur;
+		if (!c) return txt.paint();
+		const pad = Math.round(24 * $.scale);
+		window.RepaintRect(this.x - pad, this.y - pad, c.Width + pad * 2, c.Height + pad * 2);
 	}
 
 	pth() {
@@ -1612,7 +1628,7 @@ class Images {
 		this.cov.cycle = ppt.loadCovAllFb || ppt.loadCovFolder;
 		this.cov.cycle_ix = 0;
 		if (n == 'loadCovFolder' && ppt.loadCovFolder && !ppt.get('SYSTEM.Cover Folder Checked', false)) {
-			fb.ShowPopupMessage("在选项中输入文件夹：服务器设置（所有面板）>封面>封面：循环文件夹。\n\n默认：艺术家照片文件夹。\n\n当专辑改变时，图像会更新。任何在选择当前专辑后出现的图像都不包括在内。", '简介：用于封面循环的加载文件夹');
+			fb.ShowPopupMessage("专辑视图将从艺术家照片文件夹循环图像。\n\n当专辑改变时，图像会更新。任何在选择当前专辑后出现的图像都不包括在内。", '简介：从艺术家照片循环');
 			ppt.set('SYSTEM.Cover Folder Checked', true);
 		}
 		this.id.albCyc = '';
@@ -1709,12 +1725,20 @@ class ImageCache {
 			if (!ppt.text_only || ui.style.isBlur) {
 				const start = Date.now();
 				const o = this.cache[key] = {};
+				// keep the decoded source around: a resize re-processes this copy instead of
+				// going back to disk (gdi.LoadImageAsync + full JPEG decode)
+				img.master = {
+					key: key,
+					type: this.type,
+					image: image.Clone(0, 0, image.Width, image.Height)
+				};
 				o.img = img.cur = img.process(image, this.type, o);
 				o.filmID = filmStrip.id();
 				o.time = Date.now() - start;
 			}
 			this.pth = key;
 			this.embedded = embedded && ppt.showFilmStrip && !filmStrip.style.auto ? image : null;
+			if (!embedded) filmStrip.feedMaster(image, key); // 原图已解码：喂给缩略图当母版，省一次重复读盘解码
 			filmStrip.check();
 			img.paint();
 		} catch (e) {

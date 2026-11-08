@@ -1,5 +1,5 @@
 ﻿//foobox https://github.com/dream7180, jsspm http://br3tt.deviantart.com
-window.DefinePanel('JS Smooth Playlist Manager', {author: 'Br3tt, Asion, dreamawake, always_beta(CN)', version: '20151115-1000-151', features: {drag_n_drop: true} });
+window.DefinePanel('JS Smooth Playlist Manager', {author: 'Br3tt, Asion, dreamawake, always_beta(cn)', version: '2026', features: {drag_n_drop: true} });
 include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');

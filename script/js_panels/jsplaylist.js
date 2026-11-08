@@ -1,5 +1,5 @@
 ﻿//foobox https://github.com/dream7180; JSPlaylist http://br3tt.deviantart.com
-window.DefinePanel('JSPlaylist', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '1.3.2', features: {drag_n_drop: true} });
+window.DefinePanel('JSPlaylist', {author: 'Br3tt, dreamawake, always_beta(cn)', version: '1.3.2', features: {drag_n_drop: true} });
 include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
@@ -26,7 +26,7 @@ var queue_pl_on = window.GetProperty("Playlist: Turn on queue playlist", false);
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
-var g_script_version = "8.15";
+var g_script_version = "9.0";
 var g_textbox_tabbed = false;
 var g_init_window = true;
 var g_left_click_hold = false;
@@ -69,9 +69,9 @@ var g_delay_refresh_items = false;
 var g_avoid_on_item_focus_change = false;
 
 //albumart
-var albumart_id, cache_subdir, crclist = [];
+var albumart_id, cache_subdir, crc_set = {};
 var cover_worker = null;
-var cover_cache_folder = fb.ProfilePath + "foobox\\data\\";
+var cover_cache_folder = fb.ProfilePath + "foobox\\data\\albumart_cache\\";
 
 function get_table_name(subdir) {
 	return subdir.replace(/\\/g, "");
@@ -426,12 +426,12 @@ function create_cover_worker() {
 		var msg = event.data;
 		switch (msg.cmd) {
 		case 'keys':
-			crclist = msg.keys || [];
-			// Now that we know which covers are cached, kick off background preload
-			if (p.list && p.list.setList) p.list.setList();
+			crc_reset(msg.keys || []);
+			// 缓存键就绪后按当前可见窗口预加载封面（原来的 setList 调用并不存在）
+			if (p.list && p.list.preload_cover_window) p.list.preload_cover_window();
 			break;
 		case 'cached_image':
-			g_image_cache._cachelist[msg.crc] = msg.image;
+			g_image_cache.set(msg.crc, msg.image);
 			if (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) {
 				var grp2 = p.list.groups[msg.albumIndex];
 				if (grp2 && grp2.cachekey == msg.crc && grp2.cover_img == null) {
@@ -453,7 +453,7 @@ function create_cover_worker() {
 			if (grp) {
 				if (msg.image) {
 					grp.cover_img = msg.image;
-					g_image_cache._cachelist[msg.crc] = msg.image;
+					g_image_cache.set(msg.crc, msg.image);
 				} else {
 					// No cover found (cached or native) — show nocover immediately
 					grp.cover_img = images.nocover;
@@ -465,14 +465,14 @@ function create_cover_worker() {
 			// “刷新本封面缓存”完成：更新内存缓存与视图
 			var grpR = (p.list && p.list.groups && msg.albumIndex >= 0 && msg.albumIndex < p.list.groups.length) ? p.list.groups[msg.albumIndex] : null;
 			if (msg.image) {
-				g_image_cache._cachelist[msg.crc] = msg.image;
-				if (crclist.indexOf(msg.crc) < 0) crclist.push(msg.crc);
+				g_image_cache.set(msg.crc, msg.image);
+				crc_add(msg.crc);
 				if (grpR && grpR.cachekey == msg.crc) {
 					grpR.cover_img = msg.image;
 					grpR.load_requested = 1;
 				}
 			} else {
-				delete g_image_cache._cachelist[msg.crc];
+				g_image_cache.remove(msg.crc);
 				if (grpR && grpR.cachekey == msg.crc) {
 					grpR.cover_img = images.nocover;
 					grpR.load_requested = 1;
@@ -485,7 +485,7 @@ function create_cover_worker() {
 	cover_worker.onerror = function (event) {
 		console.log('JSPlaylist cover worker error: ' + event.message);
 	};
-	cover_worker.postMessage({ cmd: 'init', dbPath: cover_cache_folder + 'albumart.db' });
+	cover_worker.postMessage({ cmd: 'init', dbPath: config_dir + 'albumart.db' });
 }
 
 // Send a cover request to the worker (read-only: cache lookup + native art fetch, no save)
@@ -518,17 +518,7 @@ function request_cover(albumIndex) {
 
 // 计算单个 handle 所属分组的 cachekey（与 WSHplaylist.js oGroup 构造逻辑一致）
 function get_cachekey_for_handle(handle) {
-	var tf;
-	switch (layout.pattern_idx) {
-	case 0: tf = fb.TitleFormat("alb%album%"); break;
-	case 1: tf = fb.TitleFormat("aa%album artist%-%album%"); break;
-	case 2: tf = fb.TitleFormat("art%album artist%"); break;
-	case 3: tf = fb.TitleFormat("art%artist%"); break;
-	case 4: tf = fb.TitleFormat("gen%genre%"); break;
-	case 5: tf = fb.TitleFormat("$directory_path(%path%)"); break;
-	default: tf = fb.TitleFormat("alb%album%"); break;
-	}
-	return utils.CRC32(tf.EvalWithMetadb(handle));
+	return utils.CRC32(get_group_crc_tf().EvalWithMetadb(handle));
 }
 
 // 右键菜单“刷新本封面缓存”：按选中曲目算出所属分组（去重），
@@ -577,8 +567,59 @@ function reset_cover_from_selection(handleList) {
 	}
 }
 
+function crc_reset(keys) {
+	crc_set = {};
+	if (keys) {
+		for (var i = 0; i < keys.length; i++) crc_set[keys[i]] = 1;
+	};
+};
+
+function crc_has(crc) {
+	return crc_set[crc] === 1;
+};
+
+function crc_add(crc) {
+	crc_set[crc] = 1;
+};
+
 image_cache = function() {
 	this._cachelist = {};
+	this._cache_order = [];
+	this._cache_limit = 150; // 最多保留 150 张解码后的封面，减少来回滚动时的重复解码
+
+	// 淘汰封面时同步清理所有引用该 crc 的分组，避免 grp.cover_img 长期占用位图
+	this._drop_group_img = function(crc) {
+		if (!p.list || !p.list.crc_to_groups) return;
+		var arr = p.list.crc_to_groups[crc];
+		if (!arr) return;
+		for (var i = 0; i < arr.length; i++) {
+			var grp = p.list.groups[arr[i]];
+			if (grp && grp.cachekey == crc) {
+				grp.cover_img = null;
+				grp.load_requested = 0;
+			};
+		};
+	};
+
+	this.set = function(crc, img) {
+		if (!img) return;
+		if (typeof this._cachelist[crc] == "undefined") this._cache_order.push(crc);
+		this._cachelist[crc] = img;
+		while (this._cache_order.length > this._cache_limit) {
+			var old = this._cache_order.shift();
+			if (typeof this._cachelist[old] == "undefined") continue;
+			delete this._cachelist[old];
+			this._drop_group_img(old);
+		};
+	};
+
+	this.remove = function(crc) {
+		if (typeof this._cachelist[crc] == "undefined") return;
+		delete this._cachelist[crc];
+		var pos = this._cache_order.indexOf(crc);
+		if (pos > -1) this._cache_order.splice(pos, 1);
+		this._drop_group_img(crc);
+	};
 
 	this.hit = function(albumIndex) {
 		var grp = p.list.groups[albumIndex];
@@ -599,10 +640,8 @@ image_cache = function() {
 	};
 
 	this.getit = function(image, albumIndex) {
-		if(image){
-			try{
-				this._cachelist[p.list.groups[albumIndex].cachekey] = image;
-			} catch(e){}
+		if (image) {
+			try { this.set(p.list.groups[albumIndex].cachekey, image); } catch (e) {}
 		} else image = null;
 		return image;
 	};
@@ -613,7 +652,7 @@ image_cache = function() {
 		if (img) {
 			grp.load_requested = 1;
 			grp.cover_img = img;
-		} else if (crclist.indexOf(grp.cachekey) > -1) {
+		} else if (crc_has(grp.cachekey)) {
 			grp.load_requested = 1;
 			cover_worker.postMessage({
 				cmd: 'preload_cover',
@@ -1358,32 +1397,88 @@ function on_playlists_changed() {
 	};
 };
 
-function on_playlist_items_added(playlist_idx) {
-	if (!g_delay_refresh_items) {
-		if (playlist_idx == p.list.playlist) {
-			update_playlist(layout.collapseGroupsByDefault);
-			p.headerBar.resetSortIndicators();
-			full_repaint();
+// 列表变更 150ms 去抖：批量导入/连续事件只做一次全量重建
+var g_refresh_timer = false;
+// 曲目数低于该值时重建成本可忽略，直接同步执行，保持小列表的即时手感
+var G_SYNC_REBUILD_MAX = 1000;
+
+function do_playlist_rebuild() {
+	g_refresh_timer = false;
+	if (g_delay_refresh_items) return;
+	update_playlist(layout.collapseGroupsByDefault);
+	p.headerBar.resetSortIndicators();
+	full_repaint();
+};
+
+function schedule_playlist_rebuild() {
+	if (p.list && p.list.count < G_SYNC_REBUILD_MAX) {
+		// 小列表：取消可能存在的待执行定时器，立即同步重建
+		if (g_refresh_timer) {
+			window.ClearTimeout(g_refresh_timer);
+			g_refresh_timer = false;
 		};
+		do_playlist_rebuild();
+		return;
+	};
+	if (g_refresh_timer) return;
+	g_refresh_timer = window.SetTimeout(do_playlist_rebuild, 150);
+};
+
+// 元数据变更同样去抖，避免库扫描/批量打标签时反复 setItems + 重绘
+var g_metadb_timer = false;
+var g_metadb_handles = null;
+
+function do_metadb_refresh() {
+	g_metadb_timer = false;
+	var hs = g_metadb_handles;
+	g_metadb_handles = null;
+	p.list.setItems(false);
+	if (hs) {
+		var found = -1;
+		for (var j = 0; j < p.list.groups.length; j++) {
+			if (hs.Find(p.list.groups[j].metadb) > -1) {
+				found = j;
+				break;
+			}
+		}
+		if (found > -1) {
+			p.list.groups[found].load_requested = 0;
+			g_image_cache.remove(p.list.groups[found].cachekey);
+		}
+	}
+	full_repaint();
+};
+
+function schedule_metadb_refresh(handles) {
+	if (handles) g_metadb_handles = handles;
+	if (p.list && p.list.count < G_SYNC_REBUILD_MAX) {
+		if (g_metadb_timer) {
+			window.ClearTimeout(g_metadb_timer);
+			g_metadb_timer = false;
+		};
+		do_metadb_refresh();
+		return;
+	};
+	if (g_metadb_timer) return;
+	g_metadb_timer = window.SetTimeout(do_metadb_refresh, 150);
+};
+
+function on_playlist_items_added(playlist_idx) {
+	if (!g_delay_refresh_items && playlist_idx == p.list.playlist) {
+		schedule_playlist_rebuild();
 	};
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	if (!g_delay_refresh_items) {
-		if (playlist_idx == p.list.playlist) {
-			update_playlist(layout.collapseGroupsByDefault);
-			p.headerBar.resetSortIndicators();
-			full_repaint();
-		};
+	if (!g_delay_refresh_items && playlist_idx == p.list.playlist) {
+		schedule_playlist_rebuild();
 	};
 };
 
 function on_playlist_items_reordered(playlist_idx) {
 	if (!g_avoid_on_item_focus_change) {
 		if (playlist_idx == p.list.playlist && p.headerBar.columnDragged == 0) {
-			update_playlist(layout.collapseGroupsByDefault);
-			p.headerBar.resetSortIndicators();
-			full_repaint();
+			schedule_playlist_rebuild();
 		}
 		else {
 			p.headerBar.columnDragged = 0;
@@ -1433,21 +1528,7 @@ function on_item_focus_change(playlist, from, to) {
 };
 
 function on_metadb_changed(handles, fromhook) {
-	p.list.setItems(false);
-	if(!fromhook) {
-		var found = -1;
-		for (var j = 0; j < p.list.groups.length; j++) {
-			if (handles.Find(p.list.groups[j].metadb) > -1) {
-				found = j;
-				break;
-			}
-		}
-		if(found > -1){
-			p.list.groups[found].load_requested = 0;
-			g_image_cache._cachelist[p.list.groups[found].cachekey] = null;
-		}
-	}
-	full_repaint();
+	schedule_metadb_refresh(fromhook ? null : handles);
 };
 
 //=================================================// Keyboard Callbacks
@@ -2089,9 +2170,6 @@ function on_notify_data(name, info) {
 			save_layout();
 		}
 		break;
-	case "DoRepaint":
-		full_repaint();
-		break;
 	case "foobox_setting":
 		if(info) show_setting(3);
 		else if(cSettings.visible){
@@ -2710,7 +2788,7 @@ function get_covercahe_config(){
 			cache_subdir = "album\\";
 	};
 	// Load cached cover keys from SQLite albumart.db (worker)
-	crclist.length = 0;
+	crc_reset(null);
 	if (cover_worker) {
 		cover_worker.postMessage({ cmd: 'load_keys', table: get_table_name(cache_subdir) });
 	}

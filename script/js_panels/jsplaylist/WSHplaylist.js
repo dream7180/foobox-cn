@@ -13,6 +13,62 @@ var tf_info_size = fb.TitleFormat("%filesize_natural%");
 var tf_plain_title = fb.TitleFormat("%title%");
 var tf_plain_album = fb.TitleFormat("%album%");
 
+// 通用编译缓存：只缓存不含逐行变化字段的模板，避免每帧/每行重复编译 TitleFormat
+var g_tf_cache = {};
+var g_tf_cache_count = 0;
+var G_TF_CACHE_MAX = 256;
+
+function has_dynamic_tf(tf) {
+	if (typeof tf != "string") return true; // 非字符串保持原有走逐行解析逻辑
+	return tf.indexOf("%list_index%") > -1 || tf.indexOf("%list_total%") > -1 || tf.indexOf("%isplaying%") > -1;
+}
+
+function tf_cached(tf) {
+	var obj = g_tf_cache[tf];
+	if (obj) return obj;
+	if (g_tf_cache_count >= G_TF_CACHE_MAX) {
+		g_tf_cache = {};
+		g_tf_cache_count = 0;
+	};
+	obj = g_tf_cache[tf] = fb.TitleFormat(tf);
+	g_tf_cache_count++;
+	return obj;
+}
+
+// 分组封面 cachekey 使用的 TF：按 pattern 只编译一次，不再每个分组重建
+var tf_group_crc = null;
+var tf_group_crc_idx = -1;
+
+function get_group_crc_tf() {
+	if (tf_group_crc && tf_group_crc_idx == layout.pattern_idx) return tf_group_crc;
+	var tf;
+	switch (layout.pattern_idx) {
+		case 0:
+			tf = "alb%album%";
+			break;
+		case 1:
+			tf = "aa%album artist%-%album%";
+			break;
+		case 2:
+			tf = "art%album artist%";
+			break;
+		case 3:
+			tf = "art%artist%";
+			break;
+		case 4:
+			tf = "gen%genre%";
+			break;
+		case 5:
+			tf = "$directory_path(%path%)";
+			break;
+		default:
+			tf = "alb%album%";
+	};
+	tf_group_crc = fb.TitleFormat(tf);
+	tf_group_crc_idx = layout.pattern_idx;
+	return tf_group_crc;
+}
+
 oGroup = function(index, start, count, total_time_length, focusedTrackId, iscollapsed, handle) {
 	this.index = index;
 	this.start = start;
@@ -50,30 +106,7 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 	this.totalPreviousRows = 0;
 
 	if (handle) {
-		var tf_crc;
-		switch (layout.pattern_idx) {
-			case 0:
-				tf_crc = fb.TitleFormat("alb%album%");
-				break;
-			case 1:
-				tf_crc = fb.TitleFormat("aa%album artist%-%album%");
-				break;
-			case 2:
-				tf_crc = fb.TitleFormat("art%album artist%");
-				break;
-			case 3:
-				tf_crc = fb.TitleFormat("art%artist%");
-				break;
-			case 4:
-				tf_crc = fb.TitleFormat("gen%genre%");
-				break;
-			case 5:
-				tf_crc = fb.TitleFormat("$directory_path(%path%)");
-				break;
-			default:
-				tf_crc = fb.TitleFormat("alb%album%");
-		};
-		this.cachekey = utils.CRC32(tf_crc.EvalWithMetadb(handle));
+		this.cachekey = utils.CRC32(get_group_crc_tf().EvalWithMetadb(handle));
 	}
 };
 
@@ -96,10 +129,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 	this.setGroupMeta = function() {
 		if (this.type == 1) {
 			if (this.metadb) {
-				this.l1 = fb.TitleFormat(p.list.groupby[layout.pattern_idx].l1).EvalWithMetadb(this.metadb);
-				this.r1 = fb.TitleFormat(p.list.groupby[layout.pattern_idx].r1).EvalWithMetadb(this.metadb);
-				this.l2 = fb.TitleFormat(p.list.groupby[layout.pattern_idx].l2).EvalWithMetadb(this.metadb);
-				this.r2 = fb.TitleFormat(p.list.groupby[layout.pattern_idx].r2).EvalWithMetadb(this.metadb);
+				this.l1 = tf_cached(p.list.groupby[layout.pattern_idx].l1).EvalWithMetadb(this.metadb);
+				this.r1 = tf_cached(p.list.groupby[layout.pattern_idx].r1).EvalWithMetadb(this.metadb);
+				this.l2 = tf_cached(p.list.groupby[layout.pattern_idx].l2).EvalWithMetadb(this.metadb);
+				this.r2 = tf_cached(p.list.groupby[layout.pattern_idx].r2).EvalWithMetadb(this.metadb);
 			};
 		};
 	};
@@ -142,7 +175,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var tf2_y = 0;
 			var tf2_h = 0;
 		}
-		var _playing_idx = (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex);
+		var _playing_idx = this._playing_idx;
 		var fin = p.headerBar.columns.length;
 		for (var j = 1; j < fin; j++) {
 			tf1 = tf2 = null;
@@ -156,7 +189,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					}
 					else {
 						if (typeof(this.state_color) == "undefined" && p.headerBar.columns[j].tf != "null") {
-							this.state_tf = fb.TitleFormat(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
+							this.state_tf = tf_cached(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
 							var stateArray = this.parseTF(this.state_tf, this.text_colour);
 							this.state_tf = stateArray[0];
 							this.state_color = stateArray[1];
@@ -189,12 +222,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						gr.GdiDrawText(num(this.queue_idx, 2), g_font_b, c_white, cx, this.y, cw, cTrack.height, cc_txt);
 					} else {
 						gr.FillSolidRect(bg_x, bgy, rectz, rectz, g_color_status);
-						if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) gr.DrawImage(images.selected_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
+						if (this._sel) gr.DrawImage(images.selected_ico, icon_x, icon_y, imgw, imgw, 0, 0, imgw, imgw, 0, 255);
 					}
 					break;
 				case "喜爱":
 					if (typeof(this.mood) == "undefined") {
-						this.mood = fb.TitleFormat(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
+						this.mood = tf_cached(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
 						var moodArray = this.parseTF(this.mood, this.text_colour);
 						this.mood = moodArray[0];
 					};
@@ -226,7 +259,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				case "等级":
 					cw = p.headerBar.columns[j].w - g_z6;
 					if (typeof(this.rating) == "undefined") {
-						this.rating = fb.TitleFormat(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
+						this.rating = tf_cached(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
 						var ratingArray = this.parseTF(this.rating, this.text_colour);
 						this.rating = ratingArray[0];
 					};
@@ -276,39 +309,17 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				default:
 					// Common TF parsing
 					var eval_play = false;
-					var tf_prep = p.headerBar.columns[j].tf;
+					var col = p.headerBar.columns[j];
+					var tf_raw = col.tf;
 					// PARSING special TF fields in 1st TF line
-					if (tf_prep != "null") {
-						// %list_index%
-						tf_prep = replaceAll(tf_prep, "%list_index%", (this.track_index + 1).toString());
-						// %list_total%
-						tf_prep = replaceAll(tf_prep, "%list_total%", p.list.count.toString());
-						// %isplaying%
-						if (_playing_idx) {
-							tf_prep = replaceAll(tf_prep, "%isplaying%", "$greater(1,0)");
-							eval_play = true;
+					if (tf_raw != "null") {
+						if (!has_dynamic_tf(tf_raw)) {
+							// 静态模板直接复用已编译的 TitleFormat
+							var tf1_obj = tf_cached(tf_raw);
+							tf1 = _playing_idx ? tf1_obj.Eval(true) : tf1_obj.EvalWithMetadb(this.metadb);
 						}
 						else {
-							tf_prep = replaceAll(tf_prep, "%isplaying%", "$greater(0,1)");
-						};
-						// Evaluate TF field after parsing
-						if (eval_play) {
-							tf1 = fb.TitleFormat(tf_prep).Eval(true);
-						}
-						else {
-							tf1 = fb.TitleFormat(tf_prep).EvalWithMetadb(this.metadb);
-						};
-					};
-				};
-				// draw the general field parsed above
-				// ===================================
-				if (j > 0 && tf1 && tf1 != "null") {
-					//try {
-					gr.GdiDrawText(tf1, g_font, this.text_colour, cx, tf1_y, cw, tf1_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
-					if (layout.enableExtraLine) {
-						tf_prep = p.headerBar.columns[j].tf2;
-						// PARSING special TF fields in extra TF line
-						if (tf_prep != "null") {
+							var tf_prep = tf_raw;
 							// %list_index%
 							tf_prep = replaceAll(tf_prep, "%list_index%", (this.track_index + 1).toString());
 							// %list_total%
@@ -323,10 +334,48 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							};
 							// Evaluate TF field after parsing
 							if (eval_play) {
-								tf2 = fb.TitleFormat(tf_prep).Eval(true);
+								tf1 = fb.TitleFormat(tf_prep).Eval(true);
 							}
 							else {
-								tf2 = fb.TitleFormat(tf_prep).EvalWithMetadb(this.metadb);
+								tf1 = fb.TitleFormat(tf_prep).EvalWithMetadb(this.metadb);
+							};
+						};
+					};
+				};
+				// draw the general field parsed above
+				// ===================================
+				if (j > 0 && tf1 && tf1 != "null") {
+					//try {
+					gr.GdiDrawText(tf1, g_font, this.text_colour, cx, tf1_y, cw, tf1_h, p.headerBar.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
+					if (layout.enableExtraLine) {
+						var tf2_raw = col.tf2;
+						// PARSING special TF fields in extra TF line
+						if (tf2_raw != "null") {
+							if (!has_dynamic_tf(tf2_raw)) {
+								var tf2_obj = tf_cached(tf2_raw);
+								tf2 = _playing_idx ? tf2_obj.Eval(true) : tf2_obj.EvalWithMetadb(this.metadb);
+							}
+							else {
+								var tf2_prep = tf2_raw;
+								// %list_index%
+								tf2_prep = replaceAll(tf2_prep, "%list_index%", (this.track_index + 1).toString());
+								// %list_total%
+								tf2_prep = replaceAll(tf2_prep, "%list_total%", p.list.count.toString());
+								// %isplaying%
+								if (_playing_idx) {
+									tf2_prep = replaceAll(tf2_prep, "%isplaying%", "$greater(1,0)");
+									eval_play = true;
+								}
+								else {
+									tf2_prep = replaceAll(tf2_prep, "%isplaying%", "$greater(0,1)");
+								};
+								// Evaluate TF field after parsing
+								if (eval_play) {
+									tf2 = fb.TitleFormat(tf2_prep).Eval(true);
+								}
+								else {
+									tf2 = fb.TitleFormat(tf2_prep).EvalWithMetadb(this.metadb);
+								};
 							};
 						}
 						else {
@@ -372,8 +421,16 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			var tcolumn_x = this.x + Math.floor(cover.w);
 			var line_width = this.w - cover.w + cScrollBar.width;
 			var _playing_idx = (fb.IsPlaying && plman.PlayingPlaylist == this.playlist && this.track_index == p.list.nowplaying.PlaylistItemIndex);
+			var _sel = false;
+			if (this.empty_row_index == 0 && !_playing_idx) {
+				// 每行每帧只查询一次选中状态，drawRowContents 里复用
+				_sel = plman.IsPlaylistItemSelected(p.list.playlist, this.track_index);
+			};
 			if (this.empty_row_index == 0) {
-				this.queue_idx = plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1;
+				this._playing_idx = _playing_idx;
+				this._sel = _sel;
+				// 队列为空时不做原生查找（大列表滚动时每帧每行一次的开销）
+				this.queue_idx = (p.list.queue_total > 0) ? plman.FindPlaybackQueueItemIndex(this.metadb, this.playlist, this.track_index) + 1 : 0;
 				if (_playing_idx) {
 					// playing track bg
 					gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_highlight);
@@ -382,7 +439,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				}
 				else {
 					// no playing track bg
-					if (plman.IsPlaylistItemSelected(p.list.playlist, this.track_index)) {
+					if (_sel) {
 						if (p.list.focusedTrackId == this.track_index) {
 							gr.FillSolidRect(tcolumn_x, this.y, line_width, this.h, g_color_selected_bg);
 						}
@@ -582,26 +639,20 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				break;
 			};
 
-			// highlight group that contains a selected track
-			var now_playing_found = false;
-			if (this.obj) {
+			// highlight group that contains a selected track（展开分组无需扫描曲目）
+			var sel_found = false;
+			if (this.obj && this.obj.collapsed) {
 				for (var k = 0; k < this.obj.count; k++) {
-					if (plman.IsPlaylistItemSelected(p.list.playlist, this.obj.start + k) && this.obj.collapsed) {
+					if (plman.IsPlaylistItemSelected(p.list.playlist, this.obj.start + k)) {
 						gr.FillSolidRect(this.x, (this.y - groupDelta), this.w + cScrollBar.width, this.h - 2, g_color_selected_bg & 0x75ffffff);
+						sel_found = true;
 						break;
-					}
-					else {
-						// highlight the now playing group header
-						if (fb.IsPlaying) {
-							if (plman.PlayingPlaylist == this.playlist) {
-								if (!now_playing_found && p.list.nowplaying.PlaylistItemIndex >= this.obj.start && p.list.nowplaying.PlaylistItemIndex < this.obj.start + this.obj.count && this.obj.collapsed) {
-									gr.FillSolidRect(this.x, (this.y - groupDelta) - 1, this.w + cScrollBar.width, this.h, g_color_highlight & 0x75ffffff);
-									now_playing_found = true;
-								};
-							};
-						};
 					};
 				};
+			};
+		 // highlight the now playing group header（与曲目数无关，只判断一次）
+			if (!sel_found && this.obj && this.obj.collapsed && fb.IsPlaying && plman.PlayingPlaylist == this.playlist && p.list.nowplaying.PlaylistItemIndex >= this.obj.start && p.list.nowplaying.PlaylistItemIndex < this.obj.start + this.obj.count) {
+				gr.FillSolidRect(this.x, (this.y - groupDelta) - 1, this.w + cScrollBar.width, this.h, g_color_highlight & 0x75ffffff);
 			};
 
 			// Draw cover art
@@ -1069,6 +1120,7 @@ oList = function(object_name, playlist) {
 	this.handleList = plman.GetPlaylistItems(this.playlist);
 	this.count = this.handleList.Count;
 	this.groups = [];
+	this.crc_to_groups = {};
 	this.items = [];
 	this.groupby = [];
 	this.totalGroupBy = 0;
@@ -1254,43 +1306,60 @@ oList = function(object_name, playlist) {
 
 	this.updateGroupByPattern = function(pattern_idx) {
 		var m = pattern_idx;
-		tf_group_key = fb.TitleFormat(this.groupby[m].tf);
+		tf_group_key = tf_cached(this.groupby[m].tf);
 		cover.show = (layout.showCover == "1" ? true : false);
 		cGroup.collapsed_height = layout.collapsedHeight;
 		cGroup.expanded_height = layout.expandedHeight;
 	};
 
+	this.add_group = function(start, count, total_time_length, handle, iscollapsed) {
+		var grp = new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, handle);
+		this.groups.push(grp);
+		if (grp.cachekey != undefined) {
+			var arr = this.crc_to_groups[grp.cachekey];
+			if (!arr) arr = this.crc_to_groups[grp.cachekey] = [];
+			arr.push(grp.index);
+		};
+	};
+
 	this.init_groups = function(iscollapsed) {
-		var handle;
-		var current;
-		var previous;
+		var handle, _handle;
+		var current, current_raw, previous, previous_raw;
 		var count = 0;
 		var start = 0;
 		var total_time_length = 0;
-		var arr_pl, fin, fin2;
 
 		// update group key TF pattern
 		if (layout.showgroupheaders) {
 			this.updateGroupByPattern(layout.pattern_idx);
 		}
 		else {
-			tf_group_key = fb.TitleFormat(this.groupby[layout.pattern_idx].tf);
+			tf_group_key = tf_cached(this.groupby[layout.pattern_idx].tf);
+		};
+
+		// 重建分组时丢弃旧的预加载任务，避免访问已失效的分组索引
+		if (cover.preload_timer) {
+			clearInterval(cover.preload_timer);
+			cover.preload_timer = null;
 		};
 
 		this.groups.splice(0, this.groups.length);
+		this.crc_to_groups = {};
 		for (var i = 0; i < this.count; i++) {
 			handle = this.handleList[i];
-			var _handle;
-			current = tf_group_key.EvalWithMetadb(handle);
-			current = current.toUpperCase();
+			current_raw = tf_group_key.EvalWithMetadb(handle);
+			// 连续曲目的分组键通常完全相同：先比较原串，命中就跳过大写转换
+			current = (i > 0 && current_raw == previous_raw) ? previous : current_raw.toUpperCase();
+			var track_len = handle.Length;
 			if (i == 0) {
 				if (this.count == 1) {
 					count++;
-					total_time_length += handle.Length;
-					this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, handle));
+					total_time_length += track_len;
+					this.add_group(start, count, total_time_length, handle, iscollapsed);
 				}
 				else {
 					previous = current;
+					previous_raw = current_raw;
 					_handle = handle;
 				};
 			}
@@ -1298,56 +1367,64 @@ oList = function(object_name, playlist) {
 				if (current != previous || i == this.count - 1) {
 					if (current != previous) {
 						if (i == this.count - 1) {
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, _handle));
+							this.add_group(start, count, total_time_length, _handle, iscollapsed);
 							start = i;
 							count = 1;
-							total_time_length = handle.Length;
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, handle));
+							total_time_length = track_len;
+							this.add_group(start, count, total_time_length, handle, iscollapsed);
 						}
 						else {
-							this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, _handle));
+							this.add_group(start, count, total_time_length, _handle, iscollapsed);
 						};
 					}
 					else {
-						total_time_length += handle.Length;
+						total_time_length += track_len;
 						count++;
-						this.groups.push(new oGroup(this.groups.length, start, count, total_time_length, this.focusedTrackId, iscollapsed, _handle));
+						this.add_group(start, count, total_time_length, _handle, iscollapsed);
 					};
 					count = 0;
 					total_time_length = 0;
 					start = i;
 					previous = current;
+					previous_raw = current_raw;
 					_handle = handle;
 				};
 			};
 			if (this.count > 1) {
 				count++;
-				total_time_length += handle.Length;
+				total_time_length += track_len;
 			};
 		};
 		this.totalRows = this.getTotalRows();
-		if (p.headerBar.columns[0].w > 0 || (layout.showgroupheaders && cGroup.expanded_height > 1)){
-			let end = this.groups.length;
-			let j=0;
-			if (!cover.preload_timer) {
-				cover.preload_timer = setInterval(() => {
-					if(j < end){
-						try{
-							if (this.groups[j].load_requested == 0) {
-								g_image_cache.preload(j);
-							};
-						}catch(e){
-							clearInterval(cover.preload_timer);
-							cover.preload_timer = null;
-						}
-						j++;
-					} else {
-						clearInterval(cover.preload_timer);
-						cover.preload_timer = null;				
-					}
-				}, 30);
-			}
-		}
+	};
+
+	// 只预加载当前可见分组附近的封面，避免大列表把全部分组的封面解码进内存
+	this.preload_cover_window = function() {
+		if (cover.preload_timer) return;
+		if (!this.items.length || !this.groups.length) return;
+		if (!(p.headerBar.columns[0].w > 0 || (layout.showgroupheaders && cGroup.expanded_height > 1))) return;
+		var first = this.items[0].group_index;
+		var last = this.items[this.items.length - 1].group_index;
+		if (first < 0) return;
+		var from = Math.max(0, first - 3);
+		var to = Math.min(this.groups.length - 1, last + 6);
+		if (to - from > 15) to = from + 15; // 单次最多预取 16 组
+		var j = from;
+		cover.preload_timer = setInterval(() => {
+			if (j > to) {
+				clearInterval(cover.preload_timer);
+				cover.preload_timer = null;
+				return;
+			};
+			try {
+				var grp = this.groups[j];
+				if (grp && grp.load_requested == 0) g_image_cache.preload(j);
+			} catch (e) {
+				clearInterval(cover.preload_timer);
+				cover.preload_timer = null;
+			};
+			j++;
+		}, 30);
 	};
 
 	this.updateHandleList = function(playlist, iscollapsed, listnochange) {
@@ -1680,6 +1757,7 @@ oList = function(object_name, playlist) {
 				};
 			};
 		};
+		this.preload_cover_window();
 	};
 
 	this.isFocusedItemVisible = function() {

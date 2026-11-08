@@ -244,9 +244,8 @@ class DldArtImages {
 		} else return [5, cfg.photoAutoAdd, allFiles, imgExisting];
 	}
 
-	run(dl_ar, force, art, p_stndBio, p_supCache) {
-		let img_folder = p_stndBio && !panel.isRadio(art.focus) ? panel.cleanPth(cfg.pth.foImgArt, art.focus, 'server') : panel.cleanPth(cfg.remap.foImgArt, art.focus, 'remap', dl_ar, '', 1);
-		if (p_supCache && !$.folder(img_folder)) img_folder = panel.cleanPth(cfg.sup.foImgArt, art.focus, 'remap', dl_ar, '', 1);
+	run(dl_ar, force, art, p_stndBio) {
+		const img_folder = p_stndBio && !panel.isRadio(art.focus) ? panel.cleanPth(cfg.pth.foImgArt, art.focus, 'server') : panel.cleanPth(cfg.remap.foImgArt, art.focus, 'remap', dl_ar, '', 1);
 		const getNo = this.img_exp(dl_ar, img_folder, !force ? server.exp : 0);
 		if (!getNo[0]) return;
 		const lfm_art = new LfmArtImg(() => lfm_art.onStateChange());

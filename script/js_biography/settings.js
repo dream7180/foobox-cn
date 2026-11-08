@@ -38,48 +38,51 @@ class Setting {
 }
 
 class Settings {
-	constructor(name) {
+	constructor() {
 		// this.key_list = {}; debug
 
-		this.cfgBaseName = name;
-		this.storageFolder = fb.ProfilePath + 'foobox\\data\\biography\\';
+		this.subPth = 'foobox\\data\\biography\\';
+		this.storageFolder = bioDataPth;
 		$.buildPth(this.storageFolder);
-		this.bio = `${this.storageFolder + this.cfgBaseName}.cfg`;
+		this.cfgFile = `${this.storageFolder}server.cfg`;
 		this.item_properties = `${this.storageFolder}item_properties.json`;
 		this.nowplaying = `${this.storageFolder}nowplaying.txt`;
 
-		this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		this.cfg = $.jsonParse(this.cfgFile, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.lfmSim = true;
-
 		this.lang = {
 			arr: ['EN', 'DE', 'ES', 'FR', 'IT', 'JA', 'PL', 'PT', 'RU', 'SV', 'TR', 'ZH'],
 			ix: 0,
 			ok: false
 		}
-
 		this.remap = {}
 		this.pth = {}
-		this.sup = {}
 		this.tf = {}
 		this.dispPth = {} // 设置页"当前实际使用路径"提示用的路径（值为空时显示，不写入配置）
-		// 内置默认路径：这 7 项设置的默认值留空；留空时运行时取用这里的路径
-		this.defPth = {
-			foLfmRev: '%profile%\\yttm\\review\\lastfm\\$lower($cut(%BIO_ALBUMARTIST%,1))',
-			foLfmBio: '%profile%\\yttm\\biography\\lastfm\\$lower($cut(%BIO_ARTIST%,1))',
-			foWikiRev: '%profile%\\yttm\\review\\wikipedia\\$lower($cut(%BIO_ALBUMARTIST%,1))',
-			foWikiBio: '%profile%\\yttm\\biography\\wikipedia\\$lower($cut(%BIO_ARTIST%,1))',
-			foImgArt: '%profile%\\yttm\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%',
-			foImgRev: '%profile%\\yttm\\rev_img\\$lower($cut(%BIO_ALBUMARTIST%,1))\\%BIO_ALBUMARTIST%',
-			foLfmSim: '%profile%\\yttm\\lastfm\\$lower($cut(%BIO_ARTIST%,1))'
+		this.caPath = `${this.storageFolder}biography-cache`;
+		this.cachePath = `${this.caPath}\\`;
+		this.cacheRootDefaultDisp = `%profile%\\${this.subPth}biography-cache`; // 根路径编辑框的默认显示（无尾斜杠）
+		this.tails = {
+			foLfmRev: 'review\\lastfm\\$lower($cut(%BIO_ALBUMARTIST%,1))',
+			foLfmBio: 'biography\\lastfm\\$lower($cut(%BIO_ARTIST%,1))',
+			foWikiRev: 'review\\wikipedia\\$lower($cut(%BIO_ALBUMARTIST%,1))',
+			foWikiBio: 'biography\\wikipedia\\$lower($cut(%BIO_ARTIST%,1))',
+			foImgArt: 'art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%',
+			foImgRev: 'rev_img\\$lower($cut(%BIO_ALBUMARTIST%,1))\\%BIO_ALBUMARTIST%',
+			foLfmSim: 'lastfm\\$lower($cut(%BIO_ARTIST%,1))'
 		};
+		this.cycDefault = '%storage_folder%\\biography-cache\\' + this.tails.foImgArt; // 照片循环文件夹的内置默认（封面循环固定同此路径）
+		this.defPth = {}; // 运行期实际取用的默认路径
+		this.defPthDisp = {}; // 同一路径的 %profile% 提示形式（仅用于设置页占位提示）
+		this.rootPth = this.cachePath;
+		this.rootDisp = `%profile%\\${this.subPth}biography-cache\\`;
+		this.dispCacheRoot = this.cacheRootDefaultDisp;
+		this.buildDefPth();
 
 		this.photoRecycler = `${this.storageFolder}oldPhotosForDeletion\\`;
 		this.settingsKeys = [];
 		this.writeDefer = 0; // > 0: 变更只留在内存，批次结束时统一写盘一次
 		this.writeDirty = false;
-		
-		this.caPath = `${this.storageFolder}biography-cache`;
-		this.cachePath = `${this.caPath}\\`;
 		
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
@@ -87,12 +90,14 @@ class Settings {
 			foWikiRev: ' [Wikipedia Review]',
 			foWikiBio: ' [Wikipedia Biography]'
 		}
+		this.lfmDisplayName = 'Last.fm';
+		this.wikiDisplayName = '维基百科';
 	}
 
 	// Methods
 
 	init(settings) {
-		// 启动时补齐/迁移的默认值可能有几十项，合并为一次写盘
+		// 启动时按默认值补齐的设置可能有几十项，合并为一次写盘
 		this.beginBatch();
 		try {
 			this.build(settings);
@@ -102,37 +107,12 @@ class Settings {
 	}
 
 	build(settings) {
-		const update = this.checkCfg();
-		// migrate old tag settings (0-4 AllMusic removed; shift 5-13 down by 5)
-		if (this.cfg.tagEnabled13 !== undefined) {
-			for (let j = 0; j < 9; j++) {
-				this.cfg[`tagEnabled${j}`] = this.cfg[`tagEnabled${j + 5}`];
-				if (j < 8) this.cfg[`tagName${j}`] = this.cfg[`tagName${j + 5}`];
-			}
-			for (let j = 9; j < 14; j++) delete this.cfg[`tagEnabled${j}`];
-			for (let j = 8; j < 13; j++) delete this.cfg[`tagName${j}`];
-		}
+		this.checkCfg(settings);
 		this.settingsKeys = settings.map(v => v[3]);
 		settings.forEach(v => {
 			// this.validate(v); debug
 			this.add(v);
 		});
-		// 迁移（只做一次）：旧版本把内置默认路径存进了 cfg；这些设置现默认留空，
-		// 把"恰好等于内置默认"的值清空。加标记避免之后用户再手填同样内容又被清掉。
-		if (!this.cfg.pthEmptyMigrated) {
-			Object.keys(this.defPth).forEach(v => {
-				if (this[v] === this.defPth[v]) this[v] = '';
-			});
-			this.cfg.pthEmptyMigrated = 1;
-			this.writeDirty = true;
-		}
-		if (update) {
-			delete this.cfg.langLfm;
-			delete this.cfg.langLfmFallback;
-			this.autoCache = 0;
-			this.tagName1 = 'Album Statistics Last.fm';
-			this.tagName3 = 'Artist Statistics Last.fm';
-		}
 		this.parse();
 	}
 
@@ -216,50 +196,22 @@ class Settings {
 
 	writeCfg() {
 		this.writeDirty = false;
-		$.save(this.bio, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
+		$.save(this.cfgFile, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
 	}
 
 	toggle(name) {
 		this[name] = !this[name];
 	}
 
-	checkCfg() {
+	checkCfg(settings) {
 		if (!$.file(this.item_properties)) $.save(this.item_properties, item_properties, true);
 		if (!$.file(this.nowplaying)) $.save(this.nowplaying, nowplaying, true);
-		if ($.file(this.bio)) return;
-		const orig_cfg = `${fb.ProfilePath}yttm\\biography.cfg`;
-		if ($.file(orig_cfg)) {
-			try {
-				fso.CopyFile(orig_cfg, this.bio);
-				this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-				const blacklist_image = `${fb.ProfilePath}yttm\\blacklist_image.json`;
-				if ($.file(blacklist_image)) {
-					fso.CopyFile(blacklist_image, `${cfg.storageFolder}blacklist_image.json`);
-				}
-				return true;
-			} catch (e) {
-				this.createCfg(settings);
-				return false;
-			}
-		} else {
-			this.createCfg(settings);
-			return false;
-		}
-	}
-
-
-	createCfg(settings) {
+		if ($.file(this.cfgFile)) return;
+		// 首次运行：按默认值建立配置文件
 		settings.forEach(v => {
 			this.cfg[v[3]] = v[1];
 		});
-		if (this.cfg.supFo && this.cfg.supFo.includes('>')) {
-			const split = this.cfg.supFo.split('>');
-			if (split[0].length && split[1].length) {
-				this.cfg.supFind = split[0];
-				this.cfg.supReplace = split[1];
-			}
-		}
-		$.save(this.bio, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
+		$.save(this.cfgFile, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
 	}
 
 	getLangIndex(n) {
@@ -287,6 +239,7 @@ class Settings {
 			switch (type) {
 				case 'resetPanelCfg':
 					ui.updateProp(ppt, 'default_value');
+					panelCfg.reset();
 					break;
 				case 'resetServerCfg':
 					this.resetCfg();
@@ -319,15 +272,28 @@ class Settings {
 		dialogWindow = $.jsonParse(dialogWindow);
 		dialogWindow.version = `v${window.ScriptInfo.Version}`;
 		dialogWindow = JSON.stringify(dialogWindow);
-		if (popUpBox.isHtmlDialogSupported()) popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
-		else {
-			popUpBox.ok = false;
-			$.trace('在当前操作系统中，html 选项对话框似乎不可用。选项中的所有设置都可以在其它地方找到：1）面板设置在面板属性中；2）适用于所有面板的服务器设置都在 cfg 文件中 - 默认设置对于大多数用户来说应该没问题，但可以通过在文本编辑器中仔细编辑来更改。常用设置位于菜单上。');
-		}
+		popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
+	}
+
+	// 缓存根路径：设置里填了就用它（去掉尾部斜杠），否则用内置的 %profile%\\foobox\\data\\biography\\biography-cache\\
+	// 7 项详细路径的默认值全部由它派生，所以改根路径不需要逐项维护
+	buildDefPth() {
+		// 只有"自定义"模式才用根路径；选"默认"时一律用内置缓存目录，配置里残留的旧根路径不再生效
+		const raw = this.autoCache ? (this.cacheRoot || '').trim().replace(/\//g, '\\').replace(/\\+$/, '') : '';
+		this.dispCacheRoot = raw || this.cacheRootDefaultDisp;
+		// %profile% / %storage_folder% 写法先展开成绝对路径，最后整体只做一次 tf 转义（不能双重转义）
+		const abs = raw.replace(/^%profile%\\?/i, () => fb.ProfilePath).replace(/^%storage_folder%\\?/i, () => this.storageFolder).replace(/\\+$/, '');
+		this.rootPth = raw ? abs + '\\' : this.cachePath;
+		this.rootDisp = raw ? raw + '\\' : `%profile%\\${this.subPth}biography-cache\\`;
+		const caPth = $.tfEscape(this.rootPth); // 运行期前缀做一次 tf 转义（' ( ) [ ] , % $）
+		Object.keys(this.tails).forEach(k => {
+			this.defPth[k] = caPth + this.tails[k];
+			this.defPthDisp[k] = this.rootDisp + this.tails[k];
+		});
 	}
 
 	parse() {
-		const bioRevItems = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foWikiRev', 'foWikiBio'];
+		this.buildDefPth(); // 缓存根路径可能改过：7 项详细路径的默认值跟着重算
 		const items = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'foImgCov', 'fnImgCov'];
 		const tfIni = ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'];
 		const tfItems = ['albumArtist', 'artist', 'album', 'title', 'composition'];
@@ -346,25 +312,26 @@ class Settings {
 
 		tfItems.forEach(v => this.tf[v] = this.substituteTf(this.tf[v]));
 
-		// 内置默认路径落在"包数据"缓存目录下（原 %profile%\\yttm\\ 前缀换成 biography-cache）
-		const cachePth = d => d.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
-		const dispCachePth = d => d.replace('%profile%\\yttm\\', '%storage_folder%\\biography-cache\\');
 		this.dispPth = {};
-		items.forEach((v, i) => {
-			const def = this.defPth[v]; // 仅 7 项路径类设置存在内置默认；foImgCov/fnImgCov 无
-			const auto = this.autoCache && i <= 5 && !!def;
-			let base;
-			if (!def) base = this[v]; // 自动保存封面：没有内置默认，直接用设置值
-			else if (auto) {
-				base = cachePth(def);
-				this.remap[v] = base;
-			} else base = this[v] || cachePth(def); // 留空 -> 内置默认（与"默认"模式同一目录，切换模式不挪数据）
-			this.pth[v] = this.substituteTf(base);
+		items.forEach(v => {
+			const def = this.defPth[v]; // 7 项路径一律由根路径派生，不读设置值；foImgCov/fnImgCov 无内置默认
+			if (!def) {
+				this.pth[v] = this.substituteTf(this[v]); // 自动保存封面：仍按设置值
+				return;
+			}
+			this.pth[v] = this.substituteTf(def);
+			// remap 保留原始 tf 形式供流媒体等场景逐项替换，%BIO_* 按用途归一（对内置尾部本就是恒等替换）
+			this.remap[v] = v.endsWith('Rev')
+				? def.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%')
+				: def.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
 		});
-		// 设置页提示：7 项路径设置统一按"值为空 -> 默认缓存路径"给出（foImgRev 只用 remap，不在 items 里）
+		// 设置页提示：7 项路径一律显示由根路径派生的当前实际路径（foImgRev 只用 remap，不在 items 里）
 		Object.keys(this.defPth).forEach(v => {
-			this.dispPth[v] = this[v] ? this[v] : dispCachePth(this.defPth[v]);
+			this.dispPth[v] = this.defPthDisp[v];
 		});
+		// foImgRev 不在 items 里（它没有对应的设置项），但评论图片的下载与读取全走 remap：同样由根路径派生，
+		// 漏掉会得到空路径 -> 下载的图片按相对文件名落到脚本目录
+		this.remap.foImgRev = this.defPth.foImgRev.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
 
 		if (!this.classicalModeEnable) {
 			ppt.classicalMusicMode = false;
@@ -388,8 +355,8 @@ class Settings {
 			this.suffix.foLfmBio = this.suffix.foWikiBio = '';
 		}
 
-		this.albCovFolder = this.substituteTf(this.expandPath(this.foCycCov));
-		this.artCusImgFolder = this.substituteTf(this.expandPath(this.foCycPhoto));
+		// 封面的循环文件夹不再可自定义：固定为艺术家照片文件夹（菜单>来源>封面>从艺术家照片循环）
+		this.albCovFolder = this.substituteTf(this.expandPath(this.autoCache && this.cacheRoot ? this.rootDisp + this.tails.foImgArt : this.cycDefault));
 
 		this.exp = this.exp > 0 ? Math.max(this.exp, 30) : 0; // 0: 禁止自动更新；否则最小 30 天
 		this.getLangIndex();
@@ -405,31 +372,10 @@ class Settings {
 		this.fuzzyMatchComposition = $.clamp(this.fuzzyMatchComposition, 0, 100);
 		this.partialMatch = this.partialMatchEnabled + '-' + this.fuzzyMatchReview + '-' + this.fuzzyMatchTrack + '-' + this.fuzzyMatchComposition;
 		this.tagEnabled8 = $.clamp(this.tagEnabled8, 1, 6);
-		
-		if (this.autoCache) {
-			this.remap['foImgRev'] = cachePth(this.defPth['foImgRev']);
-		} else {
-			bioRevItems.forEach(v => {
-				this.remap[v] = this[v] || cachePth(this.defPth[v]); // 留空 -> 内置默认
-				if (v.endsWith('Rev')) this.remap[v] = this.remap[v].replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%'); // simplify later substitutions + convert case
-				else this.remap[v] = this.remap[v].replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%'); // simplify later substitutions + convert case
-			});
-		}
 
-		if (this.supCache) { // supplemental
-			let replace = this.supFind.split('|');
-			const arr1 = replace.map(v => v.trim() || 'yttm');
-			replace = this.supReplace.split('|');
-			const arr2 = replace.map(v => v.trim() || 'yttm\\bio_supplemental');
-			bioRevItems.forEach(v => {
-				this.sup[v] = this[v] || cachePth(this.defPth[v]); // 留空 -> 内置默认
-				if (arr1.length == arr2.length) arr1.forEach((w, j) => {
-					this.sup[v] = this.sup[v].replace(RegExp(w, 'gi'), arr2[j]);
-				});
-				if (v.endsWith('Rev')) this.sup[v] = this.sup[v].replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
-				else this.sup[v] = this.sup[v].replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
-			});
-		}
+		// 群星（合辑）判定表：va 支持多值，用分号或逗号分隔（默认 "Various Artists; 群星"）。
+		// 任一值命中即视为合辑标注：不进「更多标签」，Wiki 检索也统一换成 'Various Artists'。
+		this.vaList = ('' + (this.va || '')).split(/[;,，；、]/).map(v => v.trim().toLowerCase()).filter(v => v);
 
 		const fields = n => n.replace(/\$.*?\(/gi, '').replace(/(,(|\s+)\d+)/gi, '').replace(/[,()[\]%]/gi, '|').split('|');
 		this.albartFields = fields(this.tf.albumArtist).filter(v => v.trim());
@@ -443,12 +389,19 @@ class Settings {
 		}
 	}
 
+	// 群星（合辑）判定：值命中 va 的任一项（多值，见 parse 里的 vaList）即 true，忽略大小写与首尾空格。
+	// 供「更多标签」过滤与 Wiki 检索（命中时按 'Various Artists' 去查）共用。
+	isVA(n) {
+		if (!n) return false;
+		return (this.vaList || []).indexOf(('' + n).trim().toLowerCase()) != -1;
+	}
+
 	expandPath(pth) {
 		if (/%profile%\\/i.test(pth) && /%storage_folder%\\/i.test(pth)) pth = pth.replace(/%profile%\\/gi, '');
 		return pth.replace(/^%profile%\\?/i, $.tfEscape(fb.ProfilePath)).replace(/^%storage_folder%\\?/i, $.tfEscape(cfg.storageFolder));
 	}
 
-	preview(n, tfAll, excludeStream, sFind, sReplace, artistView, trackReview) {
+	preview(n, tfAll, excludeStream, artistView, trackReview) {
 		if (!tfAll) return txt.tf(n, artistView, trackReview); // heading
 		if (excludeStream) {
 			const handle = $.handle(panel.id.focus, true);
@@ -460,41 +413,29 @@ class Settings {
 		const tf = tfAll.split('~#~');
 		const tfNames = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%'];
 
-		if (sFind || sReplace) { // supplemental
-			let replace = sFind.split('|');
-			const arr1 = replace.map(v => v.trim() || 'yttm');
-			replace = sReplace.split('|');
-			const arr2 = replace.map(v => v.trim() || 'yttm\\bio_supplemental');
-			if (arr1.length == arr2.length) {
-				n = this.expandPath(this.dispPth.foLfmBio || this.foLfmBio);
-				arr1.forEach((v, i) => n = n.replace(RegExp(v, 'gi'), arr2[i]));
-			} else n = 'Invalid find and replace'
-			n = n.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
-		}
 		tfNames.forEach((v, i) => n = n.replace(RegExp(v, 'gi'), tf[i]));
 
 		const wildCard = /[*?]/.test(n);
 		return !wildCard ? panel.cleanPth(n, false) : panel.cleanPth(n.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), false).replace(/@!@/g, '*').replace(/!@!/g, '?');
 	}
 
-	move(n) {
-		const d = new Date;
-		const timestamp = [d.getFullYear(), $.padNumber((d.getMonth() + 1), 2), $.padNumber(d.getDate(), 2)].join('-') + '_' + [$.padNumber(d.getHours(), 2), $.padNumber(d.getMinutes(), 2), $.padNumber(d.getSeconds(), 2)].join('-');
+	resetCfg() { // 服务器设置被重置：直接删除 server.cfg，下次加载时按默认值重建（不做备份）
 		try {
-			const fn = `${this.storageFolder + this.cfgBaseName}_old_${timestamp}.cfg`;
-			if (!$.file(fn)) fso.MoveFile(this.bio, fn);
+			fso.DeleteFile(this.cfgFile);
 		} catch (e) {
-			if (n) fb.ShowPopupMessage(`无法重置服务器设置。\n\n${this.cfgBaseName}.cfg 正被另一个程序使用。`, '简介');
+			fb.ShowPopupMessage(`无法重置服务器设置。\n\nserver.cfg 正被另一个程序使用。`, '简介');
+			return;
 		}
-	}
-
-	resetCfg() {
-		cfg.move(true);
 		window.Reload();
 	}
 
 	setCacheMode() {
-		window.Reload();
+		// 缓存模式变化：updateCfg 已重算全部路径，不再整体 Reload（那会使设置对话框的回调失效，对话框被迫关闭）。
+		// 只强制刷新当前曲目的文本与图像，让新路径立即生效；其余在下一次曲目 / 刷新事件自然更新。
+		txt.rev.amFallback = true;
+		txt.rev.wikiFallback = true;
+		txt.on_playback_new_track(true);
+		img.on_playback_new_track(true);
 	}
 
 	setLanguage(i) {
@@ -516,8 +457,8 @@ class Settings {
 		txt.albumReset(true);
 		txt.albumFlush();
 		txt.artistFlush();
-		txt.rev.cur = '';
-		txt.bio.cur = '';
+		txt.rev.cur = -1;
+		txt.bio.cur = -1;
 		
 		txt.bio.loaded = {
 			lfm: false,
@@ -575,12 +516,11 @@ class Settings {
 				}
 				const caption = '写入文件标签：';
 				const prompt = handles.Count < 2000 ? `更新 ${handles.Count} 首音轨。\n\n继续？` : `更新 ${handles.Count} 首音轨。\n\n提示：此操作会分析大量数据。\n\n继续？`;
-				const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation) : true;
+				const wsh = popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation);
 				if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 				break;
 			}
 		}
-		if (i < 9) return;
 	}
 
 	updateCfg(new_cfg) {
@@ -594,13 +534,13 @@ class Settings {
 		}
 	}
 }
-const cfg = new Settings('biography');
+const cfg = new Settings();
 
 let settings = [
 	['Album Review [Lastfm] Auto-Download', false, 'boolean', 'dlLfmRev'],
 	['Biography [Lastfm] Auto-Download', true, 'boolean', 'dlLfmBio'],
 	['Album Review [Wikipedia] Auto-Download', false, 'boolean', 'dlWikiRev'],
-	['Biography [Wikipedia] Auto-Download', true, 'boolean', 'dlWikiBio'],
+	['Biography [Wikipedia] Auto-Download', false, 'boolean', 'dlWikiBio'],
 	['Image [Artist] Auto-Download', true, 'boolean', 'dlArtImg'],
 	['Image [Review] Auto-Download', true, 'boolean', 'dlRevImg'],
 	['Save List 0-Never 1-Auto', true, 'boolean', 'dlLfmSim'],
@@ -617,15 +557,8 @@ let settings = [
 	['Lastfm & Wikipedia Language Fallback To English', false, 'boolean', 'languageFallback'],
 	['Wikipedia English Genres', true, 'boolean', 'wikipediaEnGenres'],
 
-	['Album Review [Lastfm] Folder', '', 'text', 'foLfmRev'],
-	['Biography [Lastfm] Folder', '', 'text', 'foLfmBio'],
-	['Album Review [Wikipedia] Folder', '', 'text', 'foWikiRev'],
-	['Biography [Wikipedia] Folder', '', 'text', 'foWikiBio'],
-	['Image [Artist] Folder', '', 'text', 'foImgArt'],
-	['Image [Review] Folder', '', 'text', 'foImgRev'],
-
-	['Auto Cache', 1, 'num', 'autoCache'],
-	['Save Folder', '', 'text', 'foLfmSim'],
+	['Cache Root', '', 'text', 'cacheRoot'],
+	['Auto Cache', 0, 'num', 'autoCache'], // 0 = 默认（内置缓存目录），1 = 自定义
 
 	['Image [Artist] Initial Download Number (1-20)', 5, 'num', 'photoNum'],
 	['Image [Artist] Auto-Add New', true, 'boolean', 'photoAutoAdd'],
@@ -635,28 +568,23 @@ let settings = [
 	['Auto-Save Folder', '$directory_path(%path%)', 'text', 'foImgCov'],
 	['Auto-Save File Name', 'cover', 'text', 'fnImgCov'],
 
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
 	['Album Name Auto-Clean', false, 'boolean', 'albStrip'],
 	['Auto-Update Interval (days: min 30, 0 disables auto-update)', 0, 'num', 'exp'],
 
-	['Review Image Quality 0-Medium 1-High', false, 'boolean', 'imgRevHQ'],
+	['Review Image Quality 0-Medium 1-High', true, 'boolean', 'imgRevHQ'],
 	['Search: Include Partial Matches', true, 'boolean',  'partialMatchEnabled'],
 	['Search: Fuzzy Match Level Review', 80, 'num',  'fuzzyMatchReview'],
 	['Search: Fuzzy Match Level Track', 80, 'num',  'fuzzyMatchTrack'],
 	['Search: Fuzzy Match Level Composition', 66, 'num',  'fuzzyMatchComposition'],
 	['Similar Artists: Number to Display(0-10)', 6, 'num', 'menuSimilarNum'],
-	['Various Artists', 'Various Artists', 'text', 'va'],
-
-	['Site Display Name Last.fm', 'Last.fm', 'text', 'lfmDisplayName'],
-	['Site Display Name Wikipedia', 'Wikipedia', 'text', 'wikiDisplayName'],
+	['Various Artists', 'Various Artists; 群星', 'text', 'va'],
 
 	['Write Tag: Album Genre Last.fm', true, 'boolean', 'tagEnabled0'],
 	['Write Tag: Album Statistics Last.fm', false, 'boolean', 'tagEnabled1'],
 	['Write Tag: Artist Genre Last.fm', true, 'boolean', 'tagEnabled2'],
 	['Write Tag: Artist Statistics Last.fm', false, 'boolean', 'tagEnabled3'],
 	['Write Tag: Locale Last.fm', true, 'boolean', 'tagEnabled4'],
-	['Write Tag: Similar Artists Last.fm', true, 'boolean', 'tagEnabled5'],
+	['Write Tag: Similar Artists Last.fm', false, 'boolean', 'tagEnabled5'],
 	['Write Tag: Album Genre Wikipedia', true, 'boolean', 'tagEnabled6'],
 	['Write Tag: Artist Genre Wikipedia', true, 'boolean', 'tagEnabled7'],
 	['Write Tag: Similar Artists Last.fm: Number to Write (0-100)', 5, 'num', 'tagEnabled8'],
@@ -679,13 +607,6 @@ let settings = [
 	['Image [Cover] Check Custom Paths', false, 'boolean', 'cusCov'],
 	['Image [Cover] Custom Path [Full Path Minus Extension]', '', 'text', 'cusCov0'],
 
-	['Use Supplemental Cache', false, 'boolean', 'supCache'],
-	['Supplemental Cache [Use Find>Replace on SAVE paths]', 'yttm>yttm\\bio_supplemental', 'text', 'supFo'],
-	['Supplemental Cache Find', 'yttm', 'text', 'supFind'],
-	['Supplemental Cache Replace', 'yttm\\bio_supplemental', 'text', 'supReplace'],
-
-	['Configuration Width', 67, 'num', 'configWidth'],
-	['Configuration Height', 85, 'num', 'configHeight'],
 	['Show console messages', true, 'boolean', 'showConsoleMessages']
 ];
 

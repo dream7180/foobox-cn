@@ -4,7 +4,7 @@ const MF_GRAYED = 0x00000001;
 const MF_STRING = 0x00000000;
 
 function confirmPlaylistAction(prompt, caption, continue_confirmation) { // shared confirm dialog used by missingArt/missingBio/missingRev
-	const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation) : true;
+	const wsh = popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation);
 	if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 }
 
@@ -238,7 +238,7 @@ class MenuItems {
 	mainMenu() {
 		menu.newMenu({});
 		menu.newItem({
-			str: `${$.titlecase(cfg.cfgBaseName)} server`,
+			str: '服务器设置',
 			flags: MF_GRAYED,
 			separator: true,
 			hide: !this.shift || !vk.k('ctrl')
@@ -332,13 +332,16 @@ class MenuItems {
 			appendTo: lg['Sources']
 		});
 
-		[lg['Cycle from download folder'], lg['Cycle from custom folder [fallback to above]'], lg['Artist (single image [fb2k: display])']].forEach((v, i) => menu.newItem({
-			menuName: lg['Photo'],
-			str: v,
-			func: () => this.setPhotoType(i),
-			checkRadio: ppt.cycPhotoLocation == i,
-			separator: i == 1
-		}));
+		[lg['Cycle from download folder'], lg['Artist (single image [fb2k: display])']].forEach((v, i) => {
+			const loc = i == 0 ? 0 : 2; // 沿用原值：0 = 下载文件夹循环，2 = fb2k 单张图
+			menu.newItem({
+				menuName: lg['Photo'],
+				str: v,
+				func: () => this.setPhotoType(loc),
+				checkRadio: ppt.cycPhotoLocation == loc,
+				separator: i == 0
+			});
+		});
 
 		menu.newMenu({		
 			menuName: lg['Cover'],
@@ -431,17 +434,22 @@ class MenuItems {
 			appendTo: lg['Layout']
 		});
 
-		[lg['Top'], lg['Right'], lg['Bottom'], lg['Left'], lg['Overlay image area'], lg['Reset to default size...']].forEach((v, i) => menu.newItem({
+		[lg['Top'], lg['Right'], lg['Bottom'], lg['Left'], lg['Overlay image area'], lg['Autofit'], lg['Reset to default size...']].forEach((v, i) => menu.newItem({
 			menuName: lg['Filmstrip'],
 			str: v,
 			func: () => {
 				if (i == 4) ppt.toggle('filmStripOverlay');
-				if (i != 4 || ppt.showFilmStrip) filmStrip.set(i == 4 ? ppt.filmStripPos : i);
+				else if (i == 5) { // fit mode changes the block layout, so the strip has to be rebuilt
+					ppt.toggle('filmStripAutofit');
+					if (ppt.showFilmStrip) filmStrip.set(ppt.filmStripPos);
+					return;
+				}
+				if (i != 4 || ppt.showFilmStrip) filmStrip.set(i == 4 ? ppt.filmStripPos : i == 6 ? 5 : i);
 			},
 			flags: i != 4 || ppt.style != 4 ? MF_STRING : MF_GRAYED,
-			checkItem: i == 4 && (ppt.filmStripOverlay || (ppt.style == 4 && !ppt.text_only && !ppt.img_only)),
+			checkItem: i == 4 ? (ppt.filmStripOverlay || (ppt.style == 4 && !ppt.text_only && !ppt.img_only)) : i == 5 ? ppt.filmStripAutofit : false,
 			checkRadio: i < 4 && i == ppt.filmStripPos,
-			separator: i == 3 || i == 4
+			separator: i == 3 || i == 4 || i == 6
 		}));
 
 		menu.addSeparator({menuName: lg['Layout']});
@@ -557,7 +565,7 @@ class MenuItems {
 		}
 
 		for (let i = 0; i < 2; i++) menu.newItem({
-			str: [popUpBox.ok ? lg['Options...'] : lg['Options: see console'], lg['Configure...']][i],
+			str: [lg['Options...'], lg['Configure...']][i],
 			func: () => !i ? cfg.open('PanelCfg') : window.EditScript(),
 			separator: !i && this.shift,
 			hide: i && !this.shift
@@ -636,7 +644,7 @@ class MenuItems {
 
 	getlookUpStr(i, j, artist) {
 		return [
-			[lg['Manual cycle: wheel over button'], lg['Auto cycle items'], popUpBox.ok ? lg['Options...'] : lg['Options: see console'], lg['Reload']][i],
+			[lg['Manual cycle: wheel over button'], lg['Auto cycle items'], lg['Options...'], lg['Reload']][i],
 			[lg['Show similar artists'], lg['Show more tags (circle button if present)'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...']][i],
 			[lg['Show top albums'], lg['Auto lock'], lg['Last.fm: '] + artist + lg['...'], lg['Last.fm: '] + artist + lg[': similar artists...'], lg['Last.fm: '] + artist + lg[': top albums...']][i]
 		][j];
@@ -749,6 +757,7 @@ class MenuItems {
 			}
 		}
 		if (i < 2) {
+			filmStrip.logScrollPos();
 			img.get = false;
 			txt.get = 0;
 			if (ppt.sourcerev == 2) {
@@ -1167,12 +1176,8 @@ class MenuItems {
 	}
 
 	setPhotoType(i) {
-		ppt.cycPhoto = i < 2;
+		ppt.cycPhoto = i == 0; // 0 走下载文件夹循环；2 = fb2k 单张图。来源文件夹无图时 loadArtImage 始终回退到 fb2k
 		ppt.cycPhotoLocation = i;
-		if (i == 1 && !ppt.get('SYSTEM.Photo Folder Checked', false)) {
-			fb.ShowPopupMessage('在选项中输入文件夹：服务器设置（所有面板）>照片>自定义加载文件夹。', '简介：用于照片循环的自定义文件夹');
-			ppt.set('SYSTEM.Photo Folder Checked', true);
-		}
 		img.updImages();
 	}
 

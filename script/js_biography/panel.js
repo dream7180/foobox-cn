@@ -10,6 +10,7 @@ class Panel {
 		this.h = 0;
 		this.lock = 0;
 		this.lockHandle = null;
+		this.sized = false;
 
 		this.m = {
 			x: -1,
@@ -107,8 +108,6 @@ class Panel {
 				break;
 			}
 		}
-
-		this.id.lookUp = ppt.lookUp;
 
 		this.im = {
 			t: 0,
@@ -232,12 +231,12 @@ class Panel {
 	// Methods
 
 	albumsSame() {
-		if (this.id.lookUp && this.alb.ix && this.alb.list.length && JSON.stringify(this.alb.init) === JSON.stringify(this.alb.list)) return true;
+		if (this.alb.ix && this.alb.list.length && JSON.stringify(this.alb.init) === JSON.stringify(this.alb.list)) return true;
 		return false;
 	}
 
 	artistsSame() {
-		if (this.id.lookUp && this.art.ix && this.art.list.length && JSON.stringify(this.art.init) === JSON.stringify(this.art.list)) return true;
+		if (this.art.ix && this.art.list.length && JSON.stringify(this.art.init) === JSON.stringify(this.art.list)) return true;
 		return false;
 	}
 
@@ -277,23 +276,10 @@ class Panel {
 		else this.callServer(false, this.id.focus, '', 1);
 	}
 	
-	checkRefreshRates() {
-		[
-			{key: 'focusLoadRate', descr: 'Panel Focus Load Refresh Rate', min: 200, max: 3000, oldDef: 250, newDef: 250},
-			{key: 'focusServerRate', descr: 'Panel Focus Server Refresh Rate', min: 1500, max: 15000, oldDef: 5000, newDef: 5000},
-			{key: 'lookUpServerRate', descr: 'Panel Lookup Refresh Rate', min: 1500, max: 15000, oldDef: 1500, newDef: 1500}
-		].forEach((rate) => {
-			const name = `${rate.descr} ${rate.min}-${rate.max} msec (Max)`;
-			const value = ppt.get(name, null);
-			if (value === null) {throw ('property_name: ' + name + '\nPanel\'s rate property name does not match range checked');}
-			else {
-				if (ppt[rate.key] === rate.oldDef && ppt[rate.key] !== rate.newDef) {ppt[rate.key] = rate.newDef;}
-				ppt[rate.key] = $.clamp(ppt[rate.key], rate.min, rate.max);
-				if (ppt[rate.key] !== Number(value)) {
-					ppt.set(name, ppt[rate.key]);
-				}
-			}
-		});
+	checkRefreshRates() { // 三个刷新率钳制在允许范围内；读写由 ppt 按属性归属自动落盘，无需按名回读
+		ppt.focusLoadRate = $.clamp(ppt.focusLoadRate, 200, 3000);
+		ppt.focusServerRate = $.clamp(ppt.focusServerRate, 1500, 15000);
+		ppt.lookUpServerRate = $.clamp(ppt.lookUpServerRate, 1500, 15000);
 
 		this.focusLoad = $.debounce(() => {
 			if (!ppt.img_only) txt.on_playback_new_track();
@@ -325,11 +311,11 @@ class Panel {
 		if (Date.now() - this.id.loadTimestamp > 1500) { // delay needed for correct sizing on init; ignored by click (sets loadTimestamp = 0); 
 			switch (item) {
 				case 'stndArtist':
-					!this.id.lookUp ? txt.getText(true) : txt.getItem(true, this.art.ix, this.alb.ix);
+					txt.getItem(true, this.art.ix, this.alb.ix);
 					img.getImages();
 					break;
 				case 'stndAlbum':
-					this.style.inclTrackRev != 1 || !this.id.lookUp ? txt.getText(true) : txt.getItem(true, this.art.ix, this.alb.ix);
+					this.style.inclTrackRev != 1 ? txt.getText(true) : txt.getItem(true, this.art.ix, this.alb.ix);
 					img.getImages();
 					break;
 				case 'lookUp':
@@ -406,11 +392,11 @@ class Panel {
 		const item = this.getItem();
 		switch (item) {
 			case 'stndArtist':
-				!this.id.lookUp ? txt.getText(this.calc) : txt.getItem(this.calc, this.art.ix, this.alb.ix);
+				txt.getItem(this.calc, this.art.ix, this.alb.ix);
 				img.getImages();
 				break;
 			case 'stndAlbum':
-				this.style.inclTrackRev != 1 || !this.id.lookUp ? txt.getText(this.calc) : txt.getItem(this.calc, this.art.ix, this.alb.ix);
+				this.style.inclTrackRev != 1 ? txt.getText(this.calc) : txt.getItem(this.calc, this.art.ix, this.alb.ix);
 				img.getImages();
 				break;
 			case 'lookUp':
@@ -436,7 +422,7 @@ class Panel {
 		}
 		const caption = '创建新的布局';
 		const prompt = '这将复制当前布局样式并将其保存到输入的名称\n\n副本采用自由式格式，可提供完全灵活的图像和文本框拖动样式定位 + 叠加效果\n\n是否继续？';
-		const fallback = popUpBox.isHtmlDialogSupported() ? popUpBox.input(caption, prompt, ok_callback, '', '我的样式') : true;
+		const fallback = popUpBox.input(caption, prompt, ok_callback, '', '我的样式');
 		if (fallback) {
 			try {
 				ns = utils.InputBox(0, prompt, caption, '我的样式', true);
@@ -575,14 +561,14 @@ class Panel {
 		}
 		const caption = '删除当前样式';
 		const prompt = '删除：' + this.style.name[n] + '\n\n样式将设置为 “上”';
-		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation) : true;
+		const wsh = popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation);
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
 	exportStyle(n) {
 		const caption = '导出当前样式至其它简介面板';
 		const prompt = '导出：' + this.style.name[n];
-		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, '确定', '取消', '', '', null) : false;
+		const wsh = popUpBox.confirm(caption, prompt, '确定', '取消', '', '', null);
 		if (wsh) { /* no-op in single panel mode */ }
 	}
 
@@ -593,7 +579,6 @@ class Panel {
 	}
 
 	getList(p_clear, isAlbum) {
-		if (!this.id.lookUp) return;
 		const artist = name.artist(this.id.focus, true) || lg['Artist Unknown'];
 		const albumArtist = (!panel.isRadio(this.id.focus) ? name.albumArtist(this.id.focus, true) : artist) || lg['Artist Unknown'];
 		const composition = isAlbum ? false : ppt.classicalMusicMode && (txt.rev.loaded.wiki && !txt.rev.wikiFallback);
@@ -689,7 +674,7 @@ class Panel {
 				for (let h = 0; h < $.eval('$meta_num(' + nm + ')', this.id.focus); h++) {
 					mn = '$trim($meta(' + nm + ',' + h + '))';
 					const name = $.eval(mn, this.id.focus);
-					if (this.art.list.every(v => v.name !== name) && name.toLowerCase() != cfg.va.toLowerCase()) mult_arr.push({
+					if (this.art.list.every(v => v.name !== name) && !cfg.isVA(name)) mult_arr.push({
 						name: name,
 						field: ' ~ ' + $.titlecase(nm),
 						type: 'tag'
@@ -782,15 +767,13 @@ class Panel {
 		if (!this.albumsSame() && p_clear) this.alb.ix = 0;
 	}
 
-	getPth(sw, focus, artist, album, stnd, supCache, cleanArtist, cleanAlbumArtist, cleanAlbum, folder, basic, server) {
+	getPth(sw, focus, artist, album, stnd, cleanArtist, cleanAlbumArtist, cleanAlbum, folder, basic, server) {
 		let fo, pth;
 		switch (sw) {
 			case 'bio':
 				if (panel.isRadio(ppt.focus)) stnd = false; else if(stnd === '') stnd = this.stnd(this.art.ix, this.art.list);
 				if (server) fo = stnd ? this.cleanPth(cfg.pth[folder], focus, 'server') : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
 				else fo = stnd && !this.lock ? this.cleanPth(cfg.pth[folder], focus) : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, '', 1);
-				pth = fo + cleanArtist + cfg.suffix[folder] + '.txt';
-				if (!stnd && supCache && !$.file(pth)) fo = this.cleanPth(cfg.sup[folder], focus, 'remap', artist, '', 1);
 				pth = fo + cleanArtist + cfg.suffix[folder] + '.txt';
 				if (basic) return {
 					fo: fo,
@@ -802,8 +785,6 @@ class Panel {
 				if (!stnd) cleanAlbumArtist = cleanArtist;
 				if (server) fo = stnd ? this.cleanPth(cfg.pth[folder], focus, 'server') : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, album, 0);
 				else fo = stnd && !this.lock ? this.cleanPth(cfg.pth[folder], focus) : this.cleanPth(cfg.remap[folder], focus, 'remap', artist, album, 0);
-				pth = fo + cleanAlbumArtist + ' - ' + cleanAlbum + cfg.suffix[folder] + '.txt';
-				if (!stnd && supCache && !$.file(pth)) fo = this.cleanPth(cfg.sup[folder], focus, 'remap', artist, album, 0);
 				pth = fo + cleanAlbumArtist + ' - ' + cleanAlbum + cfg.suffix[folder] + '.txt';
 				if (pth.length > 259) {
 					cleanAlbum = $.abbreviate(cleanAlbum);
@@ -837,18 +818,11 @@ class Panel {
 					fn = $.clean(artist + ' - ' + album);
 					pth = fo + fn;
 				}
-				if (supCache === undefined) return {
+				return {
 					fo: fo,
 					fn: fn,
 					pth: pth
 				};
-				const pe = [fo];
-				if (supCache) pe.push(this.cleanPth(cfg.sup.foImgRev, focus, 'remap', artist, album, 0));
-				// fn long file path done above
-				return {
-					pe: pe,
-					fe: fn
-				}
 			}
 		}
 	}
@@ -930,7 +904,7 @@ class Panel {
 
 	mbtn_up(x, y, menuLock, bypass) {
 		if ((x < 0 || y < 0 || x > this.w || y > this.h) && !bypass) return;
-		if (this.id.lookUp && (but.btns['lookUp'].trace(x, y) || menuLock || bypass)) {
+		if (but.btns['lookUp'].trace(x, y) || menuLock || bypass) {
 			if (this.id.lyricsSource || this.id.nowplayingSource) {
 				this.lock = 0;
 				return;
@@ -1093,7 +1067,7 @@ class Panel {
 		}
 		const caption = '重命名当前样式';
 		const prompt = '重命名样式：' + this.style.name[n] + '\n\n输入新名称\n\n继续？';
-		const fallback = popUpBox.isHtmlDialogSupported() ? popUpBox.input(caption, prompt, ok_callback, '', this.style.name[n]) : true;
+		const fallback = popUpBox.input(caption, prompt, ok_callback, '', this.style.name[n]);
 		if (fallback) {
 			let ns = '';
 			let status = 'ok'
@@ -1128,7 +1102,7 @@ class Panel {
 		}
 		const caption = '重置当前样式';
 		const prompt = '重置为默认值' + (ppt.style < 5 ? this.style.name[n] : '叠加') + '样式。\n\n继续？'
-		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation) : true;
+		const wsh = popUpBox.confirm(caption, prompt, '确定', '取消', '', '', continue_confirmation);
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
@@ -1473,8 +1447,7 @@ class Panel {
 			case ppt.artistView:
 				this.id.curArtist = this.id.artist;
 				this.id.artist = $.eval(this.art.fields, this.id.focus);
-				if (!this.id.lookUp) return true;
-				else return this.id.artist != this.id.curArtist || !this.art.list.length || !this.art.ix;
+				return this.id.artist != this.id.curArtist || !this.art.list.length || !this.art.ix;
 			case !ppt.artistView:
 				this.id.curAlb = this.id.alb;
 				this.id.alb = name.albID(this.id.focus, 'simple');
@@ -1482,8 +1455,7 @@ class Panel {
 					this.id.curTr = this.id.tr;
 					this.id.tr = name.trackID(this.id.focus);
 				} else this.id.curTr = this.id.tr = '';
-				if (!this.id.lookUp) return true;
-				else return this.id.alb != this.id.curAlb || this.id.tr != this.id.curTr || !this.alb.list.length || !this.alb.ix;
+				return this.id.alb != this.id.curAlb || this.id.tr != this.id.curTr || !this.alb.list.length || !this.alb.ix;
 		}
 	}
 

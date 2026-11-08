@@ -1,6 +1,6 @@
 ﻿//Jensen (jensen-yg@163.com)
 //foobox https://github.com/dream7180
-window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'});
+window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake'});
 include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
 include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
